@@ -20,9 +20,9 @@ class DbUtils
         global $db_username;
         global $db_passwd;
 
-        if(self::$connection !== null)
+        if(self::$connection === null)
         {
-            return self::$connection = new mysqli("localhost", $db_username, $db_passwd);
+            return self::$connection = new mysqli("localhost", $db_username, $db_passwd, "smart_home");
         }
         else
         {
