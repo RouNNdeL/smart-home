@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-</head>
+<?php
+$title = "Login";
+require_once __DIR__."/includes/html_head.php";
+?>
 <body>
 <?php
 
