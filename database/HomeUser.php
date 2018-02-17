@@ -37,12 +37,7 @@ class HomeUser
 
     private static function generateRandomSecret()
     {
-        $val = '';
-        for($i = 0; $i < 256; $i++)
-        {
-            $val .= chr(rand(65, 90));
-        }
-        return $val;
+        return base64_encode(random_bytes(128));
     }
 
     /**
