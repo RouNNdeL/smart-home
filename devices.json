@@ -76,6 +76,8 @@
             "CPU Fan Lightning",
             "fan 1",
             "first fan",
+            "first fan leds",
+            "cpu fan leds",
             "cpu fan",
             "processor fan",
             "main fan"
