@@ -36,7 +36,7 @@ if(isset($_GET["oauth-username"]) && isset($_GET["oauth-token"]))
     if($g->checkCode($user->secret, $_GET["oauth-token"]))
     {
         require_once __DIR__."/../database/OAuthUtils.php";
-        $code = OAuthUtils::insertAuthCode(DbUtils::getConnection(), $client->id, $user->id);
+        $code = OAuthUtils::insertAuthCode(DbUtils::getConnection(), $client->id, $user->id, $_GET["scope"]);
         $state = $_GET["state"];
         header("Location: ".$_GET["redirect_uri"]."?code=$code&state=$state");
         exit(0);
