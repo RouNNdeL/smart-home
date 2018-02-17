@@ -49,9 +49,11 @@ class HomeUser
      * @param $conn mysqli
      * @param $username
      * @param $secret
+     * @return bool
      */
     private static function insertUser($conn, $username, $secret)
     {
+        self::cleanUsers($conn);
         $stmt = $conn->prepare("INSERT INTO home_users (username, secret) VALUES (?, ?)");
         $stmt->bind_param("ss", $username, $secret);
         $result = $stmt->execute();
@@ -103,6 +105,17 @@ class HomeUser
     public static function enableUserById($conn, $id)
     {
         $sql = "UPDATE home_users SET enabled = 1 WHERE id = $id";
+        return $conn->query($sql);
+    }
+
+
+    /**
+     * @param $conn mysqli
+     * @return bool|mysqli_result
+     */
+    public static function cleanUsers($conn)
+    {
+        $sql = "DELETE FROM home_users WHERE enabled = 0";
         return $conn->query($sql);
     }
 }

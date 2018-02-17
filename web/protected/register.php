@@ -15,15 +15,15 @@ require_once __DIR__ . "/../includes/html_head.php";
                     <input type="text" class="form-control" id="register-username" placeholder="Username">
                 </div>
             </div>
-            <div data-step="2"  class="hidden-xs-up register-step">
+            <div data-step="2" class="hidden-xs-up register-step">
                 <p class="text-center">Scan this QR code with your 2FA app</p>
-                <img id="register-qr" src="">
+                <div class="text-center"><img id="register-qr" src=""></div>
                 <div class="form-group">
                     <label for="code">6 digit code</label>
                     <input type="text" class="form-control" id="register-code" placeholder="******">
                 </div>
             </div>
-            <div data-step="3"  class="hidden-xs-up register-step">
+            <div data-step="3" class="hidden-xs-up register-step">
                 <h4>Registered successfully!</h4>
             </div>
             <div class="text-right">
