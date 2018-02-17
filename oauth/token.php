@@ -44,6 +44,7 @@ if($params["grant_type"] === "authorization_code" && isset($params["code"]))
         $tokens["expires"] = 30 * 24 * 60 * 60;
 
         echo json_encode($tokens);
+        OAuthUtils::removeExpired(DbUtils::getConnection());
     }
     else
     {
