@@ -32,18 +32,35 @@ if(isset($_GET["oauth-username"]) && isset($_GET["oauth-token"]))
     require_once __DIR__."/../vendor/autoload.php";
 
     $user = HomeUser::queryUserByUsername(DbUtils::getConnection(), $_GET["oauth-username"]);
-    $g = new Google\Authenticator\GoogleAuthenticator();
-    if($g->checkCode($user->secret, $_GET["oauth-token"]))
+    if($user !== null)
     {
-        require_once __DIR__."/../database/OAuthUtils.php";
-        $code = urlencode(OAuthUtils::insertAuthCode(DbUtils::getConnection(), $client->id, $user->id, $_GET["scope"]));
-        $state = $_GET["state"];
-        header("Location: ".$_GET["redirect_uri"]."?code=$code&state=$state");
-        exit(0);
+        if(DbUtils::countFailedLoginAttempts(DbUtils::getConnection(), $user->id, 60) > 5)
+        {
+            $user_error = "To many failed login attempts, please wait before proceeding";
+            DbUtils::insertLoginAttempt(DbUtils::getConnection(), $user->id, false);
+        }
+        else
+        {
+            $g = new Google\Authenticator\GoogleAuthenticator();
+            $checkCode = $g->checkCode($user->secret, $_GET["oauth-token"]);
+            if($checkCode)
+            {
+                require_once __DIR__ . "/../database/OAuthUtils.php";
+                $code = urlencode(OAuthUtils::insertAuthCode(DbUtils::getConnection(), $client->id, $user->id, $_GET["scope"]));
+                $state = $_GET["state"];
+                header("Location: " . $_GET["redirect_uri"] . "?code=$code&state=$state");
+                exit(0);
+            }
+            else
+            {
+                $user_error = "Invalid username or token";
+            }
+            DbUtils::insertLoginAttempt(DbUtils::getConnection(), $user->id, $checkCode);
+        }
     }
     else
     {
-        $user_error = "Invalid token";
+        $user_error = "Invalid username or token";
     }
 }
 ?>
