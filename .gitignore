@@ -1,3 +1,4 @@
 secure_config.php
-.idea
+.idea/
 composer.lock
+vendor/
