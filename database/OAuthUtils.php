@@ -76,4 +76,21 @@ class OAuthUtils
         $sql = "DELETE FROM oauth WHERE expires < NOW()";
         return $conn->query($sql);
     }
+
+    /**
+     * @param $conn mysqli
+     * @param $token
+     * @return int
+     */
+    public static function getUserForToken($conn, $token)
+    {
+        $sql = "SELECT user_id FROM oauth WHERE token=? AND type='access_token'";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $token);
+        $stmt->execute();
+        $stmt->bind_result($user_id);
+        if($stmt->fetch())
+            return $user_id;
+        return null;
+    }
 }
