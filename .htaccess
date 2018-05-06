@@ -2,10 +2,19 @@ RewriteEngine on
 
 Require all granted
 
+RewriteCond %{SERVER_NAME} !home.zdul.xyz
+RewriteRule ^ https://home.zdul.xyz%{REQUEST_URI} [END,R=permanent]
+
+RewriteRule ^/?smart(.*) $1 [R,L]
+
+RewriteRule ^$ /login [L]
+
 # This checks whether the file exsits,
 # if not the request will be redirected to the web/html folder
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-RewriteRule ^([^/]*)$ web/$1.php
+RewriteRule ^([^/]*)$ web/$1.php [S=2]
+RewriteRule ^(?!web)(.*) https://zdul.xyz/$1 [R]
+
