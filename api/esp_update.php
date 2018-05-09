@@ -17,7 +17,7 @@ $version = (int)apache_request_headers()["x-ESP8266-version"];
 $md5 = apache_request_headers()["x-ESP8266-sketch-md5"];
 $newest_file = null;
 $newest_version = -1;
-$dir = __DIR__ . "/../iot_binaries/" . $device_id . "/";
+$dir = __DIR__ . "/../iot_binaries/device_" . $device_id . "/";
 foreach(scandir($dir) as $item)
 {
     preg_match("/bin_(\d+)\.bin/", $item, $matches);
