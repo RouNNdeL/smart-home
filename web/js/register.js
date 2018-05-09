@@ -23,7 +23,7 @@ $(function()
             case 1:
             {
                 $.ajax({
-                    url: "/smart/api/register_gen_qr.php",
+                    url: "/api/register_gen_qr.php",
                     method: "POST",
                     data: JSON.stringify({username: $("#register-username").val()}),
                     dataType: "json"
@@ -49,7 +49,7 @@ $(function()
             case 2:
             {
                 $.ajax({
-                    url: "/smart/api/register_check_code.php",
+                    url: "/api/register_check_code.php",
                     method: "POST",
                     data: JSON.stringify({user_id: user_id, code: $("#register-code").val()}),
                     dataType: "json"
