@@ -6,7 +6,7 @@
  * Date: 10/08/2017
  * Time: 15:48
  */
-class DigitalDevice extends Device
+class DigitalRgbDevice extends RgbDevice
 {
     const EFFECT_OFF = 100;
     const EFFECT_STATIC = 101;
@@ -35,7 +35,7 @@ class DigitalDevice extends Device
     const DIRECTION_CCW = 0;
 
     /**
-     * DigitalDevice constructor.
+     * DigitalRgbDevice constructor.
      * @param array $colors
      * @param int $effect
      * @param float|int $off
@@ -524,7 +524,7 @@ class DigitalDevice extends Device
 
     /**
      * @param int $effect
-     * @return DigitalDevice
+     * @return DigitalRgbDevice
      */
     public static function defaultFromEffect(int $effect)
     {

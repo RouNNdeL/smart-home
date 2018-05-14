@@ -169,19 +169,19 @@ TAG;
                 </div>
                 <div class="card-body">
                     <div id="device-pc" class="device-settings-container">
-                        <?php echo $profile->analog_devices[0]->toHTML("pc"); ?>
+                        <?php echo $profile->analog_devices[0]->toHTML(["device" => "pc"]); ?>
                     </div>
                     <div id="device-gpu" class="device-settings-container hidden-xs-up">
-                        <?php echo $profile->analog_devices[1]->toHTML("gpu"); ?>
+                        <?php echo $profile->analog_devices[1]->toHTML(["device" => "gpu"]); ?>
                     </div>
                     <div id="device-strip" class="device-settings-container hidden-xs-up">
-                        <?php echo $profile->digital_devices[3]->toHTML("strip"); ?>
+                        <?php echo $profile->digital_devices[3]->toHTML(["device" => "strip"]); ?>
                     </div>
                     <?php
                     for($i = 0; $i < $data->getFanCount(); $i++)
                     {
                         $id = $i + 1;
-                        $html = $profile->digital_devices[$i]->toHTML("fan-$id");
+                        $html = $profile->digital_devices[$i]->toHTML(["device" => "fan-$id"]);
                         echo <<< HTML
                     <div id="device-fan-$id" class="device-settings-container hidden-xs-up">
                         $html

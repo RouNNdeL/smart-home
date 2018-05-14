@@ -6,7 +6,7 @@
  * Date: 10/08/2017
  * Time: 15:47
  */
-class AnalogDevice extends Device
+class AnalogRgbDevice extends RgbDevice
 {
     const EFFECT_OFF = 100;
     const EFFECT_STATIC = 101;
@@ -21,7 +21,7 @@ class AnalogDevice extends Device
     const AVR_RAINBOW = 0x03;
 
     /**
-     * AnalogDevice constructor.
+     * AnalogRgbDevice constructor.
      * @param array $colors
      * @param int $effect
      * @param float|int $off
@@ -205,7 +205,7 @@ class AnalogDevice extends Device
 
     /**
      * @param int $effect
-     * @return AnalogDevice
+     * @return AnalogRgbDevice
      */
     public static function defaultFromEffect(int $effect)
     {

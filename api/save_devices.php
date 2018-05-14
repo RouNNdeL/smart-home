@@ -21,12 +21,12 @@ if($json == false || !isset($json["devices"]) || !isset($json["profile_n"]) || !
     exit(0);
 }
 
-require_once(__DIR__ . "/../web/includes/Utils.php");
-require_once(__DIR__ . "/../web/includes/Profile.php");
-require_once(__DIR__ . "/../web/includes/Data.php");
-require_once(__DIR__ . "/../web/includes/Device.php");
-require_once(__DIR__ . "/../web/includes/DigitalDevice.php");
-require_once(__DIR__ . "/../web/includes/AnalogDevice.php");
+require_once(__DIR__ . "/../includes/Utils.php");
+require_once(__DIR__ . "/../includes/Profile.php");
+require_once(__DIR__ . "/../includes/Data.php");
+require_once(__DIR__ . "/../includes/RgbDevice.php");
+require_once(__DIR__ . "/../includes/DigitalRgbDevice.php");
+require_once(__DIR__ . "/../includes/AnalogRgbDevice.php");
 require_once(__DIR__ . "/../network/tcp.php");
 
 $data = Data::getInstance();
@@ -50,7 +50,7 @@ else
     {
         if($item["device"]["type"] === "a")
         {
-            $device = AnalogDevice::fromJson($item);
+            $device = AnalogRgbDevice::fromJson($item);
             /** @noinspection PhpNonStrictObjectEqualityInspection */
             $change = $profile->analog_devices[$item["device"]["num"]] != $device;
             if($change)
@@ -61,7 +61,7 @@ else
         }
         else
         {
-            $device = DigitalDevice::fromJson($item);
+            $device = DigitalRgbDevice::fromJson($item);
             /** @noinspection PhpNonStrictObjectEqualityInspection */
             $change = $profile->digital_devices[$item["device"]["num"]] != $device;
             if($change)

@@ -6,7 +6,9 @@
  * Date: 07/08/2017
  * Time: 18:42
  */
-abstract class Device
+require (__DIR__."/VirtualDevice.php");
+
+abstract class RgbDevice extends VirtualDevice
 {
     const TIMING_STRINGS = ["off", "fadein", "on", "fadeout", "rotation", "offset", "fade"];
 
@@ -57,7 +59,7 @@ abstract class Device
     private $colors;
 
     /**
-     * Device constructor. <b>Note:</b> Timings are interpreted as raw values input by user,
+     * RgbDevice constructor. <b>Note:</b> Timings are interpreted as raw values input by user,
      * unless <code>$t_converted</code> is explicitly set to <code>true</code>
      * @param array $colors
      * @param int $effect
@@ -70,9 +72,10 @@ abstract class Device
      * @param array $args
      * @param bool $t_converted
      */
-    protected function __construct(array $colors, int $effect, float $off, float $fadein, float $on, float $fadeout,
+    public function __construct(array $colors, int $effect, float $off, float $fadein, float $on, float $fadeout,
                                    float $rotate, float $offset, array $args = array(), bool $t_converted = false)
     {
+        parent::__construct(parent::DEVICE_TYPE_RGB);
         $this->colors = $colors;
         $this->effect = $effect;
         $t_converted ? $this->setTimings($off, $fadein, $on, $fadeout, $rotate, $offset) :
@@ -125,10 +128,12 @@ abstract class Device
     }
 
     /**
+     * @param $args
      * @return string
      */
-    public function toHTML($device)
+    public function toHTML($args)
     {
+        $device = $args["device_n"];
         $html = "<form id=\"device-form-$device\">";
         $profile_colors = Utils::getString("profile_colors");
         $profile_effect = Utils::getString("profile_effect");
@@ -209,8 +214,8 @@ abstract class Device
                         $selected1 = $argument ? "" : " selected";
                         $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
                                             <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . DigitalDevice::DIRECTION_CW . "\"$selected0>$str_cw</option>
-                                                <option value=\"" . DigitalDevice::DIRECTION_CCW . "\"$selected1>$str_ccw</option>
+                                                <option value=\"" . DigitalRgbDevice::DIRECTION_CW . "\"$selected0>$str_cw</option>
+                                                <option value=\"" . DigitalRgbDevice::DIRECTION_CCW . "\"$selected1>$str_ccw</option>
                                             </select></div>";
                         break;
                     case "smooth":
@@ -258,7 +263,7 @@ abstract class Device
                 $t = self::getTiming($this->timings[$i]);
                 $template = self::INPUT_TEMPLATE_TIMES;
                 $t_string = $i == 3 && $fade ? $timing_strings[6] : $timing_strings[$i];
-                if($this instanceof DigitalDevice && $this->effect === DigitalDevice::EFFECT_PARTICLES)
+                if($this instanceof DigitalRgbDevice && $this->effect === DigitalRgbDevice::EFFECT_PARTICLES)
                     $t_string = "particles_" . $t_string;
                 $template = str_replace("\$label", Utils::getString("profile_timing_$t_string"), $template);
                 $template = str_replace("\$name", "time_" . $timing_strings[$i], $template);
@@ -431,7 +436,6 @@ abstract class Device
         }
         return $a;
     }
-
 
     public abstract function avrEffect();
 }

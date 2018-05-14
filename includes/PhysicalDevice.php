@@ -1,0 +1,66 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Krzysiek
+ * Date: 2018-05-14
+ * Time: 17:59
+ */
+
+abstract class PhysicalDevice
+{
+    /** @var VirtualDevice[] */
+    protected $virtual_devices;
+
+    /** @var int */
+    private $id;
+
+    /**
+     * PhysicalDevice constructor.
+     * @param VirtualDevice[] $virtual_devices
+     */
+    public function __construct(array $virtual_devices)
+    {
+        $this->virtual_devices = $virtual_devices;
+    }
+
+    public abstract function isOnline();
+
+    public abstract function save();
+
+    public abstract function handleAssistantAction(array $action);
+
+    public static abstract function load();
+
+    /**
+     * @param int $id
+     * @return null|VirtualDevice
+     */
+    public function getVirtualDeviceById(int $id)
+    {
+        foreach($this->virtual_devices as $virtual_device)
+        {
+            if($virtual_device->getDeviceId() === $id)
+                return $virtual_device;
+        }
+        return null;
+    }
+
+    public function getDeviceNavbarHtml()
+    {
+        $html = "";
+
+        foreach($this->virtual_devices as $virtual_device)
+        {
+            $name = $virtual_device->getDeviceName();
+            $sanitized_name = preg_replace('!\s+!', ' ', $name);
+            $sanitized_name = preg_replace("!\s!", "_", $sanitized_name);
+            $sanitized_name = strtolower($sanitized_name);
+            $sanitized_name = preg_replace("![^\sa-z0-9]!", "", $sanitized_name);
+            $html .= "<li class=\"nav-item\" role=\"presentation\"" .
+                "><a id=\"device-link-$sanitized_name\" href=\"#$sanitized_name\" class=\"nav-link device-link\">"
+                . $name . "</a></li>";
+        }
+
+        return $html;
+    }
+}

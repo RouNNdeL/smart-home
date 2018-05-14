@@ -8,6 +8,10 @@
 
 require_once(__DIR__ . "/Profile.php");
 
+/**
+ * Class Data
+ * @deprecated The new model is based on {@link PhysicalDevice}
+ */
 class Data
 {
     const SAVE_PATH = "/_data/data.dat";
@@ -274,7 +278,7 @@ class Data
      */
     public function getAutoIncrement()
     {
-        return Device::getIncrementTiming($this->auto_increment);
+        return RgbDevice::getIncrementTiming($this->auto_increment);
     }
 
     /**
@@ -283,9 +287,9 @@ class Data
      */
     public function setAutoIncrement($value)
     {
-        $timing = Device::convertIncrementToTiming($value);
+        $timing = RgbDevice::convertIncrementToTiming($value);
         $this->auto_increment = $timing;
-        return Device::getIncrementTiming($timing);
+        return RgbDevice::getIncrementTiming($timing);
     }
 
     public function globalsToJson($web = false)
@@ -301,7 +305,7 @@ class Data
         $array["leds_enabled"] = $this->enabled;
         $array["csgo_enabled"] = $this->csgo_enabled;
         $array["fan_count"] = $this->fan_count;
-        $array["auto_increment"] = $web ? Device::getIncrementTiming($this->auto_increment) : $this->auto_increment;
+        $array["auto_increment"] = $web ? RgbDevice::getIncrementTiming($this->auto_increment) : $this->auto_increment;
         $array["fan_config"] = array(2, 0, 0);
         $array["profile_order"] = $this->getAvrOrder();
 
@@ -443,7 +447,7 @@ class Data
                 "old_avr_indexes: $old_avr_indexes<br>".
                 "avr_order: $avr_order<br>".
                 "modified_profiles: $modified_profiles<br><br>".
-                "================== Device info ==================<br>";
+                "================== RgbDevice info ==================<br>";
         if($device_json !== null && $device_json !== false)
         {
             foreach($device_json as $item => $value)
