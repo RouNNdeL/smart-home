@@ -28,8 +28,7 @@ foreach(scandir($dir) as $item)
     }
 }
 $filename = $dir . $newest_file;
-if($newest_version !== null && ($newest_version > $version ||
-        ($newest_version === $version && $md5 !== md5_file($filename))))
+if($newest_version !== null && $newest_version > $version)
 {
     switch(apache_request_headers()["x-ESP8266-mode"])
     {

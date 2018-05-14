@@ -15,7 +15,7 @@ if(!ctype_digit($version_code))
     echo "Version code must be an integer";
     exit(0);
 }
-$target_dir = __DIR__ . "/../../iot_binaries/".$_POST["device"];
+$target_dir = __DIR__ . "/../../iot_binaries/device_".$_POST["device"];
 $target_file = $target_dir ."/bin_$version_code" .".bin";
 
 if ( ! is_dir($target_dir)) {
