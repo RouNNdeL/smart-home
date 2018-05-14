@@ -7,8 +7,8 @@
  * Time: 18:40
  */
 require_once(__DIR__ . "/Device.php");
-require_once(__DIR__."/AnalogDevice.php");
-require_once(__DIR__."/DigitalDevice.php");
+require_once(__DIR__ . "/AnalogDevice.php");
+require_once(__DIR__ . "/DigitalDevice.php");
 
 class Profile
 {

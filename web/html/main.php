@@ -5,7 +5,7 @@
  * Date: 07/08/2017
  * Time: 16:42
  */
-require_once(__DIR__ . "/../includes/Utils.php");
+require_once(__DIR__ . "/../../includes/Utils.php");
 $lang = Utils::getInstance()->lang;
 echo <<<TAG
 <!DOCTYPE html>
@@ -14,13 +14,13 @@ TAG;
 ?>
 <?php
 $additional_js = ["support.js", "global.js"];
-require_once(__DIR__ . "/../../web/includes/html_head.php");
+require_once(__DIR__ . "/html_head.php");
 ?>
 <body>
 
 <?php
-require_once(__DIR__ . "/../includes/Data.php");
-require_once(__DIR__ . "/../includes/Navbar.php");
+require_once(__DIR__ . "/../../includes/Data.php");
+require_once(__DIR__ . "/../../includes/Navbar.php");
 require_once(__DIR__ . "/../../network/tcp.php");
 
 $profiles = Data::getInstance()->getProfiles();

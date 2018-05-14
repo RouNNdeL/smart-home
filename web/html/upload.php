@@ -6,8 +6,9 @@
  * Time: 12:20
  */
 $title = "Upload Binaries";
-require_once __DIR__ . "/../includes/html_head.php";
+require_once __DIR__ . "/html_head.php";
 ?>
+<html>
 <body>
 <div class="container mt-5">
     <div class="row justify-content-md-center">

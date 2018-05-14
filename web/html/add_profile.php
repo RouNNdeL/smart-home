@@ -5,8 +5,8 @@
  * Date: 08/08/2017
  * Time: 19:56
  */
-require_once(__DIR__ . "/../includes/Data.php");
-require_once(__DIR__ . "/../includes/Utils.php");
+require_once(__DIR__ . "/../../includes/Data.php");
+require_once(__DIR__ . "/../../includes/Utils.php");
 require_once(__DIR__ . "/../../network/tcp.php");
 
 $data = Data::getInstance();

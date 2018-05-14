@@ -5,7 +5,7 @@
  * Date: 08/08/2017
  * Time: 18:54
  */
-require_once(__DIR__ . "/../includes/Utils.php");
+require_once(__DIR__ . "/../../includes/Utils.php");
 $lang = Utils::getInstance()->lang;
 echo <<<TAG
 <!DOCTYPE html>
@@ -15,13 +15,13 @@ TAG;
 <?php
 $additional_css = array("profile.css");
 $additional_js = array("mathjs.js", "support.js", "profile.js");
-require_once(__DIR__ . "/../../web/includes/html_head.php");
+require_once(__DIR__ . "/html_head.php");
 ?>
 <body>
 
 <?php
-require_once(__DIR__ . "/../includes/Data.php");
-require_once(__DIR__ . "/../includes/Navbar.php");
+require_once(__DIR__ . "/../../includes/Data.php");
+require_once(__DIR__ . "/../../includes/Navbar.php");
 
 if(!isset($_GET["n_profile"]))
 {

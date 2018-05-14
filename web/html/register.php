@@ -3,7 +3,7 @@
 <?php
 $title = "Register";
 $additional_js = ["register.js"];
-require_once __DIR__ . "/../includes/html_head.php";
+require_once __DIR__ . "/html_head.php";
 ?>
 <body>
 <div class="container mt-5">
