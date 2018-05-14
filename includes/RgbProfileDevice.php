@@ -8,7 +8,7 @@
  */
 require (__DIR__."/VirtualDevice.php");
 
-abstract class RgbDevice extends VirtualDevice
+abstract class RgbProfileDevice
 {
     const TIMING_STRINGS = ["off", "fadein", "on", "fadeout", "rotation", "offset", "fade"];
 
@@ -214,8 +214,8 @@ abstract class RgbDevice extends VirtualDevice
                         $selected1 = $argument ? "" : " selected";
                         $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
                                             <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . DigitalRgbDevice::DIRECTION_CW . "\"$selected0>$str_cw</option>
-                                                <option value=\"" . DigitalRgbDevice::DIRECTION_CCW . "\"$selected1>$str_ccw</option>
+                                                <option value=\"" . DigitalRgbProfileDevice::DIRECTION_CW . "\"$selected0>$str_cw</option>
+                                                <option value=\"" . DigitalRgbProfileDevice::DIRECTION_CCW . "\"$selected1>$str_ccw</option>
                                             </select></div>";
                         break;
                     case "smooth":
@@ -263,7 +263,7 @@ abstract class RgbDevice extends VirtualDevice
                 $t = self::getTiming($this->timings[$i]);
                 $template = self::INPUT_TEMPLATE_TIMES;
                 $t_string = $i == 3 && $fade ? $timing_strings[6] : $timing_strings[$i];
-                if($this instanceof DigitalRgbDevice && $this->effect === DigitalRgbDevice::EFFECT_PARTICLES)
+                if($this instanceof DigitalRgbProfileDevice && $this->effect === DigitalRgbProfileDevice::EFFECT_PARTICLES)
                     $t_string = "particles_" . $t_string;
                 $template = str_replace("\$label", Utils::getString("profile_timing_$t_string"), $template);
                 $template = str_replace("\$name", "time_" . $timing_strings[$i], $template);

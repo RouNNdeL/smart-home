@@ -22,16 +22,27 @@ abstract class VirtualDevice
     const DEVICE_TYPE_ACTIONS_LIGHT = "action.devices.types.LIGHT";
     const DEVICE_TYPE_ACTIONS_OUTLET = "action.devices.types.OUTLET";
 
-    private $device_type;
-    private $device_id;
-    private $device_name;
+    const DEVICE_COMMAND_BRIGHTNESS_ABSOLUTE = "action.devices.commands.BrightnessAbsolute";
+    const DEVICE_COMMAND_COLOR_ABSOLUTE = "action.devices.commands.ColorAbsolute";
+    const DEVICE_COMMAND_ON_OFF = "action.devices.commands.OnOff";
+
+    const DEVICE_ID_PC_PC = 0;
+    const DEVICE_ID_PC_GPU = 1;
+    const DEVICE_ID_PC_CPU_FAN = 2;
+    const DEVICE_ID_PC_UNDERGLOW = 3;
+
+    protected $device_type;
+    protected $device_id;
+    protected $device_name;
 
     /**
      * VirtualDevice constructor.
      * @param $device_type
      */
-    public function __construct(string $device_type)
+    public function __construct(int $device_id, string $device_name, string $device_type)
     {
+        $this->device_id = $device_id;
+        $this->device_name = $device_name;
         $this->device_type = $device_type;
     }
 
@@ -67,21 +78,23 @@ abstract class VirtualDevice
         }
     }
 
+    public function getSyncJson($physical_device_id)
+    {
+        return ["id" => $this->device_id, "type" => $this->device_type, "name" => ["name" => $this->device_name],
+            "traits" => $this->getTraits(), "willReportState" => false,
+            "customData" => ["physical_device_id" => $physical_device_id]];
+    }
+
     /**
-     * @param string $command
-     * @return null
+     * @param array $command
      */
     public abstract function handleAssistantAction($command);
 
     /**
+     * @param bool $online
      * @return array
      */
-    public abstract function getSyncJson();
-
-    /**
-     * @return array
-     */
-    public abstract function getQueryJson();
+    public abstract function getQueryJson(bool $online = false);
 
     /**
      * @param array $args

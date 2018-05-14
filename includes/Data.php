@@ -278,7 +278,7 @@ class Data
      */
     public function getAutoIncrement()
     {
-        return RgbDevice::getIncrementTiming($this->auto_increment);
+        return RgbProfileDevice::getIncrementTiming($this->auto_increment);
     }
 
     /**
@@ -287,9 +287,9 @@ class Data
      */
     public function setAutoIncrement($value)
     {
-        $timing = RgbDevice::convertIncrementToTiming($value);
+        $timing = RgbProfileDevice::convertIncrementToTiming($value);
         $this->auto_increment = $timing;
-        return RgbDevice::getIncrementTiming($timing);
+        return RgbProfileDevice::getIncrementTiming($timing);
     }
 
     public function globalsToJson($web = false)
@@ -305,7 +305,7 @@ class Data
         $array["leds_enabled"] = $this->enabled;
         $array["csgo_enabled"] = $this->csgo_enabled;
         $array["fan_count"] = $this->fan_count;
-        $array["auto_increment"] = $web ? RgbDevice::getIncrementTiming($this->auto_increment) : $this->auto_increment;
+        $array["auto_increment"] = $web ? RgbProfileDevice::getIncrementTiming($this->auto_increment) : $this->auto_increment;
         $array["fan_config"] = array(2, 0, 0);
         $array["profile_order"] = $this->getAvrOrder();
 

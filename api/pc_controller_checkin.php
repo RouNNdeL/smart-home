@@ -13,8 +13,8 @@ require_once __DIR__ . "/../network/tcp.php";
 if(isset($_GET["token"]) && $_GET["token"] === $interface_token)
 {
     $addr = $_SERVER["REMOTE_ADDR"];
-    file_put_contents("interface.dat", $addr . ":" . $_GET["port"]);
-    file_put_contents("status", "");
+    file_put_contents(__DIR__."/../_status/pc_interface.dat", $addr . ":" . $_GET["port"]);
+    file_put_contents(__DIR__."/../_status/status", "");
 
     $data = Data::getInstance();
     $response["status"] = "success";

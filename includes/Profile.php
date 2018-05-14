@@ -6,32 +6,34 @@
  * Date: 07/08/2017
  * Time: 18:40
  */
-require_once(__DIR__ . "/RgbDevice.php");
-require_once(__DIR__ . "/AnalogRgbDevice.php");
-require_once(__DIR__ . "/DigitalRgbDevice.php");
+require_once(__DIR__ . "/RgbProfileDevice.php");
+require_once(__DIR__ . "/AnalogRgbProfileDevice.php");
+require_once(__DIR__ . "/DigitalRgbProfileDevice.php");
 
 class Profile
 {
     /** @var string */
     private $name;
-    /** @var DigitalRgbDevice[] */
+    /** @var DigitalRgbProfileDevice[] */
     public $digital_devices = array();
-    /** @var AnalogRgbDevice[] */
+    /** @var AnalogRgbProfileDevice[] */
     public $analog_devices = array();
     /** @var  int */
     public $flags;
 
-    function __construct($name)
+    function __construct($name, int $digital_count, int $analog_count)
     {
         $this->name = $name;
         $this->flags = 0;
 
-        array_push($this->analog_devices, AnalogRgbDevice::_off());
-        array_push($this->analog_devices, AnalogRgbDevice::_off());
-        array_push($this->digital_devices, DigitalRgbDevice::_off());
-        array_push($this->digital_devices, DigitalRgbDevice::_off());
-        array_push($this->digital_devices, DigitalRgbDevice::_off());
-        array_push($this->digital_devices, DigitalRgbDevice::_off());
+        for($i = 0; $i < $analog_count; $i++)
+        {
+            array_push($this->analog_devices, AnalogRgbProfileDevice::_off());
+        }
+        for($i = 0; $i < $digital_count; $i++)
+        {
+            array_push($this->digital_devices, DigitalRgbProfileDevice::_off());
+        }
     }
 
     /**
@@ -53,7 +55,7 @@ class Profile
     public function toJson()
     {
         $arr = array();
-        /** @type RgbDevice[] */
+        /** @type RgbProfileDevice[] */
         $arr["devices"] = array();
         $merge = array_merge($this->analog_devices, $this->digital_devices);
         foreach($merge as $i => $device)

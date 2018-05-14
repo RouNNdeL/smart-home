@@ -10,37 +10,39 @@ require(__DIR__ . "/PhysicalDevice.php");
 
 abstract class RgbProfilesDevice extends PhysicalDevice
 {
-    private $current_profile;
+    protected $current_profile;
     public $enabled;
     public $brightness_array;
-    private $auto_increment;
+    protected $auto_increment;
 
     /** @var int[] */
-    private $active_indexes;
+    protected $active_indexes;
     /** @var int[] */
-    private $inactive_indexes;
+    protected $inactive_indexes;
     /** @var int[] */
-    private $avr_indexes;
+    protected $avr_indexes;
     /** @var int[] */
-    private $old_avr_indexes;
+    protected $old_avr_indexes;
     /** @var int[] */
-    private $modified_profiles;
+    protected $modified_profiles;
     /** @var int[] */
-    private $avr_order;
+    protected $avr_order;
 
     /** @var Profile[] */
-    private $profiles;
+    protected $profiles;
 
     /**
+     * @param int $id
      * @param int $current_profile
      * @param bool $enabled
-     * @param int $fan_count
      * @param int $auto_increment
      * @param array $profiles
      * @param array $virtual_devices
+     * @param array $brightness_array
      */
-    public function __construct(int $current_profile, bool $enabled, int $fan_count, int $auto_increment,
-                                array $profiles, array $virtual_devices, array $brightness_array)
+    protected function __construct(int $id, int $current_profile, bool $enabled, int $auto_increment,
+                                   array $profiles, array $virtual_devices, array $brightness_array
+    )
     {
         $this->current_profile = $current_profile;
         $this->enabled = $enabled;
@@ -60,7 +62,7 @@ abstract class RgbProfilesDevice extends PhysicalDevice
         $this->avr_indexes = $this->active_indexes;
         $this->avr_order = $this->getAvrOrder();
         $this->modified_profiles = array();
-        parent::__construct($virtual_devices);
+        parent::__construct($id, $virtual_devices);
     }
 
     protected abstract static function getMaximumActiveProfileCount();
@@ -250,7 +252,7 @@ abstract class RgbProfilesDevice extends PhysicalDevice
      */
     public function getAutoIncrement()
     {
-        return RgbDevice::getIncrementTiming($this->auto_increment);
+        return RgbProfileDevice::getIncrementTiming($this->auto_increment);
     }
 
     /**
@@ -259,9 +261,9 @@ abstract class RgbProfilesDevice extends PhysicalDevice
      */
     public function setAutoIncrement($value)
     {
-        $timing = RgbDevice::convertIncrementToTiming($value);
+        $timing = RgbProfileDevice::convertIncrementToTiming($value);
         $this->auto_increment = $timing;
-        return RgbDevice::getIncrementTiming($timing);
+        return RgbProfileDevice::getIncrementTiming($timing);
     }
 
     public function updateOldVars()

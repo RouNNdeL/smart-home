@@ -8,6 +8,8 @@
 
 abstract class PhysicalDevice
 {
+    const ID_PC_LED_CONTROLLER = 0;
+
     /** @var VirtualDevice[] */
     protected $virtual_devices;
 
@@ -16,10 +18,12 @@ abstract class PhysicalDevice
 
     /**
      * PhysicalDevice constructor.
+     * @param int $id
      * @param VirtualDevice[] $virtual_devices
      */
-    public function __construct(array $virtual_devices)
+    protected function __construct(int $id, array $virtual_devices)
     {
+        $this->id = $id;
         $this->virtual_devices = $virtual_devices;
     }
 

@@ -6,7 +6,7 @@
  * Date: 10/08/2017
  * Time: 15:48
  */
-class DigitalRgbDevice extends RgbDevice
+class DigitalRgbProfileDevice extends RgbProfileDevice
 {
     const EFFECT_OFF = 100;
     const EFFECT_STATIC = 101;
@@ -524,7 +524,7 @@ class DigitalRgbDevice extends RgbDevice
 
     /**
      * @param int $effect
-     * @return DigitalRgbDevice
+     * @return DigitalRgbProfileDevice
      */
     public static function defaultFromEffect(int $effect)
     {

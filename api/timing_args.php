@@ -28,19 +28,19 @@ $response = array();
 $response["status"] = "success";
 
 require_once(__DIR__ . "/../includes/Utils.php");
-require_once(__DIR__ . "/../includes/RgbDevice.php");
+require_once(__DIR__ . "/../includes/RgbProfileDevice.php");
 if($type === "a")
 {
-    require_once(__DIR__ . "/../includes/AnalogRgbDevice.php");
-    require_once(__DIR__ . "/../includes/DigitalRgbDevice.php");
-    $device = AnalogRgbDevice::defaultFromEffect($effect);
+    require_once(__DIR__ . "/../includes/AnalogRgbProfileDevice.php");
+    require_once(__DIR__ . "/../includes/DigitalRgbProfileDevice.php");
+    $device = AnalogRgbProfileDevice::defaultFromEffect($effect);
     $response["html"] = $device->timingArgHtml();
     $response["limit_colors"] = $device->colorLimit();
 }
 else
 {
-    require_once(__DIR__ . "/../includes/DigitalRgbDevice.php");
-    $device = DigitalRgbDevice::defaultFromEffect($effect);
+    require_once(__DIR__ . "/../includes/DigitalRgbProfileDevice.php");
+    $device = DigitalRgbProfileDevice::defaultFromEffect($effect);
     $response["html"] = $device->timingArgHtml();
     $response["limit_colors"] = $device->colorLimit();
 }
