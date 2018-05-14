@@ -1,0 +1,3 @@
+<Files  "webhook.php">
+    Require all granted
+</Files>

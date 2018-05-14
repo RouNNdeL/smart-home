@@ -1,0 +1,19 @@
+{
+    "title": "Kontrola LEDów",
+    "global_options": "Ustawienia globalne",
+    "add_profile": "Dodaj profil",
+    "default_profile_name": "Profil $n",
+    "error_msg_404": "Strona $url nie została odnaleziona",
+    "error_msg_500": "Wystąpił problem z serwerem",
+    "options_enabled": "Włącz LEDy",
+    "options_digital_count": "Liczba wiatraków",
+    "options_analog_count": "Liczba taśm LED",
+    "options_global_brightness": "Jasność globalna",
+    "options_color_config": "Kolejność kolorów: $port",
+    "options_reset_defaults": "Przywróć ustawienia domyślne",
+    "options_save": "Zapisz zmiany",
+    "profile_analog": "Taśma $n",
+    "profile_digital": "Wentylator $n",
+    "profile_name": "Nazwa profilu",
+    "profile_devices": "Urządzenia"
+}

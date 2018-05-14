@@ -1,0 +1,11 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Krzysiek
+ * Date: 2017-12-14
+ * Time: 12:42
+ */
+
+$dialogflow_auth = "<dialogflow_auth_for_webhook>";
+$dialogflow_dev_token = "<dialog_flow_developer_token>";
+$interface_token = "<token_for_tcp_checkin>";

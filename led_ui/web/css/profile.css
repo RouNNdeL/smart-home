@@ -1,0 +1,76 @@
+#device-settings
+{
+    height: calc(100% - 12px);
+}
+
+#device-settings > div.panel
+{
+    height: 100%;
+    margin-bottom: 0;
+}
+
+#device-settings > div.panel > div.panel-body
+{
+    height: 100%;
+}
+
+.container-fluid
+{
+    height: calc(100% - 40px);
+}
+
+div.color-box
+{
+    width: 88px;
+    height: 40px;
+    border-radius: 0 4px 4px 0;
+    border: solid 1px #ccc;
+    border-left-width: 0;
+    /*display: inline-block;*/
+}
+.color-picker.static {
+    display:inline-block !important;
+    position:static !important;
+    top:0 !important;
+    left:0 !important;
+}
+.color-picker.static > .color-picker-control
+{
+    box-shadow: none; !important;
+    -webkit-box-shadow: none; !important;
+}
+.inline
+{
+    display: inline-block;
+    vertical-align: top;
+}
+.picker-container
+{
+    margin-left: 18px;
+    margin-top: 18px;
+}
+.color-input{
+    font-family: monospace;
+    font-size: 1.2rem;
+}
+.color-delete-btn, .color-jump-btn
+{
+    width: 37px;
+    height: 37px;
+}
+.color-delete-btn > .oi, .color-jump-btn > .oi
+{
+    right: 5px;
+}
+.color-swatch-container
+{
+    display: inline-block;
+}
+.device-title
+{
+    margin-top: 0;
+}
+div.colorpicker-component > span > i
+{
+    background-color: rgb(255, 255, 255);
+}
