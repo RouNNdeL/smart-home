@@ -394,10 +394,10 @@ class DigitalDevice extends Device
 
     public static function _rainbow()
     {
-        return self::rainbow(array(), 8, 0, 2, 0, 255);
+        return self::rainbow(array(), 8,  0, 255);
     }
 
-    public static function rainbow(array $colors, int $fade, int $offset, bool $smooth, bool $direction, int $brightness)
+    public static function rainbow(array $colors, int $fade, int $offset, int $brightness)
     {
         $args = array();
         $args["rainbow_brightness"] = $brightness;
