@@ -7,7 +7,6 @@
  */
 
 require_once(__DIR__ . "/Profile.php");
-require_once(__DIR__ . "/../../api_ai/update_profile_entities.php");
 
 class Data
 {
@@ -183,7 +182,6 @@ class Data
             return false;
         if(isset($this->profiles[$index]))
         {
-            delete($this->profiles[$index]->getName());
             unset($this->profiles[$index]);
             if(($key = array_search($index, $this->active_indexes)) !== false)
             {

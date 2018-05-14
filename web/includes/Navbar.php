@@ -23,7 +23,6 @@ class Navbar
     public function toHtml()
     {
         $html = "";
-        $html .= ";
         foreach($this->tabs as $i => $tab)
         {
             $url = $tab["url"];

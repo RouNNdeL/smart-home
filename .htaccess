@@ -13,12 +13,12 @@ RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-RewriteRule bootstrap/(.*) /vendor/twbs/bootstrap/$1
-RewriteRule jquery/(.*) /vendor/components/jquery/$1
-RewriteRule jqueryui/(.*) /vendor/components/jqueryui/$1
-RewriteRule bootstrap-colorpicker/(.*) /vendor/itsjavi/bootstrap-colorpicker/$1
-RewriteRule tether/(.*) /node_modules/tether/$1
-RewriteRule iconic/(.*) /node_modules/open-iconic/$1
+RewriteRule bootstrap/(.*) /vendor/twbs/bootstrap/$1 [L]
+RewriteRule jquery/(.*) /vendor/components/jquery/$1 [L]
+RewriteRule jqueryui/(.*) /vendor/components/jqueryui/$1 [L]
+RewriteRule bootstrap-colorpicker/(.*) /vendor/itsjavi/bootstrap-colorpicker/$1 [L]
+RewriteRule tether/(.*) /node_modules/tether/$1 [L]
+RewriteRule iconic/(.*) /node_modules/open-iconic/$1 [L]
 
 RewriteRule ^(.*?\.(png|jpeg|jpg|svg))$ resources/$1 [L]
 
@@ -40,6 +40,3 @@ RewriteRule ^/?api/events/?$ api/update_stream.php
 RewriteRule ^/?api/debug/control?$ api/debug_control.php
 RewriteRule ^/?api/debug/info?$ api/debug_info.php
 RewriteRule ^/?api/debug/stream?$ api/debug_stream.php
-
-RewriteRule ^([^/]*)$ web/$1.php
-
