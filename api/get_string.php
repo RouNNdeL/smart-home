@@ -18,6 +18,6 @@ if(!isset($_GET["name"]))
     echo "{\"status\":\"error\",\"message\":\"Missing arguments\"}";
     exit(0);
 }
-require_once(__DIR__."/../web/includes/Utils.php");
+require_once(__DIR__ . "/../web/includes/Utils.php");
 $string =  Utils::getString($_GET["name"]);
 echo json_encode(array("status" => "success", "string" => $string));

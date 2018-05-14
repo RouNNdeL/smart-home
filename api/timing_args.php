@@ -27,19 +27,19 @@ $type = $json["type"];
 $response = array();
 $response["status"] = "success";
 
-require_once (__DIR__."/../web/includes/Utils.php");
-require_once (__DIR__."/../web/includes/Device.php");
+require_once(__DIR__ . "/../web/includes/Utils.php");
+require_once(__DIR__ . "/../web/includes/Device.php");
 if($type === "a")
 {
-    require_once (__DIR__."/../web/includes/AnalogDevice.php");
-    require_once (__DIR__."/../web/includes/DigitalDevice.php");
+    require_once(__DIR__ . "/../web/includes/AnalogDevice.php");
+    require_once(__DIR__ . "/../web/includes/DigitalDevice.php");
     $device = AnalogDevice::defaultFromEffect($effect);
     $response["html"] = $device->timingArgHtml();
     $response["limit_colors"] = $device->colorLimit();
 }
 else
 {
-    require_once (__DIR__."/../web/includes/DigitalDevice.php");
+    require_once(__DIR__ . "/../web/includes/DigitalDevice.php");
     $device = DigitalDevice::defaultFromEffect($effect);
     $response["html"] = $device->timingArgHtml();
     $response["limit_colors"] = $device->colorLimit();

@@ -22,9 +22,9 @@ if(!isset($json["name"]) || !isset($json["flags"]) || !isset($json["profile_n"])
 $profile_n = $json["profile_n"];
 $name = $json["name"];
 
-require_once(__DIR__."/../web/includes/Data.php");
+require_once(__DIR__ . "/../web/includes/Data.php");
 require_once(__DIR__."/../api_ai/update_profile_entities.php");
-require_once(__DIR__."/../network/tcp.php");
+require_once(__DIR__ . "/../network/tcp.php");
 $data = Data::getInstance();
 try
 {

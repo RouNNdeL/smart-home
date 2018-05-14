@@ -11,7 +11,7 @@ echo <<<TAG
 <!DOCTYPE html>
 <html lang="$lang">
 TAG;
-require_once(__DIR__."/../includes/html_head.php");
+require_once(__DIR__ . "/../../../web/includes/html_head.php");
 $msg = Utils::getInstance()->getString("error_msg_500");
 echo <<<TAG
 <body>

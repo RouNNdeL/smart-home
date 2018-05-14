@@ -20,8 +20,8 @@ if(!isset($json["profile_n"]))
     exit(0);
 }
 $profile_n = $json["profile_n"];
-require_once(__DIR__."/../web/includes/Data.php");
-require_once(__DIR__."/../network/tcp.php");
+require_once(__DIR__ . "/../web/includes/Data.php");
+require_once(__DIR__ . "/../network/tcp.php");
 $data = Data::getInstance();
 $data->removeProfile($profile_n);
 Data::save();

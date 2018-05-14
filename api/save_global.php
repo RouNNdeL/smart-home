@@ -21,9 +21,9 @@ if($json == false)
     exit(0);
 }
 
-require_once(__DIR__."/../web/includes/Data.php");
-require_once(__DIR__."/../web/includes/Utils.php");
-require_once(__DIR__."/../network/tcp.php");
+require_once(__DIR__ . "/../web/includes/Data.php");
+require_once(__DIR__ . "/../web/includes/Utils.php");
+require_once(__DIR__ . "/../network/tcp.php");
 
 $data = Data::getInstance();
 $notify = isset($json["notify"]) ? $json["notify"] : true;

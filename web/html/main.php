@@ -14,7 +14,7 @@ TAG;
 ?>
 <?php
 $additional_js = ["support.js", "global.js"];
-require_once(__DIR__ . "/../includes/html_head.php");
+require_once(__DIR__ . "/../../web/includes/html_head.php");
 ?>
 <body>
 

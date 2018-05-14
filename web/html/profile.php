@@ -15,7 +15,7 @@ TAG;
 <?php
 $additional_css = array("profile.css");
 $additional_js = array("mathjs.js", "support.js", "profile.js");
-require_once(__DIR__ . "/../includes/html_head.php");
+require_once(__DIR__ . "/../../web/includes/html_head.php");
 ?>
 <body>
 

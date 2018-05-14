@@ -1,6 +1,6 @@
 RewriteEngine on
 
-Require all granted
+Require ip 192.168
 
 RewriteCond %{SERVER_NAME} !home.zdul.xyz
 RewriteRule ^ https://home.zdul.xyz%{REQUEST_URI} [END,R=permanent]
@@ -19,6 +19,27 @@ RewriteRule jqueryui/(.*) /vendor/components/jqueryui/$1
 RewriteRule bootstrap-colorpicker/(.*) /vendor/itsjavi/bootstrap-colorpicker/$1
 RewriteRule tether/(.*) /node_modules/tether/$1
 RewriteRule iconic/(.*) /node_modules/open-iconic/$1
+
+RewriteRule ^(.*?\.(png|jpeg|jpg|svg))$ resources/$1 [L]
+
+RewriteRule (?!www/)js/(.*?)\.js$ web/js/$1.js [L]
+RewriteRule (?!www/)css/(.*?)\.css$ web/css/$1.css [L]
+RewriteRule ^([^/]*)$ web/html/$1.php
+RewriteRule ^/?profile/(\d{1,2})/?$ web/html/profile.php?n_profile=$1
+RewriteRule ^/?profile/new/?$ web/html/add_profile.php [L]
+RewriteRule ^/?api/save/global/?$ api/save_global.php
+RewriteRule ^/?api/get_html/timing_args/?$ api/timing_args.php
+RewriteRule ^/?api/remove/profile/?$ api/remove_profile.php
+RewriteRule ^/?api/save/profile/?$ api/save_devices.php
+RewriteRule ^/?api/save/profile/params/?$ api/save_profile_params.php
+RewriteRule ^/?api/enable_leds/?$ api/enable_leds.php
+RewriteRule ^/?api/change_profile/?$ api/change_profile.php
+RewriteRule ^/?api/jump_frame/?$ api/jump_frame.php
+RewriteRule ^/?api/explicit_save/?$ api/explicit_save.php
+RewriteRule ^/?api/events/?$ api/update_stream.php
+RewriteRule ^/?api/debug/control?$ api/debug_control.php
+RewriteRule ^/?api/debug/info?$ api/debug_info.php
+RewriteRule ^/?api/debug/stream?$ api/debug_stream.php
 
 RewriteRule ^([^/]*)$ web/$1.php
 
