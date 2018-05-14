@@ -1,3 +1,4 @@
 $db_passwd = "**hidden**";
 $db_username = "**hidden**";
 $homegraph_key = "**hidden**";
+$interface_token = "**hidden**";

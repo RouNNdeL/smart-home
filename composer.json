@@ -1,5 +1,9 @@
 {
   "require": {
-    "sonata-project/google-authenticator": "^2.0"
+    "sonata-project/google-authenticator": "^2.0",
+    "twbs/bootstrap": "^4.1",
+    "components/jquery": "^3.3",
+    "itsjavi/bootstrap-colorpicker": "^2.5",
+    "components/jqueryui": "^1.12"
   }
 }

@@ -1,0 +1,8 @@
+{
+  "name": "SmartHome",
+  "version": "1.0.0",
+  "dependencies": {
+    "open-iconic": "^1.1.1",
+    "tether": "1.4.4"
+  }
+}

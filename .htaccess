@@ -5,8 +5,6 @@ Require all granted
 RewriteCond %{SERVER_NAME} !home.zdul.xyz
 RewriteRule ^ https://home.zdul.xyz%{REQUEST_URI} [END,R=permanent]
 
-RewriteRule ^/?smart(.*) $1 [R,L]
-
 RewriteRule ^$ /login [L]
 
 # This checks whether the file exsits,
@@ -15,6 +13,12 @@ RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
+RewriteRule bootstrap/(.*) /vendor/twbs/bootstrap/$1
+RewriteRule jquery/(.*) /vendor/components/jquery/$1
+RewriteRule jqueryui/(.*) /vendor/components/jqueryui/$1
+RewriteRule bootstrap-colorpicker/(.*) /vendor/itsjavi/bootstrap-colorpicker/$1
+RewriteRule tether/(.*) /node_modules/tether/$1
+RewriteRule iconic/(.*) /node_modules/open-iconic/$1
+
 RewriteRule ^([^/]*)$ web/$1.php
-RewriteRule ^(?!web)(.*) https://zdul.xyz/$1 [R]
 
