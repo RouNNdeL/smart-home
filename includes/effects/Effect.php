@@ -145,13 +145,14 @@ abstract class Effect
     }
 
     /**
+     * @param int $color_limit
      * @return string
      */
-    public function colorsHtml()
+    public function colorsHtml(int $color_limit)
     {
         $colors_html = "";
 
-        for($i = 0; $i < sizeof($this->getColors()); $i++)
+        for($i = 0; $i < min(sizeof($this->getColors(), $color_limit)); $i++)
         {
             $template = self::COLOR_TEMPLATE;
             $template = str_replace("\$active", $i == 0 ? "checked" : "", $template);

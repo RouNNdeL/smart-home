@@ -71,17 +71,18 @@ abstract class RgbEffectDevice extends SimpleRgbDevice
         $profile_color_input = Utils::getString("profile_color_input");
         $profile_add_color = Utils::getString("profile_add_color");
         $color_limit = $this->colorLimit();
+        $current_effect = $this->effects[$this->current_profile];
 
-        $colors_html = "";
+        $colors_html = $current_effect->colorsHtml($color_limit);
         $effects_html = "";
 
         foreach($this->getAvailableEffects() as $id => $effect)
         {
             $string = Utils::getString("profile_" . $effect);
-            $effects_html .= "<option value=\"$id\"" . ($id == $this->effects[$this->current_profile] ? " selected" : "") . ">$string</option>";
+            $effects_html .= "<option value=\"$id\"" . ($id == $current_effect ? " selected" : "") . ">$string</option>";
         }
 
-        $btn_class = sizeof($this->effects[$this->current_profile]->getColors()) >= $color_limit ? " hidden-xs-up" : "";
+        $btn_class = sizeof($current_effect->getColors()) >= $color_limit ? " hidden-xs-up" : "";
         $html .= "<div class=\"main-container row m-2\">
         <div class=\"col-12 col-sm-6 col-lg-4 col-xl-3 mb-3 mb-lg-0\">
         <div class=\"form-group\">
@@ -102,7 +103,7 @@ abstract class RgbEffectDevice extends SimpleRgbDevice
         </div>
 
     </div>";
-        $html .= $this->effects[$this->current_profile]->timingArgHtml();
+        $html .= $current_effect->timingArgHtml();
         $html .= "</form></div>";
 
         return $html;
