@@ -18,6 +18,7 @@ abstract class VirtualDevice
     const DEVICE_TRAIT_COLOR_SPECTRUM = "action.devices.traits.ColorSpectrum";
     const DEVICE_TRAIT_COLOR_TEMPERATURE = "action.devices.traits.ColorTemperature";
     const DEVICE_TRAIT_ON_OFF = "action.devices.traits.OnOff";
+    const DEVICE_TRAIT_TOGGLES = "action.devices.traits.Toggles";
 
     const DEVICE_TYPE_ACTIONS_LIGHT = "action.devices.types.LIGHT";
     const DEVICE_TYPE_ACTIONS_OUTLET = "action.devices.types.OUTLET";
@@ -37,7 +38,9 @@ abstract class VirtualDevice
 
     /**
      * VirtualDevice constructor.
-     * @param $device_type
+     * @param int $device_id
+     * @param string $device_name
+     * @param string $device_type
      */
     public function __construct(int $device_id, string $device_name, string $device_type)
     {
@@ -46,44 +49,11 @@ abstract class VirtualDevice
         $this->device_type = $device_type;
     }
 
-    public function getTraits()
-    {
-        switch($this->device_type)
-        {
-            case self::DEVICE_TYPE_RGB:
-                return [self::DEVICE_TRAIT_BRIGHTNESS, self::DEVICE_TRAIT_COLOR_SPECTRUM, self::DEVICE_TRAIT_ON_OFF];
-            case self::DEVICE_TYPE_LAMP:
-                return [self::DEVICE_TRAIT_ON_OFF];
-            case self::DEVICE_TYPE_LAMP_ANALOG:
-                return [self::DEVICE_TRAIT_BRIGHTNESS, self::DEVICE_TRAIT_ON_OFF];
-            case self::DEVICE_TYPE_SWITCH:
-                return [self::DEVICE_TRAIT_ON_OFF];
-            default:
-                throw new InvalidArgumentException("Invalid device_type: ".$this->device_type);
-        }
-    }
+    public abstract function getTraits();
 
-    public function getActionsType()
-    {
-        switch($this->device_type)
-        {
-            case self::DEVICE_TYPE_RGB:
-            case self::DEVICE_TYPE_LAMP:
-            case self::DEVICE_TYPE_LAMP_ANALOG:
-                return self::DEVICE_TYPE_ACTIONS_LIGHT;
-            case self::DEVICE_TYPE_SWITCH:
-                return self::DEVICE_TYPE_ACTIONS_OUTLET;
-            default:
-                throw new InvalidArgumentException("Invalid device_type: ".$this->device_type);
-        }
-    }
+    public abstract function getActionsDeviceType();
 
-    public function getSyncJson($physical_device_id)
-    {
-        return ["id" => $this->device_id, "type" => $this->device_type, "name" => ["name" => $this->device_name],
-            "traits" => $this->getTraits(), "willReportState" => false,
-            "customData" => ["physical_device_id" => $physical_device_id]];
-    }
+    public abstract function getAttributes();
 
     /**
      * @param array $command
@@ -97,10 +67,16 @@ abstract class VirtualDevice
     public abstract function getQueryJson(bool $online = false);
 
     /**
-     * @param array $args
      * @return string
      */
-    public abstract function toHTML($args);
+    public abstract function toHTML();
+
+    public function getSyncJson($physical_device_id)
+    {
+        return ["id" => $this->device_id, "type" => $this->getActionsDeviceType(), "name" => ["name" => $this->device_name],
+            "traits" => $this->getTraits(), "willReportState" => false, "attributes" => $this->getAttributes(),
+            "customData" => ["physical_device_id" => $physical_device_id]];
+    }
 
     /**
      * @return string

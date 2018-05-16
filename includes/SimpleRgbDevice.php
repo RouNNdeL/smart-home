@@ -25,7 +25,7 @@ class SimpleRgbDevice extends VirtualDevice
      * @param int $brightness
      * @param bool $on
      */
-    public function __construct(string $device_id, string $device_name, int $color, int $brightness, bool $on)
+    public function __construct(string $device_id, string $device_name, int $color = 0xffffff, int $brightness = 100, bool $on = true)
     {
         parent::__construct($device_id, $device_name, VirtualDevice::DEVICE_TYPE_RGB);
         $this->color = $color;
@@ -68,12 +68,26 @@ class SimpleRgbDevice extends VirtualDevice
     }
 
     /**
-     * @param array $args
      * @return string
      */
-    public function toHTML($args)
+    public function toHTML()
     {
         // TODO: Implement toHTML() method.
         return "";
+    }
+
+    public function getTraits()
+    {
+        return [self::DEVICE_TRAIT_ON_OFF, self::DEVICE_TRAIT_COLOR_SPECTRUM, self::DEVICE_TRAIT_BRIGHTNESS];
+    }
+
+    public function getActionsDeviceType()
+    {
+        return self::DEVICE_TYPE_ACTIONS_LIGHT;
+    }
+
+    public function getAttributes()
+    {
+        return [];
     }
 }
