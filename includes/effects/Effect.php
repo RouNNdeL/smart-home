@@ -286,20 +286,40 @@ abstract class Effect
         return $data;
     }
 
-    public abstract function getTimingsForEffect();
-
     public function getTimingStrings()
     {
         return ["off", "fadein", "on", "fadeout", "rotation", "offset"];
     }
 
+    /**
+     * @return array
+     */
+    public abstract function getTimingsForEffect();
+
+    /**
+     * @return array
+     */
     public abstract function argsToArray();
 
+    /**
+     * @return array
+     */
     public abstract function argList();
 
+    /**
+     * @return int
+     */
     public abstract function avrEffect();
 
+    /**
+     * @return int
+     */
     public abstract function getEffectId();
+
+    /**
+     * @return Effect
+     */
+    public static abstract function getDefault();
 
     public static function getTiming(int $x)
     {
