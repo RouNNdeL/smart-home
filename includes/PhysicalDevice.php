@@ -56,10 +56,7 @@ abstract class PhysicalDevice
         foreach($this->virtual_devices as $virtual_device)
         {
             $name = $virtual_device->getDeviceName();
-            $sanitized_name = preg_replace('!\s+!', ' ', $name);
-            $sanitized_name = preg_replace("!\s!", "_", $sanitized_name);
-            $sanitized_name = strtolower($sanitized_name);
-            $sanitized_name = preg_replace("![^\sa-z0-9]!", "", $sanitized_name);
+            $sanitized_name = Utils::sanitizeName($name);
             $html .= "<li class=\"nav-item\" role=\"presentation\"" .
                 "><a id=\"device-link-$sanitized_name\" href=\"#$sanitized_name\" class=\"nav-link device-link\">"
                 . $name . "</a></li>";

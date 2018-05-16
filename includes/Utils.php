@@ -13,16 +13,19 @@ class Utils
      */
     private static $instance;
     const DEFAULT_LANG = "en";
+    const AVAILABLE_LANGUAGES = ["en", "pl"];
 
     public $strings;
     public $lang;
 
     /**
      * Utils constructor.
+     * @param null $lang
      */
-    public function __construct()
+    public function __construct($lang = null)
     {
-        $lang = isset($_COOKIE["lang"]) ? $_COOKIE["lang"] : self::DEFAULT_LANG;
+        if($lang != null)
+            $lang = isset($_COOKIE["lang"]) ? $_COOKIE["lang"] : self::DEFAULT_LANG;
         $this->lang = $lang;
         $this->loadStrings();
     }
@@ -30,7 +33,7 @@ class Utils
     private function loadStrings()
     {
         $lang = $this->lang;
-        $path = $_SERVER["DOCUMENT_ROOT"]."/_lang/$lang.json";
+        $path = $_SERVER["DOCUMENT_ROOT"] . "/_lang/$lang.json";
         $file = file_get_contents($path);
         if($file == false)
         {
@@ -50,7 +53,15 @@ class Utils
 
         //return null;
         //Only for development purposes
-        return "_".$name;
+        return "_" . $name;
+    }
+
+    public static function sanitizeString(string $string)
+    {
+        $sanitized_string = preg_replace('!\s+!', ' ', $string);
+        $sanitized_string = preg_replace("!\s!", "_", $sanitized_string);
+        $sanitized_string = strtolower($sanitized_string);
+        return preg_replace("![^\sa-z0-9]!", "", $sanitized_string);
     }
 
     public static function getInstance()
