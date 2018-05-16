@@ -6,6 +6,11 @@
  * Date: 10/08/2017
  * Time: 15:48
  */
+
+
+/**
+ * @deprecated - Just like it's parent. Use the {@link RgbEffectDevice} together with {@link Effect}
+ */
 class DigitalRgbProfileDevice extends RgbProfileDevice
 {
     const EFFECT_OFF = 100;

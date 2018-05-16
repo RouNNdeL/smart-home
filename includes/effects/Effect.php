@@ -1,20 +1,13 @@
 <?php
-
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 07/08/2017
- * Time: 18:42
+ * Date: 2018-05-16
+ * Time: 13:43
  */
-require (__DIR__."/VirtualDevice.php");
 
-/**
- * @deprecated - Use the {@link RgbEffectDevice} together with {@link Effect}
- */
-abstract class RgbProfileDevice
+abstract class Effect
 {
-    const TIMING_STRINGS = ["off", "fadein", "on", "fadeout", "rotation", "offset", "fade"];
-
     const AVR_EFFECT_BREATHE = 0x00;
     const AVR_EFFECT_FADE = 0x01;
     const AVR_EFFECT_FILLING_FADE = 0x02;
@@ -24,6 +17,30 @@ abstract class RgbProfileDevice
     const AVR_EFFECT_PIECES = 0x0C;
     const AVR_EFFECT_PARTICLES = 0x06;
     const AVR_EFFECT_SPECTRUM = 0x07;
+
+    const ARG_COLOR_CYCLES = "color_cycles";
+
+    const EFFECT_OFF = 0;
+    const EFFECT_STATIC = 1;
+    const EFFECT_BREATHING = 2;
+    const EFFECT_BLINKING = 3;
+    const EFFECT_FADING = 4;
+    const EFFECT_RAINBOW = 5;
+    const EFFECT_FILLING = 6;
+    const EFFECT_MARQUEE = 7;
+    const EFFECT_ROTATING = 8;
+    const EFFECT_SWEEP = 9;
+    const EFFECT_ANDROID_PB = 10;
+    const EFFECT_DOUBLE_FILL = 12;
+    const EFFECT_HIGHS = 13;
+    const EFFECT_SOURCES = 14;
+    const EFFECT_PIECES = 15;
+    const EFFECT_RAINBOW_ROTATING = 16;
+    const EFFECT_FILLING_FADE = 17;
+    const EFFECT_SPECTRUM = 18;
+    const EFFECT_TWO_HALVES = 19;
+    const EFFECT_TWO_HALVES_FADE = 20;
+    const EFFECT_PARTICLES = 21;
 
     const /** @noinspection CssInvalidPropertyValue */
         COLOR_TEMPLATE =
@@ -65,7 +82,6 @@ abstract class RgbProfileDevice
      * RgbDevice constructor. <b>Note:</b> Timings are interpreted as raw values input by user,
      * unless <code>$t_converted</code> is explicitly set to <code>true</code>
      * @param array $colors
-     * @param int $effect
      * @param float|int $off
      * @param float|int $fadein
      * @param float|int $on
@@ -75,12 +91,10 @@ abstract class RgbProfileDevice
      * @param array $args
      * @param bool $t_converted
      */
-    public function __construct(array $colors, int $effect, float $off, float $fadein, float $on, float $fadeout,
-                                   float $rotate, float $offset, array $args = array(), bool $t_converted = false)
+    public function __construct(array $colors, float $off, float $fadein, float $on, float $fadeout,
+                                float $rotate, float $offset, array $args = array(), bool $t_converted = false)
     {
-        parent::__construct(parent::DEVICE_TYPE_RGB);
         $this->colors = $colors;
-        $this->effect = $effect;
         $t_converted ? $this->setTimings($off, $fadein, $on, $fadeout, $rotate, $offset) :
             $this->setTimingsRaw($off, $fadein, $on, $fadeout, $rotate, $offset);
         $this->args = $args;
@@ -131,23 +145,13 @@ abstract class RgbProfileDevice
     }
 
     /**
-     * @param $args
      * @return string
      */
-    public function toHTML($args)
+    public function colorsHtml()
     {
-        $device = $args["device_n"];
-        $html = "<form id=\"device-form-$device\">";
-        $profile_colors = Utils::getString("profile_colors");
-        $profile_effect = Utils::getString("profile_effect");
-        $profile_color_input = Utils::getString("profile_color_input");
-        $profile_add_color = Utils::getString("profile_add_color");
-        $color_limit = $this->colorLimit();
-
         $colors_html = "";
-        $effects_html = "";
 
-        for($i = 0; $i < min(sizeof($this->getColors()), $this->colorLimit()); $i++)
+        for($i = 0; $i < sizeof($this->getColors()); $i++)
         {
             $template = self::COLOR_TEMPLATE;
             $template = str_replace("\$active", $i == 0 ? "checked" : "", $template);
@@ -158,37 +162,7 @@ abstract class RgbProfileDevice
             $colors_html .= $template;
         }
 
-        foreach(static::effects() as $id => $effect)
-        {
-            $string = Utils::getString("profile_" . $effect);
-            $effects_html .= "<option value=\"$id\"" . ($id == $this->effect ? " selected" : "") . ">$string</option>";
-        }
-
-        $btn_class = sizeof($this->colors) >= $color_limit ? " hidden-xs-up" : "";
-        $html .= "<div class=\"main-container row m-2\">
-        <div class=\"col-12 col-sm-6 col-lg-4 col-xl-3 mb-3 mb-lg-0\">
-        <div class=\"form-group\">
-            <h3>$profile_effect</h3>
-            <select class=\"form-control effect-select\" name=\"effect\" id=\"effect-select-$device\">
-                $effects_html
-            </select>
-        </div>
-        <div class=\"row\">
-            <div class=\"col pr-0\"><h3 class=\"header-colors\">$profile_colors</h3></div>
-            <div class=\"col-auto pr-3\">
-                <button class=\"add-color-btn btn btn-primary btn-sm color-swatch$btn_class\" 
-                        type=\"button\">$profile_add_color</button>
-            </div>
-        </div>
-        <div class=\"swatches-container\" data-color-limit=\"$color_limit\">
-            $colors_html
-        </div>
-
-    </div>";
-        $html .= $this->timingArgHtml();
-        $html .= "</form></div>";
-
-        return $html;
+        return $colors_html;
     }
 
     public function timingArgHtml()
@@ -196,7 +170,7 @@ abstract class RgbProfileDevice
         $html = "";
 
         $timings = $this->getTimingsForEffect();
-        $timing_strings = self::TIMING_STRINGS;
+        $timing_strings =$this->getTimingStrings();
         $profile_timing = Utils::getString("profile_timing");
         $profile_arguments = Utils::getString("profile_arguments");
 
@@ -266,8 +240,6 @@ abstract class RgbProfileDevice
                 $t = self::getTiming($this->timings[$i]);
                 $template = self::INPUT_TEMPLATE_TIMES;
                 $t_string = $i == 3 && $fade ? $timing_strings[6] : $timing_strings[$i];
-                if($this instanceof DigitalRgbProfileDevice && $this->effect === DigitalRgbProfileDevice::EFFECT_PARTICLES)
-                    $t_string = "particles_" . $t_string;
                 $template = str_replace("\$label", Utils::getString("profile_timing_$t_string"), $template);
                 $template = str_replace("\$name", "time_" . $timing_strings[$i], $template);
                 $template = str_replace("\$placeholder", $t, $template);
@@ -315,15 +287,18 @@ abstract class RgbProfileDevice
 
     public abstract function getTimingsForEffect();
 
-    public abstract function colorLimit();
+    public function getTimingStrings()
+    {
+        return ["off", "fadein", "on", "fadeout", "rotation", "offset"];
+    }
 
     public abstract function argsToArray();
 
-    public static abstract function fromJson(array $json);
+    public abstract function argList();
 
-    public static abstract function effects();
+    public abstract function avrEffect();
 
-    public static abstract function defaultFromEffect(int $effect);
+    public abstract function getEffectId();
 
     public static function getTiming(int $x)
     {
@@ -439,6 +414,4 @@ abstract class RgbProfileDevice
         }
         return $a;
     }
-
-    public abstract function avrEffect();
 }
