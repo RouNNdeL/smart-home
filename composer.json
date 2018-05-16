@@ -4,6 +4,7 @@
     "twbs/bootstrap": "^4.1",
     "components/jquery": "^3.3",
     "itsjavi/bootstrap-colorpicker": "^2.5",
-    "components/jqueryui": "^1.12"
+    "components/jqueryui": "^1.12",
+    "firebase/php-jwt": "^5.0"
   }
 }
