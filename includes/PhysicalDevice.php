@@ -56,7 +56,7 @@ abstract class PhysicalDevice
         foreach($this->virtual_devices as $virtual_device)
         {
             $name = $virtual_device->getDeviceName();
-            $sanitized_name = Utils::sanitizeName($name);
+            $sanitized_name = Utils::sanitizeString($name);
             $html .= "<li class=\"nav-item\" role=\"presentation\"" .
                 "><a id=\"device-link-$sanitized_name\" href=\"#$sanitized_name\" class=\"nav-link device-link\">"
                 . $name . "</a></li>";
