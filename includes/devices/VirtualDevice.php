@@ -95,6 +95,8 @@ abstract class VirtualDevice
         return $this->device_id;
     }
 
+    public abstract function toDatabase();
+
     public static function fromDatabaseRow(array $row)
     {
         // TODO: Add more device types when their classes get created

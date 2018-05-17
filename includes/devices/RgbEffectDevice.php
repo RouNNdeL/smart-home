@@ -117,4 +117,24 @@ abstract class RgbEffectDevice extends SimpleRgbDevice
     public abstract function getAvailableEffects();
 
     public abstract function colorLimit();
+
+    public function toDatabase()
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "UPDATE devices_virtual SET 
+                  color = $this->color,
+                  brightness = $this->brightness, 
+                  state = $this->on,
+                  toggles = $this->effects_enabled 
+                WHERE id = $this->device_id";
+        $conn->query($sql);
+    }
+
+    /**
+     * @return bool
+     */
+    public function areEffectsEnabled(): bool
+    {
+        return $this->effects_enabled;
+    }
 }

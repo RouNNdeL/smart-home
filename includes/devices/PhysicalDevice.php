@@ -27,13 +27,19 @@ abstract class PhysicalDevice
         $this->virtual_devices = $virtual_devices;
     }
 
+    /**
+     * @return bool
+     */
     public abstract function isOnline();
 
     public abstract function save();
 
-    public abstract function handleAssistantAction(array $action);
-
+    /**
+     * @return PhysicalDevice
+     */
     public static abstract function load();
+
+    public abstract function handleAssistantAction(array $action);
 
     /**
      * @param int $id
@@ -79,6 +85,8 @@ abstract class PhysicalDevice
         {
             case PcLedController::class:
                 return PcLedController::load();
+            case ChrisWifiController::class:
+                return ChrisWifiController::load();
             default:
                 return null;
         }

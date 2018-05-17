@@ -59,12 +59,22 @@ class SimpleRgbDevice extends VirtualDevice
      */
     public function getStateJson(bool $online = false)
     {
-        return [ $this->device_id =>
+        return [$this->device_id =>
             ["on" => $this->on,
-            "online" => $online,
-            "brightness" => $this->brightness,
-            "color" => ["spectrumRGB" => $this->color]]
+                "online" => $online,
+                "brightness" => $this->brightness,
+                "color" => ["spectrumRGB" => $this->color]]
         ];
+    }
+
+    public function toDatabase()
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "UPDATE devices_virtual SET 
+                  color = $this->color,
+                  brightness = $this->brightness, 
+                  state = $this->on WHERE id = $this->device_id";
+        $conn->query($sql);
     }
 
     /**
@@ -89,5 +99,29 @@ class SimpleRgbDevice extends VirtualDevice
     public function getAttributes()
     {
         return [];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOn(): bool
+    {
+        return $this->on;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBrightness(): int
+    {
+        return $this->brightness;
+    }
+
+    /**
+     * @return int
+     */
+    public function getColor(): int
+    {
+        return $this->color;
     }
 }

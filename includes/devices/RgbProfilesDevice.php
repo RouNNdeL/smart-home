@@ -11,7 +11,6 @@ require(__DIR__ . "/PhysicalDevice.php");
 abstract class RgbProfilesDevice extends PhysicalDevice
 {
     protected $current_profile;
-    public $enabled;
     public $brightness_array;
     protected $auto_increment;
 
@@ -68,12 +67,6 @@ abstract class RgbProfilesDevice extends PhysicalDevice
     protected abstract static function getMaximumActiveProfileCount();
 
     protected abstract static function getMaximumOverallProfileCount();
-
-    public function handleAssistantAction(array $action)
-    {
-        // TODO: Implement handleAssistantAction() method.
-        // Iterate over the devices, set appropriate colors, brightnesses and ON, OFF states
-    }
 
     public function getProfileCount()
     {
@@ -252,7 +245,7 @@ abstract class RgbProfilesDevice extends PhysicalDevice
      */
     public function getAutoIncrement()
     {
-        return RgbProfileDevice::getIncrementTiming($this->auto_increment);
+        return Effect::getIncrementTiming($this->auto_increment);
     }
 
     /**
@@ -261,9 +254,9 @@ abstract class RgbProfilesDevice extends PhysicalDevice
      */
     public function setAutoIncrement($value)
     {
-        $timing = RgbProfileDevice::convertIncrementToTiming($value);
+        $timing = Effect::convertIncrementToTiming($value);
         $this->auto_increment = $timing;
-        return RgbProfileDevice::getIncrementTiming($timing);
+        return Effect::getIncrementTiming($timing);
     }
 
     public function updateOldVars()
