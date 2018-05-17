@@ -57,9 +57,9 @@ class UserDeviceManager
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $data = curl_exec($ch);
-        $json_response = json_decode($data, true);
+        $response = json_decode($data, true);
         curl_close($ch);
-        return $json_response["access_token"];
+        return $response;
     }
 
     public static function fromUserId(int $id)
