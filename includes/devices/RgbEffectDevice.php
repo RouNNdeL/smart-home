@@ -124,11 +124,12 @@ abstract class RgbEffectDevice extends SimpleRgbDevice
     {
         $conn = DbUtils::getConnection();
         $state = $this->on ? 1 : 0;
+        $toggles = (($this->effects_enabled ? 1 : 0) << 0);
         $sql = "UPDATE devices_virtual SET 
                   color = $this->color,
                   brightness = $this->brightness, 
                   state = $state,
-                  toggles = $this->effects_enabled 
+                  toggles = $toggles 
                 WHERE id = '$this->device_id'";
         $conn->query($sql);
     }
