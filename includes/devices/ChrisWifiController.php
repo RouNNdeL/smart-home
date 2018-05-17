@@ -6,6 +6,8 @@
  * Time: 15:43
  */
 
+require_once __DIR__ . "/EspWifiLedController.php";
+
 /**
  * Class ChrisWifiController
  * To be used with an ESP8266 WiFi Led Controller: https://github.com/RouNNdeL/esp8266-leds
@@ -19,6 +21,13 @@ class ChrisWifiController extends EspWifiLedController
         return "chris-leds";
     }
 
+    public static function load(int $device_id)
+    {
+        $devices = DeviceQueryHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
+        // TODO: Load effects from database
+        return new ChrisWifiController($device_id, 0, 0, 0, [], $devices);
+    }
+
     protected function getSmallGlobalsHex()
     {
         $device = $this->virtual_devices[0];
@@ -28,7 +37,7 @@ class ChrisWifiController extends EspWifiLedController
         $flags = (($device->isOn() ? 1 : 0) << 0);
 
         $str = "";
-        $str.= dechex($device->getBrightness() / 100 * 255);
+        $str .= dechex($device->getBrightness() / 100 * 255);
         $str .= "??";
         $str .= "??";
         $str .= dechex($flags);
@@ -46,7 +55,7 @@ class ChrisWifiController extends EspWifiLedController
         $flags = (($device->isOn() ? 1 : 0) << 0) | (($device->areEffectsEnabled() ? 1 : 0) << 2);
 
         $str = "";
-        $str.= dechex($device->getBrightness() / 100 * 255);
+        $str .= dechex($device->getBrightness() / 100 * 255);
         $str .= dechex($this->getProfileCount());
         $str .= dechex($this->getActiveProfileIndex());
         $str .= dechex($flags);

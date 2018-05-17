@@ -6,6 +6,9 @@
  * Time: 17:59
  */
 
+require_once __DIR__."/ChrisWifiController.php";
+require_once __DIR__."/PcLedController.php";
+
 abstract class PhysicalDevice
 {
     const ID_PC_LED_CONTROLLER = 0;
@@ -35,17 +38,22 @@ abstract class PhysicalDevice
     public abstract function save();
 
     /**
+     * @param int $device_id
      * @return PhysicalDevice
      */
-    public static abstract function load();
+    public static abstract function load(int $device_id);
 
+    /**
+     * @param array $action
+     * @return array - ex. ["status" => "SUCCESS", "ids" => [2, 5, 9]]
+     */
     public abstract function handleAssistantAction(array $action);
 
     /**
-     * @param int $id
+     * @param string $id
      * @return null|VirtualDevice
      */
-    public function getVirtualDeviceById(int $id)
+    public function getVirtualDeviceById(string $id)
     {
         foreach($this->virtual_devices as $virtual_device)
         {
@@ -84,11 +92,19 @@ abstract class PhysicalDevice
         switch($row["device_driver"])
         {
             case PcLedController::class:
-                return PcLedController::load();
+                return PcLedController::load($row["id"]);
             case ChrisWifiController::class:
-                return ChrisWifiController::load();
+                return ChrisWifiController::load($row["id"]);
             default:
                 return null;
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
     }
 }

@@ -6,6 +6,8 @@
  * Time: 14:15
  */
 
+require_once __DIR__."/../Utils.php";
+
 abstract class RgbEffectDevice extends SimpleRgbDevice
 {
     const ACTIONS_TOGGLE_EFFECT = "ACTIONS_TOGGLE_EFFECT";

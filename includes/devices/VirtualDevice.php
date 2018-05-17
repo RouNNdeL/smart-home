@@ -43,11 +43,11 @@ abstract class VirtualDevice
 
     /**
      * VirtualDevice constructor.
-     * @param int $device_id
+     * @param string $device_id
      * @param string $device_name
      * @param string $device_type
      */
-    public function __construct(int $device_id, string $device_name, string $device_type)
+    public function __construct(string $device_id, string $device_name, string $device_type)
     {
         $this->device_id = $device_id;
         $this->device_name = $device_name;
@@ -92,7 +92,7 @@ abstract class VirtualDevice
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getDeviceId()
     {

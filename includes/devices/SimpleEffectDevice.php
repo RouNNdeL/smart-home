@@ -6,6 +6,8 @@
  * Time: 20:18
  */
 
+require_once __DIR__."/RgbEffectDevice.php";
+require_once __DIR__."/../effects/Effect.php";
 
 class SimpleEffectDevice extends RgbEffectDevice
 {

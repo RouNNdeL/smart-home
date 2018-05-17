@@ -74,7 +74,7 @@ class PcLedController extends RgbProfilesDevice
         file_put_contents($path, serialize($this));
     }
 
-    public static function load()
+    public static function load(int $id)
     {
         $path = $_SERVER["DOCUMENT_ROOT"] . self::SAVE_PATH;
         $contents = file_get_contents($path);
@@ -144,5 +144,14 @@ class PcLedController extends RgbProfilesDevice
         $array["profile_order"] = $this->getAvrOrder();
 
         return json_encode(array("type" => "globals_update", "data" => $array));
+    }
+
+    /**
+     * @param array $action
+     * @return array - ex. ["status" => "SUCCESS", "ids" => [2, 5, 9]]
+     */
+    public function handleAssistantAction(array $action)
+    {
+        // TODO: Implement handleAssistantAction() method.
     }
 }

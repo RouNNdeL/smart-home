@@ -5,8 +5,8 @@
  * Date: 2018-05-14
  * Time: 19:03
  */
-require(__DIR__ . "/VirtualDevice.php");
-require(__DIR__ . "/PhysicalDevice.php");
+require_once __DIR__ . "/VirtualDevice.php";
+require_once __DIR__ . "/PhysicalDevice.php";
 
 abstract class RgbProfilesDevice extends PhysicalDevice
 {
@@ -37,26 +37,23 @@ abstract class RgbProfilesDevice extends PhysicalDevice
      * @param int $auto_increment
      * @param array $profiles
      * @param array $virtual_devices
-     * @param array $brightness_array
      */
     protected function __construct(int $id, int $current_profile, bool $enabled, int $auto_increment,
-                                   array $profiles, array $virtual_devices, array $brightness_array
+                                   array $profiles, array $virtual_devices
     )
     {
         $this->current_profile = $current_profile;
-        $this->enabled = $enabled;
         $this->auto_increment = $auto_increment;
         $this->profiles = $profiles;
-        $this->brightness_array = $brightness_array;
-        if(sizeof($profiles) <= self::getMaximumActiveProfileCount())
+        if(sizeof($profiles) <= static::getMaximumActiveProfileCount())
         {
             $this->active_indexes = range(0, sizeof($profiles) - 1);
             $this->inactive_indexes = array();
         }
         else
         {
-            $this->active_indexes = range(0, self::getMaximumActiveProfileCount() - 1);
-            $this->inactive_indexes = range(self::getMaximumActiveProfileCount(), sizeof($profiles) - self::getMaximumActiveProfileCount() - 1);
+            $this->active_indexes = range(0, static::getMaximumActiveProfileCount() - 1);
+            $this->inactive_indexes = range(static::getMaximumActiveProfileCount(), sizeof($profiles) - static::getMaximumActiveProfileCount() - 1);
         }
         $this->avr_indexes = $this->active_indexes;
         $this->avr_order = $this->getAvrOrder();
@@ -75,13 +72,13 @@ abstract class RgbProfilesDevice extends PhysicalDevice
 
     public function addProfile(Profile $profile)
     {
-        if(sizeof($this->profiles) >= self::getMaximumOverallProfileCount())
+        if(sizeof($this->profiles) >= static::getMaximumOverallProfileCount())
             return false;
         array_push($this->profiles, $profile);
-        if(sizeof($this->active_indexes) < self::getMaximumActiveProfileCount())
+        if(sizeof($this->active_indexes) < static::getMaximumActiveProfileCount())
         {
             array_push($this->active_indexes, $this->getMaxIndex());
-            for($i = 0; $i < self::getMaximumActiveProfileCount(); $i++)
+            for($i = 0; $i < static::getMaximumActiveProfileCount(); $i++)
             {
                 if(!isset($this->avr_indexes[$i]))
                 {
@@ -119,7 +116,7 @@ abstract class RgbProfilesDevice extends PhysicalDevice
         {
             if(array_search($item, $this->active_indexes) === false)
             {
-                for($i = 0; $i < self::getMaximumActiveProfileCount(); $i++)
+                for($i = 0; $i < static::getMaximumActiveProfileCount(); $i++)
                 {
                     if(!isset($this->avr_indexes[$i]))
                     {

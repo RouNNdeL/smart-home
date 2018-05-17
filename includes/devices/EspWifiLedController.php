@@ -6,14 +6,18 @@
  * Time: 14:44
  */
 
+require_once __DIR__ . "/../database/DeviceQueryHelper.php";
+require_once __DIR__ . "/RgbProfilesDevice.php";
+require_once __DIR__ . "/ChrisWifiController.php";
+
 /**
  * To be used with an ESP8266 WiFi Led Controller: https://github.com/RouNNdeL/esp8266-leds
  */
 abstract class EspWifiLedController extends RgbProfilesDevice
 {
-    public function __construct(int $id, int $current_profile, bool $enabled, int $auto_increment, array $profiles, array $virtual_devices, array $brightness_array)
+    public function __construct(int $id, int $current_profile, bool $enabled, int $auto_increment, array $profiles, array $virtual_devices)
     {
-        parent::__construct($id, $current_profile, $enabled, $auto_increment, $profiles, $virtual_devices, $brightness_array);
+        parent::__construct($id, $current_profile, $enabled, $auto_increment, $profiles, $virtual_devices);
     }
 
     public function isOnline()
@@ -26,8 +30,13 @@ abstract class EspWifiLedController extends RgbProfilesDevice
         return $fp === false ? false : true;
     }
 
+    /**
+     * @param array $action
+     * @return array
+     */
     public function handleAssistantAction(array $action)
     {
+        $ids = [];
         foreach($action["commands"] as $command)
         {
             foreach($command["devices"] as $d)
@@ -35,6 +44,7 @@ abstract class EspWifiLedController extends RgbProfilesDevice
                 $device = $this->getVirtualDeviceById($d["id"]);
                 if($device !== null)
                 {
+                    $ids[] = $device->getDeviceId();
                     foreach($command["execution"] as $item)
                     {
                         $device->handleAssistantAction($item);
@@ -44,12 +54,14 @@ abstract class EspWifiLedController extends RgbProfilesDevice
         }
 
         $this->save();
+
+        return ["status" => $this->isOnline() ? "SUCCESS" : "OFFLINE", "ids" => $ids];
     }
 
     public function save()
     {
-        $data_string = $this->getSmallGlobalsHex()."*";
-        $ch = curl_init("http://".$this->getDeviceHostname()."/globals");
+        $data_string = $this->getSmallGlobalsHex() . "*";
+        $ch = curl_init("http://" . $this->getDeviceHostname() . "/globals");
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -64,11 +76,6 @@ abstract class EspWifiLedController extends RgbProfilesDevice
         {
             $virtual_device->toDatabase();
         }
-    }
-
-    public static function load()
-    {
-        // TODO: Load object from database and effects from files
     }
 
     /**
