@@ -6,10 +6,14 @@
  * Time: 17:51
  */
 
+require_once __DIR__."/SimpleRgbDevice.php";
+require_once __DIR__."/SimpleEffectDevice.php";
+
 abstract class VirtualDevice
 {
     const DEVICE_TYPE_RGB = "DEVICE_RGB";
-    const DEVICE_TYPE_EFFECTS_RGB = "DEVICE_EFFECTS_RGB";
+    const DEVICE_TYPE_EFFECTS_RGB_SIMPLE = "DEVICE_EFFECTS_RGB_SIMPLE";
+    const DEVICE_TYPE_EFFECTS_RGB_ADVANCED = "DEVICE_EFFECTS_RGB_ADVANCED";
     const DEVICE_TYPE_LAMP = "DEVICE_LAMP";
     const DEVICE_TYPE_LAMP_ANALOG = "DEVICE_LAMP_ANALOG";
     const DEVICE_TYPE_SWITCH = "DEVICE_SWITCH";
@@ -107,8 +111,13 @@ abstract class VirtualDevice
                     $row["id"], $row["display_name"], $row["color"],
                     $row["brightness"], $row["state"]
                 );
+            case self::DEVICE_TYPE_EFFECTS_RGB_SIMPLE:
+                return new SimpleEffectDevice(
+                    $row["id"], $row["display_name"], $row["color"],
+                    $row["brightness"], $row["state"]
+                );
             default:
-                return null;
+                throw new InvalidArgumentException("Invalid device type ".$row["type"]);
         }
     }
 }
