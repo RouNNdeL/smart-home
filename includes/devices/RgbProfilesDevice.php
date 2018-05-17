@@ -11,7 +11,6 @@ require_once __DIR__ . "/PhysicalDevice.php";
 abstract class RgbProfilesDevice extends PhysicalDevice
 {
     protected $current_profile;
-    public $brightness_array;
     protected $auto_increment;
 
     /** @var int[] */

@@ -123,12 +123,13 @@ abstract class RgbEffectDevice extends SimpleRgbDevice
     public function toDatabase()
     {
         $conn = DbUtils::getConnection();
+        $state = $this->on ? 1 : 0;
         $sql = "UPDATE devices_virtual SET 
                   color = $this->color,
                   brightness = $this->brightness, 
-                  state = $this->on,
+                  state = $state,
                   toggles = $this->effects_enabled 
-                WHERE id = $this->device_id";
+                WHERE id = '$this->device_id'";
         $conn->query($sql);
     }
 
@@ -138,5 +139,13 @@ abstract class RgbEffectDevice extends SimpleRgbDevice
     public function areEffectsEnabled(): bool
     {
         return $this->effects_enabled;
+    }
+
+    /**
+     * @param bool $effects_enabled
+     */
+    public function setEffectsEnabled(bool $effects_enabled)
+    {
+        $this->effects_enabled = $effects_enabled;
     }
 }

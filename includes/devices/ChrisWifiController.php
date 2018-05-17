@@ -33,16 +33,18 @@ class ChrisWifiController extends EspWifiLedController
         $device = $this->virtual_devices[0];
         if(!$device instanceof RgbEffectDevice)
             throw new UnexpectedValueException("Children of ChrisWifiController should be of type RgbEffectDevice");
+
         /* We disable the effects in order to show the color */
+        $device->setEffectsEnabled(false);
         $flags = (($device->isOn() ? 1 : 0) << 0);
 
         $str = "";
-        $str .= dechex($device->getBrightness() / 100 * 255);
+        $str .= str_pad(dechex($device->getBrightness() / 100 * 255), 2, '0', STR_PAD_LEFT);
         $str .= "??";
         $str .= "??";
-        $str .= dechex($flags);
+        $str .= str_pad(dechex($flags), 2, '0', STR_PAD_LEFT);
         $str .= "??";
-        $str .= dechex($device->getColor());
+        $str .= str_pad(dechex($device->getColor()), 6, '0', STR_PAD_LEFT);
 
         return $str;
     }
