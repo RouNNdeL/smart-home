@@ -9,6 +9,7 @@
 abstract class VirtualDevice
 {
     const DEVICE_TYPE_RGB = "DEVICE_RGB";
+    const DEVICE_TYPE_EFFECTS_RGB = "DEVICE_EFFECTS_RGB";
     const DEVICE_TYPE_LAMP = "DEVICE_LAMP";
     const DEVICE_TYPE_LAMP_ANALOG = "DEVICE_LAMP_ANALOG";
     const DEVICE_TYPE_SWITCH = "DEVICE_SWITCH";
@@ -64,7 +65,7 @@ abstract class VirtualDevice
      * @param bool $online
      * @return array
      */
-    public abstract function getQueryJson(bool $online = false);
+    public abstract function getStateJson(bool $online = false);
 
     /**
      * @return string
@@ -92,5 +93,20 @@ abstract class VirtualDevice
     public function getDeviceId()
     {
         return $this->device_id;
+    }
+
+    public static function fromDatabaseRow(array $row)
+    {
+        // TODO: Add more device types when their classes get created
+        switch($row["type"])
+        {
+            case self::DEVICE_TYPE_RGB:
+                return new SimpleRgbDevice(
+                    $row["id"], $row["display_name"], $row["color"],
+                    $row["brightness"], $row["state"]
+                );
+            default:
+                return null;
+        }
     }
 }

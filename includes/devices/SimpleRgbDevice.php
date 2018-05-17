@@ -57,13 +57,13 @@ class SimpleRgbDevice extends VirtualDevice
      * @param bool $online
      * @return array
      */
-    public function getQueryJson(bool $online = false)
+    public function getStateJson(bool $online = false)
     {
-        return [
-            "on" => $this->on,
+        return [ $this->device_id =>
+            ["on" => $this->on,
             "online" => $online,
             "brightness" => $this->brightness,
-            "color" => ["spectrumRGB" => $this->color]
+            "color" => ["spectrumRGB" => $this->color]]
         ];
     }
 

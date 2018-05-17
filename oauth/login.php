@@ -27,8 +27,8 @@ if($client === null || ($client->id === 1 && $_GET["redirect_uri"] !== "https://
 
 if(isset($_GET["oauth-username"]) && isset($_GET["oauth-token"]))
 {
-    require_once __DIR__."/../database/DbUtils.php";
-    require_once __DIR__."/../database/HomeUser.php";
+    require_once __DIR__ . "/../database/DbUtils.php";
+    require_once __DIR__ . "/../database/HomeUser.php";
     require_once __DIR__."/../vendor/autoload.php";
 
     $user = HomeUser::queryUserByUsername(DbUtils::getConnection(), $_GET["oauth-username"]);

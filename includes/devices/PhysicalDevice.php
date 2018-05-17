@@ -49,6 +49,14 @@ abstract class PhysicalDevice
         return null;
     }
 
+    /**
+     * @return VirtualDevice[]
+     */
+    public function getVirtualDevices(): array
+    {
+        return $this->virtual_devices;
+    }
+
     public function getDeviceNavbarHtml()
     {
         $html = "";
@@ -63,5 +71,16 @@ abstract class PhysicalDevice
         }
 
         return $html;
+    }
+
+    public static function fromDatabaseRow(array $row)
+    {
+        switch($row["device_driver"])
+        {
+            case PcLedController::class:
+                return PcLedController::load();
+            default:
+                return null;
+        }
     }
 }

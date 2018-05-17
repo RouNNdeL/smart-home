@@ -33,12 +33,40 @@ class UserDeviceManager
     public function sendReportState(string $requestId = null)
     {
         $token = HomeGraphTokenManager::getToken();
-        // TODO: Send the actual report state
+        $states = [];
+        foreach($this->physical_devices as $physicalDevice)
+        {
+            foreach($physicalDevice->getVirtualDevices() as $virtualDevice)
+            {
+                $states[] = $virtualDevice->getStateJson($physicalDevice->isOnline());
+            }
+        }
+
+        $payload = ["agent_user_id" => $this->user_id, "payload" => ["devices" => ["states" => $states]]];
+        if($requestId !== null)
+            $payload["requestId"] = $requestId;
+
+        $header = [];
+        $header[] = "Content-type: application/json";
+        $header[] = "Authorization: Bearer " . $token;
+        $header[] = "X-GFE-SSL: yes";
+
+        $ch = curl_init("https://homegraph.googleapis.com/v1/devices:reportStateAndNotification");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $data = curl_exec($ch);
+        $json_response = json_decode($data, true);
+        curl_close($ch);
+        return $json_response["access_token"];
     }
 
     public static function fromUserId(int $id)
     {
-        // TODO: Fetch user devices from the database and return a new object
-        return new UserDeviceManager(0, []);
+        return new UserDeviceManager(
+            $id,
+            DeviceQueryHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $id)
+        );
     }
 }
