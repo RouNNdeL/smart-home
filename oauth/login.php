@@ -6,8 +6,8 @@
  * Time: 14:34
  */
 
-require_once __DIR__ . "/../database/ApiClient.php";
-require_once __DIR__ . "/../database/DbUtils.php";
+require_once __DIR__ . "/../includes/database/ApiClient.php";
+require_once __DIR__ . "/../includes/database/DbUtils.php";
 
 if(!isset($_GET["client_id"]) || !isset($_GET["redirect_uri"]) || !isset($_GET["state"]) || !isset($_GET["scope"])
     || !isset($_GET["response_type"]) || $_GET["response_type"] !== "code")
@@ -27,8 +27,8 @@ if($client === null || ($client->id === 1 && $_GET["redirect_uri"] !== "https://
 
 if(isset($_GET["oauth-username"]) && isset($_GET["oauth-token"]))
 {
-    require_once __DIR__ . "/../database/DbUtils.php";
-    require_once __DIR__ . "/../database/HomeUser.php";
+    require_once __DIR__ . "/../includes/database/DbUtils.php";
+    require_once __DIR__ . "/../includes/database/HomeUser.php";
     require_once __DIR__."/../vendor/autoload.php";
 
     $user = HomeUser::queryUserByUsername(DbUtils::getConnection(), $_GET["oauth-username"]);
@@ -45,7 +45,7 @@ if(isset($_GET["oauth-username"]) && isset($_GET["oauth-token"]))
             $checkCode = $g->checkCode($user->secret, $_GET["oauth-token"]);
             if($checkCode)
             {
-                require_once __DIR__ . "/../database/OAuthUtils.php";
+                require_once __DIR__ . "/../includes/database/OAuthUtils.php";
                 $code = urlencode(OAuthUtils::insertAuthCode(DbUtils::getConnection(), $client->id, $user->id, $_GET["scope"]));
                 $state = $_GET["state"];
                 header("Location: " . $_GET["redirect_uri"] . "?code=$code&state=$state");
@@ -69,7 +69,7 @@ if(isset($_GET["oauth-username"]) && isset($_GET["oauth-token"]))
 <html lang="en">
 <?php
 $title = "Login to Home";
-require_once __DIR__ . "/../web/includes/html_head.php";
+require_once __DIR__ . "/../web/html/html_head.php";
 
 ?>
 <body>

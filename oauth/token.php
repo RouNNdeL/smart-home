@@ -22,8 +22,8 @@ if(!isset($params["client_id"]) || !isset($params["client_secret"]) || !isset($p
     exit(0);
 }
 
-require_once __DIR__ . "/../database/DbUtils.php";
-require_once __DIR__ . "/../database/ApiClient.php";
+require_once __DIR__ . "/../includes/database/DbUtils.php";
+require_once __DIR__ . "/../includes/database/ApiClient.php";
 $client = ApiClient::queryClientById(DbUtils::getConnection(), $params["client_id"]);
 
 if($client === null || $client->secret !== $params["client_secret"])
@@ -35,7 +35,7 @@ if($client === null || $client->secret !== $params["client_secret"])
 
 if($params["grant_type"] === "authorization_code" && isset($params["code"]))
 {
-    require_once __DIR__ . "/../database/OAuthUtils.php";
+    require_once __DIR__ . "/../includes/database/OAuthUtils.php";
     $tokens = OAuthUtils::exchangeCodeForTokens(DbUtils::getConnection(), $params["code"], $params["client_id"]);
 
     if($tokens !== null)

@@ -118,4 +118,17 @@ class HomeUser
         $sql = "DELETE FROM home_users WHERE enabled = 0";
         return $conn->query($sql);
     }
+
+    /**
+     * @param $conn mysqli
+     * @param int $id
+     * @param bool $registered
+     * @return bool|mysqli_result
+     */
+    public static function setGoogleRegistered(mysqli $conn, int $id, bool $registered)
+    {
+        $val = $registered ? 1 : 0;
+        $sql = "UPDATE home_users SET google_registered = $val WHERE id = $id";
+        return $conn->query($sql);
+    }
 }

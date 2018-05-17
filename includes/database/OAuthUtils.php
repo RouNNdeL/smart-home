@@ -82,7 +82,7 @@ class OAuthUtils
      * @param $token
      * @return int
      */
-    public static function getUserForToken($conn, $token)
+    public static function getUserIdForToken($conn, $token)
     {
         $sql = "SELECT user_id FROM oauth WHERE token=? AND type='access_token'";
         $stmt = $conn->prepare($sql);
