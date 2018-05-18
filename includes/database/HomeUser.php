@@ -137,4 +137,25 @@ class HomeUser
         $sql = "UPDATE home_users SET google_registered = $val WHERE id = $id";
         return $conn->query($sql);
     }
+
+    /**
+     * @param mysqli $conn
+     * @return HomeUser[]
+     */
+    public static function queryAllRegistered(mysqli $conn)
+    {
+        $sql = "SELECT id, username, secret FROM home_users WHERE google_registered = 1";
+        $result = $conn->query($sql);
+        $arr = [];
+
+        if($result->num_rows > 0)
+        {
+            while($row = $result->fetch_assoc())
+            {
+                $arr[] =  new HomeUser($row["id"], $row["username"], $row["secret"], true);
+            }
+        }
+
+        return $arr;
+    }
 }

@@ -30,7 +30,7 @@ class ActionsRequestManager
             switch($input["intent"])
             {
                 case self::ACTION_INTENT_SYNC:
-                    $payload["agentUserId"] = $user_id;
+                    $payload["agentUserId"] = (string) $user_id;
                     $payload["devices"] = static::getSyncForUser($user_id);
                     HomeUser::setGoogleRegistered(DbUtils::getConnection(), $user_id, true);
                     break;

@@ -8,6 +8,10 @@
 
 require_once __DIR__ . "/../vendor/autoload.php";
 require_once __DIR__ . "/database/HomeGraphTokenManager.php";
+require_once __DIR__ . "/database/DbUtils.php";
+require_once __DIR__ . "/database/HomeUser.php";
+require_once __DIR__ . "/database/DeviceQueryHelper.php";
+require_once __DIR__ . "/../secure_config.php";
 
 use \Firebase\JWT\JWT;
 
@@ -42,7 +46,7 @@ class UserDeviceManager
             }
         }
 
-        $payload = ["agentUserId" => (string) $this->user_id, "payload" => ["devices" => ["states" => $states]]];
+        $payload = ["agentUserId" => (string)$this->user_id, "payload" => ["devices" => ["states" => $states]]];
         if($requestId !== null)
             $payload["requestId"] = $requestId;
 
@@ -61,6 +65,34 @@ class UserDeviceManager
         curl_close($ch);
 
         return $response;
+    }
+
+    public function requestSync()
+    {
+        global $homegraph_key;
+        $payload = ["agentUserId" => (string)$this->user_id];
+
+        $header = [];
+        $header[] = "Content-type: application/json";
+
+        $ch = curl_init("https://homegraph.googleapis.com/v1/devices:requestSync?key=" . $homegraph_key);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $data = curl_exec($ch);
+        $response = json_decode($data, true);
+        curl_close($ch);
+
+        return $response;
+    }
+
+    public static function requestSyncForAll()
+    {
+        foreach(HomeUser::queryAllRegistered(DbUtils::getConnection()) as $user)
+        {
+            UserDeviceManager::fromUserId($user->id)->requestSync();
+        }
     }
 
     public static function fromUserId(int $id)
