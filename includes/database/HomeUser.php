@@ -11,18 +11,21 @@ class HomeUser
     public $id;
     public $username;
     public $secret;
+    public $registered_for_report_state;
 
     /**
      * HomeUser constructor.
-     * @param $id
-     * @param $username
-     * @param $secret
+     * @param int $id
+     * @param string $username
+     * @param string $secret
+     * @param bool $registered_for_report_state
      */
-    private function __construct($id, $username, $secret)
+    private function __construct(int $id, string $username, string $secret, bool $registered_for_report_state)
     {
         $this->id = $id;
         $this->username = $username;
         $this->secret = $secret;
+        $this->registered_for_report_state = $registered_for_report_state;
     }
 
     public static function newUser($conn, $username)
@@ -68,12 +71,15 @@ class HomeUser
      */
     public static function queryUserByUsername($conn, $username)
     {
-        $sql = "SELECT id, username, secret FROM home_users WHERE username = '$username'";
-        $result = $conn->query($sql);
+        $sql = "SELECT id, username, secret, google_registered FROM home_users WHERE username = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
         if($result->num_rows > 0)
         {
             $row = $result->fetch_assoc();
-            return new HomeUser($row["id"], $row["username"], $row["secret"]);
+            return new HomeUser($row["id"], $row["username"], $row["secret"], $row["google_registered"]);
         }
 
         return null;
@@ -86,12 +92,12 @@ class HomeUser
      */
     public static function queryUserById($conn, $id)
     {
-        $sql = "SELECT id, username, secret FROM home_users WHERE id = $id";
+        $sql = "SELECT id, username, secret, google_registered FROM home_users WHERE id = $id";
         $result = $conn->query($sql);
         if($result->num_rows > 0)
         {
             $row = $result->fetch_assoc();
-            return new HomeUser($row["id"], $row["username"], $row["secret"]);
+            return new HomeUser($row["id"], $row["username"], $row["secret"], $row["google_registered"]);
         }
 
         return null;
