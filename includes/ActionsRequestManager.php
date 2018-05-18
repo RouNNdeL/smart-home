@@ -37,7 +37,7 @@ class ActionsRequestManager
                 case self::ACTION_INTENT_QUERY:
                     break;
                 case self::ACTION_INTENT_EXECUTE:
-                    $payload["commands"] = self::handleExecuteForUser($user_id, $input["payload"]);
+                    $payload["commands"] = self::handleExecuteForUser($user_id, $input["payload"], $request_id);
                     break;
                 case self::ACTION_INTENT_DISCONNECT:
                     HomeUser::setGoogleRegistered(DbUtils::getConnection(), $user_id, false);
@@ -66,18 +66,18 @@ class ActionsRequestManager
         return $devices_payload;
     }
 
-    private static function handleExecuteForUser(int $user_id, array $payload)
+    private static function handleExecuteForUser(int $user_id, array $payload, string $request_id)
     {
         $devices = DeviceQueryHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $user_id);
         $commands_response = [];
         foreach($devices as $device)
         {
-            $result = $device->handleAssistantAction($payload);
+            $result = $device->handleAssistantAction($payload, $request_id);
             $status = $result["status"];
-            if(isset($commands_response[$status]))
+            if(!isset($commands_response[$status]))
                 $commands_response[$status] = [];
 
-            $commands_response["status"] = array_merge($commands_response["status"], $result["ids"]);
+            $commands_response[$status] = array_merge($commands_response[$status], $result["ids"]);
         }
 
         $commands_response_array = [];

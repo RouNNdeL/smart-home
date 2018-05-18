@@ -79,7 +79,7 @@ abstract class VirtualDevice
     public function getSyncJson($physical_device_id)
     {
         return ["id" => $this->device_id, "type" => $this->getActionsDeviceType(), "name" => ["name" => $this->device_name],
-            "traits" => $this->getTraits(), "willReportState" => false, "attributes" => $this->getAttributes(),
+            "traits" => $this->getTraits(), "willReportState" => true, "attributes" => $this->getAttributes(),
             "customData" => ["physical_device_id" => $physical_device_id]];
     }
 

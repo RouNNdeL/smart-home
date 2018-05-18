@@ -6,7 +6,8 @@
  * Time: 15:43
  */
 
-require_once __DIR__ . "/EspWifiLedController.php";
+require __DIR__ . "/EspWifiLedController.php";
+require_once __DIR__ . "/../database/DbUtils.php";
 
 /**
  * Class ChrisWifiController
@@ -21,7 +22,7 @@ class ChrisWifiController extends EspWifiLedController
         return "chris-leds";
     }
 
-    public static function load(int $device_id)
+    public static function load(string $device_id)
     {
         $devices = DeviceQueryHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
         // TODO: Load effects from database

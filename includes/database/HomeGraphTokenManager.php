@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__ . "/../../vendor/autoload.php";
 require_once __DIR__ . "/DbUtils.php";
 
 use Firebase\JWT\JWT;
@@ -47,7 +47,7 @@ class HomeGraphTokenManager
 
     private static function fetchNewToken()
     {
-        $key_file = json_decode(file_get_contents("../home_graph_key.json"), true);
+        $key_file = json_decode(file_get_contents("../../home_graph_key.json"), true);
         $host = "https://accounts.google.com/o/oauth2/token";
         $payload = ["iat" => time(), "exp" => time() + 60*60, "iss" => $key_file["client_email"],
             "scope" => "https://www.googleapis.com/auth/homegraph", "aud" => $host];

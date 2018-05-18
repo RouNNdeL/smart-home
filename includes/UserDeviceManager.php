@@ -7,7 +7,7 @@
  */
 
 require_once __DIR__ . "/../vendor/autoload.php";
-require_once __DIR__ . "/../database/HomeGraphTokenManager.php";
+require_once __DIR__ . "/database/HomeGraphTokenManager.php";
 
 use \Firebase\JWT\JWT;
 
@@ -38,11 +38,11 @@ class UserDeviceManager
         {
             foreach($physicalDevice->getVirtualDevices() as $virtualDevice)
             {
-                $states[] = $virtualDevice->getStateJson($physicalDevice->isOnline());
+                $states[$virtualDevice->getDeviceId()] = $virtualDevice->getStateJson($physicalDevice->isOnline());
             }
         }
 
-        $payload = ["agent_user_id" => $this->user_id, "payload" => ["devices" => ["states" => $states]]];
+        $payload = ["agentUserId" => (string) $this->user_id, "payload" => ["devices" => ["states" => $states]]];
         if($requestId !== null)
             $payload["requestId"] = $requestId;
 
@@ -54,11 +54,12 @@ class UserDeviceManager
         $ch = curl_init("https://homegraph.googleapis.com/v1/devices:reportStateAndNotification");
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $data = curl_exec($ch);
         $response = json_decode($data, true);
         curl_close($ch);
+
         return $response;
     }
 

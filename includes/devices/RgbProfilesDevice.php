@@ -30,14 +30,14 @@ abstract class RgbProfilesDevice extends PhysicalDevice
     protected $profiles;
 
     /**
-     * @param int $id
+     * @param string $id
      * @param int $current_profile
      * @param bool $enabled
      * @param int $auto_increment
      * @param array $profiles
      * @param array $virtual_devices
      */
-    protected function __construct(int $id, int $current_profile, bool $enabled, int $auto_increment,
+    protected function __construct(string $id, int $current_profile, bool $enabled, int $auto_increment,
                                    array $profiles, array $virtual_devices
     )
     {

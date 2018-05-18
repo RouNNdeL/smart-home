@@ -61,11 +61,11 @@ class SimpleRgbDevice extends VirtualDevice
      */
     public function getStateJson(bool $online = false)
     {
-        return [$this->device_id =>
-            ["on" => $this->on,
-                "online" => $online,
-                "brightness" => $this->brightness,
-                "color" => ["spectrumRGB" => $this->color]]
+        return [
+            "on" => $this->on,
+            "online" => $online,
+            "brightness" => $this->brightness,
+            "color" => ["spectrumRGB" => $this->color]
         ];
     }
 
@@ -125,5 +125,29 @@ class SimpleRgbDevice extends VirtualDevice
     public function getColor(): int
     {
         return $this->color;
+    }
+
+    /**
+     * @param int $brightness
+     */
+    public function setBrightness(int $brightness)
+    {
+        $this->brightness = $brightness;
+    }
+
+    /**
+     * @param bool $on
+     */
+    public function setOn(bool $on)
+    {
+        $this->on = $on;
+    }
+
+    /**
+     * @param int $color
+     */
+    public function setColor(int $color)
+    {
+        $this->color = $color;
     }
 }
