@@ -41,10 +41,7 @@ class ChrisWifiController extends EspWifiLedController
 
         $str = "";
         $str .= str_pad(dechex($device->getBrightness() / 100 * 255), 2, '0', STR_PAD_LEFT);
-        $str .= "??";
-        $str .= "??";
         $str .= str_pad(dechex($flags), 2, '0', STR_PAD_LEFT);
-        $str .= "??";
         $str .= str_pad(dechex($device->getColor()), 6, '0', STR_PAD_LEFT);
 
         return $str;
@@ -59,11 +56,11 @@ class ChrisWifiController extends EspWifiLedController
 
         $str = "";
         $str .= dechex($device->getBrightness() / 100 * 255);
-        $str .= dechex($this->getProfileCount());
-        $str .= dechex($this->getActiveProfileIndex());
         $str .= dechex($flags);
-        $str .= dechex($this->getAutoIncrement());
         $str .= dechex($device->getColor());
+        $str .= dechex($this->getActiveProfileIndex());
+        $str .= dechex($this->getProfileCount());
+        $str .= dechex($this->getAutoIncrement());
 
         foreach($this->avr_order as $item)
         {

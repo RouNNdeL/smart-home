@@ -102,9 +102,9 @@ abstract class EspWifiLedController extends RgbProfilesDevice
             if(!($virtual_device instanceof RgbEffectDevice))
                 throw new UnexpectedValueException("Children of EspWifiLedController should be of type RgbEffectDevice");
             $virtual_device->setBrightness(ceil($state["brightness"][$i] * 100 / 255));
-            $virtual_device->setOn($state["flags"] & (1 << 0));
-            $virtual_device->setEffectsEnabled($state["flags"] & (1 << 2));
-            $virtual_device->setColor($state["color"]);
+            $virtual_device->setOn($state["flags"][$i] & (1 << 0));
+            $virtual_device->setEffectsEnabled($state["flags"][$i] & (1 << 2));
+            $virtual_device->setColor($state["color"][$i]);
         }
 
         foreach($this->virtual_devices as $virtual_device)
