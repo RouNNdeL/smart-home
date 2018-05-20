@@ -28,14 +28,32 @@ class HomeUser
         $this->registered_for_report_state = $registered_for_report_state;
     }
 
-    public static function newUser($conn, $username)
+    public static function newUser(mysqli $conn, string $username, string $password): HomeUser
     {
-        $secret = self::generateRandomSecret();
-        if(self::insertUser($conn, $username, $secret) === false)
+        $password_hash = self::hashPassword($password);
+        if(self::insertUser($conn, $username, $password_hash) === false)
         {
             return null;
         }
         return self::queryUserByUsername($conn, $username);
+    }
+
+    public static function authenticateUser(mysqli $conn, string $username, string $password): HomeUser
+    {
+        $password_hash = self::hashPassword($password);
+        $sql = "SELECT password FROM home_users WHERE username = ? AND password = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $username, $password_hash);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        return $result->num_rows > 0 ? self::queryUserByUsername($conn, $username) : null;
+    }
+
+    private static function hashPassword(string $password): string
+    {
+        $options = ["cost" => 12];
+        return password_hash($password, PASSWORD_BCRYPT, $options);
     }
 
     private static function generateRandomSecret()
@@ -51,27 +69,27 @@ class HomeUser
     /**
      * @param $conn mysqli
      * @param $username
-     * @param $secret
+     * @param $password_hashed
      * @return bool
      */
-    private static function insertUser($conn, $username, $secret)
+    private static function insertUser(mysqli $conn, string $username, string $password_hashed)
     {
         self::cleanUsers($conn);
-        $stmt = $conn->prepare("INSERT INTO home_users (username, secret) VALUES (?, ?)");
-        $stmt->bind_param("ss", $username, $secret);
+        $stmt = $conn->prepare("INSERT INTO home_users (username, password) VALUES (?, ?)");
+        $stmt->bind_param("ss", $username, $password_hashed);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
     }
 
     /**
-     * @param $conn mysqli
-     * @param $username
+     * @param mysqli $conn mysqli
+     * @param string $username
      * @return HomeUser|null
      */
-    public static function queryUserByUsername($conn, $username)
+    public static function queryUserByUsername(mysqli $conn, string $username)
     {
-        $sql = "SELECT id, username, secret, google_registered FROM home_users WHERE username = ?";
+        $sql = "SELECT id, username, secret_2fa, google_registered FROM home_users WHERE username = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $username);
         $stmt->execute();
@@ -79,7 +97,7 @@ class HomeUser
         if($result->num_rows > 0)
         {
             $row = $result->fetch_assoc();
-            return new HomeUser($row["id"], $row["username"], $row["secret"], $row["google_registered"]);
+            return new HomeUser($row["id"], $row["username"], $row["secret_2fa"], $row["google_registered"]);
         }
 
         return null;
@@ -90,14 +108,14 @@ class HomeUser
      * @param $id
      * @return HomeUser|null
      */
-    public static function queryUserById($conn, $id)
+    public static function queryUserById(mysqli $conn, int $id)
     {
-        $sql = "SELECT id, username, secret, google_registered FROM home_users WHERE id = $id";
+        $sql = "SELECT id, username, secret_2fa, google_registered FROM home_users WHERE id = $id";
         $result = $conn->query($sql);
         if($result->num_rows > 0)
         {
             $row = $result->fetch_assoc();
-            return new HomeUser($row["id"], $row["username"], $row["secret"], $row["google_registered"]);
+            return new HomeUser($row["id"], $row["username"], $row["secret_2fa"], $row["google_registered"]);
         }
 
         return null;
@@ -108,7 +126,7 @@ class HomeUser
      * @param $id
      * @return bool|mysqli_result
      */
-    public static function enableUserById($conn, $id)
+    public static function enableUserById(mysqli $conn, int $id)
     {
         $sql = "UPDATE home_users SET enabled = 1 WHERE id = $id";
         return $conn->query($sql);
@@ -119,7 +137,7 @@ class HomeUser
      * @param $conn mysqli
      * @return bool|mysqli_result
      */
-    public static function cleanUsers($conn)
+    public static function cleanUsers(mysqli $conn)
     {
         $sql = "DELETE FROM home_users WHERE enabled = 0";
         return $conn->query($sql);
@@ -144,7 +162,7 @@ class HomeUser
      */
     public static function queryAllRegistered(mysqli $conn)
     {
-        $sql = "SELECT id, username, secret FROM home_users WHERE google_registered = 1";
+        $sql = "SELECT id, username, secret_2fa FROM home_users WHERE google_registered = 1";
         $result = $conn->query($sql);
         $arr = [];
 
@@ -152,7 +170,7 @@ class HomeUser
         {
             while($row = $result->fetch_assoc())
             {
-                $arr[] =  new HomeUser($row["id"], $row["username"], $row["secret"], true);
+                $arr[] = new HomeUser($row["id"], $row["username"], $row["secret_2fa"], true);
             }
         }
 
