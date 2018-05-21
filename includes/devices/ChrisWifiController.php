@@ -24,7 +24,7 @@ class ChrisWifiController extends EspWifiLedController
 
     public static function load(string $device_id)
     {
-        $devices = DeviceQueryHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
+        $devices = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
         // TODO: Load effects from database
         return new ChrisWifiController($device_id, 0, 0, 0, [], $devices);
     }

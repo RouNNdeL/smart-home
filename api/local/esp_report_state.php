@@ -34,11 +34,11 @@ if($device === null)
 }
 
 require_once __DIR__."/../../includes/database/DbUtils.php";
-require_once __DIR__."/../../includes/database/DeviceQueryHelper.php";
+require_once __DIR__ . "/../../includes/database/DeviceDbHelper.php";
 require_once __DIR__."/../../includes/UserDeviceManager.php";
 $request_id = isset(apache_request_headers()["x-Request-Id"]) ? apache_request_headers()["x-Request-Id"] : null;
 $device->handleReportedState($json);
-$homeUsers = DeviceQueryHelper::queryUsersForDevice(DbUtils::getConnection(), $device->getId());
+$homeUsers = DeviceDbHelper::queryUsersForDevice(DbUtils::getConnection(), $device->getId());
 foreach($homeUsers as $user)
 {
     if($user->registered_for_report_state)

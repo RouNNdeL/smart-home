@@ -10,7 +10,7 @@ require_once __DIR__ . "/../vendor/autoload.php";
 require_once __DIR__ . "/database/HomeGraphTokenManager.php";
 require_once __DIR__ . "/database/DbUtils.php";
 require_once __DIR__ . "/database/HomeUser.php";
-require_once __DIR__ . "/database/DeviceQueryHelper.php";
+require_once __DIR__ . "/database/DeviceDbHelper.php";
 require_once __DIR__ . "/../secure_config.php";
 
 use \Firebase\JWT\JWT;
@@ -99,7 +99,7 @@ class UserDeviceManager
     {
         return new UserDeviceManager(
             $id,
-            DeviceQueryHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $id)
+            DeviceDbHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $id)
         );
     }
 }

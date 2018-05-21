@@ -6,9 +6,10 @@
  * Time: 14:13
  */
 
-require_once __DIR__."/../devices/PhysicalDevice.php";
-require_once __DIR__."/../database/HomeUser.php";
-class DeviceQueryHelper
+require_once __DIR__ . "/../devices/PhysicalDevice.php";
+require_once __DIR__ . "/../database/HomeUser.php";
+
+class DeviceDbHelper
 {
 
     /**
@@ -72,5 +73,12 @@ class DeviceQueryHelper
         }
 
         return $arr;
+    }
+
+    public static function setOnline(mysqli $conn, string $physical_device_id, bool $online)
+    {
+        $state = $online ? 1 : 0;
+        $sql = "UPDATE devices_physical SET online = $state WHERE id = '$physical_device_id'";
+        return  $conn->query($sql);
     }
 }

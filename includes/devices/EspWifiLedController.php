@@ -6,7 +6,7 @@
  * Time: 14:44
  */
 
-require_once __DIR__ . "/../database/DeviceQueryHelper.php";
+require_once __DIR__ . "/../database/DeviceDbHelper.php";
 require_once __DIR__ . "/RgbProfilesDevice.php";
 require_once __DIR__ . "/ChrisWifiController.php";
 
@@ -31,10 +31,11 @@ abstract class EspWifiLedController extends RgbProfilesDevice
         $port = 80;
         $waitTimeoutInSeconds = .2;
         $fp = fsockopen($host, $port, $errCode, $errStr, $waitTimeoutInSeconds);
-        if($fp === false)
-            return false;
-        fclose($fp);
-        return true;
+        $online = $fp !== false;
+        DeviceDbHelper::setOnline(DbUtils::getConnection(), $this->getId(), $online);
+        if($online)
+            fclose($fp);
+        return $online;
     }
 
     /**
@@ -69,22 +70,25 @@ abstract class EspWifiLedController extends RgbProfilesDevice
 
     public function save()
     {
-        $data_string = $this->getSmallGlobalsHex() . "*";
-        $headers = array(
-            "Content-Type: application/json",
-            "Content-Length: " . strlen($data_string)
-        );
-        if($this->request_id !== null)
-            $headers[] = "x-Request-Id: $this->request_id";
+        if($this->isOnline())
+        {
+            $data_string = $this->getSmallGlobalsHex() . "*";
+            $headers = array(
+                "Content-Type: application/json",
+                "Content-Length: " . strlen($data_string)
+            );
+            if($this->request_id !== null)
+                $headers[] = "x-Request-Id: $this->request_id";
 
-        $ch = curl_init("http://" . $this->getDeviceHostname() . "/globals");
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_exec($ch);
-        curl_close($ch);
+            $ch = curl_init("http://" . $this->getDeviceHostname() . "/globals");
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_exec($ch);
+            curl_close($ch);
+        }
 
         foreach($this->virtual_devices as $virtual_device)
         {

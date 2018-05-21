@@ -6,7 +6,7 @@
  * Time: 18:46
  */
 
-require_once __DIR__."/database/DeviceQueryHelper.php";
+require_once __DIR__ . "/database/DeviceDbHelper.php";
 require_once __DIR__."/database/HomeUser.php";
 
 class ActionsRequestManager
@@ -54,7 +54,7 @@ class ActionsRequestManager
      */
     private static function getSyncForUser(int $user_id)
     {
-        $devices = DeviceQueryHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $user_id);
+        $devices = DeviceDbHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $user_id);
         $devices_payload = [];
         foreach($devices as $device)
         {
@@ -68,7 +68,7 @@ class ActionsRequestManager
 
     private static function handleExecuteForUser(int $user_id, array $payload, string $request_id)
     {
-        $devices = DeviceQueryHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $user_id);
+        $devices = DeviceDbHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $user_id);
         $commands_response = [];
         foreach($devices as $device)
         {
