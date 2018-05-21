@@ -7,21 +7,32 @@
  */
 
 require_once __DIR__ . "/../includes/database/ApiClient.php";
+require_once __DIR__ . "/../includes/database/OAuthUtils.php";
 require_once __DIR__ . "/../includes/database/DbUtils.php";
 
 if(!isset($_GET["client_id"]) || !isset($_GET["redirect_uri"]) || !isset($_GET["state"]) || !isset($_GET["scope"])
     || !isset($_GET["response_type"]) || $_GET["response_type"] !== "code")
 {
+    $response = ["error" => "invalid_request"];
+    http_response_code(401);
+    echo json_encode($response);
+    exit(0);
+}
+
+if(!OAuthUtils::checkScopes($_GET["scope"]))
+{
+    $response = ["error" => "invalid_scope"];
     http_response_code(400);
+    echo json_encode($response);
     exit(0);
 }
 
 $client = ApiClient::queryClientById(DbUtils::getConnection(), $_GET["client_id"]);
 
-if($client === null || ($client->id === 1 && $_GET["redirect_uri"] !== "https://oauth-redirect.googleusercontent.com/r/led-controller-as-home"))
+if($client === null)
 {
-    echo "{\"error\": \"invalid_grant\"}";
-    http_response_code(400);
+    echo "{\"error\": \"invalid_client\"}";
+    http_response_code(401);
     exit(0);
 }
 
@@ -34,6 +45,7 @@ if(isset($_GET["oauth-username"]) && isset($_GET["oauth-token"]))
     $user = HomeUser::queryUserByUsername(DbUtils::getConnection(), $_GET["oauth-username"]);
     if($user !== null)
     {
+        // TODO: Replace this with a captcha
         if(DbUtils::countFailedLoginAttempts(DbUtils::getConnection(), $user->id, 60) > 5)
         {
             $user_error = "To many failed login attempts, please wait before proceeding";

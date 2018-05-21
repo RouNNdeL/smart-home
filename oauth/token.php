@@ -73,9 +73,15 @@ else if($params["grant_type"] === "refresh_token" && isset($params["refresh_toke
         exit(0);
     }
 }
-else
+else if($params["grant_type"] === "refresh_token" || $params["grant_type"] === "authorization_code")
 {
     echo "{\"error\": \"invalid_request\"}";
+    http_response_code(400);
+    exit(0);
+}
+else
+{
+    echo "{\"error\": \"unsupported_grant_type\"}";
     http_response_code(400);
     exit(0);
 }
