@@ -64,6 +64,8 @@ class UserDeviceManager
         $response = json_decode($data, true);
         curl_close($ch);
 
+        $this->insertStateChange($requestId, json_encode($states));
+
         return $response;
     }
 
@@ -101,5 +103,14 @@ class UserDeviceManager
             $id,
             DeviceDbHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $id)
         );
+    }
+
+    private function insertStateChange(string $request_id, string $payload)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "INSERT INTO state_changes (user_id, request_id, payload) VALUES ($this->user_id, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $request_id, $payload);
+        return $stmt->execute();
     }
 }

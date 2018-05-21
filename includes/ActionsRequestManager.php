@@ -45,6 +45,9 @@ class ActionsRequestManager
             }
         }
 
+        self::insertRequest($user_id, $request_id, $request["inputs"][0]["intent"],
+            json_encode($request["inputs"][0]["payload"]), json_encode($payload));
+
         return ["requestId" => $request_id, "payload" => $payload];
     }
 
@@ -86,5 +89,16 @@ class ActionsRequestManager
             $commands_response_array[] = ["ids" => $value, "status" => $key];
         }
         return $commands_response_array;
+    }
+
+    private static function insertRequest(int $user_id, string $request_id, string $type,
+                                          string $request_payload, string $response_payload)
+    {
+        $sql = "INSERT INTO actions_requests 
+                  (user_id, request_id, type, request_payload, response_payload) 
+                VALUES ($user_id, ?, ?, ?, ?)";
+        $stmt = DbUtils::getConnection()->prepare($sql);
+        $stmt->bind_param("ssss", $request_id, $type, $request_payload, $response_payload);
+        return $stmt->execute();
     }
 }

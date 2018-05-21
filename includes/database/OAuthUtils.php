@@ -76,16 +76,6 @@ class OAuthUtils
 
     /**
      * @param $conn mysqli
-     * @return bool|mysqli_result
-     */
-    public static function removeExpired($conn)
-    {
-        $sql = "DELETE FROM oauth_tokens WHERE expires < NOW()";
-        return $conn->query($sql);
-    }
-
-    /**
-     * @param $conn mysqli
      * @param $token
      * @return int
      */
