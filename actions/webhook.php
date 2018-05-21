@@ -26,7 +26,7 @@ $request = json_decode(file_get_contents("php://input"), true);
 if($user_id === null)
 {
     $response = ["requestId" => $request["requestId"], "payload" => ["errorCode" => "authFailure"]];
-    http_response_code(401);
+    http_response_code(400);
     exit(0);
 }
 

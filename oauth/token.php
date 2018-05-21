@@ -55,7 +55,25 @@ if($params["grant_type"] === "authorization_code" && isset($params["code"]))
 }
 else if($params["grant_type"] === "refresh_token" && isset($params["refresh_token"]))
 {
+    require_once __DIR__ . "/../includes/database/OAuthUtils.php";
+    $tokens = OAuthUtils::exchangeRefreshForAccessToken(
+        DbUtils::getConnection(), $params["refresh_token"], $params["client_id"]
+    );
 
+    if($tokens !== null)
+    {
+        $tokens["token_type"] = "bearer";
+        $tokens["expires"] = 30 * 24 * 60 * 60;
+
+        echo json_encode($tokens);
+        OAuthUtils::removeExpired(DbUtils::getConnection());
+    }
+    else
+    {
+        echo "{\"error\": \"invalid_grant\"}";
+        http_response_code(400);
+        exit(0);
+    }
 }
 else
 {

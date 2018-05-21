@@ -18,7 +18,7 @@ class OAuthUtils
     public static function insertAuthCode($conn, $client_id, $user_id, $scopes)
     {
         $code = base64_encode(random_bytes(64));
-        $sql = "INSERT INTO oauth (token, client_id, user_id, scopes, type, expires) VALUES 
+        $sql = "INSERT INTO oauth_tokens (token, client_id, user_id, scopes, type, expires) VALUES 
                 ('$code', $client_id, $user_id, ?, 'auth_code', (NOW() + INTERVAL 5 MINUTE))";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $scopes);
@@ -37,34 +37,41 @@ class OAuthUtils
      */
     public static function exchangeCodeForTokens($conn, $auth_code, $client_id)
     {
-        $sql = "SELECT user_id, scopes FROM oauth WHERE token='$auth_code' 
+        $sql = "SELECT user_id, scopes FROM oauth_tokens WHERE token='$auth_code' 
                 AND type='auth_code' AND client_id=$client_id AND expires > NOW()";
         $result = $conn->query($sql);
         if($result->num_rows > 0)
         {
-            $sql = "DELETE FROM oauth WHERE token='$auth_code'";
+            $sql = "DELETE FROM oauth_tokens WHERE token='$auth_code'";
             $conn->query($sql);
 
-            $user_id = $result->fetch_assoc()["user_id"];
-            $scopes = $result->fetch_assoc()["scopes"];
+            $row = $result->fetch_assoc();
+            $user_id = $row["user_id"];
+            $scopes =$row["scopes"];
 
-            $access_token = base64_encode(random_bytes(64));
-            $sql = "INSERT INTO oauth (token, client_id, user_id, scopes, type, expires) VALUES 
-                    ('$access_token', $client_id, $user_id, ?, 'access_token', (NOW() + INTERVAL 30 DAY ))";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("s", $scopes);
-            $stmt->execute();
-
-            $refresh_token = base64_encode(random_bytes(64));
-            $sql = "INSERT INTO oauth (token, client_id, user_id, type) VALUES 
-                    ('$refresh_token', $client_id, $user_id, 'refresh_token')";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-
-            return array("access_token" => $access_token, "refresh_token" => $refresh_token);
+            return OAuthUtils::generateAndInsertTokens($conn, $client_id, $user_id, $scopes);
         }
 
         return null;
+    }
+
+    private static function generateAndInsertTokens(mysqli $conn, int $client_id, string $user_id, string $scopes)
+    {
+        $access_token = base64_encode(random_bytes(64));
+        $sql = "INSERT INTO oauth_tokens (token, client_id, user_id, scopes, type, expires) VALUES 
+                    ('$access_token', $client_id, $user_id, ?, 'access_token', (NOW() + INTERVAL 30 DAY ))";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $scopes);
+        $stmt->execute();
+
+        $refresh_token = base64_encode(random_bytes(64));
+        $sql = "INSERT INTO oauth_tokens (token, client_id, user_id, scopes, type) VALUES 
+                    ('$refresh_token', $client_id, $user_id, ?, 'refresh_token')";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $scopes);
+        $stmt->execute();
+
+        return ["access_token" => $access_token, "refresh_token" => $refresh_token];
     }
 
     /**
@@ -73,7 +80,7 @@ class OAuthUtils
      */
     public static function removeExpired($conn)
     {
-        $sql = "DELETE FROM oauth WHERE expires < NOW()";
+        $sql = "DELETE FROM oauth_tokens WHERE expires < NOW()";
         return $conn->query($sql);
     }
 
@@ -84,7 +91,7 @@ class OAuthUtils
      */
     public static function getUserIdForToken($conn, $token)
     {
-        $sql = "SELECT user_id FROM oauth WHERE token=? AND type='access_token'";
+        $sql = "SELECT user_id FROM oauth_tokens WHERE token=? AND type='access_token'";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $token);
         $stmt->execute();
@@ -92,5 +99,18 @@ class OAuthUtils
         if($stmt->fetch())
             return $user_id;
         return null;
+    }
+
+    public static function exchangeRefreshForAccessToken(mysqli $conn, int $client_id, string $refresh_token)
+    {
+        $sql = "SELECT user_id, scopes FROM oauth_tokens WHERE token = ? AND type='refresh_token'";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $refresh_token);
+        $stmt->execute();
+        $stmt->bind_result($user_id, $scopes);
+        if(!$stmt->fetch())
+            return null;
+
+        return OAuthUtils::generateAndInsertTokens($conn, $client_id, $user_id, $scopes);
     }
 }
