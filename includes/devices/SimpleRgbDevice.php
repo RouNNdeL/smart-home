@@ -43,10 +43,13 @@ class SimpleRgbDevice extends VirtualDevice
         {
             case VirtualDevice::DEVICE_COMMAND_BRIGHTNESS_ABSOLUTE:
                 $this->brightness = $command["params"]["brightness"];
-                $this->on = true;
+                if($this->brightness != 0)
+                    $this->on = true;
                 break;
             case VirtualDevice::DEVICE_COMMAND_ON_OFF:
                 $this->on = $command["params"]["on"];
+                if($this->on && $this->brightness == 0)
+                    $this->brightness = 100;
                 break;
             case VirtualDevice::DEVICE_COMMAND_COLOR_ABSOLUTE:
                 $this->color = $command["params"]["color"]["spectrumRGB"];
