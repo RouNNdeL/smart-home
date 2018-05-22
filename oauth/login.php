@@ -95,7 +95,7 @@ TAG;
                 <div class="form-group">
                     <label for="login-username">Username</label>
                     <input type="text" class="form-control" id="login-username" placeholder="Username"
-                           name="oauth-username" >
+                           name="oauth-username" autocapitalize="off">
                 </div>
                 <div class="form-group">
                     <label for="login-username">Password</label>

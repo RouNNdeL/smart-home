@@ -40,20 +40,30 @@ class HomeUser
 
     public static function authenticateUser(mysqli $conn, string $username, string $password)
     {
-        $password_hash = self::hashPassword($password);
-        $sql = "SELECT id FROM home_users WHERE username = ? AND password = ?";
+        $sql = "SELECT password FROM home_users WHERE username = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $username, $password_hash);
+        $stmt->bind_param("s", $username);
+        $stmt->bind_result($password_hash );
         $stmt->execute();
-        $result = $stmt->get_result();
+        if(!$stmt->fetch() || !self::verifyPassword($password, $password_hash))
+        {
+            $stmt->close();
+            return null;
+        }
+        $stmt->close();
 
-        return $result->num_rows > 0 ? self::queryUserByUsername($conn, $username) : null;
+        return static::queryUserByUsername($conn, $username);
     }
 
     private static function hashPassword(string $password): string
     {
         $options = ["cost" => 12];
         return password_hash($password, PASSWORD_BCRYPT, $options);
+    }
+
+    private static function verifyPassword(string $password, string $hash): string
+    {
+        return password_verify($password, $hash);
     }
 
     private static function generateRandomSecret()
