@@ -28,7 +28,7 @@ class OAuthUtils
             throw new InvalidArgumentException("Invalid scope");
         try
         {
-            $code = base64_encode(random_bytes(64));
+            $code = base64_encode(openssl_random_pseudo_bytes(128));
         }
         catch(Exception $exception)
         {
@@ -80,7 +80,7 @@ class OAuthUtils
     private static function generateAndInsertTokens(mysqli $conn, string $client_id,
                                                     string $user_id, string $scopes, bool $only_access = false)
     {
-        $access_token = base64_encode(random_bytes(64));
+        $access_token = base64_encode(openssl_random_pseudo_bytes(128));
         $sql = "INSERT INTO oauth_tokens (token, client_id, user_id, scopes, type, expires) VALUES 
                     ('$access_token', ?, $user_id, ?, 'access_token', (NOW() + INTERVAL 30 DAY ))";
         $stmt = $conn->prepare($sql);
@@ -90,7 +90,7 @@ class OAuthUtils
 
         if(!$only_access)
         {
-            $refresh_token = base64_encode(random_bytes(64));
+            $refresh_token = base64_encode(openssl_random_pseudo_bytes(128));
             $sql = "INSERT INTO oauth_tokens (token, client_id, user_id, scopes, type) VALUES 
                     ('$refresh_token', ?, $user_id, ?, 'refresh_token')";
             $stmt = $conn->prepare($sql);
