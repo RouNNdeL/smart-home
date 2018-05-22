@@ -13,7 +13,10 @@ if($_SERVER["REQUEST_METHOD"] !== "POST")
     exit(0);
 }
 
-parse_str(file_get_contents("php://input"), $params);
+$input = file_get_contents("php://input");
+$params = json_decode($input, true);
+if($params === false)
+    parse_str($input, $params);
 
 if(!isset($params["client_id"]) || !isset($params["client_secret"]) || !isset($params["grant_type"]))
 {
@@ -56,7 +59,7 @@ else if($params["grant_type"] === "refresh_token" && isset($params["refresh_toke
 {
     require_once __DIR__ . "/../includes/database/OAuthUtils.php";
     $tokens = OAuthUtils::exchangeRefreshForAccessToken(
-        DbUtils::getConnection(), $params["refresh_token"], $params["client_id"]
+        DbUtils::getConnection(), $params["client_id"], $params["refresh_token"]
     );
 
     if($tokens !== null)

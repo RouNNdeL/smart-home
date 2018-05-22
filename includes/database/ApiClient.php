@@ -30,9 +30,9 @@ class ApiClient
      * @param $id
      * @return ApiClient|null
      */
-    public static function queryClientById($conn, $id)
+    public static function queryClientById($conn, string $id)
     {
-        $sql = "SELECT id, name, secret FROM api_clients WHERE id=$id";
+        $sql = "SELECT id, name, secret FROM api_clients WHERE id='$id'";
         $result = $conn->query($sql);
 
         if($result->num_rows > 0)
