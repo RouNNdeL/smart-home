@@ -52,8 +52,7 @@ class UserDeviceManager
 
         $header = [];
         $header[] = "Content-type: application/json";
-        $header[] = "Authorization: Bearer " . $token;
-        $header[] = "X-GFE-SSL: yes";
+
 
         $ch = curl_init("https://homegraph.googleapis.com/v1/devices:reportStateAndNotification");
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
@@ -71,13 +70,15 @@ class UserDeviceManager
 
     public function requestSync()
     {
-        global $homegraph_key;
+        $token = HomeGraphTokenManager::getToken();
         $payload = ["agentUserId" => (string)$this->user_id];
 
         $header = [];
         $header[] = "Content-type: application/json";
+        $header[] = "Authorization: Bearer " . $token;
+        $header[] = "X-GFE-SSL: yes";
 
-        $ch = curl_init("https://homegraph.googleapis.com/v1/devices:requestSync?key=" . $homegraph_key);
+        $ch = curl_init("https://homegraph.googleapis.com/v1/devices:requestSync");
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
