@@ -28,7 +28,7 @@ class HomeUser
         $this->registered_for_report_state = $registered_for_report_state;
     }
 
-    public static function newUser(mysqli $conn, string $username, string $password): HomeUser
+    public static function newUser(mysqli $conn, string $username, string $password)
     {
         $password_hash = self::hashPassword($password);
         if(self::insertUser($conn, $username, $password_hash) === false)
@@ -38,10 +38,10 @@ class HomeUser
         return self::queryUserByUsername($conn, $username);
     }
 
-    public static function authenticateUser(mysqli $conn, string $username, string $password): HomeUser
+    public static function authenticateUser(mysqli $conn, string $username, string $password)
     {
         $password_hash = self::hashPassword($password);
-        $sql = "SELECT password FROM home_users WHERE username = ? AND password = ?";
+        $sql = "SELECT id FROM home_users WHERE username = ? AND password = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $username, $password_hash);
         $stmt->execute();
