@@ -103,7 +103,7 @@ class IpTrustManager
     {
         preg_match(
             "/^" . preg_quote($ip) . "/",
-            file_get_contents(__DIR__ . "/../../ip_blacklist.txt"),
+            file_get_contents(__DIR__ . "/../../latest_blacklist.txt"),
             $match
         );
         return $match !== null && sizeof($match) > 0;

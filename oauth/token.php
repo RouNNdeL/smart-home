@@ -15,7 +15,7 @@ if($_SERVER["REQUEST_METHOD"] !== "POST")
 
 $input = file_get_contents("php://input");
 $params = json_decode($input, true);
-if($params === false)
+if($params === false || $params === null)
     parse_str($input, $params);
 
 if(!isset($params["client_id"]) || !isset($params["client_secret"]) || !isset($params["grant_type"]))
