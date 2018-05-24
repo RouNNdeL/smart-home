@@ -8,4 +8,13 @@
 
 require_once __DIR__ . "/../../includes/UserDeviceManager.php";
 
-UserDeviceManager::requestSyncForAll();
+header("Content-Type: application/json");
+
+if(isset($_GET["user_id"]))
+{
+    echo json_encode(UserDeviceManager::fromUserId($_GET["user_id"])->requestSync());
+}
+else
+{
+    echo json_encode(UserDeviceManager::requestSyncForAll());
+}

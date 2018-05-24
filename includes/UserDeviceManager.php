@@ -71,7 +71,7 @@ class UserDeviceManager
     public function requestSync()
     {
         $token = HomeGraphTokenManager::getToken();
-        $payload = ["agentUserId" => (string)$this->user_id];
+        $payload = ["agentUserId" => (string)($this->user_id)];
 
         $header = [];
         $header[] = "Content-type: application/json";
@@ -90,12 +90,17 @@ class UserDeviceManager
         return $response;
     }
 
+    /**
+     * @return array
+     */
     public static function requestSyncForAll()
     {
+        $responses = [];
         foreach(HomeUser::queryAllRegistered(DbUtils::getConnection()) as $user)
         {
-            UserDeviceManager::fromUserId($user->id)->requestSync();
+            $responses[$user->id] = UserDeviceManager::fromUserId($user->id)->requestSync();
         }
+        return $responses;
     }
 
     public static function fromUserId(int $id)
