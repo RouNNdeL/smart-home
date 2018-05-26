@@ -7,6 +7,7 @@
  */
 
 require_once __DIR__ . "/database/DeviceDbHelper.php";
+require_once __DIR__ . "/UserDeviceManager.php";
 require_once __DIR__ . "/database/HomeUser.php";
 require_once __DIR__ . "/../includes/database/DbUtils.php";
 require_once __DIR__ . "/../includes/database/OAuthUtils.php";
@@ -20,7 +21,7 @@ class ActionsRequestManager
 
     /**
      * @param array $request
-     * @param int $user_id
+     * @param string $token
      * @return array
      */
     public static function processRequest(array $request, string $token)
@@ -47,13 +48,14 @@ class ActionsRequestManager
             {
                 case self::ACTION_INTENT_SYNC:
                     $payload["agentUserId"] = (string)$user_id;
-                    $payload["devices"] = static::getSyncForUser($user_id);
+                    $payload["devices"] = UserDeviceManager::fromUserId($user_id)->getSync();
                     HomeUser::setGoogleRegistered(DbUtils::getConnection(), $user_id, true);
                     break;
                 case self::ACTION_INTENT_QUERY:
                     break;
                 case self::ACTION_INTENT_EXECUTE:
-                    $payload["commands"] = self::handleExecuteForUser($user_id, $input["payload"], $request_id);
+                    $payload["commands"] =
+                        UserDeviceManager::fromUserId($user_id)->processExecute($input["payload"], $request_id);
                     break;
                 case self::ACTION_INTENT_DISCONNECT:
                     HomeUser::setGoogleRegistered(DbUtils::getConnection(), $user_id, false);
@@ -65,46 +67,6 @@ class ActionsRequestManager
             json_encode($request["inputs"][0]["payload"]), json_encode($payload));
 
         return ["requestId" => $request_id, "payload" => $payload];
-    }
-
-    /**
-     * @param int $user_id
-     * @return array
-     */
-    private static function getSyncForUser(int $user_id)
-    {
-        $devices = DeviceDbHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $user_id);
-        $devices_payload = [];
-        foreach($devices as $device)
-        {
-            foreach($device->getVirtualDevices() as $virtualDevice)
-            {
-                $devices_payload[] = $virtualDevice->getSyncJson($device->getId());
-            }
-        }
-        return $devices_payload;
-    }
-
-    private static function handleExecuteForUser(int $user_id, array $payload, string $request_id)
-    {
-        $devices = DeviceDbHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $user_id);
-        $commands_response = [];
-        foreach($devices as $device)
-        {
-            $result = $device->handleAssistantAction($payload, $request_id);
-            $status = $result["status"];
-            if(!isset($commands_response[$status]))
-                $commands_response[$status] = [];
-
-            $commands_response[$status] = array_merge($commands_response[$status], $result["ids"]);
-        }
-
-        $commands_response_array = [];
-        foreach($commands_response as $key => $value)
-        {
-            $commands_response_array[] = ["ids" => $value, "status" => $key];
-        }
-        return $commands_response_array;
     }
 
     private static function insertRequest(int $user_id, string $request_id, string $type,

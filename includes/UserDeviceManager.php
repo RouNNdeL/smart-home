@@ -52,6 +52,8 @@ class UserDeviceManager
 
         $header = [];
         $header[] = "Content-type: application/json";
+        $header[] = "Authorization: Bearer " . $token;
+        $header[] = "X-GFE-SSL: yes";
 
 
         $ch = curl_init("https://homegraph.googleapis.com/v1/devices:reportStateAndNotification");
@@ -88,6 +90,40 @@ class UserDeviceManager
         curl_close($ch);
 
         return $response;
+    }
+
+    public function processExecute(array $payload, string $request_id)
+    {
+        $commands_response = [];
+        foreach($this->physical_devices as $device)
+        {
+            $result = $device->handleAssistantAction($payload, $request_id);
+            $status = $result["status"];
+            if(!isset($commands_response[$status]))
+                $commands_response[$status] = [];
+
+            $commands_response[$status] = array_merge($commands_response[$status], $result["ids"]);
+        }
+
+        $commands_response_array = [];
+        foreach($commands_response as $key => $value)
+        {
+            $commands_response_array[] = ["ids" => $value, "status" => $key];
+        }
+        return $commands_response_array;
+    }
+
+    public function getSync()
+    {
+        $devices_payload = [];
+        foreach($this->physical_devices as $device)
+        {
+            foreach($device->getVirtualDevices() as $virtualDevice)
+            {
+                $devices_payload[] = $virtualDevice->getSyncJson($device->getId());
+            }
+        }
+        return $devices_payload;
     }
 
     /**
