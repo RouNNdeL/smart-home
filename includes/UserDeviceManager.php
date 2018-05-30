@@ -147,8 +147,10 @@ class UserDeviceManager
         );
     }
 
-    private function insertStateChange(string $request_id, string $payload)
+    private function insertStateChange($request_id, string $payload)
     {
+        if(!is_string($request_id) && $request_id != null)
+            throw new InvalidArgumentException("request_id has to be of type string or 'null'");
         $conn = DbUtils::getConnection();
         $sql = "INSERT INTO state_changes (user_id, request_id, payload) VALUES ($this->user_id, ?, ?)";
         $stmt = $conn->prepare($sql);
