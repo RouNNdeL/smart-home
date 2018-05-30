@@ -38,30 +38,13 @@ class HomeUser
         return self::queryUserByUsername($conn, $username);
     }
 
-    public static function authenticateUser(mysqli $conn, string $username, string $password)
-    {
-        $sql = "SELECT password FROM home_users WHERE username = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $username);
-        $stmt->bind_result($password_hash );
-        $stmt->execute();
-        if(!$stmt->fetch() || !self::verifyPassword($password, $password_hash))
-        {
-            $stmt->close();
-            return null;
-        }
-        $stmt->close();
-
-        return static::queryUserByUsername($conn, $username);
-    }
-
     private static function hashPassword(string $password): string
     {
         $options = ["cost" => 12];
         return password_hash($password, PASSWORD_BCRYPT, $options);
     }
 
-    private static function verifyPassword(string $password, string $hash): string
+    public static function verifyPassword(string $password, string $hash): string
     {
         return password_verify($password, $hash);
     }

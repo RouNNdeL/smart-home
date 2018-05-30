@@ -34,6 +34,11 @@ class IpTrustManager
         $this->heat = $heat;
     }
 
+    public static function auto()
+    {
+        return IpTrustManager::fromIp($_SERVER['REMOTE_ADDR']);
+    }
+
     /**
      * @param string $ip
      * @return IpTrustManager|null
@@ -92,14 +97,14 @@ class IpTrustManager
         $this->insertOrUpdate();
     }
 
-    private static function isValid(string $ip)
+    public static function isValid(string $ip)
     {
         $re = '/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/';
         preg_match($re, $ip, $match);
         return $match !== null && sizeof($match) > 0;
     }
 
-    private static function isInBlacklist(string $ip)
+    public static function isInBlacklist(string $ip)
     {
         preg_match(
             "/^" . preg_quote($ip) . "/",
@@ -109,7 +114,7 @@ class IpTrustManager
         return $match !== null && sizeof($match) > 0;
     }
 
-    private static function isLocal(string $ip)
+    public static function isLocal(string $ip)
     {
         preg_match(
             "/(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/",

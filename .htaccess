@@ -1,7 +1,5 @@
 RewriteEngine on
 
-Require ip 192.168
-
 RewriteCond %{SERVER_NAME} !home.zdul.xyz
 RewriteRule ^ https://home.zdul.xyz%{REQUEST_URI} [END,R=permanent]
 

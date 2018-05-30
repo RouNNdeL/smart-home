@@ -8,7 +8,7 @@
 
 require_once __DIR__ . "/../includes/database/IpTrustManager.php";
 
-$trustManager = IpTrustManager::fromIp($_SERVER['REMOTE_ADDR']);
+$trustManager = IpTrustManager::auto();
 if($trustManager === null || !$trustManager->isAllowed())
 {
     http_response_code(403);
