@@ -59,7 +59,7 @@ a.nav-link.bold
 
 .device-offline-text
 {
-    color: orangered;
+    color: #dc3545;
 }
 
 /* The snackbar - position it at the bottom and in the middle of the screen */
