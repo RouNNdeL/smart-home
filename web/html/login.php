@@ -18,6 +18,12 @@ if($trustManager === null || !$trustManager->isAllowed())
 
 $manager = SessionManager::auto();
 
+if($manager->isLoggedIn())
+{
+    header("Location: /devices");
+    exit(0);
+}
+
 if($_SERVER["REQUEST_METHOD"] === "POST")
 {
     if(!isset($_POST["username"]) || !isset($_POST["password"]))

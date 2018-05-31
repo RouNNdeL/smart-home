@@ -24,7 +24,7 @@ class Utils
      */
     public function __construct($lang = null)
     {
-        if($lang != null)
+        if($lang === null)
             $lang = isset($_COOKIE["lang"]) ? $_COOKIE["lang"] : self::DEFAULT_LANG;
         $this->lang = $lang;
         $this->loadStrings();

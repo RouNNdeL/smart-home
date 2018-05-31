@@ -20,6 +20,8 @@ class PcLedController extends RgbProfilesDevice
 
     /**
      * PcLedController constructor.
+     * @param int $owner_id
+     * @param string $display_name
      * @param int $current_profile
      * @param bool $enabled
      * @param int $fan_count
@@ -29,14 +31,14 @@ class PcLedController extends RgbProfilesDevice
      * @param array $virtual_devices
      * @param array $brightness_array
      */
-    protected function __construct(int $current_profile, bool $enabled, int $fan_count, int $auto_increment,
+    protected function __construct(int $owner_id, string $display_name, int $current_profile, bool $enabled, int $fan_count, int $auto_increment,
                                    bool $csgo_enabled, array $profiles, array $virtual_devices, array $brightness_array
     )
     {
         $this->fan_count = $fan_count;
         $this->csgo_enabled = $csgo_enabled;
-        parent::__construct(PhysicalDevice::ID_PC_LED_CONTROLLER, $current_profile, $enabled, $auto_increment,
-            $profiles, $virtual_devices, $brightness_array);
+        parent::__construct(PhysicalDevice::ID_PC_LED_CONTROLLER, $owner_id, $display_name, $current_profile,
+            $enabled, $auto_increment, $profiles, $virtual_devices);
     }
 
 
@@ -74,7 +76,7 @@ class PcLedController extends RgbProfilesDevice
         file_put_contents($path, serialize($this));
     }
 
-    public static function load(string $id)
+    public static function load(string $id, int $owner_id, string $display_name)
     {
         $path = $_SERVER["DOCUMENT_ROOT"] . self::SAVE_PATH;
         $contents = file_get_contents($path);
@@ -91,7 +93,7 @@ class PcLedController extends RgbProfilesDevice
         ];
         $profiles = [new Profile(Utils::getString("default_profile_name"), 4, 2)];
         $brightness_array = [100, 100, 100, 100, 100];
-        return new PcLedController(0, true, 1, 0, true, $profiles, $virtual_devices, $brightness_array);
+        return new PcLedController($owner_id, $display_name,0, true, 1, 0, true, $profiles, $virtual_devices, $brightness_array);
     }
 
     protected static function getMaximumActiveProfileCount()

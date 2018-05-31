@@ -22,11 +22,11 @@ class ChrisWifiController extends EspWifiLedController
         return "chris-leds";
     }
 
-    public static function load(string $device_id)
+    public static function load(string $device_id, int $owner_id, string $display_name)
     {
         $devices = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
         // TODO: Load effects from database
-        return new ChrisWifiController($device_id, 0, 0, 0, [], $devices);
+        return new ChrisWifiController($device_id,  $owner_id,  $display_name,0, 0, 0, [], $devices);
     }
 
     protected function getSmallGlobalsHex()

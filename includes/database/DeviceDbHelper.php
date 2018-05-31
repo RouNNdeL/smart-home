@@ -19,7 +19,8 @@ class DeviceDbHelper
      */
     public static function queryPhysicalDevicesForUser(mysqli $conn, int $user_id)
     {
-        $sql = "SELECT id, display_name, device_driver FROM devices_physical WHERE owner_id = $user_id";
+        // TODO: Add Devices shared by other users
+        $sql = "SELECT id, display_name, device_driver, owner_id FROM devices_physical WHERE owner_id = $user_id";
         $result = $conn->query($sql);
         $arr = [];
         if($result->num_rows > 0)

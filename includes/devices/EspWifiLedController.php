@@ -20,9 +20,9 @@ abstract class EspWifiLedController extends RgbProfilesDevice
 
     private $request_id = null;
 
-    public function __construct(string $id, int $current_profile, bool $enabled, int $auto_increment, array $profiles, array $virtual_devices)
+    public function __construct(string $id, int $owner_id, string $display_name, int $current_profile, bool $enabled, int $auto_increment, array $profiles, array $virtual_devices)
     {
-        parent::__construct($id, $current_profile, $enabled, $auto_increment, $profiles, $virtual_devices);
+        parent::__construct($id, $owner_id, $display_name, $current_profile, $enabled, $auto_increment, $profiles, $virtual_devices);
     }
 
     public function isOnline()

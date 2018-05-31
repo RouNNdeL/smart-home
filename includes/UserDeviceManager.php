@@ -157,4 +157,12 @@ class UserDeviceManager
         $stmt->bind_param("ss", $request_id, $payload);
         return $stmt->execute();
     }
+
+    /**
+     * @return PhysicalDevice[]
+     */
+    public function getPhysicalDevices(): array
+    {
+        return $this->physical_devices;
+    }
 }

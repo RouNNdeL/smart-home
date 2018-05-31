@@ -117,5 +117,9 @@
   "profile_btn_hint_delete": "Delete color",
   "profile_btn_hint_jump": "Jump to color",
   "profile_frame_jump_offline": "Device is offline",
-  "debug_title": "Debugging panel"
+  "debug_title": "Debugging panel",
+  "device_status_offline": "Offline",
+  "device_devices": "Devices",
+  "device_owner_you": "You",
+  "device_owner": "Owner"
 }
