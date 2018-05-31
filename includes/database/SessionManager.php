@@ -63,6 +63,11 @@ class SessionManager
         return $manager;
     }
 
+    public function isLoggedIn()
+    {
+        return $this->user_id !== null;
+    }
+
     public function attemptLoginAuto(string $username, string $password)
     {
         return $this->attemptLogin($username, $password,  $_SERVER["REMOTE_ADDR"], $_SERVER["HTTP_USER_AGENT"]);
@@ -190,5 +195,13 @@ class SessionManager
     private static function generateSessionToken()
     {
         return base64_encode(openssl_random_pseudo_bytes(1024));
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserId()
+    {
+        return $this->user_id;
     }
 }

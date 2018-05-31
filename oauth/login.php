@@ -43,30 +43,34 @@ if($client === null)
     echo json_encode($response);
 }
 
-if(isset($_GET["oauth-username"]) && isset($_GET["oauth-password"]))
+require_once __DIR__ . "/../includes/database/SessionManager.php";
+$manager = SessionManager::auto();
+if(isset($_GET["oauth-username"]) && isset($_GET["oauth-password"]) && !$manager->isLoggedIn())
 {
     require_once __DIR__ . "/../includes/database/DbUtils.php";
     require_once __DIR__ . "/../includes/database/HomeUser.php";
     require_once __DIR__ . "/../vendor/autoload.php";
 
-    $user = HomeUser::authenticateUser(DbUtils::getConnection(), $_GET["oauth-username"], $_GET["oauth-password"]);
-    if($user !== null)
+    $success = $manager->attemptLoginAuto($_GET["oauth-username"], $_GET["oauth-password"]);
+    if($success)
     {
         $trustManager->heatUp(IpTrustManager::HEAT_SUCCESSFUL_LOGIN);
-
-        //TODO: Implement 2FA if the user has enabled it
-        require_once __DIR__ . "/../includes/database/OAuthUtils.php";
-        $user = HomeUser::queryUserByUsername(DbUtils::getConnection(), $_GET["oauth-username"]);
-        $code = urlencode(OAuthUtils::insertAuthCode(DbUtils::getConnection(), $client->id, $user->id, $_GET["scope"]));
-        $state = $_GET["state"];
-        header("Location: " . $_GET["redirect_uri"] . "?code=$code&state=$state");
-        exit(0);
     }
     else
     {
         $trustManager->heatUp(IpTrustManager::HEAT_LOGIN_ATTEMPT);
         $user_error = "Invalid username or password";
     }
+}
+
+if($manager->isLoggedIn())
+{
+    //TODO: Implement 2FA if the user has enabled it
+    require_once __DIR__ . "/../includes/database/OAuthUtils.php";
+    $code = urlencode(OAuthUtils::insertAuthCode(DbUtils::getConnection(), $client->id, $manager->getUserId(), $_GET["scope"]));
+    $state = $_GET["state"];
+    header("Location: " . $_GET["redirect_uri"] . "?code=$code&state=$state");
+    exit(0);
 }
 ?>
 
