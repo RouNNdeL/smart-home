@@ -53,9 +53,14 @@ require_once __DIR__ . "/../../web/html/html_head.php";
 <body>
 <div class="container">
 
-    <?php
-    echo $device->getDeviceNavbarHtml();
-    ?>
+
+    <div class="card-body">
+        <ul class="nav flex-column nav-pills">
+            <?php
+            echo $device->getDeviceNavbarHtml();
+            ?>
+        </ul>
+    </div>
 </div>
 </body>
 </html>
