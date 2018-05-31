@@ -3,5 +3,4 @@ secure_config.php
 composer.lock
 vendor/
 node_modules/
-package-lock.json
 /home_graph_key.json
