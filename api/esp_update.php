@@ -16,7 +16,8 @@ require_once __DIR__."/../includes/database/LocalDeviceLogger.php";
 
 $device_id = $_GET["device_id"];
 $version = (int)apache_request_headers()["x-ESP8266-version"];
-$attempts = (int)apache_request_headers()["x-Request-Attempts"];
+$attempts = isset(apache_request_headers()["x-Request-Attempts"]) ?
+        (int)apache_request_headers()["x-Request-Attempts"] : 1;
 LocalDeviceLogger::log($device_id, LocalDeviceLogger::TYPE_UPDATE_CHECK, $attempts, "");
 
 $md5 = apache_request_headers()["x-ESP8266-sketch-md5"];

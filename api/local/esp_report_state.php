@@ -6,7 +6,8 @@
  * Time: 15:11
  */
 
-if($_SERVER["REQUEST_METHOD"] !== "POST")
+if($_SERVER["REQUEST_METHOD"] !== "POST" ||
+    !isset(apache_request_headers()["x-Request-Attempts"]) || !ctype_digit(apache_request_headers()["x-Request-Attempts"]))
 {
     $response = ["status" => "error", "error" => "invalid_request"];
     echo json_encode($response);
