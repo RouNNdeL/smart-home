@@ -32,7 +32,13 @@ if($_SERVER["REQUEST_METHOD"] === "POST")
         exit(0);
     }
     $success = $manager->attemptLoginAuto($_POST["username"], $_POST["password"]);
-    
+    if($success)
+    {
+        $trustManager->heatUp(IpTrustManager::HEAT_SUCCESSFUL_LOGIN);
+        header("Location: /devices");
+        exit(0);
+    }
+    $trustManager->heatUp(IpTrustManager::HEAT_LOGIN_ATTEMPT);
 }
 
 ?>
