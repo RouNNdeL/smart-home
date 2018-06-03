@@ -6,7 +6,7 @@
  * Time: 11:22
  */
 
-require_once __DIR__."/DbUtils.php";
+require_once __DIR__ . "/DbUtils.php";
 
 class IpTrustManager
 {
@@ -73,11 +73,18 @@ class IpTrustManager
 
     private function insertOrUpdate()
     {
-        $sql = "INSERT INTO ip_heat (ip, heat_value) VALUES (?, ?) 
+        $blacklist = self::isInBlacklist($this->ip) ? 1 : 0;
+        $sql = "INSERT INTO ip_heat (ip, heat_value, blacklist) VALUES (?, ?, ?) 
                 ON DUPLICATE KEY UPDATE 
-                  heat_value = ?, max_heat = GREATEST(max_heat, heat_value)";
+                  heat_value = ?, blacklist = ?, max_heat = GREATEST(max_heat, heat_value)";
         $stmt = DbUtils::getConnection()->prepare($sql);
-        $stmt->bind_param("sii", $this->ip, $this->heat, $this->heat);
+        $stmt->bind_param("siiii",
+            $this->ip,
+            $this->heat,
+            $this->heat,
+            $blacklist,
+            $blacklist
+        );
         $success = $stmt->execute();
         $stmt->close();
         return $success;
@@ -132,7 +139,7 @@ class IpTrustManager
     public function getHeat(): int
     {
         return $this->heat + (self::isInBlacklist($this->ip) ? self::HEAT_BLACKLIST_BONUS : 0) +
-            (self::isLocal($this->ip) ? self::HEAT_LOCAL_BONUS : 0) ;
+            (self::isLocal($this->ip) ? self::HEAT_LOCAL_BONUS : 0);
     }
 
     /**

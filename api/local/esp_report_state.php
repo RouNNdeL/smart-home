@@ -24,7 +24,8 @@ if($json === false || !isset($json["device_id"]))
 }
 
 require_once __DIR__."/../../includes/devices/EspWifiLedController.php";
-$device = DeviceDbHelper::queryPhysicalDeviceById(DbUtils::getConnection(), $json["device_id"]);
+$device_id = $json["device_id"];
+$device = DeviceDbHelper::queryPhysicalDeviceById(DbUtils::getConnection(), $device_id);
 if($device === null)
 {
     $response = ["status" => "error", "error" => "invalid_device_id"];
@@ -36,8 +37,12 @@ if($device === null)
 require_once __DIR__."/../../includes/database/DbUtils.php";
 require_once __DIR__ . "/../../includes/database/DeviceDbHelper.php";
 require_once __DIR__."/../../includes/UserDeviceManager.php";
+require_once __DIR__."/../../includes/database/LocalDeviceLogger.php";
 $request_id = isset(apache_request_headers()["x-Request-Id"]) ? apache_request_headers()["x-Request-Id"] : null;
 $attempts = isset(apache_request_headers()["x-Request-Attempts"]) ? apache_request_headers()["x-Request-Attempts"] : null;
+
+LocalDeviceLogger::log($device_id, LocalDeviceLogger::TYPE_REPORT_STATE, $attempts, json_encode($json));
+
 $device->handleReportedState($json);
 $homeUsers = DeviceDbHelper::queryUsersForDevice(DbUtils::getConnection(), $device->getId());
 foreach($homeUsers as $user)
