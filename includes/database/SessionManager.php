@@ -107,13 +107,10 @@ class SessionManager
         return true;
     }
 
-    public static function newAnonymous(mysqli $conn, string $ip)
+    public static function newAnonymous(mysqli $conn)
     {
         $session_token = SessionManager::generateSessionToken();
-        $local = IpTrustManager::isLocal($ip);
-        $sql = $local ?
-            "INSERT INTO sessions (token, expires) VALUES (?, DATE_ADD(NOW(), INTERVAL 3 DAY))" :
-            "INSERT INTO sessions (token) VALUES (?)";
+        $sql = "INSERT INTO sessions (token, expires) VALUES (?, DATE_ADD(NOW(), INTERVAL 3 DAY))";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $session_token);
         $stmt->execute();

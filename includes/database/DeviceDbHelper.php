@@ -15,7 +15,7 @@ class DeviceDbHelper
     /**
      * @param mysqli $conn
      * @param string $physical_device_id
-     * @return PhysicalDevice[]
+     * @return PhysicalDevice
      */
     public static function queryPhysicalDeviceById(mysqli $conn, string $physical_device_id)
     {
@@ -59,7 +59,8 @@ class DeviceDbHelper
         $stmt->close();
 
         $arr = [];
-        foreach ($rows as $row) {
+        foreach($rows as $row)
+        {
             $arr[] = PhysicalDevice::fromDatabaseRow($row);
         }
 
@@ -108,10 +109,11 @@ class DeviceDbHelper
         $arr = [];
         if($stmt->fetch())
         {
+            $stmt->close();
             $arr[] = HomeUser::queryUserById($conn, $owner_id);
         }
+        else $stmt->close();
 
-        $stmt->close();
         return $arr;
     }
 

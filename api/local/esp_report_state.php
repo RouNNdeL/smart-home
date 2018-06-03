@@ -24,7 +24,7 @@ if($json === false || !isset($json["device_id"]))
 }
 
 require_once __DIR__."/../../includes/devices/EspWifiLedController.php";
-$device = EspWifiLedController::getByIotId($json["device_id"]);
+$device = DeviceDbHelper::queryPhysicalDeviceById(DbUtils::getConnection(), $json["device_id"]);
 if($device === null)
 {
     $response = ["status" => "error", "error" => "invalid_device_id"];
@@ -37,6 +37,7 @@ require_once __DIR__."/../../includes/database/DbUtils.php";
 require_once __DIR__ . "/../../includes/database/DeviceDbHelper.php";
 require_once __DIR__."/../../includes/UserDeviceManager.php";
 $request_id = isset(apache_request_headers()["x-Request-Id"]) ? apache_request_headers()["x-Request-Id"] : null;
+$attempts = isset(apache_request_headers()["x-Request-Attempts"]) ? apache_request_headers()["x-Request-Attempts"] : null;
 $device->handleReportedState($json);
 $homeUsers = DeviceDbHelper::queryUsersForDevice(DbUtils::getConnection(), $device->getId());
 foreach($homeUsers as $user)
@@ -46,3 +47,4 @@ foreach($homeUsers as $user)
         UserDeviceManager::fromUserId($user->id)->sendReportState($request_id);
     }
 }
+http_response_code(204);

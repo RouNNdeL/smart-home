@@ -73,7 +73,9 @@ class IpTrustManager
 
     private function insertOrUpdate()
     {
-        $sql = "INSERT INTO ip_heat (ip, heat_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE heat_value = ?";
+        $sql = "INSERT INTO ip_heat (ip, heat_value) VALUES (?, ?) 
+                ON DUPLICATE KEY UPDATE 
+                  heat_value = ?, max_heat = GREATEST(max_heat, heat_value)";
         $stmt = DbUtils::getConnection()->prepare($sql);
         $stmt->bind_param("sii", $this->ip, $this->heat, $this->heat);
         $success = $stmt->execute();

@@ -117,20 +117,6 @@ abstract class EspWifiLedController extends RgbProfilesDevice
         }
     }
 
-    public static function getByIotId(int $id)
-    {
-        $device_id = "iot_" . $id;
-        switch($id)
-        {
-            case self::ID_ESP_CHRIS:
-                return ChrisWifiController::fromDatabaseRow(
-                    ["id" => $device_id, "device_driver" => ChrisWifiController::class]
-                );
-            default:
-                return null;
-        }
-    }
-
     /**
      * Either a local IP address or local DNS hostname
      * @return string
