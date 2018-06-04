@@ -32,9 +32,9 @@
 
 require_once __DIR__ . "/../../includes/GlobalManager.php";
 
+$manager = GlobalManager::withSessionManager();
 
-
-if($manager->isLoggedIn())
+if($manager->getSessionManager()->isLoggedIn())
 {
     header("Location: /devices");
     exit(0);
@@ -47,7 +47,7 @@ if($_SERVER["REQUEST_METHOD"] === "POST")
         http_response_code(400);
         exit(0);
     }
-    $success = $manager->attemptLoginAuto($_POST["username"], $_POST["password"]);
+    $success = $manager->getSessionManager()->attemptLoginAuto($_POST["username"], $_POST["password"]);
     if($success)
     {
         $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_SUCCESSFUL_LOGIN);
