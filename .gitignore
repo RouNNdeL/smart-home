@@ -1,6 +1,5 @@
 secure_config.php
 .idea/
-composer.lock
 vendor/
 node_modules/
 /home_graph_key.json
