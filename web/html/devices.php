@@ -9,6 +9,7 @@
 require_once __DIR__ . "/../../includes/database/IpTrustManager.php";
 require_once __DIR__ . "/../../includes/database/SessionManager.php";
 require_once __DIR__ . "/../../includes/UserDeviceManager.php";
+require_once __DIR__ . "/../../includes/logging/RequestLogger.php";
 
 $trustManager = IpTrustManager::auto();
 if($trustManager === null || !$trustManager->isAllowed())
@@ -17,7 +18,9 @@ if($trustManager === null || !$trustManager->isAllowed())
     exit(0);
 }
 
-$manager = SessionManager::auto();
+$manager = SessionManager::getInstance();
+RequestLogger::getInstance($manager);
+
 if(!$manager->isLoggedIn())
 {
     require __DIR__."/../error/404.php";

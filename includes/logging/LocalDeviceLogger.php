@@ -6,7 +6,7 @@
  * Time: 16:53
  */
 
-require_once __DIR__."/DbUtils.php";
+require_once __DIR__ . "/../database/DbUtils.php";
 
 class LocalDeviceLogger
 {
@@ -17,7 +17,7 @@ class LocalDeviceLogger
     {
         $payload = $payload === "" ? null : $payload;
         $conn = DbUtils::getConnection();
-        $sql = "INSERT INTO device_request_logs 
+        $sql = "INSERT INTO log_device_requests 
                 (device_id, type, request_attempts, payload) 
                 VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);

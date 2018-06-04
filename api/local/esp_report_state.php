@@ -38,7 +38,7 @@ if($device === null)
 require_once __DIR__."/../../includes/database/DbUtils.php";
 require_once __DIR__ . "/../../includes/database/DeviceDbHelper.php";
 require_once __DIR__."/../../includes/UserDeviceManager.php";
-require_once __DIR__."/../../includes/database/LocalDeviceLogger.php";
+require_once __DIR__ . "/../../includes/database/LocalDeviceLogger.php";
 $request_id = isset(apache_request_headers()["x-Request-Id"]) ? apache_request_headers()["x-Request-Id"] : null;
 $attempts = isset(apache_request_headers()["x-Request-Attempts"]) ? apache_request_headers()["x-Request-Attempts"] : null;
 

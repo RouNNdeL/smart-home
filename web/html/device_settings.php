@@ -15,7 +15,10 @@ if ($trustManager === null || !$trustManager->isAllowed()) {
 }
 
 require_once __DIR__ . "/../../includes/database/SessionManager.php";
-$manager = SessionManager::auto();
+require_once __DIR__ . "/../../includes/logging/RequestLogger.php";
+$manager = SessionManager::getInstance();
+RequestLogger::getInstance($manager);
+
 if (!$manager->isLoggedIn()) {
     require __DIR__ . "/../error/404.php";
     http_response_code(404);

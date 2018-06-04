@@ -20,27 +20,36 @@ class SessionManager
 
     private $user_id;
 
+
+    private static $instance = null;
     /**
      * SessionManager constructor.
      * @param $session_id
      * @param $session_token
      * @param $user_id
      */
-    public function __construct(int $session_id, $session_token, $user_id)
+    private function __construct(int $session_id, $session_token, $user_id)
     {
         $this->session_id = $session_id;
         $this->session_token = $session_token;
         $this->user_id = $user_id;
     }
 
-    public static function auto()
+    /**
+     * @return SessionManager
+     */
+    public static function getInstance()
     {
-        $session_token = isset($_COOKIE[self::SESSION_COOKIE]) ? $_COOKIE[self::SESSION_COOKIE] : "";
-        return SessionManager::fromSessionToken(
-            $session_token,
-            $_SERVER["REMOTE_ADDR"],
-            $_SERVER['HTTP_USER_AGENT']
-        );
+        if(SessionManager::$instance === null)
+        {
+            $session_token = isset($_COOKIE[self::SESSION_COOKIE]) ? $_COOKIE[self::SESSION_COOKIE] : "";
+            SessionManager::$instance =  SessionManager::fromSessionToken(
+                $session_token,
+                $_SERVER["REMOTE_ADDR"],
+                $_SERVER['HTTP_USER_AGENT']
+            );
+        }
+        return SessionManager::$instance;
     }
 
     public static function fromSessionToken(string $session_token, string $ip, string $agent)
@@ -52,13 +61,17 @@ class SessionManager
         $stmt->bind_result($id, $user_id);
         $stmt->execute();
         if($stmt->fetch())
+        {
             $manager = new SessionManager($id, $session_token, $user_id);
+        }
         else
+        {
             $manager = SessionManager::newAnonymous($conn);
+            $manager->setCookie();
+        }
 
         $stmt->close();
 
-        $manager->setCookie();
         $manager->updateSession($conn, $ip, $agent);
         return $manager;
     }
@@ -200,5 +213,13 @@ class SessionManager
     public function getUserId()
     {
         return $this->user_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSessionId(): int
+    {
+        return $this->session_id;
     }
 }

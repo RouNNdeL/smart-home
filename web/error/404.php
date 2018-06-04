@@ -6,6 +6,10 @@
  * Time: 20:16
  */
 require_once(__DIR__ . "/../../includes/Utils.php");
+require_once(__DIR__ . "/../../includes/logging/RequestLogger.php");
+require_once(__DIR__ . "/../../includes/database/SessionManager.php");
+$manager = SessionManager::getInstance();
+RequestLogger::getInstance($manager);
 $lang = Utils::getInstance()->lang;
 echo <<<TAG
 <!DOCTYPE html>

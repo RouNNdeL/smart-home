@@ -44,7 +44,7 @@ if($client === null)
 }
 
 require_once __DIR__ . "/../includes/database/SessionManager.php";
-$manager = SessionManager::auto();
+$manager = SessionManager::getInstance();
 if(isset($_GET["oauth-username"]) && isset($_GET["oauth-password"]) && !$manager->isLoggedIn())
 {
     require_once __DIR__ . "/../includes/database/DbUtils.php";
