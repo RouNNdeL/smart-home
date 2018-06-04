@@ -54,7 +54,7 @@ class SessionManager
         if($stmt->fetch())
             $manager = new SessionManager($id, $session_token, $user_id);
         else
-            $manager = SessionManager::newAnonymous($conn, $ip);
+            $manager = SessionManager::newAnonymous($conn);
 
         $stmt->close();
 
@@ -99,7 +99,7 @@ class SessionManager
         $this->session_id = $manager->session_id;
         $this->user_id = $manager->user_id;
         $this->session_token = $manager->session_token;
-        $this->updateSession($conn, $ip, $agent);
+        $this->updateSession($conn, $ip, $agent, true);
         $this->setCookie();
 
         SessionManager::insertLoginAttempt($user_id, $this->session_id, $ip);
@@ -140,9 +140,9 @@ class SessionManager
         setcookie(self::SESSION_COOKIE, $this->session_token, 0, "/", "zdul.xyz", true, true);
     }
 
-    private function updateSession(mysqli $conn, string $ip, string $agent)
+    private function updateSession(mysqli $conn, string $ip, string $agent, bool $force_refresh = false)
     {
-        if(IpTrustManager::isLocal($ip))
+        if($force_refresh || IpTrustManager::isLocal($ip))
         {
             $sql = "UPDATE sessions SET 
                       expires = DATE_ADD(NOW(), INTERVAL 3 DAY), 
