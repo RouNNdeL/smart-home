@@ -137,7 +137,6 @@ class SessionManager
         $this->user_id = $manager->user_id;
         $this->session_token = $manager->session_token;
         $this->updateSession($conn, $ip, $agent, true);
-        $this->setCookie();
 
         SessionManager::insertLoginAttempt($user_id, $this->session_id, $ip);
 
@@ -174,13 +173,14 @@ class SessionManager
 
     private function setCookie()
     {
-        setcookie(self::SESSION_COOKIE, $this->session_token, 0, "/", "zdul.xyz", true, true);
+        setcookie(self::SESSION_COOKIE, $this->session_token, time() + 3*24*60*60, "/", "zdul.xyz", true, true);
     }
 
     private function updateSession(mysqli $conn, string $ip, string $agent, bool $force_refresh = false)
     {
         if($force_refresh || IpTrustManager::isLocal($ip))
         {
+            $this->setCookie();
             $sql = "UPDATE sessions SET 
                       expires = DATE_ADD(NOW(), INTERVAL 3 DAY), 
                       last_active = NOW(),
@@ -228,7 +228,7 @@ class SessionManager
 
     private static function generateSessionToken()
     {
-        return base64_encode(openssl_random_pseudo_bytes(1024));
+        return base64_encode(openssl_random_pseudo_bytes(512));
     }
 
     /**
