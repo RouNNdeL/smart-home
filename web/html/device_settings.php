@@ -6,24 +6,9 @@
  * Time: 1:53 PM
  */
 
-require_once __DIR__ . "/../../includes/database/IpTrustManager.php";
+require_once __DIR__ . "/../../includes/GlobalManager.php";
 
-$trustManager = IpTrustManager::auto();
-if ($trustManager === null || !$trustManager->isAllowed()) {
-    http_response_code(403);
-    exit(0);
-}
-
-require_once __DIR__ . "/../../includes/database/SessionManager.php";
-require_once __DIR__ . "/../../includes/logging/RequestLogger.php";
-$manager = SessionManager::getInstance();
-RequestLogger::getInstance($manager);
-
-if (!$manager->isLoggedIn()) {
-    require __DIR__ . "/../error/404.php";
-    http_response_code(404);
-    exit(0);
-}
+$manager = GlobalManager::withSessionManager(true);
 
 if (!isset($_GET["device_id"])) {
     require __DIR__ . "/../error/404.php";
@@ -31,10 +16,9 @@ if (!isset($_GET["device_id"])) {
     exit(0);
 }
 
-require_once __DIR__ . "/../../includes/UserDeviceManager.php";
-$device_manager = UserDeviceManager::fromUserId($manager->getUserId());
+$manager->loadUserDeviceManager();
 
-$device = $device_manager->getPhysicalDeviceById($_GET["device_id"]);
+$device = $manager->getUserDeviceManager()->getPhysicalDeviceById($_GET["device_id"]);
 if($device === null)
 {
     require __DIR__ . "/../error/404.php";

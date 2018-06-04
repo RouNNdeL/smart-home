@@ -6,14 +6,9 @@
  * Time: 14:34
  */
 
-require_once __DIR__ . "/../includes/database/IpTrustManager.php";
+require_once __DIR__ . "/../includes/GlobalManager.php";
 
-$trustManager = IpTrustManager::auto();
-if($trustManager === null || !$trustManager->isAllowed())
-{
-    http_response_code(403);
-    exit(0);
-}
+$manager = GlobalManager::minimal();
 
 require_once __DIR__ . "/../includes/database/ApiClient.php";
 require_once __DIR__ . "/../includes/database/OAuthUtils.php";
@@ -42,32 +37,30 @@ if($client === null)
     http_response_code(401);
     echo json_encode($response);
 }
-
-require_once __DIR__ . "/../includes/database/SessionManager.php";
-$manager = SessionManager::getInstance();
-if(isset($_GET["oauth-username"]) && isset($_GET["oauth-password"]) && !$manager->isLoggedIn())
+$manager->loadSessionManager();
+if(isset($_GET["oauth-username"]) && isset($_GET["oauth-password"]) && !$manager->getSessionManager()->isLoggedIn())
 {
     require_once __DIR__ . "/../includes/database/DbUtils.php";
     require_once __DIR__ . "/../includes/database/HomeUser.php";
     require_once __DIR__ . "/../vendor/autoload.php";
 
-    $success = $manager->attemptLoginAuto($_GET["oauth-username"], $_GET["oauth-password"]);
+    $success = $manager->getSessionManager()->attemptLoginAuto($_GET["oauth-username"], $_GET["oauth-password"]);
     if($success)
     {
-        $trustManager->heatUp(IpTrustManager::HEAT_SUCCESSFUL_LOGIN);
+        $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_SUCCESSFUL_LOGIN);
     }
     else
     {
-        $trustManager->heatUp(IpTrustManager::HEAT_LOGIN_ATTEMPT);
+        $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_LOGIN_ATTEMPT);
         $user_error = "Invalid username or password";
     }
 }
 
-if($manager->isLoggedIn())
+if($manager->getSessionManager()->isLoggedIn())
 {
     //TODO: Implement 2FA if the user has enabled it
     require_once __DIR__ . "/../includes/database/OAuthUtils.php";
-    $code = urlencode(OAuthUtils::insertAuthCode(DbUtils::getConnection(), $client->id, $manager->getUserId(), $_GET["scope"]));
+    $code = urlencode(OAuthUtils::insertAuthCode(DbUtils::getConnection(), $client->id, $manager->getSessionManager()->getUserId(), $_GET["scope"]));
     $state = $_GET["state"];
     header("Location: " . $_GET["redirect_uri"] . "?code=$code&state=$state");
     exit(0);
@@ -107,7 +100,7 @@ TAG;
                            name="oauth-password">
                 </div>
                 <?php
-                if(!$trustManager->isTrusted())
+                if(!$manager->getIpTrustManager()->isTrusted())
                 {
                     echo <<<HTML
                 <div class="g-recaptcha" data-sitekey="6LedoFoUAAAAADtLI8MmDil2Yf8_DYeq6iMk7Xb7"></div>

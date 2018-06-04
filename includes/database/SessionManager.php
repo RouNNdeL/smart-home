@@ -208,7 +208,7 @@ class SessionManager
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getUserId()
     {

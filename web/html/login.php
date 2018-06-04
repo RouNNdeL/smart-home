@@ -6,19 +6,9 @@
  * Time: 14:34
  */
 
-require_once __DIR__ . "/../../includes/database/IpTrustManager.php";
-require_once __DIR__ . "/../../includes/database/SessionManager.php";
-require_once __DIR__ . "/../../includes/logging/RequestLogger.php";
+require_once __DIR__ . "/../../includes/GlobalManager.php";
 
-$trustManager = IpTrustManager::auto();
-if($trustManager === null || !$trustManager->isAllowed())
-{
-    http_response_code(403);
-    exit(0);
-}
 
-$manager = SessionManager::getInstance();
-RequestLogger::getInstance($manager);
 
 if($manager->isLoggedIn())
 {
@@ -36,11 +26,11 @@ if($_SERVER["REQUEST_METHOD"] === "POST")
     $success = $manager->attemptLoginAuto($_POST["username"], $_POST["password"]);
     if($success)
     {
-        $trustManager->heatUp(IpTrustManager::HEAT_SUCCESSFUL_LOGIN);
+        $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_SUCCESSFUL_LOGIN);
         header("Location: /devices");
         exit(0);
     }
-    $trustManager->heatUp(IpTrustManager::HEAT_LOGIN_ATTEMPT);
+    $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_LOGIN_ATTEMPT);
 }
 
 ?>
@@ -78,7 +68,7 @@ TAG;
                            name="password">
                 </div>
                 <?php
-                if(!$trustManager->isTrusted())
+                if(!$manager->getIpTrustManager()->isTrusted())
                 {
                     echo <<<HTML
                 <div class="g-recaptcha" data-sitekey="6LedoFoUAAAAADtLI8MmDil2Yf8_DYeq6iMk7Xb7"></div>

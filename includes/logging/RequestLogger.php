@@ -25,15 +25,14 @@ class RequestLogger
     }
 
     /**
-     * @param SessionManager $sessionManager
      * @return RequestLogger
      */
-    public static function getInstance(SessionManager $sessionManager)
+    public static function getInstance()
     {
         if(RequestLogger::$instance === null)
         {
             RequestLogger::$instance = RequestLogger::create(
-                $sessionManager->getSessionId(),
+                SessionManager::getInstance()->getSessionId(),
                 $_SERVER["SCRIPT_NAME"],
                 $_SERVER["REQUEST_URI"],
                 $_SERVER["REQUEST_METHOD"],

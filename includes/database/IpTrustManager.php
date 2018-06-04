@@ -23,6 +23,9 @@ class IpTrustManager
     /** @var int */
     private $heat;
 
+    /** @var IpTrustManager */
+    private static $instance = null;
+
     /**
      * IpTrustManager constructor.
      * @param string $ip
@@ -34,16 +37,21 @@ class IpTrustManager
         $this->heat = $heat;
     }
 
-    public static function auto()
+    public static function getInstance()
     {
-        return IpTrustManager::fromIp($_SERVER['REMOTE_ADDR']);
+        if(IpTrustManager::$instance === null)
+        {
+            IpTrustManager::$instance =  IpTrustManager::fromIp($_SERVER['REMOTE_ADDR']);
+        }
+
+        return IpTrustManager::$instance;
     }
 
     /**
      * @param string $ip
      * @return IpTrustManager|null
      */
-    public static function fromIp(string $ip)
+    private static function fromIp(string $ip)
     {
         if(!self::isValid($ip))
             return null;
