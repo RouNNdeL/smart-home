@@ -104,7 +104,7 @@ abstract class PhysicalDevice
     public function getRowHtml(int $user_id)
     {
         $id = urlencode($this->id);
-        $display_name = urldecode($this->display_name);
+        $display_name = urlencode($this->display_name);
         $offline = $this->isOnline() ? "" : "<span class=\"device-offline-text\">(" . Utils::getString("device_status_offline") . ")</span>";
 
         if(sizeof($this->virtual_devices) > 1) {
@@ -157,5 +157,13 @@ HTML;
     public function getId(): string
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDisplayName(): string
+    {
+        return $this->display_name;
     }
 }

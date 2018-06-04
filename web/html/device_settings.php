@@ -39,6 +39,10 @@ if($device === null)
     exit(0);
 }
 
+if(isset($_GET["name"]) && $_GET["name"] === "false")
+{
+    header("Location: /device/" . urlencode($device->getDisplayName()) . "/" . urlencode($device->getId()));
+}
 
 ?>
 

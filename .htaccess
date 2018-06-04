@@ -3,8 +3,12 @@ RewriteEngine on
 RewriteCond %{SERVER_NAME} !home.zdul.xyz
 RewriteRule ^ https://home.zdul.xyz%{REQUEST_URI} [END,R=permanent]
 
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /$1 [L,R=301]
+
 RewriteRule ^$ /login [L]
-RewriteRule ^/?device/.*?/(.*)$ /device_settings?device_id=$1
+RewriteRule ^/?device/.*?/(.+)$ /device_settings?device_id=$1
+RewriteRule ^/?device/(.+)$ /device_settings?device_id=$1&name=false
 
 # This checks whether the file exsits,
 # if not the request will be redirected to the web/html folder
