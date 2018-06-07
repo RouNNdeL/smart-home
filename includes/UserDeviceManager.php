@@ -139,7 +139,7 @@ class UserDeviceManager
         $devices_payload = [];
         foreach ($this->physical_devices as $device) {
             foreach ($device->getVirtualDevices() as $virtualDevice) {
-                $devices_payload[] = $virtualDevice->getSyncJson($device->getId());
+                $devices_payload[] = $virtualDevice->getSyncJson();
             }
         }
         return $devices_payload;

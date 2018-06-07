@@ -100,11 +100,10 @@ abstract class VirtualDevice
      */
     public abstract function toHTML();
 
-    public function getSyncJson($physical_device_id)
+    public function getSyncJson()
     {
         return ["id" => $this->device_id, "type" => $this->getActionsDeviceType(), "name" => ["name" => $this->device_name],
-            "traits" => $this->getTraits(), "willReportState" => true, "attributes" => $this->getAttributes(),
-            "customData" => ["physical_device_id" => $physical_device_id]];
+            "traits" => $this->getTraits(), "willReportState" => true, "attributes" => $this->getAttributes()];
     }
 
     /**
