@@ -32,6 +32,8 @@
 
 require_once __DIR__."/SimpleRgbDevice.php";
 require_once __DIR__."/SimpleEffectDevice.php";
+require_once __DIR__."/LampAnalog.php";
+require_once __DIR__."/LampSimple.php";
 
 abstract class VirtualDevice
 {
@@ -61,8 +63,11 @@ abstract class VirtualDevice
     const DEVICE_ID_PC_CPU_FAN = 2;
     const DEVICE_ID_PC_UNDERGLOW = 3;
 
+    /** @var string  */
     protected $device_type;
+    /** @var string  */
     protected $device_id;
+    /** @var string  */
     protected $device_name;
 
     /**
@@ -138,6 +143,14 @@ abstract class VirtualDevice
                 return new SimpleEffectDevice(
                     $row["id"], $row["display_name"], $row["color"],
                     $row["brightness"], $row["state"]
+                );
+            case self::DEVICE_TYPE_LAMP:
+                return new LampSimple(
+                    $row["id"], $row["display_name"], $row["state"]
+                );
+            case self::DEVICE_TYPE_LAMP_ANALOG:
+                return new LampAnalog(
+                    $row["id"], $row["display_name"], $row["brightness"], $row["state"]
                 );
             default:
                 throw new InvalidArgumentException("Invalid device type ".$row["type"]);

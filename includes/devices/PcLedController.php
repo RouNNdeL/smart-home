@@ -29,6 +29,8 @@
  * Date: 2018-05-14
  * Time: 19:41
  */
+
+require_once __DIR__."/RgbProfilesDevice.php";
 class PcLedController extends RgbProfilesDevice
 {
 

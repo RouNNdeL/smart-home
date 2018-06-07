@@ -32,6 +32,7 @@
 
 require_once __DIR__ . "/EspWifiLedController.php";
 require_once __DIR__ . "/PcLedController.php";
+require_once __DIR__ . "/EspWiFiLamp.php";
 require_once __DIR__ . "/../database/HomeUser.php";
 require_once __DIR__ . "/../Utils.php";
 
@@ -86,9 +87,31 @@ abstract class PhysicalDevice
     /**
      * @param array $action
      * @param string $request_id
-     * @return array - ex. ["status" => "SUCCESS", "ids" => [2, 5, 9]]
+     * @return array
      */
-    public abstract function handleAssistantAction(array $action, string $request_id);
+    public function handleAssistantAction(array $action, string $request_id)
+    {
+        $ids = [];
+        foreach($action["commands"] as $command)
+        {
+            foreach($command["devices"] as $d)
+            {
+                $device = $this->getVirtualDeviceById($d["id"]);
+                if($device !== null)
+                {
+                    $ids[] = $device->getDeviceId();
+                    foreach($command["execution"] as $item)
+                    {
+                        $device->handleAssistantAction($item);
+                    }
+                }
+            }
+        }
+
+        $this->save();
+
+        return ["status" => ($this->isOnline() ? "SUCCESS" : "OFFLINE"), "ids" => $ids];
+    }
 
     /**
      * @param string $id

@@ -26,18 +26,12 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-05-14
- * Time: 20:03
+ * Date: 2018-06-07
+ * Time: 18:14
  */
 
-class SimpleRgbDevice extends VirtualDevice
+class LampSimple extends VirtualDevice
 {
-    /** @var int */
-    protected $color;
-
-    /** @var int */
-    protected $brightness;
-
     /** @var bool */
     protected $on;
 
@@ -45,15 +39,11 @@ class SimpleRgbDevice extends VirtualDevice
      * SimpleRgbDevice constructor.
      * @param string $device_id
      * @param string $device_name
-     * @param int $color
-     * @param int $brightness
      * @param bool $on
      */
-    public function __construct(string $device_id, string $device_name, int $color = 0xffffff, int $brightness = 100, bool $on = true)
+    public function __construct(string $device_id, string $device_name, bool $on = true)
     {
-        parent::__construct($device_id, $device_name, VirtualDevice::DEVICE_TYPE_RGB);
-        $this->color = $color;
-        $this->brightness = $brightness;
+        parent::__construct($device_id, $device_name, VirtualDevice::DEVICE_TYPE_LAMP);
         $this->on = $on;
     }
 
@@ -65,20 +55,8 @@ class SimpleRgbDevice extends VirtualDevice
     {
         switch($command["command"])
         {
-            case VirtualDevice::DEVICE_COMMAND_BRIGHTNESS_ABSOLUTE:
-                $this->brightness = $command["params"]["brightness"];
-                $this->on = $this->brightness !== 0 ? true : false;
-                break;
             case VirtualDevice::DEVICE_COMMAND_ON_OFF:
                 $this->on = $command["params"]["on"];
-                if($this->on && $this->brightness == 0)
-                    $this->brightness = 100;
-                break;
-            case VirtualDevice::DEVICE_COMMAND_COLOR_ABSOLUTE:
-                $this->color = $command["params"]["color"]["spectrumRGB"];
-                $this->on = true;
-                if($this->brightness === 0)
-                    $this->brightness = 100;
                 break;
         }
     }
@@ -92,8 +70,6 @@ class SimpleRgbDevice extends VirtualDevice
         return [
             "on" => $this->on,
             "online" => $online,
-            "brightness" => $this->brightness,
-            "color" => ["spectrumRGB" => $this->color]
         ];
     }
 
@@ -101,8 +77,6 @@ class SimpleRgbDevice extends VirtualDevice
     {
         $conn = DbUtils::getConnection();
         $sql = "UPDATE devices_virtual SET 
-                  color = $this->color,
-                  brightness = $this->brightness, 
                   state = $this->on WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $this->device_id);
@@ -121,7 +95,7 @@ class SimpleRgbDevice extends VirtualDevice
 
     public function getTraits()
     {
-        return [self::DEVICE_TRAIT_ON_OFF, self::DEVICE_TRAIT_COLOR_SPECTRUM, self::DEVICE_TRAIT_BRIGHTNESS];
+        return [self::DEVICE_TRAIT_ON_OFF];
     }
 
     public function getActionsDeviceType()
@@ -143,42 +117,10 @@ class SimpleRgbDevice extends VirtualDevice
     }
 
     /**
-     * @return int
-     */
-    public function getBrightness(): int
-    {
-        return $this->brightness;
-    }
-
-    /**
-     * @return int
-     */
-    public function getColor(): int
-    {
-        return $this->color;
-    }
-
-    /**
-     * @param int $brightness
-     */
-    public function setBrightness(int $brightness)
-    {
-        $this->brightness = $brightness;
-    }
-
-    /**
      * @param bool $on
      */
     public function setOn(bool $on)
     {
         $this->on = $on;
-    }
-
-    /**
-     * @param int $color
-     */
-    public function setColor(int $color)
-    {
-        $this->color = $color;
     }
 }

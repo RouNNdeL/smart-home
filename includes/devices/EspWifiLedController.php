@@ -60,27 +60,8 @@ class EspWifiLedController extends RgbProfilesDevice
      */
     public function handleAssistantAction(array $action, string $request_id)
     {
-        $ids = [];
-        foreach($action["commands"] as $command)
-        {
-            foreach($command["devices"] as $d)
-            {
-                $device = $this->getVirtualDeviceById($d["id"]);
-                if($device !== null)
-                {
-                    $ids[] = $device->getDeviceId();
-                    foreach($command["execution"] as $item)
-                    {
-                        $device->handleAssistantAction($item);
-                    }
-                }
-            }
-        }
-
         $this->request_id = $request_id;
-        $this->save();
-
-        return ["status" => ($this->isOnline() ? "SUCCESS" : "OFFLINE"), "ids" => $ids];
+        return parent::handleAssistantAction($action, $request_id);
     }
 
     public function save()
