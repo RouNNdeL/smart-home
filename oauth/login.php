@@ -61,7 +61,7 @@ if($client === null)
     http_response_code(401);
     echo json_encode($response);
 }
-$manager->loadSessionManager();
+$manager->loadSessionManager(false);
 if(isset($_GET["oauth-username"]) && isset($_GET["oauth-password"]) && !$manager->getSessionManager()->isLoggedIn())
 {
     require_once __DIR__ . "/../includes/database/DbUtils.php";

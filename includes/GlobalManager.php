@@ -99,10 +99,10 @@ class GlobalManager
         }
     }
 
-    public function loadSessionManager($login_required = false)
+    public function loadSessionManager($log = GlobalManager::LOG, $login_required = false)
     {
         $this->sessionManager = SessionManager::getInstance();
-        if(GlobalManager::LOG)
+        if($log)
             $this->requestLogger = RequestLogger::getInstance();
         if($login_required && !$this->sessionManager->isLoggedIn())
         {
