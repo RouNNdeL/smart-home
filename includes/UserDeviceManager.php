@@ -118,10 +118,13 @@ class UserDeviceManager
         foreach ($this->physical_devices as $device) {
             $result = $device->handleAssistantAction($payload, $request_id);
             $status = $result["status"];
-            if (!isset($commands_response[$status]))
-                $commands_response[$status] = [];
+            if(sizeof($result["ids"]) > 0)
+            {
+                if(!isset($commands_response[$status]))
+                    $commands_response[$status] = [];
 
-            $commands_response[$status] = array_merge($commands_response[$status], $result["ids"]);
+                $commands_response[$status] = array_merge($commands_response[$status], $result["ids"]);
+            }
         }
 
         $commands_response_array = [];
