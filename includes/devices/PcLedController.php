@@ -29,15 +29,11 @@
  * Date: 2018-05-14
  * Time: 19:41
  */
-
 class PcLedController extends RgbProfilesDevice
 {
 
     const SAVE_PATH = "/_data/pc_controller.dat";
     const UPDATE_PATH = "/_data/pc_controller_update.dat";
-
-    const MAX_ACTIVE_COUNT = 8;
-    const MAX_OVERALL_COUNT = 32;
 
     private $fan_count;
     private $csgo_enabled;
@@ -46,6 +42,7 @@ class PcLedController extends RgbProfilesDevice
      * PcLedController constructor.
      * @param int $owner_id
      * @param string $display_name
+     * @param string $hostname
      * @param int $current_profile
      * @param bool $enabled
      * @param int $fan_count
@@ -55,14 +52,14 @@ class PcLedController extends RgbProfilesDevice
      * @param array $virtual_devices
      * @param array $brightness_array
      */
-    protected function __construct(int $owner_id, string $display_name, int $current_profile, bool $enabled, int $fan_count, int $auto_increment,
+    protected function __construct(int $owner_id, string $display_name, string $hostname, int $current_profile, bool $enabled, int $fan_count, int $auto_increment,
                                    bool $csgo_enabled, array $profiles, array $virtual_devices, array $brightness_array
     )
     {
         $this->fan_count = $fan_count;
         $this->csgo_enabled = $csgo_enabled;
-        parent::__construct(PhysicalDevice::ID_PC_LED_CONTROLLER, $owner_id, $display_name, $current_profile,
-            $enabled, $auto_increment, $profiles, $virtual_devices);
+        parent::__construct(PcLedController::DEVICE_ID, $owner_id, $display_name, $hostname,
+            $current_profile, $enabled, $auto_increment, $profiles, $virtual_devices);
     }
 
 
@@ -100,7 +97,7 @@ class PcLedController extends RgbProfilesDevice
         file_put_contents($path, serialize($this));
     }
 
-    public static function load(string $id, int $owner_id, string $display_name)
+    public static function load(string $id, int $owner_id, string $display_name, string $hostname)
     {
         $path = $_SERVER["DOCUMENT_ROOT"] . self::SAVE_PATH;
         $contents = file_get_contents($path);
@@ -116,18 +113,7 @@ class PcLedController extends RgbProfilesDevice
             new SimpleRgbDevice(VirtualDevice::DEVICE_ID_PC_UNDERGLOW, null, 0x000000, 100, false),
         ];
         $profiles = [new Profile(Utils::getString("default_profile_name"), 4, 2)];
-        $brightness_array = [100, 100, 100, 100, 100];
-        return new PcLedController($owner_id, $display_name,0, true, 1, 0, true, $profiles, $virtual_devices, $brightness_array);
-    }
-
-    protected static function getMaximumActiveProfileCount()
-    {
-        return self::MAX_ACTIVE_COUNT;
-    }
-
-    protected static function getMaximumOverallProfileCount()
-    {
-        return self::MAX_OVERALL_COUNT;
+        return new PcLedController($owner_id, $display_name, $hostname, 0, true, 1, 0, true, $profiles, $virtual_devices);
     }
 
     function tcp_send($string = null)

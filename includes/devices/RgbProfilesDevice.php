@@ -31,6 +31,8 @@
  */
 require_once __DIR__ . "/VirtualDevice.php";
 require_once __DIR__ . "/PhysicalDevice.php";
+require_once __DIR__ . "/../database/DbUtils.php";
+require_once __DIR__ . "/../database/DeviceDbHelper.php";
 
 abstract class RgbProfilesDevice extends PhysicalDevice
 {
@@ -49,6 +51,12 @@ abstract class RgbProfilesDevice extends PhysicalDevice
     protected $modified_profiles;
     /** @var int[] */
     protected $avr_order;
+    
+    /** @var int */
+    protected $active_profile_count;
+    
+    /** @var int */
+    protected $max_profile_count;
 
     /** @var Profile[] */
     protected $profiles;
@@ -57,35 +65,39 @@ abstract class RgbProfilesDevice extends PhysicalDevice
      * @param string $id
      * @param int $owner_id
      * @param string $display_name
+     * @param string $hostname
      * @param int $current_profile
      * @param bool $enabled
      * @param int $auto_increment
      * @param array $profiles
      * @param array $virtual_devices
      */
-    protected function __construct(string $id, int $owner_id, string $display_name, int $current_profile, bool $enabled, int $auto_increment,
-                                   array $profiles, array $virtual_devices
-    )
+    protected function __construct(string $id, int $owner_id, string $display_name, string $hostname, int $current_profile, bool $enabled, int $auto_increment,
+                                   array $profiles, array $virtual_devices)
     {
-        parent::__construct($id, $owner_id, $display_name, $virtual_devices);
+        parent::__construct($id, $owner_id, $display_name, $hostname, $virtual_devices);
+
         $this->current_profile = $current_profile;
         $this->auto_increment = $auto_increment;
         $this->profiles = $profiles;
-        if (sizeof($profiles) <= static::getMaximumActiveProfileCount()) {
+        $this->max_profile_count = DeviceDbHelper::getMaxProfileCount(DbUtils::getConnection(), $id);
+        $this->active_profile_count = DeviceDbHelper::getActiveProfileCount(DbUtils::getConnection(), $id);
+        if($this->max_profile_count === null || $this->active_profile_count === null)
+        {
+            throw new UnexpectedValueException("Missing max_profile_count or active_profile_count for $id, 
+            please add the appropriate record in the database");
+        }
+        if (sizeof($profiles) <= $this->max_profile_count) {
             $this->active_indexes = range(0, sizeof($profiles) - 1);
             $this->inactive_indexes = array();
         } else {
-            $this->active_indexes = range(0, static::getMaximumActiveProfileCount() - 1);
-            $this->inactive_indexes = range(static::getMaximumActiveProfileCount(), sizeof($profiles) - static::getMaximumActiveProfileCount() - 1);
+            $this->active_indexes = range(0,$this->max_profile_count - 1);
+            $this->inactive_indexes = range($this->max_profile_count, sizeof($profiles) - $this->active_profile_count - 1);
         }
         $this->avr_indexes = $this->active_indexes;
         $this->avr_order = $this->getAvrOrder();
         $this->modified_profiles = array();
     }
-
-    protected abstract static function getMaximumActiveProfileCount();
-
-    protected abstract static function getMaximumOverallProfileCount();
 
     public function getProfileCount()
     {
@@ -94,12 +106,12 @@ abstract class RgbProfilesDevice extends PhysicalDevice
 
     public function addProfile(Profile $profile)
     {
-        if (sizeof($this->profiles) >= static::getMaximumOverallProfileCount())
+        if (sizeof($this->profiles) >= $this->max_profile_count)
             return false;
         array_push($this->profiles, $profile);
-        if (sizeof($this->active_indexes) < static::getMaximumActiveProfileCount()) {
+        if (sizeof($this->active_indexes) < $this->active_profile_count) {
             array_push($this->active_indexes, $this->getMaxIndex());
-            for ($i = 0; $i < static::getMaximumActiveProfileCount(); $i++) {
+            for ($i = 0; $i < $this->active_profile_count; $i++) {
                 if (!isset($this->avr_indexes[$i])) {
                     $this->avr_indexes[$i] = $this->getMaxIndex();
                     break;
@@ -130,7 +142,7 @@ abstract class RgbProfilesDevice extends PhysicalDevice
         }
         foreach ($active as $item) {
             if (array_search($item, $this->active_indexes) === false) {
-                for ($i = 0; $i < static::getMaximumActiveProfileCount(); $i++) {
+                for ($i = 0; $i < $this->active_profile_count; $i++) {
                     if (!isset($this->avr_indexes[$i])) {
                         $this->avr_indexes[$i] = $item;
                         $avr_i = $i;

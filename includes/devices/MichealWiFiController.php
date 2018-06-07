@@ -41,17 +41,13 @@ require_once __DIR__ . "/../database/DbUtils.php";
 class MichealWiFiController extends EspWifiLedController
 {
     const VIRTUAL_DEVICE_COUNT = 2;
+    const DEVICE_ID = "iot_1";
 
-    protected function getDeviceHostname()
-    {
-        return "michas-leds";
-    }
-
-    public static function load(string $device_id, int $owner_id, string $display_name)
+    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname)
     {
         $devices = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
         // TODO: Load effects from database
-        return new MichealWiFiController($device_id, $owner_id, $display_name, 0, 0, 0, [], $devices);
+        return new MichealWiFiController($device_id, $owner_id, $display_name, $hostname, 0, 0, 0, [], $devices);
     }
 
     protected static function getMaximumActiveProfileCount()
@@ -67,8 +63,16 @@ class MichealWiFiController extends EspWifiLedController
     /**
      * @return int
      */
-    protected function getVirtualDeviceCount()
+    protected static function getVirtualDeviceCount()
     {
-        return 2;
+        return MichealWiFiController::VIRTUAL_DEVICE_COUNT;
+    }
+
+    /**
+     * @return string
+     */
+    protected static function getDeviceId()
+    {
+        return MichealWiFiController::DEVICE_ID;
     }
 }

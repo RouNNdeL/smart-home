@@ -37,24 +37,16 @@ require_once __DIR__ . "/ChrisWifiController.php";
 /**
  * To be used with an ESP8266 WiFi Led Controller: https://github.com/RouNNdeL/esp8266-leds
  */
-abstract class EspWifiLedController extends RgbProfilesDevice
+class EspWifiLedController extends RgbProfilesDevice
 {
-    const ID_ESP_CHRIS = 0;
-    const ID_ESP_MICHEAL = 1;
 
     private $request_id = null;
 
-    public function __construct(string $id, int $owner_id, string $display_name, int $current_profile, bool $enabled, int $auto_increment, array $profiles, array $virtual_devices)
-    {
-        parent::__construct($id, $owner_id, $display_name, $current_profile, $enabled, $auto_increment, $profiles, $virtual_devices);
-    }
-
     public function isOnline()
     {
-        $host = $this->getDeviceHostname();
         $port = 80;
         $waitTimeoutInSeconds = .2;
-        $fp = fsockopen($host, $port, $errCode, $errStr, $waitTimeoutInSeconds);
+        $fp = fsockopen($this->hostname, $port, $errCode, $errStr, $waitTimeoutInSeconds);
         $online = $fp !== false;
         DeviceDbHelper::setOnline(DbUtils::getConnection(), $this->getId(), $online);
         if($online)
@@ -104,7 +96,7 @@ abstract class EspWifiLedController extends RgbProfilesDevice
             if($this->request_id !== null)
                 $headers[] = "x-Request-Id: $this->request_id";
 
-            $ch = curl_init("http://" . $this->getDeviceHostname() . "/globals");
+            $ch = curl_init("http://" . $this->hostname . "/globals");
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -125,7 +117,7 @@ abstract class EspWifiLedController extends RgbProfilesDevice
         $this->current_profile = $state["current_profile"];
         $this->auto_increment = $state["auto_increment"];
         // $this->avr_order = $state["profiles"];
-        for($i = 0; $i < $this->getVirtualDeviceCount(); $i++)
+        for($i = 0; $i < sizeof($this->virtual_devices); $i++)
         {
             $virtual_device = $this->virtual_devices[$i];
             if(!($virtual_device instanceof RgbEffectDevice))
@@ -147,7 +139,7 @@ abstract class EspWifiLedController extends RgbProfilesDevice
         $str_b = "";
         $str_f = "";
         $str_c = "";
-        for($i = 0; $i < $this->getVirtualDeviceCount(); $i++)
+        for($i = 0; $i < sizeof($this->virtual_devices); $i++)
         {
             $device = $this->virtual_devices[$i];
             $class_name = get_class($this);
@@ -182,13 +174,16 @@ abstract class EspWifiLedController extends RgbProfilesDevice
     }
 
     /**
-     * Either a local IP address or local DNS hostname
-     * @return string
+     * @param string $device_id
+     * @param int $owner_id
+     * @param string $display_name
+     * @param string $hostname
+     * @return PhysicalDevice
      */
-    protected abstract function getDeviceHostname();
-
-    /**
-     * @return int
-     */
-    protected abstract function getVirtualDeviceCount();
+    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname)
+    {
+        $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
+        //TODO: Fetch profiles from DB
+        return new EspWifiLedController($device_id, $owner_id, $display_name, $hostname, 0, true, 0, [], $virtual);
+    }
 }

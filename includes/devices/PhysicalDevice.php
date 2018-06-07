@@ -39,8 +39,6 @@ require_once __DIR__ . "/../Utils.php";
 
 abstract class PhysicalDevice
 {
-    const ID_PC_LED_CONTROLLER = 0;
-
     /** @var VirtualDevice[] */
     protected $virtual_devices;
 
@@ -53,6 +51,8 @@ abstract class PhysicalDevice
     /** @var int */
     private $owner_id;
 
+    protected $hostname;
+
     /**
      * PhysicalDevice constructor.
      * @param string $id
@@ -60,11 +60,12 @@ abstract class PhysicalDevice
      * @param string $display_name
      * @param VirtualDevice[] $virtual_devices
      */
-    protected function __construct(string $id, int $owner_id, string $display_name, array $virtual_devices)
+    protected function __construct(string $id, int $owner_id, string $display_name, string $hostname, array $virtual_devices)
     {
         $this->id = $id;
         $this->owner_id = $owner_id;
         $this->display_name = $display_name;
+        $this->hostname = $hostname;
         $this->virtual_devices = $virtual_devices;
     }
 
@@ -79,9 +80,10 @@ abstract class PhysicalDevice
      * @param string $device_id
      * @param int $owner_id
      * @param string $display_name
+     * @param string $hostname
      * @return PhysicalDevice
      */
-    public static abstract function load(string $device_id, int $owner_id, string $display_name);
+    public static abstract function load(string $device_id, int $owner_id, string $display_name, string $hostname);
 
     /**
      * @param array $action
@@ -170,7 +172,7 @@ HTML;
         {
             throw new InvalidArgumentException("$row[device_driver] is not a valid PhysicalDevice class name");
         }
-        return $row["device_driver"]::load($row["id"], $row["owner_id"], $row["display_name"]);
+        return $row["device_driver"]::load($row["id"], $row["owner_id"], $row["display_name"], $row["hostname"]);
     }
 
     /**

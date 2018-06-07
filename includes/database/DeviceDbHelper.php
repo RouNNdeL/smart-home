@@ -44,7 +44,7 @@ class DeviceDbHelper
     public static function queryPhysicalDeviceById(mysqli $conn, string $physical_device_id)
     {
         // TODO: Add Devices shared by other users
-        $sql = "SELECT id, display_name, device_driver, owner_id FROM devices_physical WHERE id = ?";
+        $sql = "SELECT id, display_name, device_driver, hostname, owner_id FROM devices_physical WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $physical_device_id);
         $stmt->execute();
@@ -67,7 +67,7 @@ class DeviceDbHelper
     public static function queryPhysicalDevicesForUser(mysqli $conn, int $user_id)
     {
         // TODO: Add Devices shared by other users
-        $sql = "SELECT id, display_name, device_driver, owner_id FROM devices_physical WHERE owner_id = ?";
+        $sql = "SELECT id, display_name, device_driver, hostname, owner_id FROM devices_physical WHERE owner_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -149,5 +149,40 @@ class DeviceDbHelper
         $stmt->bind_param("s", $physical_device_id);
         $stmt->execute();
         $stmt->close();
+    }
+
+    public static function getActiveProfileCount(mysqli $conn, string $physical_device_id)
+    {
+        $sql = "SELECT active_profile_count FROM devices_effect_properties WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $physical_device_id);
+        $stmt->bind_result($value);
+        $stmt->execute();
+        if($stmt->fetch())
+        {
+            $stmt->close();
+            return $value;
+        }
+        else $stmt->close();
+
+        return null;
+    }
+
+
+    public static function getMaxProfileCount(mysqli $conn, string $physical_device_id)
+    {
+        $sql = "SELECT max_profile_count FROM devices_effect_properties WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $physical_device_id);
+        $stmt->bind_result($value);
+        $stmt->execute();
+        if($stmt->fetch())
+        {
+            $stmt->close();
+            return $value;
+        }
+        else $stmt->close();
+
+        return null;
     }
 }
