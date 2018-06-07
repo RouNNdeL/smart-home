@@ -36,6 +36,7 @@ class LocalDeviceLogger
 {
     const TYPE_UPDATE_CHECK = "update_check";
     const TYPE_REPORT_STATE = "report_state";
+    const TYPE_REPORT_HALT = "report_halt";
 
     public static function log(string $device_id, string $type, int $attempts, string $payload)
     {
