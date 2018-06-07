@@ -32,6 +32,7 @@
 
 require_once __DIR__ . "/EspWifiLedController.php";
 require_once __DIR__ . "/ChrisWifiController.php";
+require_once __DIR__ . "/MichealWiFiController.php";
 require_once __DIR__ . "/PcLedController.php";
 require_once __DIR__ . "/../database/HomeUser.php";
 require_once __DIR__ . "/../Utils.php";
@@ -165,14 +166,11 @@ HTML;
 
     public static function fromDatabaseRow(array $row)
     {
-        switch ($row["device_driver"]) {
-            case PcLedController::class:
-                return PcLedController::load($row["id"], $row["owner_id"], $row["display_name"]);
-            case ChrisWifiController::class:
-                return ChrisWifiController::load($row["id"], $row["owner_id"], $row["display_name"]);
-            default:
-                return null;
+        if(!class_exists($row["device_driver"]) || !is_subclass_of($row["device_driver"], PhysicalDevice::class ))
+        {
+            throw new InvalidArgumentException("$row[device_driver] is not a valid PhysicalDevice class name");
         }
+        return $row["device_driver"]::load($row["id"], $row["owner_id"], $row["display_name"]);
     }
 
     /**

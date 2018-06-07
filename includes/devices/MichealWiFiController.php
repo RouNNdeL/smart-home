@@ -26,11 +26,11 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-05-17
- * Time: 15:43
+ * Date: 2018-06-06
+ * Time: 21:35
  */
 
-require __DIR__ . "/EspWifiLedController.php";
+require_once __DIR__ . "/EspWifiLedController.php";
 require_once __DIR__ . "/../database/DbUtils.php";
 
 /**
@@ -38,20 +38,20 @@ require_once __DIR__ . "/../database/DbUtils.php";
  * To be used with an ESP8266 WiFi Led Controller: https://github.com/RouNNdeL/esp8266-leds
  * Build environment: device_0
  */
-class ChrisWifiController extends EspWifiLedController
+class MichealWiFiController extends EspWifiLedController
 {
-    const VIRTUAL_DEVICE_COUNT = 1;
+    const VIRTUAL_DEVICE_COUNT = 2;
 
     protected function getDeviceHostname()
     {
-        return "chris-leds";
+        return "michas-leds";
     }
 
     public static function load(string $device_id, int $owner_id, string $display_name)
     {
         $devices = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
         // TODO: Load effects from database
-        return new ChrisWifiController($device_id,  $owner_id,  $display_name,0, 0, 0, [], $devices);
+        return new MichealWiFiController($device_id, $owner_id, $display_name, 0, 0, 0, [], $devices);
     }
 
     protected static function getMaximumActiveProfileCount()
@@ -69,6 +69,6 @@ class ChrisWifiController extends EspWifiLedController
      */
     protected function getVirtualDeviceCount()
     {
-        return 1;
+        return 2;
     }
 }

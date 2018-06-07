@@ -89,7 +89,7 @@ abstract class EspWifiLedController extends RgbProfilesDevice
         $this->request_id = $request_id;
         $this->save();
 
-        return ["status" => $this->isOnline() ? "SUCCESS" : "OFFLINE", "ids" => $ids];
+        return ["status" => ($this->isOnline() ? "SUCCESS" : "OFFLINE"), "ids" => $ids];
     }
 
     public function save()
@@ -125,8 +125,9 @@ abstract class EspWifiLedController extends RgbProfilesDevice
         $this->current_profile = $state["current_profile"];
         $this->auto_increment = $state["auto_increment"];
         // $this->avr_order = $state["profiles"];
-        foreach($this->virtual_devices as $i => $virtual_device)
+        for($i = 0; $i < $this->getVirtualDeviceCount(); $i++)
         {
+            $virtual_device = $this->virtual_devices[$i];
             if(!($virtual_device instanceof RgbEffectDevice))
                 throw new UnexpectedValueException("Children of EspWifiLedController should be of type RgbEffectDevice");
             $virtual_device->setBrightness(ceil($state["brightness"][$i] * 100 / 255));
@@ -141,21 +142,53 @@ abstract class EspWifiLedController extends RgbProfilesDevice
         }
     }
 
+    private function getSmallGlobalsHex()
+    {
+        $str_b = "";
+        $str_f = "";
+        $str_c = "";
+        for($i = 0; $i < $this->getVirtualDeviceCount(); $i++)
+        {
+            $device = $this->virtual_devices[$i];
+            $class_name = get_class($this);
+            if(!$device instanceof RgbEffectDevice)
+                throw new UnexpectedValueException("Children of $class_name should be of type RgbEffectDevice");
+
+            /* We disable the effects in order to show the color */
+            $device->setEffectsEnabled(false);
+            $flags = (($device->isOn() ? 1 : 0) << 0) | (($device->areEffectsEnabled() ? 1 : 0) << 2);
+
+            $str_b .= str_pad(dechex($device->getBrightness() / 100 * 255), 2, '0', STR_PAD_LEFT);
+            $str_f .= str_pad(dechex($flags), 2, '0', STR_PAD_LEFT);
+            $str_c .= str_pad(dechex($device->getColor()), 6, '0', STR_PAD_LEFT);
+        }
+
+        return $str_b . $str_f . $str_c;
+    }
+
+    private function getGlobalsHex()
+    {
+        $str = $this->getSmallGlobalsHex();
+        $str .= dechex($this->getActiveProfileIndex());
+        $str .= dechex($this->getProfileCount());
+        $str .= dechex($this->getAutoIncrement());
+
+        foreach($this->avr_order as $item)
+        {
+            $str .= dechex($item);
+        }
+
+        return $str;
+    }
+
     /**
      * Either a local IP address or local DNS hostname
      * @return string
      */
     protected abstract function getDeviceHostname();
 
-    protected abstract function getGlobalsHex();
-
     /**
-     * Just the 'simple' part of the globals (state, brightness and color)
-     * @return string
+     * @return int
      */
-    protected abstract function getSmallGlobalsHex();
-
-    protected abstract function getProfileHex();
-
-    protected abstract function saveProfile(int $n);
+    protected abstract function getVirtualDeviceCount();
 }
