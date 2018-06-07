@@ -31,8 +31,6 @@
  */
 
 require_once __DIR__ . "/EspWifiLedController.php";
-require_once __DIR__ . "/ChrisWifiController.php";
-require_once __DIR__ . "/MichealWiFiController.php";
 require_once __DIR__ . "/PcLedController.php";
 require_once __DIR__ . "/../database/HomeUser.php";
 require_once __DIR__ . "/../Utils.php";

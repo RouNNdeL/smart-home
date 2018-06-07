@@ -32,7 +32,6 @@
 
 require_once __DIR__ . "/../database/DeviceDbHelper.php";
 require_once __DIR__ . "/RgbProfilesDevice.php";
-require_once __DIR__ . "/ChrisWifiController.php";
 
 /**
  * To be used with an ESP8266 WiFi Led Controller: https://github.com/RouNNdeL/esp8266-leds
