@@ -145,7 +145,7 @@ abstract class PhysicalDevice
             $devices = "";
         }
 
-        $owner = HomeUser::queryUserById(DbUtils::getConnection(), $this->owner_id)->username;
+        $owner = HomeUser::queryUserById(DbUtils::getConnection(), $this->owner_id)->formatName();
         if ($user_id === $this->owner_id) {
             $owner = Utils::getString("device_owner_you") . " (" . $owner . ")";
         }

@@ -29,27 +29,54 @@
  * Date: 2018-02-16
  * Time: 19:35
  */
-
 class HomeUser
 {
+    /** @var int */
     public $id;
+    /** @var string */
     public $username;
+    /** @var string */
     public $secret;
+    /** @var bool */
     public $registered_for_report_state;
+    /** @var string */
+    public $first_name;
+    /** @var string */
+    public $last_name;
 
     /**
      * HomeUser constructor.
      * @param int $id
      * @param string $username
+     * @param string $first_name
+     * @param string $last_name
      * @param string $secret
      * @param bool $registered_for_report_state
      */
-    private function __construct(int $id, string $username, string $secret, bool $registered_for_report_state)
+    private function __construct(int $id, string $username, string $first_name, string $last_name, string $secret, bool $registered_for_report_state)
     {
         $this->id = $id;
         $this->username = $username;
+        $this->first_name = $first_name;
+        $this->last_name = $last_name;
         $this->secret = $secret;
         $this->registered_for_report_state = $registered_for_report_state;
+    }
+
+    public function formatName($short = false)
+    {
+        if($short)
+        {
+            if($this->first_name !== null)
+                return $this->first_name;
+            return $this->username;
+        }
+        else
+        {
+            if($this->first_name !== null && $this->last_name !== null)
+                return $this->first_name." ".$this->last_name;
+            return $this->username;
+        }
     }
 
     public static function newUser(mysqli $conn, string $username, string $password)
@@ -105,7 +132,7 @@ class HomeUser
      */
     public static function queryUserByUsername(mysqli $conn, string $username)
     {
-        $sql = "SELECT id, username, secret_2fa, google_registered FROM home_users WHERE username = ?";
+        $sql = "SELECT id, username, first_name, last_name, secret_2fa, google_registered FROM home_users WHERE username = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $username);
         $stmt->execute();
@@ -113,7 +140,9 @@ class HomeUser
         if($result->num_rows > 0)
         {
             $row = $result->fetch_assoc();
-            return new HomeUser($row["id"], $row["username"], $row["secret_2fa"], $row["google_registered"]);
+            return new HomeUser($row["id"], $row["username"], $row["first_name"], $row["last_name"],
+                $row["secret_2fa"], $row["google_registered"]
+            );
         }
 
         return null;
@@ -126,12 +155,14 @@ class HomeUser
      */
     public static function queryUserById(mysqli $conn, int $id)
     {
-        $sql = "SELECT id, username, secret_2fa, google_registered FROM home_users WHERE id = $id";
+        $sql = "SELECT id, username, first_name, last_name, secret_2fa, google_registered FROM home_users WHERE id = $id";
         $result = $conn->query($sql);
         if($result->num_rows > 0)
         {
             $row = $result->fetch_assoc();
-            return new HomeUser($row["id"], $row["username"], $row["secret_2fa"], $row["google_registered"]);
+            return new HomeUser($row["id"], $row["username"], $row["first_name"], $row["last_name"],
+                $row["secret_2fa"], $row["google_registered"]
+            );
         }
 
         return null;
@@ -167,7 +198,7 @@ class HomeUser
      */
     public static function queryAllRegistered(mysqli $conn)
     {
-        $sql = "SELECT id, username, secret_2fa FROM home_users WHERE google_registered = 1";
+        $sql = "SELECT id, username, first_name, last_name, secret_2fa FROM home_users WHERE google_registered = 1";
         $result = $conn->query($sql);
         $arr = [];
 
@@ -175,7 +206,9 @@ class HomeUser
         {
             while($row = $result->fetch_assoc())
             {
-                $arr[] = new HomeUser($row["id"], $row["username"], $row["secret_2fa"], true);
+                $arr[] = new HomeUser($row["id"], $row["username"], $row["first_name"], $row["last_name"],
+                    $row["secret_2fa"], true
+                );
             }
         }
 
