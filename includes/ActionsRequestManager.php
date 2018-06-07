@@ -76,6 +76,7 @@ class ActionsRequestManager
                     HomeUser::setGoogleRegistered(DbUtils::getConnection(), $user_id, true);
                     break;
                 case self::ACTION_INTENT_QUERY:
+                    $payload["errorCode"] = "notSupported";
                     break;
                 case self::ACTION_INTENT_EXECUTE:
                     $payload["commands"] =
