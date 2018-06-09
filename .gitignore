@@ -3,3 +3,4 @@ secure_config.php
 vendor/
 node_modules/
 /home_graph_key.json
+/database.mwb.bak
