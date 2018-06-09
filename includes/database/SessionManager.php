@@ -125,11 +125,13 @@ class SessionManager
         }
         if(!HomeUser::verifyPassword($password, $password_hash))
         {
-            SessionManager::insertLoginAttempt($user_id, -1, $ip);
             $stmt->close();
+            SessionManager::insertLoginAttempt($user_id, $this->session_id, $ip, false);
             return false;
         }
         $stmt->close();
+
+        SessionManager::insertLoginAttempt($user_id, $this->session_id, $ip, true);
 
         $manager = SessionManager::createNew($user_id, $ip);
         $this->invalidate();
@@ -137,8 +139,6 @@ class SessionManager
         $this->user_id = $manager->user_id;
         $this->session_token = $manager->session_token;
         $this->updateSession($conn, $ip, $agent, true);
-
-        SessionManager::insertLoginAttempt($user_id, $this->session_id, $ip);
 
         return true;
     }
@@ -214,15 +214,16 @@ class SessionManager
         $stmt->close();
     }
 
-    private static function insertLoginAttempt(int $user_id, int $session_id, string $ip)
+    private static function insertLoginAttempt(int $user_id, int $session_id, string $ip, bool $success)
     {
         if($session_id == -1)
             $session_id = null;
         $sql = "INSERT INTO login_attempts 
-                  (user_id, session_id, ip_address) 
-                VALUES ($user_id, $session_id,  ?)";
+                  (user_id, session_id, ip_address, success) 
+                VALUES (?, ?,  ?, ?)";
         $stmt = DbUtils::getConnection()->prepare($sql);
-        $stmt->bind_param("s", $ip);
+        $val = $success ? 1 : 0;
+        $stmt->bind_param("iisi", $user_id, $session_id, $ip, $val);
         return $stmt->execute();
     }
 
