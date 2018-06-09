@@ -29,7 +29,6 @@
  * Date: 2018-06-07
  * Time: 18:12
  */
-
 class LampAnalog extends VirtualDevice
 {
     /** @var int */
@@ -42,12 +41,15 @@ class LampAnalog extends VirtualDevice
      * SimpleRgbDevice constructor.
      * @param string $device_id
      * @param string $device_name
+     * @param array $synonyms
+     * @param bool $home_actions
+     * @param bool $will_report_state
      * @param int $brightness
      * @param bool $on
      */
-    public function __construct(string $device_id, string $device_name, int $brightness = 100, bool $on = true)
+    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions, bool $will_report_state, int $brightness = 100, bool $on = true)
     {
-        parent::__construct($device_id, $device_name, VirtualDevice::DEVICE_TYPE_LAMP_ANALOG);
+        parent::__construct($device_id, $device_name, $synonyms, VirtualDevice::DEVICE_TYPE_LAMP_ANALOG, $home_actions, $will_report_state);
         $this->brightness = $brightness;
         $this->on = $on;
     }

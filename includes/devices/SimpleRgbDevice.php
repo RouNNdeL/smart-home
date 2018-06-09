@@ -45,13 +45,16 @@ class SimpleRgbDevice extends VirtualDevice
      * SimpleRgbDevice constructor.
      * @param string $device_id
      * @param string $device_name
+     * @param array $synonyms
+     * @param bool $home_actions
+     * @param bool $will_report_state
      * @param int $color
      * @param int $brightness
      * @param bool $on
      */
-    public function __construct(string $device_id, string $device_name, int $color = 0xffffff, int $brightness = 100, bool $on = true)
+    public function __construct(string $device_id, string $device_name, array $synonyms,  bool $home_actions, bool $will_report_state, int $color = 0xffffff, int $brightness = 100, bool $on = true)
     {
-        parent::__construct($device_id, $device_name, VirtualDevice::DEVICE_TYPE_RGB);
+        parent::__construct($device_id, $device_name, $synonyms, VirtualDevice::DEVICE_TYPE_RGB,  $home_actions, $will_report_state);
         $this->color = $color;
         $this->brightness = $brightness;
         $this->on = $on;

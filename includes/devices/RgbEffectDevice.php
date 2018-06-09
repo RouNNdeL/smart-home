@@ -30,7 +30,7 @@
  * Time: 14:15
  */
 
-require_once __DIR__."/../Utils.php";
+require_once __DIR__ . "/../Utils.php";
 
 abstract class RgbEffectDevice extends SimpleRgbDevice
 {
@@ -48,6 +48,9 @@ abstract class RgbEffectDevice extends SimpleRgbDevice
      * RgbEffectDevice constructor.
      * @param string $device_id
      * @param string $device_name
+     * @param array $synonyms
+     * @param bool $home_actions
+     * @param bool $will_report_state
      * @param int $color
      * @param int $brightness
      * @param bool $on
@@ -55,10 +58,12 @@ abstract class RgbEffectDevice extends SimpleRgbDevice
      * @param bool $effects_enabled
      * @param int $current_profile
      */
-    public function __construct(string $device_id, string $device_name, int $color = 0xffffff, int $brightness = 100,
-                                bool $on = true, $effects = [], $effects_enabled = true, $current_profile = 0)
+    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions,
+                                bool $will_report_state, int $color = 0xffffff, int $brightness = 100,
+                                bool $on = true, $effects = [], $effects_enabled = true, $current_profile = 0
+    )
     {
-        parent::__construct($device_id, $device_name, $color, $brightness, $on);
+        parent::__construct($device_id, $device_name, $synonyms, $home_actions, $will_report_state, $color, $brightness, $on);
         $this->effects = $effects;
         $this->effects_enabled = $effects_enabled;
         $this->current_profile = $current_profile;

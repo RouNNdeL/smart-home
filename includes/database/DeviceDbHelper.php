@@ -98,7 +98,7 @@ class DeviceDbHelper
      */
     public static function queryVirtualDevicesForPhysicalDevice(mysqli $conn, string $physical_device_id)
     {
-        $sql = "SELECT id, type, display_name, state, brightness, color, toggles
+        $sql = "SELECT id, type, display_name, synonyms, home_actions, will_report_state, state, brightness, color, toggles
                 FROM devices_virtual WHERE parent_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $physical_device_id);

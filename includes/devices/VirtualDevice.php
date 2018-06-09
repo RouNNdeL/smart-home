@@ -30,10 +30,10 @@
  * Time: 17:51
  */
 
-require_once __DIR__."/SimpleRgbDevice.php";
-require_once __DIR__."/SimpleEffectDevice.php";
-require_once __DIR__."/LampAnalog.php";
-require_once __DIR__."/LampSimple.php";
+require_once __DIR__ . "/SimpleRgbDevice.php";
+require_once __DIR__ . "/SimpleEffectDevice.php";
+require_once __DIR__ . "/LampAnalog.php";
+require_once __DIR__ . "/LampSimple.php";
 
 abstract class VirtualDevice
 {
@@ -43,7 +43,7 @@ abstract class VirtualDevice
     const DEVICE_TYPE_LAMP = "DEVICE_LAMP";
     const DEVICE_TYPE_LAMP_ANALOG = "DEVICE_LAMP_ANALOG";
     const DEVICE_TYPE_SWITCH = "DEVICE_SWITCH";
-    const DEVICE_TYPE_REMOTE = "DEVICE_REMOTE";
+    const DEVICE_TYPE_REMOTE_CONTROLLED = "DEVICE_REMOTE_CONTROLLED";
 
     const DEVICE_TRAIT_BRIGHTNESS = "action.devices.traits.Brightness";
     const DEVICE_TRAIT_COLOR_SPECTRUM = "action.devices.traits.ColorSpectrum";
@@ -63,24 +63,38 @@ abstract class VirtualDevice
     const DEVICE_ID_PC_CPU_FAN = 2;
     const DEVICE_ID_PC_UNDERGLOW = 3;
 
-    /** @var string  */
+    /** @var string */
     protected $device_type;
-    /** @var string  */
+    /** @var string */
     protected $device_id;
-    /** @var string  */
+    /** @var string */
     protected $device_name;
+    /** @var string[] */
+    protected $synonyms;
+    /** @var bool */
+    protected $home_actions;
+    /** @var  bool */
+    protected $will_report_state;
 
     /**
      * VirtualDevice constructor.
      * @param string $device_id
      * @param string $device_name
+     * @param string[] $synonyms
      * @param string $device_type
+     * @param bool $home_actions
+     * @param bool $will_report_state
      */
-    public function __construct(string $device_id, string $device_name, string $device_type)
+    public function __construct(string $device_id, string $device_name, array $synonyms, string $device_type,
+                                bool $home_actions, bool $will_report_state
+    )
     {
         $this->device_id = $device_id;
         $this->device_name = $device_name;
+        $this->synonyms = $synonyms;
         $this->device_type = $device_type;
+        $this->home_actions = $home_actions;
+        $this->will_report_state = $will_report_state;
     }
 
     public abstract function getTraits();
@@ -107,8 +121,16 @@ abstract class VirtualDevice
 
     public function getSyncJson()
     {
-        return ["id" => $this->device_id, "type" => $this->getActionsDeviceType(), "name" => ["name" => $this->device_name],
-            "traits" => $this->getTraits(), "willReportState" => true, "attributes" => $this->getAttributes()];
+        if(!$this->home_actions)
+            return null;
+        $attributes = $this->getAttributes();
+        $arr = ["id" => $this->device_id, "type" => $this->getActionsDeviceType(), "name" => ["name" => $this->device_name],
+            "traits" => $this->getTraits(), "willReportState" => $this->will_report_state];
+        if(sizeof($attributes) > 0)
+            $arr["attributes"] = $attributes;
+        if(sizeof($this->synonyms) > 0)
+            $arr["name"]["nicknames"] = $this->synonyms;
+        return $arr;
     }
 
     /**
@@ -131,29 +153,43 @@ abstract class VirtualDevice
 
     public static function fromDatabaseRow(array $row)
     {
+        if($row["synonyms"] === null || strlen(trim($row["synonyms"])) === 0)
+        {
+            $synonyms = [];
+        }
+        else
+        {
+            $synonyms = explode(",", $row["synonyms"]);
+            foreach($synonyms as &$synonym) $synonym = trim($synonym);
+        }
+
+        if(!$row["home_actions"])
+            $row["will_report_state"] = 0;
         // TODO: Add more device types when their classes get created
         switch($row["type"])
         {
             case self::DEVICE_TYPE_RGB:
                 return new SimpleRgbDevice(
-                    $row["id"], $row["display_name"], $row["color"],
-                    $row["brightness"], $row["state"]
+                    $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["will_report_state"],
+                    $row["color"], $row["brightness"], $row["state"]
                 );
             case self::DEVICE_TYPE_EFFECTS_RGB_SIMPLE:
                 return new SimpleEffectDevice(
-                    $row["id"], $row["display_name"], $row["color"],
-                    $row["brightness"], $row["state"]
+                    $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["will_report_state"],
+                    $row["color"], $row["brightness"], $row["state"]
                 );
             case self::DEVICE_TYPE_LAMP:
                 return new LampSimple(
-                    $row["id"], $row["display_name"], $row["state"]
+                    $row["id"], $row["display_name"], $synonyms,
+                    $row["home_actions"], $row["will_report_state"], $row["state"]
                 );
             case self::DEVICE_TYPE_LAMP_ANALOG:
                 return new LampAnalog(
-                    $row["id"], $row["display_name"], $row["brightness"], $row["state"]
+                    $row["id"], $row["display_name"], $synonyms, $row["home_actions"],
+                    $row["will_report_state"], $row["brightness"], $row["state"]
                 );
             default:
-                throw new InvalidArgumentException("Invalid device type ".$row["type"]);
+                throw new InvalidArgumentException("Invalid device type " . $row["type"]);
         }
     }
 }
