@@ -153,13 +153,11 @@ abstract class VirtualDevice
 
     public static function fromDatabaseRow(array $row)
     {
-        if($row["synonyms"] === null || strlen(trim($row["synonyms"])) === 0)
+        /* For some reason Google uses the first value of the synonyms as the main device name */
+        $synonyms = [$row["display_name"]];
+        if($row["synonyms"] !== null && strlen(trim($row["synonyms"])) !== 0)
         {
-            $synonyms = [];
-        }
-        else
-        {
-            $synonyms = explode(",", $row["synonyms"]);
+            $synonyms = array_merge($synonyms, explode(",", $row["synonyms"]));
             foreach($synonyms as &$synonym) $synonym = trim($synonym);
         }
 
