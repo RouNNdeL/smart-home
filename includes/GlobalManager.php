@@ -78,12 +78,12 @@ class GlobalManager
         return $manager;
     }
 
-    public static function all()
+    public static function all($log = GlobalManager::LOG)
     {
         $manager = new GlobalManager();
 
         $manager->loadIpTrustManager();
-        $manager->loadSessionManager(true);
+        $manager->loadSessionManager($log, true);
         $manager->loadUserDeviceManager();
 
         return $manager;
