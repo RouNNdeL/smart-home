@@ -29,6 +29,9 @@
  * Date: 2018-02-16
  * Time: 19:35
  */
+
+require_once __DIR__."/DbUtils.php";
+
 class HomeUser
 {
     /** @var int */
@@ -53,7 +56,7 @@ class HomeUser
      * @param string $secret
      * @param bool $registered_for_report_state
      */
-    private function __construct(int $id, string $username, string $first_name, string $last_name, string $secret, bool $registered_for_report_state)
+    private function __construct(int $id, string $username, $first_name, $last_name, $secret, bool $registered_for_report_state)
     {
         $this->id = $id;
         $this->username = $username;
@@ -79,6 +82,18 @@ class HomeUser
         }
     }
 
+    public static function newUserWithGoogle(string $username, string $google_id)
+    {
+        $conn = DbUtils::getConnection();
+        $stmt = $conn->prepare("INSERT INTO home_users (username, google_id) VALUES (?, ?)");
+        $stmt->bind_param("ss", $username, $google_id);
+        $result = $stmt->execute();
+        $stmt->close();
+        if($result === false)
+            return null;
+        self::queryUserByUsername($conn, $username);
+    }
+
     public static function newUser(mysqli $conn, string $username, string $password)
     {
         $password_hash = self::hashPassword($password);
@@ -98,16 +113,6 @@ class HomeUser
     public static function verifyPassword(string $password, string $hash): string
     {
         return password_verify($password, $hash);
-    }
-
-    private static function generateRandomSecret()
-    {
-        $val = '';
-        for($i = 0; $i < 256; $i++)
-        {
-            $val .= chr(rand(65, 90));
-        }
-        return $val;
     }
 
     /**
@@ -132,11 +137,13 @@ class HomeUser
      */
     public static function queryUserByUsername(mysqli $conn, string $username)
     {
-        $sql = "SELECT id, username, first_name, last_name, secret_2fa, google_registered FROM home_users WHERE username = ?";
+        $sql = "SELECT id, username, first_name, last_name, secret_2fa, actions_registered FROM home_users WHERE username = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $username);
         $stmt->execute();
+        $stmt->fetch();
         $result = $stmt->get_result();
+        $stmt->close();
         if($result->num_rows > 0)
         {
             $row = $result->fetch_assoc();
@@ -155,16 +162,38 @@ class HomeUser
      */
     public static function queryUserById(mysqli $conn, int $id)
     {
-        $sql = "SELECT id, username, first_name, last_name, secret_2fa, google_registered FROM home_users WHERE id = $id";
+        $sql = "SELECT id, username, first_name, last_name, secret_2fa, actions_registered FROM home_users WHERE id = $id";
         $result = $conn->query($sql);
         if($result->num_rows > 0)
         {
             $row = $result->fetch_assoc();
             return new HomeUser($row["id"], $row["username"], $row["first_name"], $row["last_name"],
-                $row["secret_2fa"], $row["google_registered"]
+                $row["secret_2fa"], $row["actions_registered"]
             );
         }
 
+        return null;
+    }
+
+
+    /**
+     * @param string $id
+     * @return HomeUser|null
+     */
+    public static function queryUserByGoogleId(string $id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, username, first_name, last_name, secret_2fa, actions_registered FROM home_users WHERE google_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $id);
+        $stmt->bind_result($id, $username, $first_name, $last_name, $secret, $actions_registred);
+        $stmt->execute();
+        if($stmt->fetch())
+        {
+            $stmt->close();
+            return new HomeUser($id, $username, $first_name, $last_name, $secret, $actions_registred);
+        }
+        $stmt->close();
         return null;
     }
 
@@ -185,10 +214,10 @@ class HomeUser
      * @param bool $registered
      * @return bool|mysqli_result
      */
-    public static function setGoogleRegistered(mysqli $conn, int $id, bool $registered)
+    public static function setActionsRegistered(mysqli $conn, int $id, bool $registered)
     {
         $val = $registered ? 1 : 0;
-        $sql = "UPDATE home_users SET google_registered = $val WHERE id = $id";
+        $sql = "UPDATE home_users SET actions_registered = $val WHERE id = $id";
         return $conn->query($sql);
     }
 
@@ -198,7 +227,7 @@ class HomeUser
      */
     public static function queryAllRegistered(mysqli $conn)
     {
-        $sql = "SELECT id, username, first_name, last_name, secret_2fa FROM home_users WHERE google_registered = 1";
+        $sql = "SELECT id, username, first_name, last_name, secret_2fa FROM home_users WHERE actions_registered = 1";
         $result = $conn->query($sql);
         $arr = [];
 

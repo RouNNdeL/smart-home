@@ -29,21 +29,22 @@
  * Date: 2018-05-22
  * Time: 15:22
  */
-
 class OAuthServiceUtils
 {
     const REDIRECT_URI = "https://home.zdul.xyz/oauth/response.php";
 
     /**
      * @param mysqli $conn
+     * @param int $session_id
+     * @param string $service_id
      * @param string $state
      * @return bool
      */
-    public static function insertState(mysqli $conn, string $state)
+    public static function insertState(mysqli $conn, int $session_id, string $service_id, string $state)
     {
-        $sql = "INSERT INTO service_auth_states (state) VALUES(?)";
+        $sql = "INSERT INTO service_auth_states (session_id, service_id, state) VALUES(?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $state);
+        $stmt->bind_param("iss", $session_id, $service_id, $state);
         return $stmt->execute();
     }
 

@@ -86,6 +86,13 @@ a.nav-link.bold
     color: #dc3545;
 }
 
+#google-signin-button
+{
+    width: 191px;
+    height: 46px;
+    background: url('/google_signin_button/1x/btn_google_signin_light_normal_web.png') no-repeat;
+}
+
 /* The snackbar - position it at the bottom and in the middle of the screen */
 #snackbar {
     visibility: hidden; /* Hidden by default. Visible on click */

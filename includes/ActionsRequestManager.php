@@ -73,7 +73,7 @@ class ActionsRequestManager
                 case self::ACTION_INTENT_SYNC:
                     $payload["agentUserId"] = (string)$user_id;
                     $payload["devices"] = UserDeviceManager::fromUserId($user_id)->getSync();
-                    HomeUser::setGoogleRegistered(DbUtils::getConnection(), $user_id, true);
+                    HomeUser::setActionsRegistered(DbUtils::getConnection(), $user_id, true);
                     break;
                 case self::ACTION_INTENT_QUERY:
                     $payload["errorCode"] = "notSupported";
@@ -83,7 +83,7 @@ class ActionsRequestManager
                         UserDeviceManager::fromUserId($user_id)->processExecute($input["payload"], $request_id);
                     break;
                 case self::ACTION_INTENT_DISCONNECT:
-                    HomeUser::setGoogleRegistered(DbUtils::getConnection(), $user_id, false);
+                    HomeUser::setActionsRegistered(DbUtils::getConnection(), $user_id, false);
                     break;
             }
         }

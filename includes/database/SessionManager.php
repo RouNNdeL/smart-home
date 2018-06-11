@@ -146,6 +146,24 @@ class SessionManager
         return true;
     }
 
+    public function forceLoginAuto(int $user_id)
+    {
+        $this->forceLogin($user_id, $_SERVER["REMOTE_ADDR"], $_SERVER["HTTP_USER_AGENT"]);
+    }
+
+    public function forceLogin(int $user_id, string $ip, string $agent)
+    {
+        $conn = DbUtils::getConnection();
+        SessionManager::insertLoginAttempt($user_id, $this->session_id, $ip, true);
+
+        $manager = SessionManager::createNew($user_id, $ip);
+        $this->invalidate();
+        $this->session_id = $manager->session_id;
+        $this->user_id = $manager->user_id;
+        $this->session_token = $manager->session_token;
+        $this->updateSession($conn, $ip, $agent, true);
+    }
+
     public static function newAnonymous(mysqli $conn)
     {
         $session_token = SessionManager::generateSessionToken();

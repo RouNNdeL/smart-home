@@ -26,39 +26,41 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-05-22
- * Time: 14:55
+ * Date: 2018-06-11
+ * Time: 14:50
  */
 
+require_once __DIR__."/../database/HomeUser.php";
+require_once __DIR__."/../../vendor/autoload.php";
 
-require_once __DIR__."/../includes/GlobalManager.php";
-$manager = GlobalManager::withSessionManager(false);
+class GoogleOAuthService extends OAuthService
+{
+    const ID = "1";
 
-if($_SERVER["REQUEST_METHOD"] !== "GET" || !isset($_GET["state"]) || !isset($_GET["code"]))
-{
-    $response = ["error" => "invalid_request"];
-    echo json_encode($response);
-    http_response_code(400);
-    exit();
-}
+    const ID_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v3/tokeninfo";
 
-require_once __DIR__ . "/../includes/oauth/OAuthService.php";
+    /**
+     * @param array $requestTokens
+     * @return HomeUser|null
+     */
+    public function getUser(array $requestTokens)
+    {
+        $id_token = GoogleOAuthService::decodeIdToken($requestTokens["id_token"]);
+        if($id_token === null || isset($id_token["error_description"]))
+            return null;
+        return HomeUser::queryUserByGoogleId($id_token["sub"]);
+    }
 
-$service = OAuthService::fromSessionAndState($manager->getSessionManager()->getSessionId(), $_GET["state"]);
-if($service === null)
-{
-    $response = ["error" => "session_expired"];
-    echo json_encode($response);
-    http_response_code(400);
-    exit();
-}
-$user = $service->getUserFromCode($_GET["code"]);
-if($user === null)
-{
-    //TODO: Redirect the user to provide username
-}
-else
-{
-    $manager->getSessionManager()->forceLoginAuto($user->id);
-    header("Location: /");
+    private function decodeIdToken(string $id_token)
+    {
+        $fields = ["id_token" => $id_token];
+        $ch = curl_init(GoogleOAuthService::ID_TOKEN_ENDPOINT."?".http_build_query($fields));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $data = curl_exec($ch);
+        $json_response = json_decode($data, true);
+        curl_close($ch);
+        if($json_response["aud"] !== $this->client_id)
+            return null;
+        return $json_response;
+    }
 }

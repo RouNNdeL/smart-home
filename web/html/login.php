@@ -32,7 +32,7 @@
 
 require_once __DIR__ . "/../../includes/GlobalManager.php";
 
-$manager = GlobalManager::withSessionManager();
+$manager = GlobalManager::withSessionManager(false, false);
 
 if($manager->getSessionManager()->isLoggedIn())
 {
@@ -80,7 +80,9 @@ if($_SERVER["REQUEST_METHOD"] === "POST")
 <?php
 require_once __DIR__."/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("Login to Smart Home");
+$head->addEntry(new JavaScriptEntry(JavaScriptEntry::LOGIN));
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::CAPTCHA));
+$head->addEntry(new StyleSheetEntry(StyleSheetEntry::MAIN));
 echo $head->toString();
 
 ?>
@@ -120,11 +122,12 @@ HTML;
                 <div class="text-right">
                     <button id="register-next-btn" class="btn btn-primary" role="button" type="submit">Login</button>
                 </div>
-
-                <div class="row">
-                    <div></div>
-                </div>
             </form>
+            <div class="row">
+                <div class="col">
+                    <button class="btn service-signin-button" data-service-id="1" id="google-signin-button"></button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

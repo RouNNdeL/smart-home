@@ -1,5 +1,4 @@
-<?php
-/**
+/*
  * MIT License
  *
  * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
@@ -23,42 +22,10 @@
  * SOFTWARE.
  */
 
-/**
- * Created by PhpStorm.
- * User: Krzysiek
- * Date: 2018-05-22
- * Time: 14:55
- */
-
-
-require_once __DIR__."/../includes/GlobalManager.php";
-$manager = GlobalManager::withSessionManager(false);
-
-if($_SERVER["REQUEST_METHOD"] !== "GET" || !isset($_GET["state"]) || !isset($_GET["code"]))
+$(function()
 {
-    $response = ["error" => "invalid_request"];
-    echo json_encode($response);
-    http_response_code(400);
-    exit();
-}
-
-require_once __DIR__ . "/../includes/oauth/OAuthService.php";
-
-$service = OAuthService::fromSessionAndState($manager->getSessionManager()->getSessionId(), $_GET["state"]);
-if($service === null)
-{
-    $response = ["error" => "session_expired"];
-    echo json_encode($response);
-    http_response_code(400);
-    exit();
-}
-$user = $service->getUserFromCode($_GET["code"]);
-if($user === null)
-{
-    //TODO: Redirect the user to provide username
-}
-else
-{
-    $manager->getSessionManager()->forceLoginAuto($user->id);
-    header("Location: /");
-}
+    $(".service-signin-button").click(function()
+    {
+        window.location = "/oauth/service_login.php?id="+$(this).data("service-id");
+    });
+});

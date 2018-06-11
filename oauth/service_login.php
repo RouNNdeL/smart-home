@@ -37,7 +37,10 @@ if($_SERVER["REQUEST_METHOD"] !== "GET" || !isset($_GET["id"]))
     exit(0);
 }
 
-require_once __DIR__."/../includes/database/OAuthService.php";
+require_once __DIR__ . "/../includes/oauth/OAuthService.php";
+require_once __DIR__."/../includes/GlobalManager.php";
+
+$manager = GlobalManager::withSessionManager( false);
 
 $service = OAuthService::fromId($_GET["id"]);
-header("Location: ".$service->generateAuthUrl());
+header("Location: ".$service->generateAuthUrl($manager->getSessionManager()->getSessionId()));

@@ -68,12 +68,12 @@ class GlobalManager
         return $manager;
     }
 
-    public static function withSessionManager($login_required = false)
+    public static function withSessionManager($login_required = false, $log = GlobalManager::LOG)
     {
         $manager = new GlobalManager();
 
         $manager->loadIpTrustManager();
-        $manager->loadSessionManager($login_required);
+        $manager->loadSessionManager($login_required, $log);
 
         return $manager;
     }
@@ -83,7 +83,7 @@ class GlobalManager
         $manager = new GlobalManager();
 
         $manager->loadIpTrustManager();
-        $manager->loadSessionManager($log, true);
+        $manager->loadSessionManager(true, $log);
         $manager->loadUserDeviceManager();
 
         return $manager;
@@ -99,7 +99,7 @@ class GlobalManager
         }
     }
 
-    public function loadSessionManager($log = GlobalManager::LOG, $login_required = false)
+    public function loadSessionManager($login_required = false, $log = GlobalManager::LOG)
     {
         $this->sessionManager = SessionManager::getInstance();
         if($log)
