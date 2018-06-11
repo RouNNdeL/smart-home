@@ -47,12 +47,28 @@ if($_SERVER["REQUEST_METHOD"] === "POST")
         http_response_code(400);
         exit(0);
     }
-    $success = $manager->getSessionManager()->attemptLoginAuto($_POST["username"], $_POST["password"]);
-    if($success)
+    if($manager->getIpTrustManager()->isTrusted() || (isset($_POST["g-recaptcha-response"]) &&
+            $_POST["g-recaptcha-response"] !== null && strlen($_POST["g-recaptcha-response"]) > 0))
     {
-        $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_SUCCESSFUL_LOGIN);
-        header("Location: /devices");
-        exit(0);
+        if($manager->getIpTrustManager()->isTrusted() || SessionManager::validateCaptchaAuto($_POST["g-recaptcha-response"]))
+        {
+            $success = $manager->getSessionManager()->attemptLoginAuto($_POST["username"], $_POST["password"]);
+            if($success)
+            {
+                $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_SUCCESSFUL_LOGIN);
+                header("Location: /devices");
+                exit(0);
+            }
+            $user_error = "Invalid username or password";
+        }
+        else
+        {
+            $user_error = "Incorrect captcha";
+        }
+    }
+    else
+    {
+        $user_error = "Please complete the Captcha";
     }
     $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_LOGIN_ATTEMPT);
 }
@@ -88,7 +104,7 @@ TAG;
                 </div>
                 <div class="form-group">
                     <label for="login-username">Password</label>
-                    <input type="password" class="form-control" id="login-username" placeholder="Password"
+                    <input type="password" class="form-control" id="login-password" placeholder="Password"
                            name="password">
                 </div>
                 <?php

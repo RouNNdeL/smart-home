@@ -113,8 +113,8 @@ class IpTrustManager
         $stmt->bind_param("siiii",
             $this->ip,
             $this->heat,
-            $this->heat,
             $blacklist,
+            $this->heat,
             $blacklist
         );
         $success = $stmt->execute();

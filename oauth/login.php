@@ -61,23 +61,35 @@ if($client === null)
     http_response_code(401);
     echo json_encode($response);
 }
-$manager->loadSessionManager(false);
-if(isset($_GET["oauth-username"]) && isset($_GET["oauth-password"]) && !$manager->getSessionManager()->isLoggedIn())
-{
-    require_once __DIR__ . "/../includes/database/DbUtils.php";
-    require_once __DIR__ . "/../includes/database/HomeUser.php";
-    require_once __DIR__ . "/../vendor/autoload.php";
 
-    $success = $manager->getSessionManager()->attemptLoginAuto($_GET["oauth-username"], $_GET["oauth-password"]);
-    if($success)
+$manager->loadSessionManager(false);
+if(isset($_POST["oauth-username"]) && isset($_POST["oauth-password"]) && !$manager->getSessionManager()->isLoggedIn())
+{
+    if($manager->getIpTrustManager()->isTrusted() || (isset($_POST["g-recaptcha-response"]) &&
+            $_POST["g-recaptcha-response"] !== null && strlen($_POST["g-recaptcha-response"]) > 0))
     {
-        $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_SUCCESSFUL_LOGIN);
+        if(SessionManager::validateCaptchaAuto($_POST["g-recaptcha-response"]))
+        {
+            $success = $manager->getSessionManager()->attemptLoginAuto($_POST["oauth-username"], $_POST["oauth-password"]);
+            if($success)
+            {
+                $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_SUCCESSFUL_LOGIN);
+            }
+            else
+            {
+                $user_error = "Invalid username or password";
+            }
+        }
+        else
+        {
+            $user_error = "Incorrect captcha";
+        }
     }
     else
     {
-        $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_LOGIN_ATTEMPT);
-        $user_error = "Invalid username or password";
+        $user_error = "Please complete the Captcha";
     }
+    $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_LOGIN_ATTEMPT);
 }
 
 if($manager->getSessionManager()->isLoggedIn())
@@ -112,7 +124,7 @@ require_once __DIR__ . "/../web/html/html_head.php";
 TAG;
             }
             ?>
-            <form target="_self">
+            <form target="_self" method="post">
                 <div class="form-group">
                     <label for="login-username">Username</label>
                     <input type="text" class="form-control" id="login-username" placeholder="Username"

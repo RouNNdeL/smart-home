@@ -54,4 +54,23 @@ class DbUtils
             return self::$connection;
         }
     }
+
+    public static function getSecret(string $id)
+    {
+        $sql = "SELECT value FROM secrets WHERE id = ?";
+        $stmt = DbUtils::$connection->prepare($sql);
+        $stmt->bind_param("s", $id);
+        $stmt->bind_result($value);
+        $stmt->execute();
+        if($stmt->fetch())
+        {
+            $stmt->close();
+            return $value;
+        }
+        else
+        {
+            $stmt->close();
+            return null;
+        }
+    }
 }

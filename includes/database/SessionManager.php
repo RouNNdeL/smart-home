@@ -37,6 +37,8 @@ require_once __DIR__ . "/HomeUser.php";
 class SessionManager
 {
     const SESSION_COOKIE = "session";
+    const CAPTCHA_HOST = "https://www.google.com/recaptcha/api/siteverify";
+    const CAPTCHA_SECRET = "captcha_secret";
 
     private $session_id;
 
@@ -46,6 +48,7 @@ class SessionManager
 
 
     private static $instance = null;
+
     /**
      * SessionManager constructor.
      * @param $session_id
@@ -67,7 +70,7 @@ class SessionManager
         if(SessionManager::$instance === null)
         {
             $session_token = isset($_COOKIE[self::SESSION_COOKIE]) ? $_COOKIE[self::SESSION_COOKIE] : "";
-            SessionManager::$instance =  SessionManager::fromSessionToken(
+            SessionManager::$instance = SessionManager::fromSessionToken(
                 $session_token,
                 $_SERVER["REMOTE_ADDR"],
                 $_SERVER['HTTP_USER_AGENT']
@@ -107,7 +110,7 @@ class SessionManager
 
     public function attemptLoginAuto(string $username, string $password)
     {
-        return $this->attemptLogin($username, $password,  $_SERVER["REMOTE_ADDR"], $_SERVER["HTTP_USER_AGENT"]);
+        return $this->attemptLogin($username, $password, $_SERVER["REMOTE_ADDR"], $_SERVER["HTTP_USER_AGENT"]);
     }
 
     public function attemptLogin(string $username, string $password, string $ip, string $agent)
@@ -173,7 +176,7 @@ class SessionManager
 
     private function setCookie()
     {
-        setcookie(self::SESSION_COOKIE, $this->session_token, time() + 3*24*60*60, "/", "zdul.xyz", true, true);
+        setcookie(self::SESSION_COOKIE, $this->session_token, time() + 3 * 24 * 60 * 60, "/", "zdul.xyz", true, true);
     }
 
     private function updateSession(mysqli $conn, string $ip, string $agent, bool $force_refresh = false)
@@ -209,7 +212,7 @@ class SessionManager
 
         $sql = "UPDATE sessions SET valid = 0 WHERE id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i",  $this->session_id);
+        $stmt->bind_param("i", $this->session_id);
         $stmt->execute();
         $stmt->close();
     }
@@ -230,6 +233,29 @@ class SessionManager
     private static function generateSessionToken()
     {
         return base64_encode(openssl_random_pseudo_bytes(512));
+    }
+
+    public static function validateCaptchaAuto(string $token)
+    {
+        return SessionManager::validateCaptcha($token, $_SERVER["REMOTE_ADDR"]);
+    }
+
+    private static function validateCaptcha(string $token, string $ip)
+    {
+        $post_fields = [
+            "secret" => DbUtils::getSecret(SessionManager::CAPTCHA_SECRET),
+            "response" => $token,
+            "remoteip" => $ip
+        ];
+
+        $ch = curl_init(SessionManager::CAPTCHA_HOST);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_fields));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $data = curl_exec($ch);
+        $json_response = json_decode($data, true);
+        curl_close($ch);
+        return $json_response["success"];
     }
 
     /**
