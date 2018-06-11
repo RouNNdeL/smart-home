@@ -26,18 +26,73 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-05-17
- * Time: 20:18
+ * Date: 2018-06-11
+ * Time: 17:47
  */
-
-require_once __DIR__."/RgbEffectDevice.php";
-require_once __DIR__."/../effects/Effect.php";
-
-class SimpleEffectDevice extends RgbEffectDevice
+class Off extends Effect
 {
 
-    public function getAvailableEffects()
+    /**
+     * @return int
+     */
+    public function getTimingsForEffect()
     {
-        return [Effect::EFFECT_OFF, Effect::EFFECT_STATIC, Effect::EFFECT_BREATHING];
+        return 0;
+    }
+
+    /**
+     * @return array
+     */
+    public function argsToArray()
+    {
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    public function argList()
+    {
+        return [];
+    }
+
+    /**
+     * @return int
+     */
+    public function avrEffect()
+    {
+        return Effect::AVR_EFFECT_BREATHE;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEffectId()
+    {
+        return Effect::EFFECT_OFF;
+    }
+
+    /**
+     * @return Effect
+     */
+    public static function getDefault()
+    {
+        return new Off([0x000000], 1, 0, 0, 0, 0, 0);
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxColors()
+    {
+        return 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMinColors()
+    {
+        return 0;
     }
 }

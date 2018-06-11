@@ -66,6 +66,18 @@ abstract class Effect
     const EFFECT_TWO_HALVES_FADE = 20;
     const EFFECT_PARTICLES = 21;
 
+    const DIRECTION_CW = 0;
+    const DIRECTION_CCW = 1;
+
+    const TIME_OFF = 0;
+    const TIME_FADEIN = 1;
+    const TIME_ON = 2;
+    const TIME_FADEOUT = 3;
+    const TIME_ROTATION = 4;
+    const TIME_DELAY = 5;
+
+    const COLOR_COUNT_UNLIMITED = -1;
+
     const /** @noinspection CssInvalidPropertyValue */
         COLOR_TEMPLATE =
         "<div class=\"color-container row mb-1\">
@@ -194,8 +206,8 @@ abstract class Effect
     {
         $html = "";
 
-        $timings = $this->getTimingsForEffect();
-        $timing_strings =$this->getTimingStrings();
+        $timings = $this->getTimingsForEffect() | (1 << Effect::TIME_DELAY);
+        $timing_strings = $this->getTimingStrings();
         $profile_timing = Utils::getString("profile_timing");
         $profile_arguments = Utils::getString("profile_arguments");
 
@@ -216,8 +228,8 @@ abstract class Effect
                         $selected1 = $argument ? "" : " selected";
                         $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
                                             <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . DigitalRgbProfileDevice::DIRECTION_CW . "\"$selected0>$str_cw</option>
-                                                <option value=\"" . DigitalRgbProfileDevice::DIRECTION_CCW . "\"$selected1>$str_ccw</option>
+                                                <option value=\"" . Effect::DIRECTION_CW . "\"$selected0>$str_cw</option>
+                                                <option value=\"" . Effect::DIRECTION_CCW . "\"$selected1>$str_ccw</option>
                                             </select></div>";
                         break;
                     case "smooth":
@@ -256,16 +268,13 @@ abstract class Effect
             }
         }
 
-
-        $fade = ($timings & (1 << 2)) > 0 && ((~$timings) & (1 << 4)) > 0;
         for($i = 0; $i < 6; $i++)
         {
             if(($timings & (1 << (5 - $i))) > 0)
             {
                 $t = self::getTiming($this->timings[$i]);
                 $template = self::INPUT_TEMPLATE_TIMES;
-                $t_string = $i == 3 && $fade ? $timing_strings[6] : $timing_strings[$i];
-                $template = str_replace("\$label", Utils::getString("profile_timing_$t_string"), $template);
+                $template = str_replace("\$label", Utils::getString("profile_timing_$timing_strings[i]"), $template);
                 $template = str_replace("\$name", "time_" . $timing_strings[$i], $template);
                 $template = str_replace("\$placeholder", $t, $template);
                 $template = str_replace("\$value", $t, $template);
@@ -316,7 +325,7 @@ abstract class Effect
     }
 
     /**
-     * @return array
+     * @return int
      */
     public abstract function getTimingsForEffect();
 
@@ -339,6 +348,16 @@ abstract class Effect
      * @return int
      */
     public abstract function getEffectId();
+
+    /**
+     * @return int
+     */
+    public abstract function getMaxColors();
+
+    /**
+     * @return int
+     */
+    public abstract function getMinColors();
 
     /**
      * @return Effect

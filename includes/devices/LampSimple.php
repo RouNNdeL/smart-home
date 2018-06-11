@@ -95,7 +95,7 @@ class LampSimple extends VirtualDevice
      * @return string
      */
     public
-    function toHTML()
+    function toHtml()
     {
         // TODO: Implement toHTML() method.
         return "";

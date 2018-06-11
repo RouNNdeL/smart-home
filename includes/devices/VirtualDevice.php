@@ -117,7 +117,7 @@ abstract class VirtualDevice
     /**
      * @return string
      */
-    public abstract function toHTML();
+    public abstract function toHtml();
 
     public function getSyncJson()
     {

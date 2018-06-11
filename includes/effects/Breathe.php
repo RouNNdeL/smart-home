@@ -37,7 +37,7 @@ class Breathe extends Effect
 
     public function getTimingsForEffect()
     {
-        return 0b111101;
+        return (1 << Effect::TIME_OFF) | (1 << Effect::TIME_FADEIN) | (1 << Effect::TIME_ON) | (1 << Effect::TIME_FADEOUT);
     }
 
     public function argsToArray()
@@ -65,6 +65,22 @@ class Breathe extends Effect
 
     public static function getDefault()
     {
-        return new Breathe([0xff0000, 0x00ff00, 0x0000ff], 0, 1, 0, 1, 0, 0, [0, 255, 1]);
+        return new Breathe([0xff0000, 0x00ff00, 0x0000ff], 0, 1, 0, 1, 0, 0, [1, 0, 255]);
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxColors()
+    {
+        return Effect::COLOR_COUNT_UNLIMITED;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMinColors()
+    {
+        return 1;
     }
 }

@@ -42,6 +42,8 @@ abstract class RgbEffectDevice extends SimpleRgbDevice
     /** @var bool */
     private $effects_enabled;
 
+    private $color_count;
+
     public $current_profile;
 
     /**
@@ -93,7 +95,7 @@ abstract class RgbEffectDevice extends SimpleRgbDevice
         ]];
     }
 
-    public function toHTML()
+    public function toHtml()
     {
         $device = $this->device_id;
         $html = "<form id=\"device-form-$device\">";
@@ -101,7 +103,7 @@ abstract class RgbEffectDevice extends SimpleRgbDevice
         $profile_effect = Utils::getString("profile_effect");
         $profile_color_input = Utils::getString("profile_color_input");
         $profile_add_color = Utils::getString("profile_add_color");
-        $color_limit = $this->colorLimit();
+        $color_limit = $this->color_count;
         $current_effect = $this->effects[$this->current_profile];
 
         $colors_html = $current_effect->colorsHtml($color_limit);
@@ -146,8 +148,6 @@ abstract class RgbEffectDevice extends SimpleRgbDevice
     }
 
     public abstract function getAvailableEffects();
-
-    public abstract function colorLimit();
 
     public function toDatabase()
     {

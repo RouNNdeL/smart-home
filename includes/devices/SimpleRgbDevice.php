@@ -116,7 +116,7 @@ class SimpleRgbDevice extends VirtualDevice
     /**
      * @return string
      */
-    public function toHTML()
+    public function toHtml()
     {
         // TODO: Implement toHTML() method.
         return "";
