@@ -30,8 +30,7 @@
  * Time: 15:32
  */
 require_once(__DIR__ . "/../../includes/Utils.php");
-require_once(__DIR__ . "/../../includes/logging/RequestLogger.php");
-require_once(__DIR__ . "/../../includes/database/SessionManager.php");
+require_once(__DIR__ . "/../../includes/GlobalManager.php");
 GlobalManager::withSessionManager();
 $lang = Utils::getInstance()->lang;
 echo <<<TAG
