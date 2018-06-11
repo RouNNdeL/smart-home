@@ -26,26 +26,48 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 10/08/2017
- * Time: 15:32
+ * Date: 2018-06-11
+ * Time: 11:40
  */
-require_once(__DIR__ . "/../../includes/Utils.php");
-require_once(__DIR__ . "/../../includes/logging/RequestLogger.php");
-require_once(__DIR__ . "/../../includes/database/SessionManager.php");
-GlobalManager::withSessionManager();
-$lang = Utils::getInstance()->lang;
-echo <<<TAG
-<!DOCTYPE html>
-<html lang="$lang">
-TAG;
-require_once __DIR__."/../../includes/head/HtmlHead.php";
-$head = new HtmlHead("404 Error");
-echo $head->toString();
-$msg = Utils::getInstance()->getString("error_msg_500");
-echo <<<TAG
-<body>
-<h1>500 Error</h1>
-<p>$msg</p>
-</body>
-TAG;
-?>
+
+require_once __DIR__."/HeadEntry.php";
+
+class StyleSheetEntry extends HeadEntry
+{
+    const BOOTSTRAP = "/bootstrap/dist/css/bootstrap.min.css";
+    const ICONIC = "/iconic/font/css/open-iconic-bootstrap.min.css";
+    const TETHER = "/tether/dist/css/tether.min.css";
+    const COLOR_PICKER = "/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css";
+    const MAIN = "/web/css/main.css";
+
+    const DEFAULT = [StyleSheetEntry::BOOTSTRAP, StyleSheetEntry::TETHER, StyleSheetEntry::ICONIC];
+
+    /** @var string */
+    private $url;
+
+    /**
+     * StylesheetEntry constructor.
+     * @param string $url
+     */
+    public function __construct(string $url)
+    {
+        $this->url = $url;
+    }
+
+
+    /** @return string */
+    public function toString()
+    {
+        return "<link rel='stylesheet' href='$this->url'>";
+    }
+
+    public static function getDefaults()
+    {
+        $arr = [];
+        foreach(StyleSheetEntry::DEFAULT as $item)
+        {
+            $arr[] = new StyleSheetEntry($item);
+        }
+        return $arr;
+    }
+}

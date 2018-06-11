@@ -60,9 +60,10 @@ if(isset($_GET["name"]) && $_GET["name"] === "false")
 <!DOCTYPE html>
 <html lang="en">
 <?php
-$title = "Smart Home";
-$additional_css = ["main.css"];
-require_once __DIR__ . "/../../web/html/html_head.php";
+require_once __DIR__."/../../includes/head/HtmlHead.php";
+$head = new HtmlHead("Smart Home - ".$device->getDisplayName());
+$head->addEntry(new StyleSheetEntry(StyleSheetEntry::MAIN));
+echo $head->toString();
 
 ?>
 <body>

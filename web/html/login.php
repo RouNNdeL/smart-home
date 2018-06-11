@@ -78,8 +78,10 @@ if($_SERVER["REQUEST_METHOD"] === "POST")
 <!DOCTYPE html>
 <html lang="en">
 <?php
-$title = "Login to Smart Home";
-require_once __DIR__ . "/../../web/html/html_head.php";
+require_once __DIR__."/../../includes/head/HtmlHead.php";
+$head = new HtmlHead("Login to Smart Home");
+$head->addEntry(new JavaScriptEntry(JavaScriptEntry::CAPTCHA));
+echo $head->toString();
 
 ?>
 <body>
@@ -117,6 +119,10 @@ HTML;
                 ?>
                 <div class="text-right">
                     <button id="register-next-btn" class="btn btn-primary" role="button" type="submit">Login</button>
+                </div>
+
+                <div class="row">
+                    <div></div>
                 </div>
             </form>
         </div>

@@ -26,46 +26,54 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 07/08/2017
- * Time: 16:43
+ * Date: 2018-06-11
+ * Time: 11:28
  */
 
-//TODO: Make this a separate class
+require_once __DIR__."/HeadEntry.php";
+require_once __DIR__."/JavaScriptEntry.php";
+require_once __DIR__."/StyleSheetEntry.php";
 
-$add = "";
-if(isset($additional_css))
+class HtmlHead
 {
-    foreach ($additional_css as $css)
+
+    /** @var string */
+    private $title;
+
+    /** @var HeadEntry[] */
+    private $entries;
+
+    /**
+     * HtmlHead constructor.
+     * @param string $title
+     */
+    public function __construct(string $title)
     {
-        $add.="<link rel=\"stylesheet\" href=\"/web/css/$css\"/>";
+        $this->title = $title;
+        $this->entries = JavaScriptEntry::getDefaults();
+        $this->entries = array_merge($this->entries, StyleSheetEntry::getDefaults());
     }
-}
-if(isset($additional_js))
-{
-    foreach ($additional_js as $js)
+
+    public function addEntry(HeadEntry $entry)
     {
-        $add.="<script src=\"/web/js/$js\"/></script>";
+        $this->entries[] = $entry;
     }
-}
-if(!isset($title))
-{
-    $title = "Smart Home";
-}
-echo <<<TAG
-<head>
+
+    public function toString($head_tags = true)
+    {
+        $str = $head_tags ? "<head>" : "";
+        $str .= <<<TAG
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>$title</title>
-    <script src="/jquery/jquery.min.js"></script>
-    <script src="/tether/dist/js/tether.min.js"></script>
-    <script src="/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js"></script>
-    <script src="/jqueryui/jquery-ui.min.js"></script>
-    <script src='https://www.google.com/recaptcha/api.js'></script>
-    <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css"/>
-    <link rel="stylesheet" href="/iconic/font/css/open-iconic-bootstrap.min.css"/>
-    <link rel="stylesheet" href="/tether/dist/css/tether.min.css"/>
-    $add
-</head>
+    <title>$this->title</title>
 TAG;
+        foreach($this->entries as $entry)
+        {
+            $str .= $entry->toString();
+        }
+        if($head_tags)
+            $str .= "</head>";
+
+        return $str;
+    }
+}

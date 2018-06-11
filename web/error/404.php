@@ -32,14 +32,15 @@
 require_once(__DIR__ . "/../../includes/Utils.php");
 require_once(__DIR__ . "/../../includes/logging/RequestLogger.php");
 require_once(__DIR__ . "/../../includes/database/SessionManager.php");
-$manager = SessionManager::getInstance();
-RequestLogger::getInstance($manager);
+GlobalManager::withSessionManager();
 $lang = Utils::getInstance()->lang;
 echo <<<TAG
 <!DOCTYPE html>
 <html lang="$lang">
 TAG;
-require_once(__DIR__ . "/../html/html_head.php");
+require_once __DIR__."/../../includes/head/HtmlHead.php";
+$head = new HtmlHead("404 Error");
+echo $head->toString();
 $msg = Utils::getInstance()->getString("error_msg_404");
 $msg = str_replace("\$url", "<b>$_SERVER[REQUEST_URI]</b>", $msg);
 echo <<<TAG
