@@ -27,47 +27,44 @@
  * Created by PhpStorm.
  * User: Krzysiek
  * Date: 2018-06-11
- * Time: 11:40
+ * Time: 12:07
  */
 
 require_once __DIR__."/HeadEntry.php";
 
-class StyleSheetEntry extends HeadEntry
+class MetaEntry extends HeadEntry
 {
-    const BOOTSTRAP = "/bootstrap/dist/css/bootstrap.min.css";
-    const ICONIC = "/iconic/font/css/open-iconic-bootstrap.min.css";
-    const TETHER = "/tether/dist/css/tether.min.css";
-    const COLOR_PICKER = "/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css";
-    const MAIN = "/css/main.css";
-
-    const DEFAULT = [StyleSheetEntry::BOOTSTRAP, StyleSheetEntry::TETHER, StyleSheetEntry::ICONIC];
+    const VIEWPORT_NAME = "viewport";
+    const VIEWPORT_CONTENT = "width=device-width, initial-scale=1, shrink-to-fit=no";
 
     /** @var string */
-    private $url;
+    private $name;
+
+    /** @var string */
+    private $content;
 
     /**
-     * StylesheetEntry constructor.
-     * @param string $url
+     * MetaEntry constructor.
+     * @param string $name
+     * @param string $content
      */
-    public function __construct(string $url)
+    public function __construct(string $name, string $content)
     {
-        $this->url = $url;
+        $this->name = $name;
+        $this->content = $content;
     }
 
 
     /** @return string */
     public function toString()
     {
-        return "<link rel='stylesheet' href='$this->url'>";
+        return "<meta name='$this->name' content='$this->content'>";
     }
 
     public static function getDefaults()
     {
         $arr = [];
-        foreach(StyleSheetEntry::DEFAULT as $item)
-        {
-            $arr[] = new StyleSheetEntry($item);
-        }
+        $arr[] = new MetaEntry(MetaEntry::VIEWPORT_NAME, MetaEntry::VIEWPORT_CONTENT);
         return $arr;
     }
 }

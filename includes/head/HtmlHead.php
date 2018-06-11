@@ -31,6 +31,7 @@
  */
 
 require_once __DIR__."/HeadEntry.php";
+require_once __DIR__."/MetaEntry.php";
 require_once __DIR__."/JavaScriptEntry.php";
 require_once __DIR__."/StyleSheetEntry.php";
 
@@ -50,7 +51,8 @@ class HtmlHead
     public function __construct(string $title)
     {
         $this->title = $title;
-        $this->entries = JavaScriptEntry::getDefaults();
+        $this->entries = MetaEntry::getDefaults();
+        $this->entries = array_merge($this->entries, JavaScriptEntry::getDefaults());
         $this->entries = array_merge($this->entries, StyleSheetEntry::getDefaults());
     }
 
@@ -64,7 +66,6 @@ class HtmlHead
         $str = $head_tags ? "<head>" : "";
         $str .= <<<TAG
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>$this->title</title>
 TAG;
         foreach($this->entries as $entry)

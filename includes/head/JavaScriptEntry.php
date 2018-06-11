@@ -41,6 +41,7 @@ class JavaScriptEntry extends HeadEntry
     const COLOR_PICKER = "/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js";
     const CAPTCHA = "https://www.google.com/recaptcha/api.js";
     const GOOGLE_PLATFORM = "https://apis.google.com/js/platform.js";
+    const LOGIN = "/js/login.js";
 
     const DEFAULT = [JavaScriptEntry::JQUERY, JavaScriptEntry::TETHER, JavaScriptEntry::BOOTSTRAP];
 
