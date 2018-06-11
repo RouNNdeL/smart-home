@@ -34,8 +34,8 @@ require_once __DIR__ . "/../includes/GlobalManager.php";
 
 $manager = GlobalManager::minimal();
 
-require_once __DIR__ . "/../includes/database/ApiClient.php";
-require_once __DIR__ . "/../includes/database/OAuthUtils.php";
+require_once __DIR__ . "/../includes/oauth/ApiClient.php";
+require_once __DIR__ . "/../includes/oauth/OAuthUtils.php";
 require_once __DIR__ . "/../includes/database/DbUtils.php";
 
 if(!isset($_GET["client_id"]) || !isset($_GET["redirect_uri"]) || !isset($_GET["state"]) || !isset($_GET["scope"])

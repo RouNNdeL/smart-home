@@ -34,7 +34,7 @@ require_once __DIR__ . "/database/DeviceDbHelper.php";
 require_once __DIR__ . "/UserDeviceManager.php";
 require_once __DIR__ . "/database/HomeUser.php";
 require_once __DIR__ . "/../includes/database/DbUtils.php";
-require_once __DIR__ . "/../includes/database/OAuthUtils.php";
+require_once __DIR__ . "/../includes/oauth/OAuthUtils.php";
 
 class ActionsRequestManager
 {
