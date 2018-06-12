@@ -71,10 +71,11 @@ class SessionManager
         {
             $session_token = (isset($_COOKIE[self::SESSION_COOKIE]) && $_COOKIE[self::SESSION_COOKIE] !== null) ?
                 $_COOKIE[self::SESSION_COOKIE] : "";
+            $agent = isset($_SERVER["HTTP_USER_AGENT"]) ? $_SERVER['HTTP_USER_AGENT'] : "NOT_SET";
             SessionManager::$instance = SessionManager::fromSessionToken(
                 $session_token,
                 $_SERVER["REMOTE_ADDR"],
-                $_SERVER['HTTP_USER_AGENT']
+                $agent
             );
         }
         return SessionManager::$instance;

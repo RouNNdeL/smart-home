@@ -28,6 +28,8 @@ const UPDATE_URL = "/api/save_device.php";
 $(function()
 {
     let last_update = Date.now();
+    let last_call = 0;
+    let last_call_time = 0;
     let update_timeout = 0;
 
     $(".checkbox-switch").bootstrapSwitch().on('switchChange.bootstrapSwitch', update);
@@ -69,7 +71,7 @@ $(function()
 
     /**
      *
-     * @param id String
+     * @param {String} id
      */
     function updateById(id)
     {
@@ -80,21 +82,26 @@ $(function()
         {
             form[$(this).attr("name")] = $(this)[0].checked;
         });
+        last_call = Date.now();
         $.ajax(UPDATE_URL, {
             method: "POST",
             dataType: "json",
             contentType: "application/json",
             data: JSON.stringify(form)
-        })
+        }).done(function(repsonse)
+        {
+            last_call_time = Date.now() - last_call;
+        });
     }
 
     /**
      *
-     * @param e Event
+     * @param {Event} e
      */
     function update(e)
     {
-        if(Date.now() > last_update + MIN_UPDATE_DELAY)
+        let update_delay = Math.max(MIN_UPDATE_DELAY, 2*last_call_time);
+        if(Date.now() > last_update + update_delay)
         {
             if(e !== undefined && e.target !== undefined)
             {

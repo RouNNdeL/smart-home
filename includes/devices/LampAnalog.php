@@ -74,6 +74,18 @@ class LampAnalog extends VirtualDevice
         }
     }
 
+
+    /**
+     * @param array $json
+     */
+    public function handleSaveJson($json)
+    {
+        if(isset($json["state"]))
+            $this->on = $json["state"];
+        if(isset($json["brightness"]))
+            $this->brightness = $json["brightness"];
+    }
+
     /**
      * @param bool $online
      * @return array

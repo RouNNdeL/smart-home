@@ -30,8 +30,38 @@
  * Time: 09:49
  */
 
-//TODO: Implement saving. Check session before allowing to save
-$json = json_decode(file_get_contents("php://input"), true);
+if($_SERVER["REQUEST_METHOD"] !== "POST")
+{
+    $response = ["status" => "error", "error" => "invalid_request"];
+    http_response_code(400);
+    echo json_encode($response);
+}
 
-$response = ["status" => "success"];
+require_once __DIR__."/../includes/GlobalManager.php";
+
+$manager = GlobalManager::all();
+
+$json = json_decode(file_get_contents("php://input"), true);
+if($json === false || !isset($json["device_id"]))
+{
+    $response = ["status" => "error", "error" => "invalid_json"];
+    http_response_code(400);
+    echo json_encode($response);
+}
+
+$physical_device = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($json["device_id"]);
+if($physical_device === null)
+{
+    $response = ["status" => "error", "error" => "invalid_device_id"];
+    http_response_code(400);
+    echo json_encode($response);
+}
+
+$virtualDevice = $physical_device->getVirtualDeviceById($json["device_id"]);
+$virtualDevice->handleSaveJson($json);
+
+if($physical_device->save(true))
+    $response = ["status" => "success"];
+else
+    $response = ["status" => "offline"];
 echo json_encode($response);

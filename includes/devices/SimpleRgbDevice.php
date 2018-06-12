@@ -85,6 +85,20 @@ class SimpleRgbDevice extends VirtualDevice
         }
     }
 
+
+    /**
+     * @param array $json
+     */
+    public function handleSaveJson($json)
+    {
+        if(isset($json["state"]))
+            $this->on = $json["state"];
+        if(isset($json["brightness"]))
+            $this->brightness = $json["brightness"];
+        if(isset($json["color"]))
+            $this->color = hexdec(substr($json["color"], 1));
+    }
+
     /**
      * @param bool $online
      * @return array

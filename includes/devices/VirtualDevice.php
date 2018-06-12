@@ -109,6 +109,11 @@ abstract class VirtualDevice
     public abstract function handleAssistantAction($command);
 
     /**
+     * @param array $json
+     */
+    public abstract function handleSaveJson($json);
+
+    /**
      * @param bool $online
      * @return array
      */

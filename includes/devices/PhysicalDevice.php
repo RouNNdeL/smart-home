@@ -73,7 +73,11 @@ abstract class PhysicalDevice
      */
     public abstract function isOnline();
 
-    public abstract function save();
+    /**
+     * @param bool $quick
+     * @return bool - whether the device was online when calling save
+     */
+    public abstract function save(bool $quick);
 
     /**
      * @param string $device_id
@@ -108,7 +112,7 @@ abstract class PhysicalDevice
             }
         }
 
-        $this->save();
+        $this->save(false);
 
         return ["status" => ($this->isOnline() ? "SUCCESS" : "OFFLINE"), "ids" => $ids];
     }

@@ -53,9 +53,7 @@ class LampSimple extends VirtualDevice
     /**
      * @param array $command
      */
-    public
-    function handleAssistantAction($command
-    )
+    public function handleAssistantAction($command)
     {
         switch($command["command"])
         {
@@ -66,12 +64,19 @@ class LampSimple extends VirtualDevice
     }
 
     /**
+     * @param array $json
+     */
+    public function handleSaveJson($json)
+    {
+        if(isset($json["state"]))
+            $this->on = $json["state"];
+    }
+
+    /**
      * @param bool $online
      * @return array
      */
-    public
-    function getStateJson(bool $online = false
-    )
+    public function getStateJson(bool $online = false)
     {
         return [
             "on" => $this->on,
@@ -79,8 +84,7 @@ class LampSimple extends VirtualDevice
         ];
     }
 
-    public
-    function toDatabase()
+    public function toDatabase()
     {
         $conn = DbUtils::getConnection();
         $sql = "UPDATE devices_virtual SET 
@@ -101,20 +105,17 @@ class LampSimple extends VirtualDevice
         return "";
     }
 
-    public
-    function getTraits()
+    public function getTraits()
     {
         return [self::DEVICE_TRAIT_ON_OFF];
     }
 
-    public
-    function getActionsDeviceType()
+    public function getActionsDeviceType()
     {
         return self::DEVICE_TYPE_ACTIONS_LIGHT;
     }
 
-    public
-    function getAttributes()
+    public function getAttributes()
     {
         return [];
     }
@@ -122,8 +123,7 @@ class LampSimple extends VirtualDevice
     /**
      * @return bool
      */
-    public
-    function isOn(): bool
+    public function isOn(): bool
     {
         return $this->on;
     }
@@ -131,10 +131,9 @@ class LampSimple extends VirtualDevice
     /**
      * @param bool $on
      */
-    public
-    function setOn(bool $on
-    )
+    public function setOn(bool $on)
     {
         $this->on = $on;
     }
+
 }

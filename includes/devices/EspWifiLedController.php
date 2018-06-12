@@ -64,11 +64,16 @@ class EspWifiLedController extends RgbProfilesDevice
         return parent::handleAssistantAction($action, $request_id);
     }
 
-    public function save()
+    /**
+     * @param bool $quick
+     * @return bool - whether the device was online when calling save
+     */
+    public function save(bool $quick)
     {
-        if($this->isOnline())
+        $online = $quick || $this->isOnline();
+        if($online)
         {
-            $data_string = $this->getSmallGlobalsHex() . "*";
+            $data_string = ($quick ? "q" : "") . $this->getSmallGlobalsHex() . "*";
             $headers = array(
                 "Content-Type: application/json",
                 "Content-Length: " . strlen($data_string)
@@ -90,6 +95,7 @@ class EspWifiLedController extends RgbProfilesDevice
         {
             $virtual_device->toDatabase();
         }
+        return $online;
     }
 
     public function handleReportedState(array $state)

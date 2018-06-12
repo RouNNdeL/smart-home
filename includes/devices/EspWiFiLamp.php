@@ -53,20 +53,31 @@ class EspWiFiLamp extends PhysicalDevice
         return $online;
     }
 
-    public function save()
+    /**
+     * @param bool $quick
+     * @return bool - whether the device was online when calling save
+     */
+    public function save(bool $quick)
     {
         $device = $this->virtual_devices[0];
         if(!$device instanceof LampAnalog)
             throw new UnexpectedValueException("Children of EspWiFiLamp should be of type LampAnalog");
-        $b = $device->getBrightness() * 255 / 100;
-        $s = $device->isOn() ? 1 : 0;
-        $ch = curl_init("http://" . $this->hostname . "?b=" . $b . "&s=" . $s);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
-        curl_exec($ch);
-        curl_close($ch);
+
+        $online = $this->isOnline();
+        if($online)
+        {
+            $b = $device->getBrightness() * 255 / 100;
+            $s = $device->isOn() ? 1 : 0;
+            $ch = curl_init("http://" . $this->hostname . "?b=" . $b . "&s=" . $s);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+            curl_exec($ch);
+            curl_close($ch);
+        }
+
         $device->toDatabase();
+        return $online;
     }
 
     /**

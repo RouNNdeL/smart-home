@@ -198,4 +198,32 @@ class UserDeviceManager
         }
         return null;
     }
+
+    /**
+     * @param string $id
+     * @return VirtualDevice|null
+     */
+    public function getVirtualDeviceById(string $id)
+    {
+        foreach ($this->physical_devices as $physical_device) {
+            $device = $physical_device->getVirtualDeviceById($id);
+            if($device !== null)
+                return $device;
+        }
+        return null;
+    }
+
+    /**
+     * @param string $id
+     * @return PhysicalDevice|null
+     */
+    public function getPhysicalDeviceByVirtualId(string $id)
+    {
+        foreach ($this->physical_devices as $physical_device) {
+            $device = $physical_device->getVirtualDeviceById($id);
+            if($device !== null)
+                return $physical_device;
+        }
+        return null;
+    }
 }

@@ -86,7 +86,7 @@ class PcLedController extends RgbProfilesDevice
         return $this->tcp_send();
     }
 
-    public function save()
+    public function save(bool $quick)
     {
         $path = $_SERVER["DOCUMENT_ROOT"] . self::SAVE_PATH;
         $path_update = $_SERVER["DOCUMENT_ROOT"] . self::UPDATE_PATH;
