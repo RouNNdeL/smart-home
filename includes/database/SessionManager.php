@@ -69,7 +69,8 @@ class SessionManager
     {
         if(SessionManager::$instance === null)
         {
-            $session_token = isset($_COOKIE[self::SESSION_COOKIE]) ? $_COOKIE[self::SESSION_COOKIE] : "";
+            $session_token = (isset($_COOKIE[self::SESSION_COOKIE]) && $_COOKIE[self::SESSION_COOKIE] !== null) ?
+                $_COOKIE[self::SESSION_COOKIE] : "";
             SessionManager::$instance = SessionManager::fromSessionToken(
                 $session_token,
                 $_SERVER["REMOTE_ADDR"],
