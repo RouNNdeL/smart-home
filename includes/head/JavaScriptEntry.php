@@ -34,14 +34,17 @@ require_once __DIR__."/HeadEntry.php";
 
 class JavaScriptEntry extends HeadEntry
 {
-    const JQUERY = "/jquery/jquery.min.js";
-    const TETHER = "/tether/dist/js/tether.min.js";
-    const BOOTSTRAP = "/bootstrap/dist/js/bootstrap.min.js";
-    const JQUERY_UI = "/jqueryui/jquery-ui.min.js";
-    const COLOR_PICKER = "/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js";
+    const JQUERY = "/jquery/jquery.js";
+    const TETHER = "/tether/dist/js/tether.js";
+    const BOOTSTRAP = "/bootstrap/dist/js/bootstrap.js";
+    const JQUERY_UI = "/jqueryui/jquery-ui.js";
+    const COLOR_PICKER = "/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.js";
+    const SLIDER = "/bootstrap-slider/dist/bootstrap-slider.js";
+    const SWITCH = "/bootstrap-switch/dist/js/bootstrap-switch.js";
     const CAPTCHA = "https://www.google.com/recaptcha/api.js";
     const GOOGLE_PLATFORM = "https://apis.google.com/js/platform.js";
     const LOGIN = "/js/login.js";
+    const DEVICE_SETTINGS = "/js/device_settings.js";
 
     const DEFAULT = [JavaScriptEntry::JQUERY, JavaScriptEntry::TETHER, JavaScriptEntry::BOOTSTRAP];
 

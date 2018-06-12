@@ -95,8 +95,14 @@ abstract class RgbEffectDevice extends SimpleRgbDevice
         ]];
     }
 
-    public function toHtml()
+    /**
+     * @param string $device_html
+     * @return string
+     */
+    public function toHtml($device_html = null)
     {
+        //TODO: Add a link to Effects edit page
+        return parent::toHtml($device_html);
         $device = $this->device_id;
         $html = "<form id=\"device-form-$device\">";
         $profile_colors = Utils::getString("profile_colors");
@@ -112,7 +118,7 @@ abstract class RgbEffectDevice extends SimpleRgbDevice
         foreach($this->getAvailableEffects() as $id => $effect)
         {
             $string = Utils::getString("profile_" . $effect);
-            $effects_html .= "<option value=\"$id\"" . ($id == $current_effect ? " selected" : "") . ">$string</option>";
+            $effects_html .= "<option value=\"$id\" " . ($id == $current_effect ? " selected" : "") . ">$string</option>";
         }
 
         $btn_class = sizeof($current_effect->getColors()) >= $color_limit ? " hidden-xs-up" : "";

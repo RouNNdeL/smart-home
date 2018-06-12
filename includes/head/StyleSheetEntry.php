@@ -34,11 +34,14 @@ require_once __DIR__."/HeadEntry.php";
 
 class StyleSheetEntry extends HeadEntry
 {
-    const BOOTSTRAP = "/bootstrap/dist/css/bootstrap.min.css";
-    const ICONIC = "/iconic/font/css/open-iconic-bootstrap.min.css";
-    const TETHER = "/tether/dist/css/tether.min.css";
-    const COLOR_PICKER = "/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css";
+    const BOOTSTRAP = "/bootstrap/dist/css/bootstrap.css";
+    const ICONIC = "/iconic/font/css/open-iconic-bootstrap.css";
+    const TETHER = "/tether/dist/css/tether.css";
+    const COLOR_PICKER = "/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.css";
+    const SLIDER = "/bootstrap-slider/dist/css/bootstrap-slider.css";
+    const SWITCH = "/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.css";
     const MAIN = "/css/main.css";
+    const DEVICE_SETTINGS = "/css/device_settings.css";
 
     const DEFAULT = [StyleSheetEntry::BOOTSTRAP, StyleSheetEntry::TETHER, StyleSheetEntry::ICONIC];
 

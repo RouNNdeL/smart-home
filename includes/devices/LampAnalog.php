@@ -100,9 +100,10 @@ class LampAnalog extends VirtualDevice
     }
 
     /**
+     * @param null $device_name
      * @return string
      */
-    public function toHtml()
+    public function toHtml($device_name = null)
     {
         // TODO: Implement toHTML() method.
         return "";

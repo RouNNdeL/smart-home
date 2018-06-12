@@ -29,7 +29,6 @@
  * Date: 2018-05-14
  * Time: 20:03
  */
-
 class SimpleRgbDevice extends VirtualDevice
 {
     /** @var int */
@@ -52,9 +51,9 @@ class SimpleRgbDevice extends VirtualDevice
      * @param int $brightness
      * @param bool $on
      */
-    public function __construct(string $device_id, string $device_name, array $synonyms,  bool $home_actions, bool $will_report_state, int $color = 0xffffff, int $brightness = 100, bool $on = true)
+    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions, bool $will_report_state, int $color = 0xffffff, int $brightness = 100, bool $on = true)
     {
-        parent::__construct($device_id, $device_name, $synonyms, VirtualDevice::DEVICE_TYPE_RGB,  $home_actions, $will_report_state);
+        parent::__construct($device_id, $device_name, $synonyms, VirtualDevice::DEVICE_TYPE_RGB, $home_actions, $will_report_state);
         $this->color = $color;
         $this->brightness = $brightness;
         $this->on = $on;
@@ -114,12 +113,58 @@ class SimpleRgbDevice extends VirtualDevice
     }
 
     /**
+     * @param string $device_html
      * @return string
      */
-    public function toHtml()
+    public function toHtml($device_html = null)
     {
-        // TODO: Implement toHTML() method.
-        return "";
+        if($device_html !== null)
+            $name = $device_html;
+        else
+            $name = $this->device_name;
+        $checked = $this->on ? "checked" :"";
+        $color = "#".str_pad(dechex($this->color), 6, '0', STR_PAD_LEFT);
+        return <<<HTML
+        <form>
+            <div class="card-header">
+                <div class="row">
+                    <div class="col"><h6 class="vertical-align mb-0">$name</h6></div>
+                    <div class="col-auto float-right pl-0">
+                        <input class="checkbox-switch change-listen" type="checkbox" name="state" $checked
+                            data-size="small" data-label-width="10" id="state-$this->device_id">
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <p class="mb-0">Brightness</p>
+                        <div> 
+                            <input
+                                class="slider change-listen"
+                                type="text"
+                                name="brightness"
+                                id="brightness-$this->device_id"
+                                data-provide="slider"
+                                data-slider-ticks="[0, 100]"
+                                data-slider-min="0"
+                                data-slider-max="100"
+                                data-slider-step="1"
+                                data-slider-value="$this->brightness">
+                        </div>
+                        <div class="color-container row mt-3">
+                            <div class="col px-1">
+                                <div class="color-picker-init" >
+                                    <input id="color-$this->device_id" name="color" type="text change-listen" class="form-control color-input" value="$color"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </form>
+HTML;
+
     }
 
     public function getTraits()

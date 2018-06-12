@@ -138,11 +138,12 @@ abstract class PhysicalDevice
     {
         $html = "";
 
-        foreach ($this->virtual_devices as $virtual_device) {
+        foreach ($this->virtual_devices as $i => $virtual_device) {
+            $active = $i ? "" : "active";
             $name = $virtual_device->getDeviceName();
             $sanitized_name = Utils::sanitizeString($name);
             $html .= "<li class=\"nav-item\" role=\"presentation\"" .
-                "><a id=\"device-link-$sanitized_name\" href=\"#$sanitized_name\" class=\"nav-link device-link\">"
+                "><a id=\"device-link-$sanitized_name\" href=\"#$sanitized_name\" class=\"nav-link device-link $active\">"
                 . $name . "</a></li>";
         }
 
@@ -153,7 +154,6 @@ abstract class PhysicalDevice
     {
         $id = urlencode($this->id);
         $display_name = urlencode($this->display_name);
-        $offline = $this->isOnline() ? "" : "<span class=\"device-offline-text\">(" . Utils::getString("device_status_offline") . ")</span>";
 
         if(sizeof($this->virtual_devices) > 1) {
             $devices = "- ".Utils::getString("device_devices").": ";
@@ -170,12 +170,13 @@ abstract class PhysicalDevice
         if ($user_id === $this->owner_id) {
             $owner = Utils::getString("device_owner_you") . " (" . $owner . ")";
         }
+        $name = $this->getNameWithState();
 
         return <<<HTML
 <a href="/device/$display_name/$id" class="list-group-item list-group-item-action">
         <div class="row">
             <div class="col">
-                <h5 class="card-title">$this->display_name $offline</h5>
+                <h5 class="card-title">$name</h5>
                 <p class="card-text">
                     $devices
                     - Owner: <b>$owner</b><br>
@@ -210,5 +211,11 @@ HTML;
     public function getDisplayName(): string
     {
         return $this->display_name;
+    }
+
+    public function getNameWithState()
+    {
+        $offline = $this->isOnline() ? "" : "<span class=\"device-offline-text\">(" . Utils::getString("device_status_offline") . ")</span>";
+        return trim("$this->display_name $offline");
     }
 }

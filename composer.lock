@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b64b2da7d893f4b3cdfa3d29f90ea70c",
+    "content-hash": "df204398ce645066171fdb6814fdfbd3",
     "packages": [
         {
             "name": "components/jquery",
@@ -178,37 +178,6 @@
             "description": "A simple library to encode and decode JSON Web Tokens (JWT) in PHP. Should conform to the current spec.",
             "homepage": "https://github.com/firebase/php-jwt",
             "time": "2017-06-27T22:17:23+00:00"
-        },
-        {
-            "name": "itsjavi/bootstrap-colorpicker",
-            "version": "2.5.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/farbelous/bootstrap-colorpicker.git",
-                "reference": "d56d0d3d5bee59904d48bce3c47a0029741e10e6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/farbelous/bootstrap-colorpicker/zipball/d56d0d3d5bee59904d48bce3c47a0029741e10e6",
-                "reference": "d56d0d3d5bee59904d48bce3c47a0029741e10e6",
-                "shasum": ""
-            },
-            "require": {
-                "components/jquery": ">=1.10"
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache License Version 2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Javier Aguilar",
-                    "homepage": "https://itsjavi.com"
-                }
-            ],
-            "description": "Fancy and customizable colorpicker plugin for Twitter Bootstrap",
-            "time": "2018-03-29T04:47:33+00:00"
         },
         {
             "name": "sonata-project/google-authenticator",
