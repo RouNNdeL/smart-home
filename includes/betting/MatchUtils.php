@@ -50,4 +50,34 @@ class MatchUtils
             return date("D, j/n, ", $dateTime) . $time_string;
         }
     }
+
+    public static function getPredictionForUserAndMatch(int $user_id, int $match_id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT scoreA, scoreB FROM bet_predictions WHERE user_id = ? AND match_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ii", $user_id, $match_id);
+        $stmt->bind_result($scoreA, $scoreB);
+        $stmt->execute();
+        if(!$stmt->fetch())
+        {
+            $stmt->close();
+            return null;
+        }
+        $stmt->close();
+        return ["a" => $scoreA, "b" => $scoreB];
+    }
+
+    public static function insertPrediction(int $user_id, int $match_id, int $scoreA, int $scoreB)
+    {
+        //TODO: Check if user can still update predictions
+        $conn = DbUtils::getConnection();
+        $sql = "INSERT INTO bet_predictions (user_id, match_id, scoreA, scoreB) VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE scoreA = ?, scoreB = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iiiiii", $user_id, $match_id, $scoreA, $scoreB, $scoreA, $scoreB);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
 }

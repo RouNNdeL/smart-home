@@ -57,6 +57,12 @@ class Match
     /** @var string */
     private $stage;
 
+    /** @var int|null */
+    private $predictionA;
+
+    /** @var int|null */
+    private $predictionB;
+
     /**
      * Match constructor.
      * @param int $id
@@ -154,15 +160,28 @@ class Match
         return $arr;
     }
 
+    public function loadPredictions(int $user_id)
+    {
+        $prediction = MatchUtils::getPredictionForUserAndMatch($user_id, $this->id);
+        if($prediction === null)
+        {
+            $this->predictionA = null;
+            $this->predictionB = null;
+        }
+        else
+        {
+            $this->predictionA = $prediction["a"];
+            $this->predictionB = $prediction["b"];
+        }
+    }
+
     /**
-     * @param $pickA
-     * @param $pickB
      * @return string
      */
-    public function toHtml($pickA, $pickB)
+    public function toHtml()
     {
-        $pickA = $pickA === null ? "" : $pickA;
-        $pickB = $pickB === null ? "" : $pickB;
+        $pickA = $this->predictionA === null ? "" : $this->predictionA;
+        $pickB = $this->predictionB === null ? "" : $this->predictionB;
 
         $nameTeamA = $this->teamA->getName();
         $nameTeamB = $this->teamB->getName();

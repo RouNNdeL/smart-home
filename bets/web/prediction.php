@@ -31,8 +31,9 @@
  */
 
 require_once __DIR__."/../../includes/GlobalManager.php";
+require_once __DIR__."/../../includes/betting/MatchUtils.php";
 
-$manger = GlobalManager::withSessionManager(true);
+$manager = GlobalManager::withSessionManager(true);
 
 if($_SERVER["REQUEST_METHOD"] !== "POST")
 {
@@ -49,3 +50,4 @@ if($json === false || !isset($json["match_id"]) || !isset($json["teamA"]) || !is
     exit();
 }
 
+MatchUtils::insertPrediction($manager->getSessionManager()->getUserId(), $json["match_id"], $json["teamA"], $json["teamB"]);
