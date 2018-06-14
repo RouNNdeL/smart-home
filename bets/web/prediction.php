@@ -50,4 +50,11 @@ if($json === false || !isset($json["match_id"]) || !isset($json["teamA"]) || !is
     exit();
 }
 
-MatchUtils::insertPrediction($manager->getSessionManager()->getUserId(), $json["match_id"], $json["teamA"], $json["teamB"]);
+$success = MatchUtils::insertPrediction(
+    $manager->getSessionManager()->getUserId(),
+    $json["match_id"],
+    $json["teamA"],
+    $json["teamB"]
+);
+$response = ["status" => $success ? "success" : "failure"];
+echo json_encode($response);

@@ -175,6 +175,11 @@ class Match
         }
     }
 
+    public function picks_open()
+    {
+        return time() < $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
+    }
+
     /**
      * @return string
      */
@@ -190,7 +195,7 @@ class Match
         $logoTeamB = $this->teamB->getLogo();
 
         $time = MatchUtils::formatDate($this->start_date);
-        $picks_locked = time() > $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
+        $picks_locked = !$this->picks_open();
         $disabled = $picks_locked ? "disabled" : "";
         $prediction_text = "Your predictions" . ($picks_locked ? " (locked)" : "");
         $invisible = $picks_locked ? "invisible" : "";

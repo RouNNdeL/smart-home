@@ -29,6 +29,9 @@
  * Date: 2018-06-14
  * Time: 14:39
  */
+
+require_once __DIR__."/Match.php";
+
 class MatchUtils
 {
     const PICK_LOCK_MINUTES = 15;
@@ -70,7 +73,8 @@ class MatchUtils
 
     public static function insertPrediction(int $user_id, int $match_id, int $scoreA, int $scoreB)
     {
-        //TODO: Check if user can still update predictions
+        if(!Match::byId($match_id)->picks_open())
+            return false;
         $conn = DbUtils::getConnection();
         $sql = "INSERT INTO bet_predictions (user_id, match_id, scoreA, scoreB) VALUES (?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE scoreA = ?, scoreB = ?";
