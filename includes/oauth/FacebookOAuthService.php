@@ -26,18 +26,15 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-06-11
- * Time: 14:50
+ * Date: 2018-06-14
+ * Time: 19:03
  */
 
-require_once __DIR__."/../database/HomeUser.php";
-require_once __DIR__."/../../vendor/autoload.php";
-
-class GoogleOAuthService extends OAuthService
+class FacebookOAuthService extends OAuthService
 {
-    const ID = "1";
+    const ID = 2;
 
-    const ID_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v3/tokeninfo";
+    const USER_INFO_ENDPOINT = "https://graph.facebook.com/v3.0/me";
 
     /**
      * @param array $requestTokens
@@ -45,23 +42,9 @@ class GoogleOAuthService extends OAuthService
      */
     public function getUser(array $requestTokens)
     {
-        $id_token = GoogleOAuthService::decodeIdToken($requestTokens["id_token"]);
-        if($id_token === null || isset($id_token["error_description"]))
-            return null;
-        return HomeUser::queryUserByGoogleId($id_token["sub"]);
-    }
-
-    private function decodeIdToken(string $id_token)
-    {
-        $fields = ["id_token" => $id_token];
-        $ch = curl_init(GoogleOAuthService::ID_TOKEN_ENDPOINT."?".http_build_query($fields));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $data = curl_exec($ch);
-        $json_response = json_decode($data, true);
-        curl_close($ch);
-        if($json_response["aud"] !== $this->client_id)
-            return null;
-        return $json_response;
+        $user_id = FacebookOAuthService::queryUserData($requestTokens)["id"];
+        $user = HomeUser::queryUserByFacebookId($user_id);
+        return $user;
     }
 
     /**
@@ -70,6 +53,23 @@ class GoogleOAuthService extends OAuthService
      */
     public function registerUser(array $requestTokens)
     {
-        // TODO: Implement registerUser() method.
+        $user_data = FacebookOAuthService::queryUserData($requestTokens);
+        $name_arr = explode(" ", $user_data["name"]);
+        return HomeUser::newUserWithFacebook($user_data["id"], $name_arr[0], end($name_arr));
+    }
+
+    private static function queryUserData(array $requestTokens)
+    {
+        $header = [];
+        $token_type = ucfirst($requestTokens["token_type"]);
+        $header[] = "Authorization: $token_type $requestTokens[access_token]";
+
+        $ch = curl_init(FacebookOAuthService::USER_INFO_ENDPOINT);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $data = curl_exec($ch);
+        $json_response = json_decode($data, true);
+        curl_close($ch);
+        return $json_response;
     }
 }

@@ -24,8 +24,12 @@
 
 $(function()
 {
+    const redirect_uri = $("input[name=redirect_uri]").val();
+    console.log(redirect_uri);
     $(".service-signin-button").click(function()
     {
-        window.location = "/oauth/service_login.php?id="+$(this).data("service-id");
+        let service_id = $(this).data("service-id");
+        window.location = `/oauth/service_login.php?id=${service_id}`+
+            (redirect_uri !== undefined ? `&redirect_uri=${encodeURI(redirect_uri)}` : "");
     });
 });

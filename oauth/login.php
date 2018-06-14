@@ -109,7 +109,9 @@ if($manager->getSessionManager()->isLoggedIn())
 
 require_once __DIR__."/../includes/head/HtmlHead.php";
 $head = new HtmlHead("Login to Smart Home");
+$head->addEntry(new StyleSheetEntry(StyleSheetEntry::MAIN));
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::CAPTCHA));
+$head->addEntry(new JavaScriptEntry(JavaScriptEntry::LOGIN));
 echo $head->toString();
 
 ?>
@@ -161,6 +163,16 @@ HTML;
                 }
                 ?>
             </form>
+            <div class="row">
+                <div class="col">
+                    <button class="btn service-signin-button" data-service-id="1" id="google-signin-button"></button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button class="btn service-signin-button" data-service-id="2" id="facebook-signin-button"></button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

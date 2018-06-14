@@ -43,4 +43,12 @@ require_once __DIR__."/../includes/GlobalManager.php";
 $manager = GlobalManager::withSessionManager( false);
 
 $service = OAuthService::fromId($_GET["id"]);
+if(isset($_GET["redirect_uri"]))
+    $service->setRedirectUri($_GET["redirect_uri"]);
+if($service === null)
+{
+    echo "Invalid request";
+    http_response_code(400);
+    exit();
+}
 header("Location: ".$service->generateAuthUrl($manager->getSessionManager()->getSessionId()));

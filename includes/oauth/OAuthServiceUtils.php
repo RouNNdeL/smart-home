@@ -38,13 +38,14 @@ class OAuthServiceUtils
      * @param int $session_id
      * @param string $service_id
      * @param string $state
+     * @param $redirect_uri
      * @return bool
      */
-    public static function insertState(mysqli $conn, int $session_id, string $service_id, string $state)
+    public static function insertState(mysqli $conn, int $session_id, string $service_id, string $state, $redirect_uri)
     {
-        $sql = "INSERT INTO service_auth_states (session_id, service_id, state) VALUES(?, ?, ?)";
+        $sql = "INSERT INTO service_auth_states (session_id, service_id, state, redirect_uri) VALUES(?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iss", $session_id, $service_id, $state);
+        $stmt->bind_param("isss", $session_id, $service_id, $state, $redirect_uri);
         return $stmt->execute();
     }
 
