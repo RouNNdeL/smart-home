@@ -1,0 +1,13 @@
+RewriteEngine on
+
+RewriteRule ^$ /matches [L]
+
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+
+RewriteRule ^([^/]*)$ web/$1.php
+RewriteRule ^/?js/([^/]*)$ web/js/$1
+RewriteRule ^/?css/([^/]*)$ web/css/$1
+RewriteRule ^(?!web)(.*) https://zdul.xyz/$1 [R]
