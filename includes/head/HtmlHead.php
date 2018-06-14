@@ -34,6 +34,7 @@ require_once __DIR__."/HeadEntry.php";
 require_once __DIR__."/MetaEntry.php";
 require_once __DIR__."/JavaScriptEntry.php";
 require_once __DIR__."/StyleSheetEntry.php";
+require_once __DIR__."/FaviconEntry.php";
 
 class HtmlHead
 {

@@ -32,22 +32,30 @@
 
 class FaviconEntry extends HeadEntry
 {
+    const WORLD_CUP = "/favicons/worldcup_icon.png";
+
+    const TYP_PNG = "image/png";
 
     /** @var string */
     private $uri;
+
+
+    /** @var string */
+    private $type;
 
     /**
      * FaviconEntry constructor.
      * @param string $uri
      */
-    public function __construct(string $uri)
+    public function __construct(string $uri, string $type = FaviconEntry::TYP_PNG)
     {
         $this->uri = $uri;
+        $this->type = $type;
     }
 
     /** @return string */
     public function toString()
     {
-        return "<link rel=\"shortcut icon\" href=\"$this->uri\" />";
+        return "<link rel=\"icon\" href=\"$this->uri\" type='$this->type'/>";
     }
 }
