@@ -56,7 +56,7 @@ class HomeUser
      * @param string $secret
      * @param bool $registered_for_report_state
      */
-    private function __construct(int $id, string $username, $first_name, $last_name, $secret, bool $registered_for_report_state)
+    private function __construct(int $id, $username, $first_name, $last_name, $secret, bool $registered_for_report_state)
     {
         $this->id = $id;
         $this->username = $username;
@@ -82,16 +82,40 @@ class HomeUser
         }
     }
 
-    public static function newUserWithGoogle(string $username, string $google_id)
+    /**
+     * @param string $google_id
+     * @param $first_name
+     * @param $last_name
+     * @return HomeUser|null
+     */
+    public static function newUserWithGoogle(string $google_id, $first_name, $last_name)
     {
         $conn = DbUtils::getConnection();
-        $stmt = $conn->prepare("INSERT INTO home_users (username, google_id) VALUES (?, ?)");
-        $stmt->bind_param("ss", $username, $google_id);
+        $stmt = $conn->prepare("INSERT INTO home_users (google_id, first_name, last_name) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $google_id, $first_name, $last_name);
         $result = $stmt->execute();
         $stmt->close();
         if($result === false)
             return null;
-        self::queryUserByUsername($conn, $username);
+        self::queryUserByGoogleId($google_id);
+    }
+
+    /**
+     * @param string $facebook_id
+     * @param $first_name
+     * @param $last_name
+     * @return HomeUser|null
+     */
+    public static function newUserWithFacebook(string $facebook_id, $first_name, $last_name)
+    {
+        $conn = DbUtils::getConnection();
+        $stmt = $conn->prepare("INSERT INTO home_users (facebook_id, first_name, last_name) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $facebook_id, $first_name, $last_name);
+        $result = $stmt->execute();
+        $stmt->close();
+        if($result === false)
+            return null;
+        self::queryUserByFacebookId($facebook_id);
     }
 
     public static function newUser(mysqli $conn, string $username, string $password)
@@ -184,6 +208,28 @@ class HomeUser
     {
         $conn = DbUtils::getConnection();
         $sql = "SELECT id, username, first_name, last_name, secret_2fa, actions_registered FROM home_users WHERE google_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $id);
+        $stmt->bind_result($id, $username, $first_name, $last_name, $secret, $actions_registred);
+        $stmt->execute();
+        if($stmt->fetch())
+        {
+            $stmt->close();
+            return new HomeUser($id, $username, $first_name, $last_name, $secret, $actions_registred);
+        }
+        $stmt->close();
+        return null;
+    }
+
+
+    /**
+     * @param string $id
+     * @return HomeUser|null
+     */
+    public static function queryUserByFacebookId(string $id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, username, first_name, last_name, secret_2fa, actions_registered FROM home_users WHERE facebook_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $id);
         $stmt->bind_result($id, $username, $first_name, $last_name, $secret, $actions_registred);

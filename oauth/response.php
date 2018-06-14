@@ -55,10 +55,14 @@ if($service === null)
 $user = $service->getUserFromCode($_GET["code"]);
 if($user === null)
 {
-    //TODO: Redirect the user to provide username
+    echo "En error occurred";
 }
 else
 {
     $manager->getSessionManager()->forceLoginAuto($user->id);
-    header("Location: /");
+    $redirect_uri = $service->getRedirectUri();
+    if($redirect_uri !== null)
+        header("Location: ".$redirect_uri);
+    else
+        header("Location: /");
 }

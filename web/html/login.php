@@ -90,6 +90,14 @@ echo $head->toString();
 
 ?>
 <body>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.0&appId=261214724616622&autoLogAppEvents=1';
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
 <div class="container mt-5">
     <div class="row justify-content-md-center">
         <div class="col-12 col-md-auto"><h3>Login to Smart Home</h3>
@@ -135,6 +143,11 @@ HTML;
             <div class="row">
                 <div class="col">
                     <button class="btn service-signin-button" data-service-id="1" id="google-signin-button"></button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <button class="btn service-signin-button" data-service-id="2" id="facebook-signin-button"></button>
                 </div>
             </div>
         </div>

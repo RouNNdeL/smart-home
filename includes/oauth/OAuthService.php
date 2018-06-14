@@ -32,6 +32,7 @@
 
 require_once __DIR__ . "/OAuthServiceUtils.php";
 require_once __DIR__ . "/GoogleOAuthService.php";
+require_once __DIR__ . "/FacebookOAuthService.php";
 require_once __DIR__ . "/../database/DbUtils.php";
 
 abstract class OAuthService
@@ -56,6 +57,9 @@ abstract class OAuthService
 
     /** @var string */
     private $token_endpoint;
+
+    /** @var string|null */
+    private $redirect_uri;
 
     /**
      * OAuthService constructor.
@@ -83,7 +87,7 @@ abstract class OAuthService
     public function generateAuthUrl(int $session_id)
     {
         $state = base64_encode(openssl_random_pseudo_bytes(1024));
-        OAuthServiceUtils::insertState(DbUtils::getConnection(), $session_id, $this->id, $state);
+        OAuthServiceUtils::insertState(DbUtils::getConnection(), $session_id, $this->id, $state, $this->redirect_uri);
         $params = [
             "client_id" => $this->client_id,
             "response_type" => "code",
@@ -110,7 +114,12 @@ abstract class OAuthService
     {
         $requestTokens = $this->requestTokens($code);
         //TODO: Show a registration page if needed
-        return $this->getUser($requestTokens);
+        $homeUser = $this->getUser($requestTokens);
+        if($homeUser === null)
+        {
+            return $this->registerUser($requestTokens);
+        }
+        return $homeUser;
     }
 
     public function requestTokens($code)
@@ -161,11 +170,11 @@ abstract class OAuthService
 
     private static function queryBySessionAndState(mysqli $conn, int $session_id, string $state)
     {
-        $sql = "SELECT service_id FROM service_auth_states WHERE session_id = ? AND state = ? 
+        $sql = "SELECT service_id, redirect_uri FROM service_auth_states WHERE session_id = ? AND state = ? 
                 AND DATE_ADD(date, INTERVAL 30 MINUTE) > NOW()";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("is", $session_id, $state);
-        $stmt->bind_result($id);
+        $stmt->bind_result($id, $redirect_uri);
         $stmt->execute();
         if(!$stmt->fetch())
         {
@@ -179,7 +188,9 @@ abstract class OAuthService
         $stmt->bind_param("is", $session_id, $state);
         $stmt->execute();
         $stmt->close();
-        return OAuthService::fromId($id);
+        $authService = OAuthService::fromId($id);
+        $authService->setRedirectUri($redirect_uri);
+        return $authService;
     }
 
     private static function queryById(mysqli $conn, string $id)
@@ -197,6 +208,8 @@ abstract class OAuthService
             {
                 case GoogleOAuthService::ID:
                     return new GoogleOAuthService($id, $name, $scopes, $client_id, $client_secret, $auth_endpoint, $token_endpoint);
+                case FacebookOAuthService::ID:
+                    return new FacebookOAuthService($id, $name, $scopes, $client_id, $client_secret, $auth_endpoint, $token_endpoint);
             }
         }
         $stmt->close();
@@ -208,4 +221,26 @@ abstract class OAuthService
      * @return HomeUser|null
      */
     public abstract function getUser(array $requestTokens);
+
+    /**
+     * @param array $requestTokens
+     * @return HomeUser
+     */
+    public abstract function registerUser(array $requestTokens);
+
+    /**
+     * @return mixed
+     */
+    public function getRedirectUri()
+    {
+        return $this->redirect_uri;
+    }
+
+    /**
+     * @param mixed $redirect_uri
+     */
+    public function setRedirectUri($redirect_uri)
+    {
+        $this->redirect_uri = $redirect_uri;
+    }
 }

@@ -39,6 +39,7 @@ class SessionManager
     const SESSION_COOKIE = "session";
     const CAPTCHA_HOST = "https://www.google.com/recaptcha/api/siteverify";
     const CAPTCHA_SECRET = "captcha_secret";
+    const SESSION_EXPIRY_DAYS = 5;
 
     private $session_id;
 
@@ -169,7 +170,8 @@ class SessionManager
     public static function newAnonymous(mysqli $conn)
     {
         $session_token = SessionManager::generateSessionToken();
-        $sql = "INSERT INTO sessions (token, expires) VALUES (?, DATE_ADD(NOW(), INTERVAL 3 DAY))";
+        $days = SessionManager::SESSION_EXPIRY_DAYS;
+        $sql = "INSERT INTO sessions (token, expires) VALUES (?, DATE_ADD(NOW(), INTERVAL $days DAY))";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $session_token);
         $stmt->execute();
@@ -183,8 +185,9 @@ class SessionManager
         $conn = DbUtils::getConnection();
         $session_token = SessionManager::generateSessionToken();
         $local = IpTrustManager::isLocal($ip);
+        $days = SessionManager::SESSION_EXPIRY_DAYS;
         $sql = $local ?
-            "INSERT INTO sessions (user_id, token, expires) VALUES ($user_id,  ?, DATE_ADD(NOW(), INTERVAL 3 DAY))" :
+            "INSERT INTO sessions (user_id, token, expires) VALUES ($user_id,  ?, DATE_ADD(NOW(), INTERVAL $days DAY))" :
             "INSERT INTO sessions (user_id, token) VALUES ($user_id,  ?)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $session_token);
@@ -196,16 +199,17 @@ class SessionManager
 
     private function setCookie()
     {
-        setcookie(self::SESSION_COOKIE, $this->session_token, time() + 3 * 24 * 60 * 60, "/", "zdul.xyz", true, true);
+        setcookie(self::SESSION_COOKIE, $this->session_token, time() + SessionManager::SESSION_EXPIRY_DAYS * 24 * 60 * 60, "/", "zdul.xyz", true, true);
     }
 
     private function updateSession(mysqli $conn, string $ip, string $agent, bool $force_refresh = false)
     {
         if($force_refresh || IpTrustManager::isLocal($ip))
         {
+            $days = SessionManager::SESSION_EXPIRY_DAYS;
             $this->setCookie();
             $sql = "UPDATE sessions SET 
-                      expires = DATE_ADD(NOW(), INTERVAL 3 DAY), 
+                      expires = DATE_ADD(NOW(), INTERVAL $days DAY), 
                       last_active = NOW(),
                       last_ip = ?,
                       last_agent = ?
