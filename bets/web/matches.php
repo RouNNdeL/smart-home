@@ -61,7 +61,7 @@ echo $head->toString();
         $matches = Match::all();
         foreach($matches as $match)
         {
-            $html = $match->toHtml();
+            $html = $match->toHtml(2, 0);
             echo <<<HTML
             <div class="col-sm-12 col-lg-6">
             $html

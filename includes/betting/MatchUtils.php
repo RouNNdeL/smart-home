@@ -31,10 +31,11 @@
  */
 class MatchUtils
 {
+    const PICK_LOCK_MINUTES = 15;
+
     public static function formatDate(int $dateTime)
     {
-        $diff = $dateTime - time();
-        $day_diff = floor($diff / 86400);
+        $day_diff = floor($dateTime / 86400) - floor(time() / 86400);
         $time_string = date("h:iA", $dateTime);
         if($day_diff == 0)
         {

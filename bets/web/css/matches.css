@@ -22,6 +22,11 @@
  * SOFTWARE.
  */
 
+.invisible
+{
+    visibility: hidden;
+}
+
 .team-icon
 {
     width: auto;

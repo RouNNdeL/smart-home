@@ -30,3 +30,22 @@
  * Time: 16:45
  */
 
+require_once __DIR__."/../../includes/GlobalManager.php";
+
+$manger = GlobalManager::withSessionManager(true);
+
+if($_SERVER["REQUEST_METHOD"] !== "POST")
+{
+    $response = ["error" => "invalid_request"];
+    http_response_code(400);
+    exit();
+}
+
+$json = json_decode(file_get_contents("php://input"), true);
+if($json === false || !isset($json["match_id"]) || !isset($json["teamA"]) || !isset($json["teamB"]))
+{
+    $response = ["error" => "invalid_json"];
+    http_response_code(400);
+    exit();
+}
+

@@ -155,10 +155,15 @@ class Match
     }
 
     /**
+     * @param $pickA
+     * @param $pickB
      * @return string
      */
-    public function toHtml()
+    public function toHtml($pickA, $pickB)
     {
+        $pickA = $pickA === null ? "" : $pickA;
+        $pickB = $pickB === null ? "" : $pickB;
+
         $nameTeamA = $this->teamA->getName();
         $nameTeamB = $this->teamB->getName();
 
@@ -166,6 +171,10 @@ class Match
         $logoTeamB = $this->teamB->getLogo();
 
         $time = MatchUtils::formatDate($this->start_date);
+        $picks_locked = time() > $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
+        $disabled = $picks_locked ? "disabled" : "";
+        $prediction_text = "Your predictions" . ($picks_locked ? " (locked)" : "");
+        $invisible = $picks_locked ? "invisible" : "";
 
         return <<< HTML
 <div class="card">
@@ -179,29 +188,32 @@ class Match
                     </div>
                     <div class="row">
                         <div class="col-6">
-                            <img src="$logoTeamA" class="team-icon">
+                            <img src="$logoTeamA" class="team-icon mb-2">
                             <h3>$nameTeamA</h3>
 
                         </div>
                         <div class="col-6">
-                            <img src="$logoTeamB" class="team-icon">
+                            <img src="$logoTeamB" class="team-icon mb-2">
                             <h3>$nameTeamB</h3>
                         </div>
                     </div>
                     <form>
                         <div class="row">
-                            <input type="hidden" name="match-id" value="$this->id">
+                            <input type="hidden" name="match_id" value="$this->id">
                             <div class="col">
-                                <p class="text-center">Your prediction</p>
+                                <p class="text-center">$this->stage</p>
+                                <p class="text-center">$prediction_text</p>
                                 <div class="row">
                                     <div class="col-4 offset-1">
-                                        <input class="form-control" type="text" name="teamA">
+                                        <input class="form-control text-center" type="text" value="$pickA"
+                                        name="teamA" $disabled>
                                     </div>
                                     <div class="col-4 offset-2">
-                                        <input class="form-control" type="text" name="teamB">
+                                        <input class="form-control text-center" type="text" value="$pickB"
+                                        name="teamB" $disabled>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary match-submit-button" role="button" type="button">Save</button>
+                                <button class="btn btn-primary match-submit-button $invisible" role="button" type="button">Save</button>
                             </div>
                         </div>
                     </form>
