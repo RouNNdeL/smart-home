@@ -189,12 +189,12 @@ class Match
                     <div class="row">
                         <div class="col-6">
                             <img src="$logoTeamA" class="team-icon mb-2">
-                            <h3>$nameTeamA</h3>
+                            <h5>$nameTeamA</h5>
 
                         </div>
                         <div class="col-6">
                             <img src="$logoTeamB" class="team-icon mb-2">
-                            <h3>$nameTeamB</h3>
+                            <h5>$nameTeamB</h5>
                         </div>
                     </div>
                     <form>

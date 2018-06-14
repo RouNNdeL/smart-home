@@ -36,7 +36,7 @@ class MatchUtils
     public static function formatDate(int $dateTime)
     {
         $day_diff = floor($dateTime / 86400) - floor(time() / 86400);
-        $time_string = date("h:iA", $dateTime);
+        $time_string = date("g:iA", $dateTime);
         if($day_diff == 0)
         {
             return "Today, " . $time_string;

@@ -61,9 +61,9 @@ echo $head->toString();
         $matches = Match::all();
         foreach($matches as $match)
         {
-            $html = $match->toHtml(2, 0);
+            $html = $match->toHtml(null, null);
             echo <<<HTML
-            <div class="col-sm-12 col-lg-6">
+            <div class="col-xs-12 col-md-6 col-lg-4 mb-3 px-md-2">
             $html
 </div>
 HTML;

@@ -30,7 +30,7 @@
 .team-icon
 {
     width: auto;
-    height: 100px;
+    height: 60px;
     border: 1px solid rgba(0, 0, 0, 0.5);
 }
 
@@ -38,7 +38,7 @@
 @media (max-width: 575.98px) {
     .team-icon
     {
-        height: 60px; !important;
+        height: 50px; !important;
     }
 }
 
