@@ -56,7 +56,10 @@ if($_SERVER["REQUEST_METHOD"] === "POST")
             if($success)
             {
                 $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_SUCCESSFUL_LOGIN);
-                header("Location: /devices");
+                if(isset($_POST["redirect_uri"]))
+                    header("Location: $_POST[redirect_uri]");
+                else
+                    header("Location: /devices");
                 exit(0);
             }
             $user_error = "Invalid username or password";
@@ -122,6 +125,12 @@ HTML;
                 <div class="text-right">
                     <button id="register-next-btn" class="btn btn-primary" role="button" type="submit">Login</button>
                 </div>
+                <?php
+                if(isset($_GET["next"]))
+                {
+                    echo "<input type='hidden' name='redirect_uri' value='$_GET[next]'>";
+                }
+                ?>
             </form>
             <div class="row">
                 <div class="col">
