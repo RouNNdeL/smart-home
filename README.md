@@ -12,4 +12,4 @@ All devices are custom designed with all files being open source. Schematic and 
 
 # Database
 The project uses a MySQL database hosted on my private server.
-![database_model](https://github.com/RouNNdeL/smart-home/blob/master/database_model.png?raw=true)
+![database_model](https://github.com/RouNNdeL/smart-home/blob/worldcup-bets/database_model.png?raw=true)
