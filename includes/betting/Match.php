@@ -195,10 +195,35 @@ class Match
         $logoTeamB = $this->teamB->getLogo();
 
         $time = MatchUtils::formatDate($this->start_date);
+
         $picks_locked = !$this->picks_open();
         $disabled = $picks_locked ? "disabled" : "";
         $prediction_text = "Your predictions" . ($picks_locked ? " (locked)" : "");
-        $invisible = $picks_locked ? "invisible" : "";
+
+        $scores = $this->scoreA !== null && $this->scoreB !==  null;
+        if($picks_locked)
+        {
+            if($scores)
+            {
+                $time = "Finished";
+                $score = $this->scoreA.":".$this->scoreB;
+                $top = <<<HTML
+                    <div class="row btn-mock">
+                        <div class="col">
+                            <h3>$score</h3>
+                        </div>
+                    </div>
+HTML;
+            }
+            else
+            {
+                $bottom = "<button class=\"btn btn-primary match-submit-button invisible\" role=\"button\" type=\"button\">Save</button>";
+            }
+        }
+        else
+        {
+            $bottom = "<button class=\"btn btn-primary match-submit-button\" role=\"button\" type=\"button\">Save</button>";
+        }
 
         return <<< HTML
 <div class="card">
@@ -218,15 +243,16 @@ class Match
                         </div>
                         <div class="col-6">
                             <img src="$logoTeamB" class="team-icon mb-2">
-                            <h5>$nameTeamB</h5>
+                            <h6>$nameTeamB</h6>
                         </div>
                     </div>
+                    $top
                     <form>
                         <div class="row">
                             <input type="hidden" name="match_id" value="$this->id">
                             <div class="col">
                                 <p class="text-center">$this->stage</p>
-                                <p class="text-center">$prediction_text</p>
+                                <p class="text-center mb-1">$prediction_text</p>
                                 <div class="row">
                                     <div class="col-4 offset-1">
                                         <input class="form-control text-center" type="text" value="$pickA"
@@ -237,7 +263,7 @@ class Match
                                         name="teamB" $disabled>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary match-submit-button $invisible" role="button" type="button">Save</button>
+                                $bottom
                             </div>
                         </div>
                     </form>
