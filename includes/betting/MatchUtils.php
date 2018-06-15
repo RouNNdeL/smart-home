@@ -73,7 +73,7 @@ class MatchUtils
 
     public static function insertPrediction(int $user_id, int $match_id, int $scoreA, int $scoreB)
     {
-        if(!Match::byId($match_id)->picks_open())
+        if(!Match::byId($match_id)->picksOpen())
             return false;
         $conn = DbUtils::getConnection();
         $sql = "INSERT INTO bet_predictions (user_id, match_id, scoreA, scoreB) VALUES (?, ?, ?, ?)

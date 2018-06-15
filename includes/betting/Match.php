@@ -96,26 +96,6 @@ class Match
         return new Match($row["id"], $teamA, $teamB, $date, $row["scoreA"], $row["scoreB"], $row["stage"]);
     }
 
-    public static function upcoming()
-    {
-        $conn = DbUtils::getConnection();
-        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE date >= NOW()";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        $arr = [];
-        if($result = $stmt->get_result())
-        {
-            while($row = $result->fetch_assoc())
-            {
-                $arr[] = Match::fromDbRow($row);
-            }
-        }
-        $stmt->close();
-
-        return $arr;
-    }
-
     /**
      * @param int $match_id
      * @return Match|null
@@ -136,6 +116,53 @@ class Match
         }
 
         return null;
+    }
+
+
+    /**
+     * @return Match[]
+     */
+    public static function todayAndUpcoming()
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE DATE(date) >= DATE(NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $arr = [];
+        if($result = $stmt->get_result())
+        {
+            while($row = $result->fetch_assoc())
+            {
+                $arr[] = Match::fromDbRow($row);
+            }
+        }
+        $stmt->close();
+
+        return $arr;
+    }
+
+    /**
+     * @return Match[]
+     */
+    public static function upcoming()
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE date > NOW()";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $arr = [];
+        if($result = $stmt->get_result())
+        {
+            while($row = $result->fetch_assoc())
+            {
+                $arr[] = Match::fromDbRow($row);
+            }
+        }
+        $stmt->close();
+
+        return $arr;
     }
 
     /**
@@ -175,7 +202,7 @@ class Match
         }
     }
 
-    public function picks_open()
+    public function picksOpen()
     {
         return time() < $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
     }
@@ -196,7 +223,7 @@ class Match
 
         $time = MatchUtils::formatDate($this->start_date);
 
-        $picks_locked = !$this->picks_open();
+        $picks_locked = !$this->picksOpen();
         $disabled = $picks_locked ? "disabled" : "";
         $prediction_text = "Your predictions" . ($picks_locked ? " (locked)" : "");
 
@@ -217,7 +244,13 @@ HTML;
             }
             else
             {
-                $bottom = "<button class=\"btn btn-primary match-submit-button invisible\" role=\"button\" type=\"button\">Save</button>";
+                $top = <<<HTML
+                    <div class="row btn-mock">
+                        <div class="col">
+                            <h3>TBD</h3>
+                        </div>
+                    </div>
+HTML;
             }
         }
         else

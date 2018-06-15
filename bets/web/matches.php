@@ -63,7 +63,7 @@ echo $head->toString();
         if($_GET["all"] === "true")
             $matches = Match::all();
         else
-            $matches = Match::upcoming();
+            $matches = Match::todayAndUpcoming();
 
         foreach($matches as $match)
         {
