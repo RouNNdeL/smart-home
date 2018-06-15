@@ -97,7 +97,7 @@ class HomeUser
         $stmt->close();
         if($result === false)
             return null;
-        self::queryUserByGoogleId($google_id);
+        return self::queryUserByGoogleId($google_id);
     }
 
     /**
@@ -115,7 +115,7 @@ class HomeUser
         $stmt->close();
         if($result === false)
             return null;
-        self::queryUserByFacebookId($facebook_id);
+        return self::queryUserByFacebookId($facebook_id);
     }
 
     public static function newUser(mysqli $conn, string $username, string $password)
