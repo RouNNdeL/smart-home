@@ -30,8 +30,8 @@
  * Time: 16:45
  */
 
-require_once __DIR__."/../../includes/GlobalManager.php";
-require_once __DIR__."/../../includes/betting/MatchUtils.php";
+require_once __DIR__ . "/../../includes/GlobalManager.php";
+require_once __DIR__ . "/../../includes/betting/MatchUtils.php";
 
 $manager = GlobalManager::withSessionManager(true);
 
@@ -56,5 +56,8 @@ $success = MatchUtils::insertPrediction(
     $json["teamA"],
     $json["teamB"]
 );
-$response = ["status" => $success ? "success" : "failure"];
+$response = [
+    "status" => $success ? "success" : "failure",
+    "message" => $success ? "Successfully saved!" : "An error occurred!"
+];
 echo json_encode($response);

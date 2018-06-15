@@ -32,8 +32,19 @@ $(function()
             dataType: "json",
             contentType: "json",
             data: JSON.stringify(array)
+        }).done(function(response)
+        {
+            showSnackbar(response["message"]);
         })
-    })
+    });
+
+    function showSnackbar(text, duration = 2500)
+    {
+        const snackbar = $("#snackbar");
+        snackbar.text(text);
+        snackbar.addClass("show");
+        setTimeout(() => snackbar.removeClass("show"), duration);
+    }
 });
 
 function serializeToAssociative(array)

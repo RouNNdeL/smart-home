@@ -74,5 +74,6 @@ HTML;
         ?>
     </div>
 </div>
+<div id="snackbar"></div>
 </body>
 </html>
