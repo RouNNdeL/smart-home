@@ -68,6 +68,7 @@ echo $head->toString();
         foreach($matches as $match)
         {
             $match->loadPredictions($manager->getSessionManager()->getUserId());
+            $points = $match->getPoints();
             $html = $match->toHtml();
             echo <<<HTML
             <div class="col-xs-12 col-md-6 col-lg-4 mb-3 px-md-2">

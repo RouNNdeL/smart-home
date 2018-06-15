@@ -85,6 +85,24 @@ class Match
     }
 
     /**
+     * @return int|null
+     */
+    public function getPoints()
+    {
+        if($this->scoreA === null || $this->scoreB === null)
+            return null;
+        if($this->predictionA === null || $this->predictionB === null)
+            return 0;
+        if($this->predictionA === $this->scoreA && $this->predictionB === $this->scoreB)
+            return 4;
+        if($this->predictionA - $this->predictionB === $this->scoreA - $this->scoreB)
+            return 2;
+        if(!($this->predictionA > $this->predictionB xor $this->scoreA > $this->scoreB))
+            return 1;
+        return 0;
+    }
+
+    /**
      * @param array $row
      * @return Match
      */
@@ -118,6 +136,28 @@ class Match
         return null;
     }
 
+    /**
+     * @return Match[]
+     */
+    public static function finished()
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches 
+                WHERE scoreB IS NOT NULL  AND scoreA IS NOT NULL";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $arr = [];
+        if($result = $stmt->get_result())
+        {
+            while($row = $result->fetch_assoc())
+            {
+                $arr[] = Match::fromDbRow($row);
+            }
+        }
+        $stmt->close();
+
+        return $arr;
+    }
 
     /**
      * @return Match[]
@@ -225,7 +265,7 @@ class Match
 
         $picks_locked = !$this->picksOpen();
         $disabled = $picks_locked ? "disabled" : "";
-        $prediction_text = "Your predictions" . ($picks_locked ? " (locked)" : "");
+        $prediction_text = "Your prediction" . ($picks_locked ? " (locked)" : "");
 
         $scores = $this->scoreA !== null && $this->scoreB !==  null;
         if($picks_locked)
@@ -306,5 +346,13 @@ HTML;
     </div>
 HTML;
 
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
     }
 }

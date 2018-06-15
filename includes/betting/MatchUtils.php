@@ -30,7 +30,7 @@
  * Time: 14:39
  */
 
-require_once __DIR__."/Match.php";
+require_once __DIR__ . "/Match.php";
 
 class MatchUtils
 {
@@ -71,6 +71,17 @@ class MatchUtils
         return ["a" => $scoreA, "b" => $scoreB];
     }
 
+    public static function updatePredictionPoints(int $prediction_id, int $points)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "UPDATE bet_predictions SET points = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ii", $points, $prediction_id);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
+
     public static function insertPrediction(int $user_id, int $match_id, int $scoreA, int $scoreB)
     {
         if(!Match::byId($match_id)->picksOpen())
@@ -83,5 +94,36 @@ class MatchUtils
         $result = $stmt->execute();
         $stmt->close();
         return $result;
+    }
+
+    public static function getUserIdsAndPredictionIdsForMatch(int $match_id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, user_id FROM bet_predictions WHERE match_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $match_id);
+        $stmt->bind_result($id, $user_id);
+        $stmt->execute();
+        $arr = [];
+        while($stmt->fetch())
+        {
+            $arr[] = ["id" => $id, "user_id" => $user_id];
+        }
+        $stmt->close();
+        return $arr;
+    }
+
+    public static function refreshPoints()
+    {
+        $matches = Match::finished();
+        foreach($matches as $match)
+        {
+            $predictions = MatchUtils::getUserIdsAndPredictionIdsForMatch($match->getId());
+            foreach($predictions as $prediction)
+            {
+                $match->loadPredictions($prediction["user_id"]);
+                MatchUtils::updatePredictionPoints($prediction["id"], $match->getPoints());
+            }
+        }
     }
 }
