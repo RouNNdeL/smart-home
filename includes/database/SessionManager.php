@@ -230,7 +230,7 @@ class SessionManager
         $stmt->close();
     }
 
-    private function invalidate()
+    public function invalidate()
     {
         $conn = DbUtils::getConnection();
 
