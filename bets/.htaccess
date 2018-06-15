@@ -1,5 +1,8 @@
 RewriteEngine on
 
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /$1 [L,R=301]
+
 RewriteRule ^$ /matches [L]
 RewriteRule ^/?matches/all /matches?all=true [L]
 
