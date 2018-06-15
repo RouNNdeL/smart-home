@@ -59,7 +59,12 @@ echo $head->toString();
     <div class="row">
         <?php
         require_once __DIR__."/../../includes/betting/Match.php";
-        $matches = Match::all();
+
+        if($_GET["all"] === "true")
+            $matches = Match::all();
+        else
+            $matches = Match::upcoming();
+
         foreach($matches as $match)
         {
             $match->loadPredictions($manager->getSessionManager()->getUserId());

@@ -99,7 +99,7 @@ class Match
     public static function upcoming()
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE DATE(date) >= DATE(NOW())";
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE date >= NOW()";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
@@ -243,7 +243,7 @@ HTML;
                         </div>
                         <div class="col-6">
                             <img src="$logoTeamB" class="team-icon mb-2">
-                            <h6>$nameTeamB</h6>
+                            <h5>$nameTeamB</h5>
                         </div>
                     </div>
                     $top
