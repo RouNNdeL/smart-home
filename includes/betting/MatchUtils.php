@@ -54,6 +54,24 @@ class MatchUtils
         }
     }
 
+    public static function getLeaderboard()
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT CONCAT(first_name,' ', last_name) as Name, SUM(bet_predictions.points) as Points
+                FROM bet_predictions
+                JOIN home_users h ON bet_predictions.user_id = h.id GROUP BY h.id ORDER BY Points DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_result($name, $points);
+        $stmt->execute();
+        $arr = [];
+        while($stmt->fetch())
+        {
+            $arr[] = ["name" => $name, "points" => (int)$points];
+        }
+        $stmt->close();
+        return $arr;
+    }
+
     public static function getPredictionForUserAndMatch(int $user_id, int $match_id)
     {
         $conn = DbUtils::getConnection();
@@ -125,5 +143,17 @@ class MatchUtils
                 MatchUtils::updatePredictionPoints($prediction["id"], $match->getPoints());
             }
         }
+    }
+
+    public static function leaderboardHtml($position, $name, $points)
+    {
+        return <<<HTML
+        <tr>
+            <th scope="row">$position</th>
+            <td>$name</td>
+            <td>$points</td>
+        </tr>
+HTML;
+
     }
 }

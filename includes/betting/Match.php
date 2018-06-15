@@ -97,7 +97,7 @@ class Match
             return 4;
         if($this->predictionA - $this->predictionB === $this->scoreA - $this->scoreB)
             return 2;
-        if(!($this->predictionA > $this->predictionB xor $this->scoreA > $this->scoreB))
+        if(!($this->predictionA >= $this->predictionB xor $this->scoreA >= $this->scoreB))
             return 1;
         return 0;
     }
@@ -268,6 +268,9 @@ class Match
         $prediction_text = "Your prediction" . ($picks_locked ? " (locked)" : "");
 
         $scores = $this->scoreA !== null && $this->scoreB !==  null;
+
+        $top = "";
+        $bottom = "";
         if($picks_locked)
         {
             if($scores)
