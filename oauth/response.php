@@ -32,7 +32,7 @@
 
 
 require_once __DIR__."/../includes/GlobalManager.php";
-$manager = GlobalManager::withSessionManager(false);
+$manager = GlobalManager::withSessionManager(false, false);
 
 if($_SERVER["REQUEST_METHOD"] !== "GET" || !isset($_GET["state"]) || !isset($_GET["code"]))
 {

@@ -32,6 +32,7 @@
 
 require_once __DIR__."/../../includes/GlobalManager.php";
 
+$manager = GlobalManager::withSessionManager(true);
 $manager->getSessionManager()->invalidate();
 
 header("Location: /");
