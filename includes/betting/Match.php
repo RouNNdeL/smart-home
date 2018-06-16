@@ -161,6 +161,30 @@ class Match
         return $arr;
     }
 
+
+    /**
+     * @return Match[]
+     */
+    public static function today()
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE DATE(date) = DATE(NOW())";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $arr = [];
+        if($result = $stmt->get_result())
+        {
+            while($row = $result->fetch_assoc())
+            {
+                $arr[] = Match::fromDbRow($row);
+            }
+        }
+        $stmt->close();
+
+        return $arr;
+    }
+
     /**
      * @return Match[]
      */

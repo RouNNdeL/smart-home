@@ -36,7 +36,7 @@ $manager = GlobalManager::withSessionManager(false);
 
 if(!$manager->getSessionManager()->isLoggedIn())
 {
-    $params = ["next" => "https://bets.zdul.xyz".$_SERVER["REQUEST_URI"]];
+    $params = ["next" => "https://bets.zdul.xyz" . $_SERVER["REQUEST_URI"]];
     header("Location: https://home.zdul.xyz/login?" . http_build_query($params));
     exit(0);
 }
@@ -52,16 +52,22 @@ $head->addEntry(new StyleSheetEntry("/css/matches.css"));
 $head->addEntry(new JavaScriptEntry("/js/matches.js"));
 echo $head->toString();
 
-
 ?>
 <body>
+
 <div class="container mt-3">
     <div class="row">
         <?php
-        require_once __DIR__."/../../includes/betting/Match.php";
+        require_once __DIR__ . "/../../includes/betting/Match.php";
 
-        if($_GET["all"] === "true")
+        if($_GET["mode"] === "all")
             $matches = Match::all();
+        else if($_GET["mode"] === "upcoming")
+            $matches = Match::upcoming();
+        else if($_GET["mode"] === "today")
+            $matches = Match::today();
+        else if($_GET["mode"] === "finished")
+            $matches = Match::finished();
         else
             $matches = Match::todayAndUpcoming();
 
