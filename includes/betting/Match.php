@@ -97,7 +97,9 @@ class Match
             return 4;
         if($this->predictionA - $this->predictionB === $this->scoreA - $this->scoreB)
             return 2;
-        if(!($this->predictionA >= $this->predictionB xor $this->scoreA >= $this->scoreB))
+        if($this->scoreA === $this->scoreB || $this->predictionA === $this->predictionB)
+            return 0;
+        if(!($this->predictionA > $this->predictionB xor $this->scoreA > $this->scoreB))
             return 1;
         return 0;
     }

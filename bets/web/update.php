@@ -36,4 +36,4 @@ $manager = GlobalManager::withSessionManager(true);
 
 require_once __DIR__."/../../includes/betting/MatchUtils.php";
 MatchUtils::refreshPoints();
-echo "Success";
+header("Location: /leaderboard");
