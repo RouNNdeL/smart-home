@@ -273,6 +273,12 @@ class Match
         return time() < $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
     }
 
+    public function matchInProgress()
+    {
+        return time() > $this->start_date;
+    }
+
+
     /**
      * @return string
      */
@@ -287,14 +293,13 @@ class Match
         $logoTeamA = $this->teamA->getLogo();
         $logoTeamB = $this->teamB->getLogo();
 
-        $time = MatchUtils::formatDate($this->start_date);
-
         $picks_locked = !$this->picksOpen();
         $disabled = $picks_locked ? "disabled" : "";
         $prediction_text = "Your prediction" . ($picks_locked ? " (locked)" : "");
 
         $scores = $this->scoreA !== null && $this->scoreB !==  null;
 
+        $time = MatchUtils::formatDate($this->start_date);
         $top = "";
         $bottom = "";
         if($picks_locked)
@@ -324,8 +329,12 @@ HTML;
         }
         else
         {
+
             $bottom = "<button class=\"btn btn-primary match-submit-button\" role=\"button\" type=\"button\">Save</button>";
         }
+
+        if($this->matchInProgress())
+            $time = "In Progress";
 
         return <<< HTML
 <div class="card">
