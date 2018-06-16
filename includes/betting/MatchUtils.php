@@ -57,9 +57,21 @@ class MatchUtils
     public static function getLeaderboard()
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT CONCAT(first_name,' ', last_name) as Name, SUM(bet_predictions.points) as Points
-                FROM bet_predictions
-                JOIN home_users h ON bet_predictions.user_id = h.id GROUP BY h.id ORDER BY Points DESC";
+        $sql = "
+        SELECT
+          CONCAT(first_name, ' ', last_name) AS Name,
+          SUM(points)                        AS Points
+        FROM (SELECT
+                user_id,
+                points
+              FROM bet_predictions
+              UNION ALL SELECT
+                          user_id,
+                          points
+                        FROM bet_bonuses) AS t1
+          JOIN home_users ON t1.user_id = home_users.id
+        GROUP BY user_id
+        ORDER BY Points DESC, user_id ASC ";
         $stmt = $conn->prepare($sql);
         $stmt->bind_result($name, $points);
         $stmt->execute();
