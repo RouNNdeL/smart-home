@@ -332,7 +332,7 @@ HTML;
         }
 
         return <<<HTML
-<div class="row text-center">
+            <div class="row text-center">
                 <div class="col"><p class="match-time">$time</p></div>
             </div>
             <div class="row text-center">
@@ -393,7 +393,7 @@ HTML;
         {
             if($scores)
             {
-                $score = $this->scoreA . ":" . $this->scoreB;
+                $score = $this->scoreA . " ‒ " . $this->scoreB;
                 $top = <<<HTML
                     <div class="row btn-mock">
                         <div class="col">
@@ -425,7 +425,7 @@ HTML;
         $picks_lock_text = $this->picksOpen() ?
             "<small class='pick-lock-time text-muted float-right $bold' data-match-start='$lock_time'>Picks lock in ".
             MatchUtils::formatDuration($lock_time - time())."</small>" :
-            "";
+            "<small class='text-muted float-right'>Locked</small>";
 
         return <<< HTML
 <div class="card">

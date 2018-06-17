@@ -167,7 +167,7 @@ class MatchUtils
                        concat(scoreA, '-', scoreB), IF(points IS NULL, 'TBD', points) 
                 FROM bet_predictions 
                 JOIN home_users ON bet_predictions.user_id = home_users.id WHERE match_id = ?
-                ORDER BY points DESC, user_id ASC";
+                ORDER BY points DESC, bet_predictions.id ASC";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $match_id);
         $stmt->bind_result($user_id, $name, $score, $points);
