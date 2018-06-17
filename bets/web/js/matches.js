@@ -24,6 +24,8 @@
 
 $(function()
 {
+    const time_diff = Date.now() - $("input[name=time]").first().val()*1000;
+    console.log(time_diff);
     $(".match-submit-button").click(function()
     {
         const array = serializeToAssociative($(this).parents("form").serializeArray());
@@ -38,12 +40,40 @@ $(function()
         })
     });
 
+    $(".pick-lock-time").each(function()
+    {
+        setInterval(updateTime.bind(this), 1000);
+    });
+
     function showSnackbar(text, duration = 2500)
     {
         const snackbar = $("#snackbar");
         snackbar.text(text);
         snackbar.addClass("show");
         setTimeout(() => snackbar.removeClass("show"), duration);
+    }
+
+    function updateTime(element)
+    {
+        const time = parseInt($(this).data("match-start"));
+        const time_left = Math.round((time*1000 + time_diff - Date.now())/1000);
+
+        let str = "";
+        const days = Math.floor(time_left / 86400);
+        if(days > 0)
+        {
+            str += `${days} day${(days === 1 ? "s " : " ")}`;
+        }
+        if(time_left < 60*60)
+        {
+            $(this).addClass("font-weight-bold");
+        }
+        const h = String(Math.floor(time_left / 3600) % 24).padStart(2, "0");
+        const m = String(Math.floor(time_left / 60) % 60).padStart(2, "0");
+        const s = String(time_left % 60).padStart(2, "0");
+
+        str += `${h}:${m}:${s}`;
+        $(this).text("Picks lock in "+str);
     }
 });
 

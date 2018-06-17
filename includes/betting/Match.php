@@ -420,6 +420,11 @@ HTML;
         }
 
         $match_url = "/match/".$this->getTeamString()."/$this->id";
+        $bold = $this->start_date - time() < MatchUtils::PICK_LOCK_WARNING * 60 ? "font-weight-bold" : "";
+        $picks_lock_text = $this->picksOpen() ?
+            "<small class='pick-lock-time text-muted float-right $bold' data-match-start='$this->start_date'>Picks lock in ".
+            MatchUtils::formatDuration($this->start_date - time())."</small>" :
+            "";
 
         return <<< HTML
 <div class="card">
@@ -468,6 +473,7 @@ HTML;
         </div>
         <div class="card-footer">
             <a class="text-muted" href="$match_url"><small>More info</small></a>
+            $picks_lock_text
         </div>
     </div>
 HTML;

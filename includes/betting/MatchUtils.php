@@ -35,6 +35,7 @@ require_once __DIR__ . "/Match.php";
 class MatchUtils
 {
     const PICK_LOCK_MINUTES = 15;
+    const PICK_LOCK_WARNING = 60;
 
     public static function formatDate(int $dateTime)
     {
@@ -52,6 +53,22 @@ class MatchUtils
         {
             return date("D, j/n, ", $dateTime) . $time_string;
         }
+    }
+
+    public static function formatDuration(int $time)
+    {
+        $str = "";
+        $days = floor($time / 86400);
+        if($days > 0)
+        {
+            $str .= "$days day" . ($days === 1 ? "s " : " ");
+        }
+        $hours = str_pad(floor($time / 3600) % 24, 2, "0", STR_PAD_LEFT);
+        $minutes = str_pad(floor($time / 60) % 60, 2, "0", STR_PAD_LEFT);
+        $seconds = str_pad($time % 60, 2, "0", STR_PAD_LEFT);
+
+        $str .= "$hours:$minutes:$seconds";
+        return $str;
     }
 
     public static function getLeaderboard()
@@ -153,7 +170,7 @@ class MatchUtils
                 ORDER BY points DESC, user_id ASC";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $match_id);
-        $stmt->bind_result($user_id,$name, $score, $points);
+        $stmt->bind_result($user_id, $name, $score, $points);
         $stmt->execute();
         $arr = [];
         while($stmt->fetch())
@@ -180,7 +197,7 @@ class MatchUtils
 
     public static function predictionRow($name, $score, $points, $highlight = false)
     {
-        $highlight_class = $highlight ? "class=\"table-success\"" :"";
+        $highlight_class = $highlight ? "class=\"table-success\"" : "";
         return <<<HTML
         <tr $highlight_class>
             <td>$name</td>
