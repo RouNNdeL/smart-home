@@ -132,7 +132,8 @@ class Match
         {
             $row = $result->fetch_assoc();
             $stmt->close();
-            return Match::fromDbRow($row);
+            if($row !== null)
+                return Match::fromDbRow($row);
         }
 
         return null;
@@ -275,14 +276,100 @@ class Match
 
     public function matchInProgress()
     {
-        return time() > $this->start_date;
+        return time() > $this->start_date && $this->scoreB === null && $this->scoreA === null;
+    }
+
+    public function toBigHtml(int $user_id)
+    {
+        $nameTeamA = $this->teamA->getName();
+        $nameTeamB = $this->teamB->getName();
+
+        $logoTeamA = $this->teamA->getLogo();
+        $logoTeamB = $this->teamB->getLogo();
+
+        $scores = $this->scoreA !== null && $this->scoreB !== null ? "$this->scoreA ‒ $this->scoreB" : "TBD";
+        $time = $this->getTimeString();
+
+        $rows = MatchUtils::getUserNamesIdsAndPredictionForMatch($this->id);
+        if(sizeof($rows) > 0)
+        {
+            $table_rows = "";
+            foreach($rows as $row)
+            {
+                $table_rows .= MatchUtils::predictionRow(
+                    $row["name"], $row["score"], $row["points"],
+                    $user_id === $row["user_id"]
+                );
+            }
+        }
+        else
+        {
+            $table_rows = "";
+        }
+
+        if($this->picksOpen())
+        {
+            $table = "<h5 class='text-center'>Predictions of other users will be shown once the picks are locked</h5>";
+        }
+        else
+        {
+            $table = <<<HTML
+            <table class="table table-bordered table-striped">
+            <caption>Predictions</caption>
+            <thead>
+                <tr>
+                    <th scope="col" class="col-6">Name</th>
+                    <th scope="col">Score</th>
+                    <th scope="col">Points</th>
+                </tr>
+            </thead>
+            <tbody>
+            $table_rows
+            </tbody>
+            </table>
+HTML;
+
+        }
+
+        return <<<HTML
+<div class="row text-center">
+                <div class="col"><p class="match-time">$time</p></div>
+            </div>
+            <div class="row text-center">
+                <div class="col-5 col-lg-4">
+                    <div class="float-right">
+                        <img src="$logoTeamA" class="team-icon-big mb-2">
+                        <h4>$nameTeamA</h4>
+                    </div>
+                </div>
+                <div class="col-2 col-lg-4 px-1">
+                    <h1 class="score-big d-none d-md-block">$scores</h1>
+                    <h3 class="score-big d-md-none">$scores</h3>
+                </div>
+                <div class="col-5 col-lg-4">
+                    <div class="float-left">
+                        <img src="$logoTeamB" class="team-icon-big mb-2">
+                        <h4>$nameTeamB</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="col"><p class="match-time">$this->stage</p></div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+                    $table
+                </div>
+            </div>
+HTML;
+
     }
 
 
     /**
      * @return string
      */
-    public function toHtml()
+    public function toCardHtml()
     {
         $pickA = $this->predictionA === null ? "" : $this->predictionA;
         $pickB = $this->predictionB === null ? "" : $this->predictionB;
@@ -297,17 +384,16 @@ class Match
         $disabled = $picks_locked ? "disabled" : "";
         $prediction_text = "Your prediction" . ($picks_locked ? " (locked)" : "");
 
-        $scores = $this->scoreA !== null && $this->scoreB !==  null;
+        $scores = $this->scoreA !== null && $this->scoreB !== null;
 
-        $time = MatchUtils::formatDate($this->start_date);
+        $time = $this->getTimeString();
         $top = "";
         $bottom = "";
         if($picks_locked)
         {
             if($scores)
             {
-                $time = "Finished";
-                $score = $this->scoreA.":".$this->scoreB;
+                $score = $this->scoreA . ":" . $this->scoreB;
                 $top = <<<HTML
                     <div class="row btn-mock">
                         <div class="col">
@@ -333,8 +419,7 @@ HTML;
             $bottom = "<button class=\"btn btn-primary match-submit-button\" role=\"button\" type=\"button\">Save</button>";
         }
 
-        if($this->matchInProgress())
-            $time = "In Progress";
+        $match_url = "/match/".$this->getTeamString()."/$this->id";
 
         return <<< HTML
 <div class="card">
@@ -381,9 +466,26 @@ HTML;
                 </div>
             </div>
         </div>
+        <div class="card-footer">
+            <a class="text-muted" href="$match_url"><small>More info</small></a>
+        </div>
     </div>
 HTML;
 
+    }
+
+    private function getTimeString()
+    {
+        if($this->matchInProgress())
+            return "In Progress";
+        if($this->scoreA !== null && $this->scoreB !== null)
+            return "Finished";
+        return MatchUtils::formatDate($this->start_date);
+    }
+
+    public function getTeamString()
+    {
+        return $this->teamA->getName() . "-" . $this->teamB->getName();
     }
 
     /**

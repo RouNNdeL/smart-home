@@ -26,30 +26,56 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-06-15
- * Time: 18:42
+ * Date: 2018-06-17
+ * Time: 13:09
  */
 
 require_once __DIR__ . "/../../includes/GlobalManager.php";
-
 
 $manager = GlobalManager::withSessionManager(false);
 
 if(!$manager->getSessionManager()->isLoggedIn())
 {
-    $params = ["next" => "https://bets.zdul.xyz/leaderboard"];
+    $params = ["next" => "https://bets.zdul.xyz" . $_SERVER["REQUEST_URI"]];
     header("Location: https://home.zdul.xyz/login?" . http_build_query($params));
     exit(0);
 }
+
+if(!isset($_GET["id"]))
+{
+    echo "Invalid request";
+    http_response_code(400);
+    exit();
+}
+
+require_once __DIR__ . "/../../includes/betting/Match.php";
+
+$match = Match::byId($_GET["id"]);
+if($match === null)
+{
+    require __DIR__."/../../web/error/404.php";
+    http_response_code(404);
+    exit(0);
+}
+
+if(isset($_GET["name"]) && $_GET["name"] === "false")
+{
+    require_once __DIR__ . "/../../includes/Utils.php";
+    $name = urlencode($match->getTeamString());
+    header("Location: /match/$name/$_GET[id]");
+    exit();
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <?php
 require_once __DIR__ . "/../../includes/head/HtmlHead.php";
-$head = new HtmlHead("World Cup Betting Leaderboard");
+$head = new HtmlHead("");
 $head->addEntry(new FaviconEntry(FaviconEntry::WORLD_CUP));
+$head->addEntry(new StyleSheetEntry("/css/matches.css"));
+$head->addEntry(new StyleSheetEntry("https://zdul.xyz/" . StyleSheetEntry::MAIN));
 echo $head->toString();
-
 
 ?>
 <body>
@@ -64,7 +90,6 @@ echo $head->toString();
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mr-auto">
-
             <li class="nav-item">
                 <a class="nav-link" href="/matches">Upcoming</a>
             </li>
@@ -74,7 +99,7 @@ echo $head->toString();
             <li class="nav-item">
                 <a class="nav-link" href="/matches/all">All</a>
             </li>
-            <li class="nav-item active">
+            <li class="nav-item">
                 <a class="nav-link" href="/leaderboard">Leaderboard</a>
             </li>
             <li class="nav-item d-md-none">
@@ -101,38 +126,12 @@ echo $head->toString();
 </nav>
 <div class="container mt-3">
     <div class="row">
-        <div class="col col-lg-6 offset-lg-3">
-            <div class="card">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col" class="col-6">Name</th>
-                        <th scope="col">Points</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php
-                    require_once __DIR__ . "/../../includes/betting/MatchUtils.php";
-
-                    $position = 0;
-                    $last_points = -1;
-                    foreach(MatchUtils::getLeaderboard() as $i => $item)
-                    {
-                        if($last_points === -1 || $item["points"] < $last_points)
-                        {
-                            $last_points = $item["points"];
-                            $position = $i+1;
-                        }
-                        echo MatchUtils::leaderboardRow($position, $item["name"], $item["points"]);
-                    }
-                    ?>
-                    </tbody>
-                </table>
-            </div>
+        <div class="col">
+            <?php
+            echo $match->toBigHtml($manager->getSessionManager()->getUserId());
+            ?>
         </div>
     </div>
-</div>
 </div>
 <div id="snackbar"></div>
 </body>

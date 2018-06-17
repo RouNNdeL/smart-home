@@ -22,42 +22,88 @@
  * SOFTWARE.
  */
 
-.btn-mock
-{
+.btn-mock {
     height: 38px;
 }
 
-.team-icon
-{
+.team-icon {
     width: auto;
     height: 60px;
     border: 1px solid rgba(0, 0, 0, 0.5);
 }
 
+.team-icon-big {
+    width: auto;
+    height: 120px;
+    border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.score-big {
+    top: 36px;
+    position: relative;
+}
+
+.match-time
+{
+    font-size: larger;
+}
+
 /* Extra small devices (portrait phones, less than 576px) */
 @media (max-width: 575.98px) {
-    .team-icon
-    {
-        height: 50px; !important;
+    .team-icon {
+        height: 50px;
+    !important;
+    }
+
+    .score-big {
+        top: 23px;
+    !important;
+    }
+
+    .team-icon-big {
+        height: 80px;
+    !important;
     }
 }
 
 /* Small devices (landscape phones, 576px and up) */
-@media (min-width: 576px) and (max-width: 767.98px) {  }
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .team-icon-big {
+        height: 80px;
+    !important;
+    }
+
+    .score-big {
+        top: 23px;
+    !important;
+    }
+}
 
 /* Medium devices (tablets, 768px and up) */
 @media (min-width: 768px) and (max-width: 991.98px) {
-    .team-icon
-    {
-        height: 50px; !important;
+    .team-icon-big {
+        height: 80px;
+    !important;
+    }
+
+    .score-big {
+        top: 16px;
+    !important;
+    }
+
+    .team-icon {
+        height: 50px;
+    !important;
     }
 }
 
 /* Large devices (desktops, 992px and up) */
-@media (min-width: 992px) and (max-width: 1199.98px) {  }
+@media (min-width: 992px) and (max-width: 1199.98px) {
+}
 
 /* Extra large devices (large desktops, 1200px and up) */
-@media (min-width: 1200px) {  }
+@media (min-width: 1200px) {
+}
 
 /* The snackbar - position it at the bottom and in the middle of the screen */
 #snackbar {

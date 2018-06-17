@@ -5,6 +5,8 @@ RewriteRule ^(.*)/$ /$1 [L,R=301]
 
 RewriteRule ^$ /matches [L,R]
 RewriteRule ^/?matches/(.+) /matches?mode=$1 [L]
+RewriteRule ^/?match/.*?/(\d+) /match?id=$1 [L]
+RewriteRule ^/?match/(\d+) /match?id=$1&name=false [L]
 
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d

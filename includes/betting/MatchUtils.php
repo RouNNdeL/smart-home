@@ -143,6 +143,27 @@ class MatchUtils
         return $arr;
     }
 
+    public static function getUserNamesIdsAndPredictionForMatch(int $match_id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT user_id, concat(first_name, ' ', last_name), 
+                       concat(scoreA, '-', scoreB), IF(points IS NULL, 'TBD', points) 
+                FROM bet_predictions 
+                JOIN home_users ON bet_predictions.user_id = home_users.id WHERE match_id = ?
+                ORDER BY points DESC, user_id ASC";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $match_id);
+        $stmt->bind_result($user_id,$name, $score, $points);
+        $stmt->execute();
+        $arr = [];
+        while($stmt->fetch())
+        {
+            $arr[] = ["user_id" => $user_id, "name" => $name, "score" => $score, "points" => $points];
+        }
+        $stmt->close();
+        return $arr;
+    }
+
     public static function refreshPoints()
     {
         $matches = Match::finished();
@@ -157,13 +178,26 @@ class MatchUtils
         }
     }
 
-    public static function leaderboardHtml($position, $name, $points)
+    public static function predictionRow($name, $score, $points, $highlight = false)
+    {
+        $highlight_class = $highlight ? "class=\"table-success\"" :"";
+        return <<<HTML
+        <tr $highlight_class>
+            <td>$name</td>
+            <td class="text-center">$score</td>
+            <td class="text-center">$points</td>
+        </tr>
+HTML;
+
+    }
+
+    public static function leaderboardRow($position, $name, $points)
     {
         return <<<HTML
         <tr>
             <th scope="row">$position</th>
             <td>$name</td>
-            <td>$points</td>
+            <td class="text-center">$points</td>
         </tr>
 HTML;
 

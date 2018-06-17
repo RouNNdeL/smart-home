@@ -129,7 +129,7 @@ HTML;
         {
             $match->loadPredictions($manager->getSessionManager()->getUserId());
             $points = $match->getPoints();
-            $html = $match->toHtml();
+            $html = $match->toCardHtml();
             echo <<<HTML
             <div class="col-xs-12 col-md-6 col-lg-4 mb-3 px-md-2">
             $html
