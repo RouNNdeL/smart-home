@@ -61,7 +61,7 @@ class MatchUtils
         $days = floor($time / 86400);
         if($days > 0)
         {
-            $str .= "$days day" . ($days === 1 ? "s " : " ");
+            $str .= "$days day" . ($days == 1 ? " " : "s ");
         }
         $hours = str_pad(floor($time / 3600) % 24, 2, "0", STR_PAD_LEFT);
         $minutes = str_pad(floor($time / 60) % 60, 2, "0", STR_PAD_LEFT);

@@ -25,7 +25,6 @@
 $(function()
 {
     const time_diff = Date.now() - $("input[name=time]").first().val()*1000;
-    console.log(time_diff);
     $(".match-submit-button").click(function()
     {
         const array = serializeToAssociative($(this).parents("form").serializeArray());
@@ -62,7 +61,7 @@ $(function()
         const days = Math.floor(time_left / 86400);
         if(days > 0)
         {
-            str += `${days} day${(days === 1 ? "s " : " ")}`;
+            str += `${days} day${(days === 1 ? " " : "s ")}`;
         }
         if(time_left < 60*60)
         {
