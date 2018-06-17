@@ -56,7 +56,7 @@ class Utils
     private function loadStrings()
     {
         $lang = $this->lang;
-        $path = $_SERVER["DOCUMENT_ROOT"] . "/_lang/$lang.json";
+        $path = __DIR__."/../_lang/$lang.json";
         $file = file_get_contents($path);
         if($file == false)
         {
