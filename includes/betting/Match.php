@@ -140,13 +140,15 @@ class Match
     }
 
     /**
+     * @param bool $reverse
      * @return Match[]
      */
-    public static function finished()
+    public static function finished($reverse = false)
     {
+        $order = $reverse ? "DESC" : "ASC";
         $conn = DbUtils::getConnection();
         $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches 
-                WHERE scoreB IS NOT NULL  AND scoreA IS NOT NULL";
+                WHERE scoreB IS NOT NULL  AND scoreA IS NOT NULL ORDER BY date $order";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $arr = [];
@@ -233,12 +235,14 @@ class Match
     }
 
     /**
+     * @param bool $reverse
      * @return Match[]
      */
-    public static function all()
+    public static function all($reverse = false)
     {
+        $order = $reverse ? "DESC" : "ASC";
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches";
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches ORDER BY date $order";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $arr = [];

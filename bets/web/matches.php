@@ -122,7 +122,7 @@ HTML;
         else if($_GET["mode"] === "today")
             $matches = Match::today();
         else if($_GET["mode"] === "finished")
-            $matches = Match::finished();
+            $matches = Match::finished(true);
         else
             $matches = Match::todayAndUpcoming();
 
