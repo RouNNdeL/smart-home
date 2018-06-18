@@ -74,6 +74,7 @@ require_once __DIR__ . "/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("");
 $head->addEntry(new FaviconEntry(FaviconEntry::WORLD_CUP));
 $head->addEntry(new StyleSheetEntry("/css/matches.css"));
+$head->addEntry(new JavaScriptEntry("/js/matches.js"));
 $head->addEntry(new StyleSheetEntry("https://zdul.xyz/" . StyleSheetEntry::MAIN));
 echo $head->toString();
 
@@ -124,6 +125,7 @@ echo $head->toString();
         </ul>
     </div>
 </nav>
+<input type="hidden" name="time" value="<?php echo time() ?>"/>
 <div class="container mt-3">
     <div class="row">
         <div class="col">

@@ -336,8 +336,13 @@ class Match
             </table>
 HTML;
 
+        $google_link = "https://google.com/search?q=".
+            urlencode("2018 Russia World Cup ".$this->teamA->getName()." vs ".$this->teamB->getName());
+        $pick_lock_span = $this->getPickLock("span");
 
         return <<<HTML
+    <div class="card mb-3">
+        <div class="card-body">
             <div class="row text-center">
                 <div class="col"><p class="match-time">$time</p></div>
             </div>
@@ -370,6 +375,16 @@ HTML;
                     $table
                 </div>
             </div>
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="col">
+                    <a target="_blank" href="$google_link"><span class="text-muted">This match in Google</span></a>
+                    $pick_lock_span
+                </div>
+            </div>
+        </div>
+    </div>
 HTML;
 
     }
@@ -430,12 +445,7 @@ HTML;
         }
 
         $match_url = "/match/" . $this->getTeamString() . "/$this->id";
-        $bold = $this->start_date - time() < MatchUtils::PICK_LOCK_WARNING * 60 ? "font-weight-bold" : "";
-        $lock_time = $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
-        $picks_lock_text = $this->picksOpen() ?
-            "<small class='pick-lock-time text-muted float-right $bold' data-match-start='$lock_time'>Picks lock in " .
-            MatchUtils::formatDuration($lock_time - time()) . "</small>" :
-            "<small class='text-muted float-right'>Locked</small>";
+        $picks_lock_text = $this->getPickLock();
 
         return <<< HTML
 <div class="card">
@@ -489,6 +499,16 @@ HTML;
     </div>
 HTML;
 
+    }
+
+    private function getPickLock($element = "small")
+    {
+        $bold = $this->start_date - time() < MatchUtils::PICK_LOCK_WARNING * 60 ? "font-weight-bold" : "";
+        $lock_time = $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
+        return $this->picksOpen() ?
+            "<$element class='pick-lock-time text-muted float-right $bold' data-match-start='$lock_time'>Picks lock in " .
+            MatchUtils::formatDuration($lock_time - time()) . "</$element>" :
+            "<$element class='text-muted float-right'>Locked</$element>";
     }
 
     private
