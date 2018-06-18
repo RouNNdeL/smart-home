@@ -85,38 +85,6 @@ class Match
     }
 
     /**
-     * @return int|null
-     */
-    public function getPoints()
-    {
-        if($this->scoreA === null || $this->scoreB === null)
-            return null;
-        if($this->predictionA === null || $this->predictionB === null)
-            return 0;
-        if($this->predictionA === $this->scoreA && $this->predictionB === $this->scoreB)
-            return 4;
-        if($this->predictionA - $this->predictionB === $this->scoreA - $this->scoreB)
-            return 2;
-        if($this->scoreA === $this->scoreB || $this->predictionA === $this->predictionB)
-            return 0;
-        if(!($this->predictionA > $this->predictionB xor $this->scoreA > $this->scoreB))
-            return 1;
-        return 0;
-    }
-
-    /**
-     * @param array $row
-     * @return Match
-     */
-    private static function fromDbRow(array $row)
-    {
-        $teamA = Team::byId($row["teamA"]);
-        $teamB = Team::byId($row["teamB"]);
-        $date = strtotime($row["date"]);
-        return new Match($row["id"], $teamA, $teamB, $date, $row["scoreA"], $row["scoreB"], $row["stage"]);
-    }
-
-    /**
      * @param int $match_id
      * @return Match|null
      */
@@ -137,6 +105,18 @@ class Match
         }
 
         return null;
+    }
+
+    /**
+     * @param array $row
+     * @return Match
+     */
+    private static function fromDbRow(array $row)
+    {
+        $teamA = Team::byId($row["teamA"]);
+        $teamB = Team::byId($row["teamB"]);
+        $date = strtotime($row["date"]);
+        return new Match($row["id"], $teamA, $teamB, $date, $row["scoreA"], $row["scoreB"], $row["stage"]);
     }
 
     /**
@@ -164,14 +144,15 @@ class Match
         return $arr;
     }
 
-
     /**
      * @return Match[]
      */
     public static function today()
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE DATE(date) = DATE(NOW())";
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches 
+                WHERE DATE(date) = DATE(NOW())
+                ORDER BY date ASC";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $arr = [];
@@ -193,7 +174,9 @@ class Match
     public static function todayAndUpcoming()
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE DATE(date) >= DATE(NOW())";
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches 
+                WHERE DATE(date) >= DATE(NOW()) 
+                ORDER BY date ASC";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $arr = [];
@@ -215,7 +198,7 @@ class Match
     public static function upcoming()
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE date > NOW()";
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE date > NOW() ORDER BY date ASC";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $arr = [];
@@ -255,6 +238,26 @@ class Match
         return $arr;
     }
 
+    /**
+     * @return int|null
+     */
+    public function getPoints()
+    {
+        if($this->scoreA === null || $this->scoreB === null)
+            return null;
+        if($this->predictionA === null || $this->predictionB === null)
+            return 0;
+        if($this->predictionA === $this->scoreA && $this->predictionB === $this->scoreB)
+            return 4;
+        if($this->predictionA - $this->predictionB === $this->scoreA - $this->scoreB)
+            return 2;
+        if($this->scoreA === $this->scoreB || $this->predictionA === $this->predictionB)
+            return 0;
+        if(!($this->predictionA > $this->predictionB xor $this->scoreA > $this->scoreB))
+            return 1;
+        return 0;
+    }
+
     public function loadPredictions(int $user_id)
     {
         $prediction = MatchUtils::getPredictionForUserAndMatch($user_id, $this->id);
@@ -268,16 +271,6 @@ class Match
             $this->predictionA = $prediction["a"];
             $this->predictionB = $prediction["b"];
         }
-    }
-
-    public function picksOpen()
-    {
-        return time() < $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
-    }
-
-    public function matchInProgress()
-    {
-        return time() > $this->start_date && $this->scoreB === null && $this->scoreA === null;
     }
 
     public function toBigHtml(int $user_id)
@@ -337,8 +330,8 @@ class Match
             </table>
 HTML;
 
-        $google_link = "https://google.com/search?q=".
-            urlencode("2018 Russia World Cup ".$this->teamA->getName()." vs ".$this->teamB->getName());
+        $google_link = "https://google.com/search?q=" .
+            urlencode("2018 Russia World Cup " . $this->teamA->getName() . " vs " . $this->teamB->getName());
         $pick_lock_span = $this->getPickLock("span");
 
         return <<<HTML
@@ -390,6 +383,42 @@ HTML;
 
     }
 
+    private
+    function getTimeString()
+    {
+        if($this->matchInProgress())
+            return "In Progress";
+        if($this->scoreA !== null && $this->scoreB !== null)
+            return "Finished";
+        return MatchUtils::formatDate($this->start_date);
+    }
+
+    public function matchInProgress()
+    {
+        return time() > $this->start_date && $this->scoreB === null && $this->scoreA === null;
+    }
+
+    public function picksOpen()
+    {
+        return time() < $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
+    }
+
+    private function getPickLock($element = "small")
+    {
+        $pick_warn = $this->warnPicks();
+        $bold = $pick_warn ? "font-weight-bold" : "";
+        $text = $pick_warn ? "text-light" : "text-muted";
+        $lock_time = $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
+        return $this->picksOpen() ?
+            "<$element class='pick-lock-time $text float-right $bold' data-match-start='$lock_time'>Picks lock in " .
+            MatchUtils::formatDuration($lock_time - time()) . "</$element>" :
+            "<$element class='text-muted float-right'>Locked</$element>";
+    }
+
+    public function warnPicks()
+    {
+        return $this->start_date - (MatchUtils::PICK_LOCK_WARNING + MatchUtils::PICK_LOCK_MINUTES) * 60 < time();
+    }
 
     /**
      * @return string
@@ -447,6 +476,10 @@ HTML;
 
         $match_url = "/match/" . $this->getTeamString() . "/$this->id";
         $picks_lock_text = $this->getPickLock();
+        $show_danger = $this->warnPicks() && $this->picksOpen();
+        $footer_class = $show_danger ? "bg-danger" : "";
+        $more_info_class = $show_danger ? "text-light" : "text-muted";
+        $bold = $show_danger ? "font-weight-bold" : "";
 
         return <<< HTML
 <div class="card">
@@ -493,34 +526,13 @@ HTML;
                 </div>
             </div>
         </div>
-        <div class="card-footer">
-            <a class="text-muted" href="$match_url"><small>More info</small></a>
+        <div class="card-footer $footer_class">
+            <a class="$more_info_class" href="$match_url"><small class="$bold">More info</small></a>
             $picks_lock_text
         </div>
     </div>
 HTML;
 
-    }
-
-    private function getPickLock($element = "small")
-    {
-        $bold = $this->start_date - (MatchUtils::PICK_LOCK_WARNING + MatchUtils::PICK_LOCK_MINUTES) * 60 < time()  ?
-            "font-weight-bold" : "";
-        $lock_time = $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
-        return $this->picksOpen() ?
-            "<$element class='pick-lock-time text-muted float-right $bold' data-match-start='$lock_time'>Picks lock in " .
-            MatchUtils::formatDuration($lock_time - time()) . "</$element>" :
-            "<$element class='text-muted float-right'>Locked</$element>";
-    }
-
-    private
-    function getTimeString()
-    {
-        if($this->matchInProgress())
-            return "In Progress";
-        if($this->scoreA !== null && $this->scoreB !== null)
-            return "Finished";
-        return MatchUtils::formatDate($this->start_date);
     }
 
     public

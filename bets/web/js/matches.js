@@ -42,7 +42,7 @@
 
         $(".pick-lock-time").each(function()
         {
-            setInterval(updateTime.bind(this), 1000);
+            $(this).data("interval-id", setInterval(updateTime.bind(this), 1000));
         });
 
         function showSnackbar(text, duration = 2500)
@@ -53,7 +53,7 @@
             setTimeout(() => snackbar.removeClass("show"), duration);
         }
 
-        function updateTime(element)
+        function updateTime()
         {
             const time = parseInt($(this).data("match-start"));
             const time_left = Math.round((time * 1000 - Date.now()) / 1000);
@@ -64,10 +64,21 @@
             {
                 str += `${days} day${(days === 1 ? " " : "s ")}`;
             }
+
+            if(time_left < 0)
+            {
+                $(this).parent().find("span,small").removeClass("font-weight-bold text-light").addClass("text-muted");
+                $(this).parent().removeClass("bg-danger");
+                $(this).text("Locked");
+                clearInterval( parseInt($(this).data("interval-id")));
+                return;
+            }
             if(time_left < 60 * 60)
             {
-                $(this).addClass("font-weight-bold");
+                $(this).parent().find("span,small").addClass("font-weight-bold text-light").removeClass("text-muted");
+                $(this).parent().addClass("bg-danger");
             }
+
             const h = String(Math.floor(time_left / 3600) % 24).padStart(2, "0");
             const m = String(Math.floor(time_left / 60) % 60).padStart(2, "0");
             const s = String(time_left % 60).padStart(2, "0");
