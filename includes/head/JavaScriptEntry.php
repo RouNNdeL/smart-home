@@ -34,17 +34,17 @@ require_once __DIR__."/HeadEntry.php";
 
 class JavaScriptEntry extends HeadEntry
 {
-    const JQUERY = "/jquery/jquery.js";
-    const TETHER = "/tether/dist/js/tether.js";
-    const BOOTSTRAP = "/bootstrap/dist/js/bootstrap.js";
-    const JQUERY_UI = "/jqueryui/jquery-ui.js";
-    const COLOR_PICKER = "/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.js";
-    const SLIDER = "/bootstrap-slider/dist/bootstrap-slider.js";
-    const SWITCH = "/bootstrap-switch/dist/js/bootstrap-switch.js";
-    const CAPTCHA = "https://www.google.com/recaptcha/api.js";
-    const GOOGLE_PLATFORM = "https://apis.google.com/js/platform.js";
-    const LOGIN = "/js/login.js";
-    const DEVICE_SETTINGS = "/js/device_settings.js";
+    const JQUERY = "/jquery/jquery";
+    const TETHER = "/tether/dist/js/tether";
+    const BOOTSTRAP = "/bootstrap/dist/js/bootstrap";
+    const JQUERY_UI = "/jqueryui/jquery-ui";
+    const COLOR_PICKER = "/bootstrap-colorpicker/dist/js/bootstrap-colorpicker";
+    const SLIDER = "/bootstrap-slider/dist/bootstrap-slider";
+    const SWITCH = "/bootstrap-switch/dist/js/bootstrap-switch";
+    const CAPTCHA = "https://www.google.com/recaptcha/api";
+    const GOOGLE_PLATFORM = "https://apis.google.com/js/platform";
+    const LOGIN = "/js/login";
+    const DEVICE_SETTINGS = "/js/device_settings";
 
     const DEFAULT = [JavaScriptEntry::JQUERY, JavaScriptEntry::TETHER, JavaScriptEntry::BOOTSTRAP];
 
@@ -70,12 +70,16 @@ class JavaScriptEntry extends HeadEntry
         $this->defer = $defer;
     }
 
-    /** @return string */
-    public function toString()
+    /**
+     * @param bool $minified
+     * @return string
+     */
+    public function toString(bool $minified)
     {
         $async = $this->async ? "async" : "";
         $defer = $this->defer ? "defer" : "";
-        return "<script src='$this->url' $async $defer></script>";
+        $url = $this->url . ($minified ? ".min.js" : ".js");
+        return "<script src='$url' $async $defer></script>";
     }
 
     public static function getDefaults()

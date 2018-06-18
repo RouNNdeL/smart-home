@@ -5,7 +5,12 @@
     "bootstrap-colorpicker": "^2.5.2",
     "bootstrap-slider": "^10.0.2",
     "bootstrap-switch": "^3.3.4",
+    "mathjs": "^5.0.0",
     "open-iconic": "^1.1.1",
     "tether": "1.4.4"
+  },
+  "devDependencies": {
+    "uglify-js": "^3.4.0",
+    "uglifycss": "0.0.29"
   }
 }

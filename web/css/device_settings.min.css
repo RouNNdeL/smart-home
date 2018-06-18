@@ -1,5 +1,4 @@
-<?php
-/**
+/*
  * MIT License
  *
  * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
@@ -23,51 +22,4 @@
  * SOFTWARE.
  */
 
-/**
- * Created by PhpStorm.
- * User: Krzysiek
- * Date: 2018-06-11
- * Time: 12:07
- */
-
-require_once __DIR__."/HeadEntry.php";
-
-class MetaEntry extends HeadEntry
-{
-    const VIEWPORT_NAME = "viewport";
-    const VIEWPORT_CONTENT = "width=device-width, initial-scale=1, shrink-to-fit=no";
-
-    /** @var string */
-    private $name;
-
-    /** @var string */
-    private $content;
-
-    /**
-     * MetaEntry constructor.
-     * @param string $name
-     * @param string $content
-     */
-    public function __construct(string $name, string $content)
-    {
-        $this->name = $name;
-        $this->content = $content;
-    }
-
-
-    /**
-     * @param bool $minified
-     * @return string
-     */
-    public function toString(bool $minified)
-    {
-        return "<meta name='$this->name' content='$this->content'>";
-    }
-
-    public static function getDefaults()
-    {
-        $arr = [];
-        $arr[] = new MetaEntry(MetaEntry::VIEWPORT_NAME, MetaEntry::VIEWPORT_CONTENT);
-        return $arr;
-    }
-}
+.color-input{font-family:monospace;font-size:1.2rem;width:184px}.colorpicker-big .colorpicker-saturation{width:150px;height:150px}.colorpicker-big .colorpicker-hue,.colorpicker-big .colorpicker-alpha{width:20px;height:150px}.colorpicker-big .colorpicker-color,.colorpicker-big .colorpicker-color div{height:20px}.colorpicker-big .colorpicker-preview,.colorpicker-big .colorpicker-preview div{height:20px;font-size:12px;line-height:120%}.colorpicker-big .colorpicker-saturation .colorpicker-guide,.colorpicker-big .colorpicker-saturation .colorpicker-guide i{height:7px;width:7px;border-radius:7px}.slider.slider-horizontal{width:100%;!important;max-width:164px}.device-settings-content{padding-top:12px;height:100%}.vertical-align{display:inline-block;vertical-align:middle;float:none}

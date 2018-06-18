@@ -30,18 +30,18 @@
  * Time: 11:40
  */
 
-require_once __DIR__."/HeadEntry.php";
+require_once __DIR__ . "/HeadEntry.php";
 
 class StyleSheetEntry extends HeadEntry
 {
-    const BOOTSTRAP = "/bootstrap/dist/css/bootstrap.css";
-    const ICONIC = "/iconic/font/css/open-iconic-bootstrap.css";
-    const TETHER = "/tether/dist/css/tether.css";
-    const COLOR_PICKER = "/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.css";
-    const SLIDER = "/bootstrap-slider/dist/css/bootstrap-slider.css";
-    const SWITCH = "/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.css";
-    const MAIN = "/css/main.css";
-    const DEVICE_SETTINGS = "/css/device_settings.css";
+    const BOOTSTRAP = "/bootstrap/dist/css/bootstrap";
+    const ICONIC = "/iconic/font/css/open-iconic-bootstrap";
+    const TETHER = "/tether/dist/css/tether";
+    const COLOR_PICKER = "/bootstrap-colorpicker/dist/css/bootstrap-colorpicker";
+    const SLIDER = "/bootstrap-slider/dist/css/bootstrap-slider";
+    const SWITCH = "/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch";
+    const MAIN = "/css/main";
+    const DEVICE_SETTINGS = "/css/device_settings";
 
     const DEFAULT = [StyleSheetEntry::BOOTSTRAP, StyleSheetEntry::TETHER, StyleSheetEntry::ICONIC];
 
@@ -58,10 +58,14 @@ class StyleSheetEntry extends HeadEntry
     }
 
 
-    /** @return string */
-    public function toString()
+    /**
+     * @param bool $minified
+     * @return string
+     */
+    public function toString(bool $minified)
     {
-        return "<link rel='stylesheet' href='$this->url'>";
+        $url = $this->url . ($minified ? ".min.css" : ".css");
+        return "<link rel='stylesheet' href='$url'>";
     }
 
     public static function getDefaults()

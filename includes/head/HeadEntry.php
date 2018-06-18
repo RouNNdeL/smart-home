@@ -32,6 +32,9 @@
 
 abstract class HeadEntry
 {
-    /** @return string */
-    public abstract function toString();
+    /**
+     * @param bool $minified
+     * @return string
+     */
+    public abstract function toString(bool $minified);
 }

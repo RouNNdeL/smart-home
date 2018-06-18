@@ -34,6 +34,7 @@ require_once __DIR__."/HeadEntry.php";
 require_once __DIR__."/MetaEntry.php";
 require_once __DIR__."/JavaScriptEntry.php";
 require_once __DIR__."/StyleSheetEntry.php";
+require_once __DIR__."/FaviconEntry.php";
 
 class HtmlHead
 {
@@ -43,6 +44,9 @@ class HtmlHead
 
     /** @var HeadEntry[] */
     private $entries;
+
+    /** @var bool */
+    private $minified = true;
 
     /**
      * HtmlHead constructor.
@@ -55,6 +59,8 @@ class HtmlHead
         $this->entries = array_merge($this->entries, JavaScriptEntry::getDefaults());
         $this->entries = array_merge($this->entries, StyleSheetEntry::getDefaults());
     }
+
+
 
     public function addEntry(HeadEntry $entry)
     {
@@ -70,11 +76,19 @@ class HtmlHead
 TAG;
         foreach($this->entries as $entry)
         {
-            $str .= $entry->toString();
+            $str .= $entry->toString($this->minified);
         }
         if($head_tags)
             $str .= "</head>";
 
         return $str;
+    }
+
+    /**
+     * @param bool $minified
+     */
+    public function setMinified(bool $minified)
+    {
+        $this->minified = $minified;
     }
 }

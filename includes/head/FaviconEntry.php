@@ -45,8 +45,11 @@ class FaviconEntry extends HeadEntry
         $this->uri = $uri;
     }
 
-    /** @return string */
-    public function toString()
+    /**
+     * @param bool $minified
+     * @return string
+     */
+    public function toString(bool $minified)
     {
         return "<link rel=\"shortcut icon\" href=\"$this->uri\" />";
     }
