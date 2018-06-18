@@ -43,8 +43,7 @@
     position: relative;
 }
 
-.match-time
-{
+.match-time {
     font-size: larger;
 }
 
@@ -56,13 +55,22 @@
     }
 
     .score-big {
-        top: 23px;
+        top: 18px;
     !important;
     }
 
     .team-icon-big {
-        height: 80px;
+        height: 70px;
     !important;
+    }
+
+    .match-time {
+        font-size: large;
+    !important;
+    }
+
+    .ml-xs-05 {
+        margin-left: 4.16666666667%;
     }
 }
 
@@ -76,6 +84,15 @@
     .score-big {
         top: 23px;
     !important;
+    }
+
+    .match-time {
+        font-size: large;
+    !important;
+    }
+
+    .ml-sm-05 {
+        margin-left: 4.16666666667%;
     }
 }
 
@@ -95,14 +112,27 @@
         height: 50px;
     !important;
     }
+
+    .ml-md-05
+    {
+        margin-left: 4.16666666667%;
+    }
 }
 
 /* Large devices (desktops, 992px and up) */
 @media (min-width: 992px) and (max-width: 1199.98px) {
+    .ml-lg-05
+    {
+        margin-left: 4.16666666667%;
+    }
 }
 
 /* Extra large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
+    .ml-xl-05
+    {
+        margin-left: 4.16666666667%;
+    }
 }
 
 /* The snackbar - position it at the bottom and in the middle of the screen */

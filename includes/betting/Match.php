@@ -336,20 +336,23 @@ HTML;
                 <div class="col"><p class="match-time">$time</p></div>
             </div>
             <div class="row text-center">
-                <div class="col-5 col-lg-4">
+                <div class="ml-sm-0 ml-xs-05 col-4 px-1 px-sm-3">
                     <div class="float-right">
                         <img src="$logoTeamA" class="team-icon-big mb-2">
-                        <h4>$nameTeamA</h4>
+                        <h4 class="d-none d-md-block">$nameTeamA</h4>
+                        <h5 class="d-md-none">$nameTeamA</h5>
                     </div>
                 </div>
-                <div class="col-2 col-lg-4 px-1">
+                <div class="col-3 col-sm-4 px-1">
                     <h1 class="score-big d-none d-md-block">$scores</h1>
-                    <h3 class="score-big d-md-none">$scores</h3>
+                    <h3 class="score-big d-none d-sm-block d-md-none">$scores</h3>
+                    <h4 class="score-big d-sm-none">$scores</h4>
                 </div>
-                <div class="col-5 col-lg-4">
+                <div class="col-4 px-1 px-sm-3">
                     <div class="float-left">
                         <img src="$logoTeamB" class="team-icon-big mb-2">
-                        <h4>$nameTeamB</h4>
+                        <h4 class="d-none d-md-block">$nameTeamB</h4>
+                        <h5 class="d-md-none">$nameTeamB</h5>
                     </div>
                 </div>
             </div>
