@@ -30,4 +30,5 @@
  * Time: 20:12
  */
 
+header("Access-Control-Allow-Origin: *");
 echo round(microtime(true) * 1000);
