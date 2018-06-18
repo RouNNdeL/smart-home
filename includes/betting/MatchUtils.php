@@ -160,6 +160,27 @@ class MatchUtils
         return $arr;
     }
 
+    public static function getPredictionPointsForUserAndMatch(int $user_id, int $match_id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT user_id, concat(first_name, ' ', last_name), 
+                       concat(scoreA, '-', scoreB), IF(points IS NULL, 'TBD', points) 
+                FROM bet_predictions 
+                JOIN home_users ON bet_predictions.user_id = home_users.id WHERE match_id = ? AND user_id = ?
+                ORDER BY points DESC, bet_predictions.id ASC";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ii", $match_id, $user_id);
+        $stmt->bind_result($user_id, $name, $score, $points);
+        $stmt->execute();
+        if($stmt->fetch())
+        {
+            $stmt->close();
+            return ["user_id" => $user_id, "name" => $name, "score" => $score, "points" => $points];
+        }
+        $stmt->close();
+        return null;
+    }
+
     public static function getUserNamesIdsAndPredictionForMatch(int $match_id)
     {
         $conn = DbUtils::getConnection();

@@ -290,7 +290,15 @@ class Match
         $scores = $this->scoreA !== null && $this->scoreB !== null ? "$this->scoreA ‒ $this->scoreB" : "TBD";
         $time = $this->getTimeString();
 
-        $rows = MatchUtils::getUserNamesIdsAndPredictionForMatch($this->id);
+        if($this->picksOpen())
+        {
+            $rows = [MatchUtils::getPredictionPointsForUserAndMatch($user_id, $this->id)];
+        }
+        else
+        {
+            $rows = MatchUtils::getUserNamesIdsAndPredictionForMatch($this->id);
+        }
+
         if(sizeof($rows) > 0)
         {
             $table_rows = "";
@@ -309,11 +317,10 @@ class Match
 
         if($this->picksOpen())
         {
-            $table = "<h5 class='text-center'>Predictions of other users will be shown once the picks are locked</h5>";
+            $table_rows .= "<tr><td colspan='3'>Other user's predictions will be shown once the picks are locked</td></tr>";
         }
-        else
-        {
-            $table = <<<HTML
+
+        $table = <<<HTML
             <table class="table table-bordered table-striped">
             <caption>Predictions</caption>
             <thead>
@@ -329,7 +336,6 @@ class Match
             </table>
 HTML;
 
-        }
 
         return <<<HTML
             <div class="row text-center">
@@ -360,7 +366,7 @@ HTML;
                 <div class="col"><p class="match-time">$this->stage</p></div>
             </div>
             <div class="row">
-                <div class="col-12 col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+                <div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
                     $table
                 </div>
             </div>
@@ -372,7 +378,8 @@ HTML;
     /**
      * @return string
      */
-    public function toCardHtml()
+    public
+    function toCardHtml()
     {
         $pickA = $this->predictionA === null ? "" : $this->predictionA;
         $pickB = $this->predictionB === null ? "" : $this->predictionB;
@@ -422,12 +429,12 @@ HTML;
             $bottom = "<button class=\"btn btn-primary match-submit-button\" role=\"button\" type=\"button\">Save</button>";
         }
 
-        $match_url = "/match/".$this->getTeamString()."/$this->id";
+        $match_url = "/match/" . $this->getTeamString() . "/$this->id";
         $bold = $this->start_date - time() < MatchUtils::PICK_LOCK_WARNING * 60 ? "font-weight-bold" : "";
-        $lock_time = $this->start_date - MatchUtils::PICK_LOCK_MINUTES*60;
+        $lock_time = $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
         $picks_lock_text = $this->picksOpen() ?
-            "<small class='pick-lock-time text-muted float-right $bold' data-match-start='$lock_time'>Picks lock in ".
-            MatchUtils::formatDuration($lock_time - time())."</small>" :
+            "<small class='pick-lock-time text-muted float-right $bold' data-match-start='$lock_time'>Picks lock in " .
+            MatchUtils::formatDuration($lock_time - time()) . "</small>" :
             "<small class='text-muted float-right'>Locked</small>";
 
         return <<< HTML
@@ -484,7 +491,8 @@ HTML;
 
     }
 
-    private function getTimeString()
+    private
+    function getTimeString()
     {
         if($this->matchInProgress())
             return "In Progress";
@@ -493,7 +501,8 @@ HTML;
         return MatchUtils::formatDate($this->start_date);
     }
 
-    public function getTeamString()
+    public
+    function getTeamString()
     {
         return $this->teamA->getName() . "-" . $this->teamB->getName();
     }
@@ -501,7 +510,8 @@ HTML;
     /**
      * @return int
      */
-    public function getId(): int
+    public
+    function getId(): int
     {
         return $this->id;
     }
