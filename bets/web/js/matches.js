@@ -26,6 +26,15 @@
 {
     $(function()
     {
+        let time_diff = 0;
+        const request_begin = Date.now();
+        $.ajax("https://home.zdul.xyz/api/time.php").done(function(response)
+        {
+            const request_time = Date.now() - request_begin;
+            time_diff = Date.now() - request_time/2 - parseInt(response);
+            console.log(time_diff);
+        });
+
         $(".match-submit-button").click(function()
         {
             const array = serializeToAssociative($(this).parents("form").serializeArray());
@@ -56,7 +65,7 @@
         function updateTime()
         {
             const time = parseInt($(this).data("match-start"));
-            const time_left = Math.round((time * 1000 - Date.now()) / 1000);
+            const time_left = Math.round((time * 1000 - Date.now() - time_diff) / 1000);
 
             let str = "";
             const days = Math.floor(time_left / 86400);

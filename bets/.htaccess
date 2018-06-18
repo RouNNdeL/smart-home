@@ -15,4 +15,4 @@ RewriteRule ^ - [L]
 RewriteRule ^([^/]*)$ web/$1.php
 RewriteRule ^/?js/([^/]*)$ web/js/$1
 RewriteRule ^/?css/([^/]*)$ web/css/$1
-RewriteRule ^(?!web)(.*) https://zdul.xyz/$1 [R]
+RewriteRule ^(?!web)(.*) https://home.zdul.xyz/$1 [R]
