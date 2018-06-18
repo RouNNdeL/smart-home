@@ -24,7 +24,6 @@
 
 $(function()
 {
-    const time_diff = Date.now() - $("input[name=time]").first().val()*1000;
     $(".match-submit-button").click(function()
     {
         const array = serializeToAssociative($(this).parents("form").serializeArray());
@@ -55,7 +54,7 @@ $(function()
     function updateTime(element)
     {
         const time = parseInt($(this).data("match-start"));
-        const time_left = Math.round((time*1000 + time_diff - Date.now())/1000);
+        const time_left = Math.round((time*1000 - Date.now())/1000);
 
         let str = "";
         const days = Math.floor(time_left / 86400);

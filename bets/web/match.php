@@ -125,7 +125,6 @@ echo $head->toString();
         </ul>
     </div>
 </nav>
-<input type="hidden" name="time" value="<?php echo time() ?>"/>
 <div class="container mt-3">
     <div class="row">
         <div class="col">
