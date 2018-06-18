@@ -173,7 +173,6 @@ class Match
         $conn = DbUtils::getConnection();
         $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE DATE(date) = DATE(NOW())";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $arr = [];
         if($result = $stmt->get_result())
@@ -196,7 +195,6 @@ class Match
         $conn = DbUtils::getConnection();
         $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE DATE(date) >= DATE(NOW())";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $arr = [];
         if($result = $stmt->get_result())
@@ -219,7 +217,6 @@ class Match
         $conn = DbUtils::getConnection();
         $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE date > NOW()";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $arr = [];
         if($result = $stmt->get_result())
@@ -507,7 +504,8 @@ HTML;
 
     private function getPickLock($element = "small")
     {
-        $bold = $this->start_date - time() < MatchUtils::PICK_LOCK_WARNING * 60 ? "font-weight-bold" : "";
+        $bold = $this->start_date - (MatchUtils::PICK_LOCK_WARNING + MatchUtils::PICK_LOCK_MINUTES) * 60 < time()  ?
+            "font-weight-bold" : "";
         $lock_time = $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
         return $this->picksOpen() ?
             "<$element class='pick-lock-time text-muted float-right $bold' data-match-start='$lock_time'>Picks lock in " .

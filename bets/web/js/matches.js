@@ -22,65 +22,68 @@
  * SOFTWARE.
  */
 
-$(function()
+(function()
 {
-    $(".match-submit-button").click(function()
+    $(function()
     {
-        const array = serializeToAssociative($(this).parents("form").serializeArray());
-        $.ajax("/prediction", {
-            method: "POST",
-            dataType: "json",
-            contentType: "json",
-            data: JSON.stringify(array)
-        }).done(function(response)
+        $(".match-submit-button").click(function()
         {
-            showSnackbar(response["message"]);
-        })
+            const array = serializeToAssociative($(this).parents("form").serializeArray());
+            $.ajax("/prediction", {
+                method: "POST",
+                dataType: "json",
+                contentType: "json",
+                data: JSON.stringify(array)
+            }).done(function(response)
+            {
+                showSnackbar(response["message"]);
+            })
+        });
+
+        $(".pick-lock-time").each(function()
+        {
+            setInterval(updateTime.bind(this), 1000);
+        });
+
+        function showSnackbar(text, duration = 2500)
+        {
+            const snackbar = $("#snackbar");
+            snackbar.text(text);
+            snackbar.addClass("show");
+            setTimeout(() => snackbar.removeClass("show"), duration);
+        }
+
+        function updateTime(element)
+        {
+            const time = parseInt($(this).data("match-start"));
+            const time_left = Math.round((time * 1000 - Date.now()) / 1000);
+
+            let str = "";
+            const days = Math.floor(time_left / 86400);
+            if(days > 0)
+            {
+                str += `${days} day${(days === 1 ? " " : "s ")}`;
+            }
+            if(time_left < 60 * 60)
+            {
+                $(this).addClass("font-weight-bold");
+            }
+            const h = String(Math.floor(time_left / 3600) % 24).padStart(2, "0");
+            const m = String(Math.floor(time_left / 60) % 60).padStart(2, "0");
+            const s = String(time_left % 60).padStart(2, "0");
+
+            str += `${h}:${m}:${s}`;
+            $(this).text("Picks lock in " + str);
+        }
     });
 
-    $(".pick-lock-time").each(function()
+    function serializeToAssociative(array)
     {
-        setInterval(updateTime.bind(this), 1000);
-    });
-
-    function showSnackbar(text, duration = 2500)
-    {
-        const snackbar = $("#snackbar");
-        snackbar.text(text);
-        snackbar.addClass("show");
-        setTimeout(() => snackbar.removeClass("show"), duration);
-    }
-
-    function updateTime(element)
-    {
-        const time = parseInt($(this).data("match-start"));
-        const time_left = Math.round((time*1000 - Date.now())/1000);
-
-        let str = "";
-        const days = Math.floor(time_left / 86400);
-        if(days > 0)
+        const obj = {};
+        for(let i = 0; i < array.length; i++)
         {
-            str += `${days} day${(days === 1 ? " " : "s ")}`;
+            obj[array[i].name] = array[i].value;
         }
-        if(time_left < 60*60)
-        {
-            $(this).addClass("font-weight-bold");
-        }
-        const h = String(Math.floor(time_left / 3600) % 24).padStart(2, "0");
-        const m = String(Math.floor(time_left / 60) % 60).padStart(2, "0");
-        const s = String(time_left % 60).padStart(2, "0");
-
-        str += `${h}:${m}:${s}`;
-        $(this).text("Picks lock in "+str);
+        return obj;
     }
-});
-
-function serializeToAssociative(array)
-{
-    const obj = {};
-    for(let i = 0; i < array.length; i++)
-    {
-        obj[array[i].name] = array[i].value;
-    }
-    return obj;
-}
+})();
