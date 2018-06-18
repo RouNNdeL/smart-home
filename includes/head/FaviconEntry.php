@@ -53,8 +53,11 @@ class FaviconEntry extends HeadEntry
         $this->type = $type;
     }
 
-    /** @return string */
-    public function toString()
+    /**
+     * @param bool $minified
+     * @return string
+     */
+    public function toString(bool $minified)
     {
         return "<link rel=\"icon\" href=\"$this->uri\" type='$this->type'/>";
     }
