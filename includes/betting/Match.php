@@ -333,6 +333,10 @@ HTML;
         $google_link = "https://google.com/search?q=" .
             urlencode("2018 Russia World Cup " . $this->teamA->getName() . " vs " . $this->teamB->getName());
         $pick_lock_span = $this->getPickLock("span");
+        $show_danger = $this->warnPicks() && $this->picksOpen();
+        $footer_class = $show_danger ? "bg-danger" : "";
+        $more_info_class = $show_danger ? "text-light" : "text-muted";
+        $bold = $show_danger ? "font-weight-bold" : "";
 
         return <<<HTML
     <div class="card mb-3">
@@ -370,13 +374,9 @@ HTML;
                 </div>
             </div>
         </div>
-        <div class="card-footer">
-            <div class="row">
-                <div class="col">
-                    <a target="_blank" href="$google_link"><span class="text-muted">This match in Google</span></a>
-                    $pick_lock_span
-                </div>
-            </div>
+        <div class="card-footer $footer_class">
+            <a target="_blank" href="$google_link"><span class="$more_info_class $bold">This match in Google</span></a>
+            $pick_lock_span
         </div>
     </div>
 HTML;

@@ -28,7 +28,7 @@
     {
         let time_diff = 0;
         const request_begin = Date.now();
-        $.ajax("https://home.zdul.xyz/api/time.php").done(function(response)
+        $.ajax("https://home.zdul.xyz/api/time.php").done(response =>
         {
             const request_time = Date.now() - request_begin;
             time_diff = Date.now() - request_time/2 - parseInt(response);
@@ -43,7 +43,7 @@
                 dataType: "json",
                 contentType: "json",
                 data: JSON.stringify(array)
-            }).done(function(response)
+            }).done(response =>
             {
                 showSnackbar(response["message"]);
             })
