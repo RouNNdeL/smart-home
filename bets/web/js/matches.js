@@ -32,7 +32,6 @@
         {
             const request_time = Date.now() - request_begin;
             time_diff = Date.now() - request_time/2 - parseInt(response);
-            console.log(time_diff);
         });
 
         $(".match-submit-button").click(function()
