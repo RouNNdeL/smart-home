@@ -30,7 +30,7 @@
  * Time: 11:36
  */
 
-require_once __DIR__."/HeadEntry.php";
+require_once __DIR__ . "/HeadEntry.php";
 
 class JavaScriptEntry extends HeadEntry
 {
@@ -41,7 +41,7 @@ class JavaScriptEntry extends HeadEntry
     const COLOR_PICKER = "/bootstrap-colorpicker/dist/js/bootstrap-colorpicker";
     const SLIDER = "/bootstrap-slider/dist/bootstrap-slider";
     const SWITCH = "/bootstrap-switch/dist/js/bootstrap-switch";
-    const CAPTCHA = "https://www.google.com/recaptcha/api";
+    const CAPTCHA = "https://www.google.com/recaptcha/api.js";
     const GOOGLE_PLATFORM = "https://apis.google.com/js/platform";
     const LOGIN = "/js/login";
     const DEVICE_SETTINGS = "/js/device_settings";
@@ -78,7 +78,8 @@ class JavaScriptEntry extends HeadEntry
     {
         $async = $this->async ? "async" : "";
         $defer = $this->defer ? "defer" : "";
-        $url = $this->url . ($minified ? ".min.js" : ".js");
+        preg_match("/.js$/", $this->url, $output_array);
+        $url = $output_array === null ? $this->url : $this->url . ($minified ? ".min.js" : ".js");
         return "<script src='$url' $async $defer></script>";
     }
 
