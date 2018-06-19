@@ -64,7 +64,8 @@ class StyleSheetEntry extends HeadEntry
      */
     public function toString(bool $minified)
     {
-        $url = $this->url . ($minified ? ".min.css" : ".css");
+        preg_match("/.css$/", $this->url, $output_array);
+        $url = $output_array !== null ? $this->url : $this->url . ($minified ? ".min.css" : ".css");
         return "<link rel='stylesheet' href='$url'>";
     }
 
