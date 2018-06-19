@@ -79,7 +79,7 @@ class JavaScriptEntry extends HeadEntry
         $async = $this->async ? "async" : "";
         $defer = $this->defer ? "defer" : "";
         preg_match("/.js$/", $this->url, $output_array);
-        $url = $output_array !== null ? $this->url : $this->url . ($minified ? ".min.js" : ".js");
+        $url = $output_array === null ? $this->url : $this->url . ($minified ? ".min.js" : ".js");
         return "<script src='$url' $async $defer></script>";
     }
 
