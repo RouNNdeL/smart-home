@@ -5,3 +5,6 @@ node_modules/
 /home_graph_key.json
 /database.mwb.bak
 lib/
+*.min.js
+*.min.js.map
+*.min.css
