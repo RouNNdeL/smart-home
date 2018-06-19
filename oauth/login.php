@@ -95,7 +95,7 @@ if(isset($_POST["oauth-username"]) && isset($_POST["oauth-password"]) && !$manag
 if($manager->getSessionManager()->isLoggedIn())
 {
     //TODO: Implement 2FA if the user has enabled it
-    require_once __DIR__ . "/../includes/database/OAuthUtils.php";
+    require_once __DIR__ . "/../includes/oauth/OAuthUtils.php";
     $code = urlencode(OAuthUtils::insertAuthCode(DbUtils::getConnection(), $client->id, $manager->getSessionManager()->getUserId(), $_GET["scope"]));
     $state = $_GET["state"];
     header("Location: " . $_GET["redirect_uri"] . "?code=$code&state=$state");
