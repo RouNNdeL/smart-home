@@ -43,15 +43,15 @@ class MatchUtils
         $time_string = date("g:iA", $dateTime);
         if($day_diff == 0)
         {
-            return "Today, " . $time_string;
+            return "Today • " . $time_string;
         }
         else if($day_diff == 1)
         {
-            return "Tomorrow, " . $time_string;
+            return "Tomorrow • " . $time_string;
         }
         else
         {
-            return date("D, j/n, ", $dateTime) . $time_string;
+            return date("D, j/n • ", $dateTime) . $time_string;
         }
     }
 
