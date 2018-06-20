@@ -30,6 +30,8 @@
  * Time: 13:43
  */
 
+require_once __DIR__ . "/../database/DbUtils.php";
+
 abstract class Effect
 {
     const AVR_EFFECT_BREATHE = 0x00;
@@ -105,34 +107,33 @@ abstract class Effect
 
     const HIDDEN_TEMPLATE = "<input type=\"hidden\" name=\"\$name\" value=\"\$value\">";
 
-    public $effect;
-    public $timings;
-    public $args;
+    /** @var string */
+    private $device_id;
 
-    /**
-     * @var array()
-     */
+    /** @var int[] */
+    protected $timings;
+
+    /** @var int[] */
+    protected $args;
+
+    /** @var  int[] */
     private $colors;
 
     /**
      * RgbDevice constructor. <b>Note:</b> Timings are interpreted as raw values input by user,
      * unless <code>$t_converted</code> is explicitly set to <code>true</code>
+     * @param string $device_id
      * @param array $colors
-     * @param float|int $off
-     * @param float|int $fadein
-     * @param float|int $on
-     * @param float|int $fadeout
-     * @param float|int $rotate
-     * @param float|int $offset
+     * @param array $timing
      * @param array $args
      * @param bool $t_converted
      */
-    public function __construct(array $colors, float $off, float $fadein, float $on, float $fadeout,
-                                float $rotate, float $offset, array $args = array(), bool $t_converted = false)
+    public function __construct(string $device_id, array $colors, array $timing, array $args = array(), bool $t_converted = false
+    )
     {
+        $this->device_id = $device_id;
         $this->colors = $colors;
-        $t_converted ? $this->setTimings($off, $fadein, $on, $fadeout, $rotate, $offset) :
-            $this->setTimingsRaw($off, $fadein, $on, $fadeout, $rotate, $offset);
+        $t_converted ? $this->setTimings($timing) : $this->setTimingsRaw($timing);
         $this->args = $args;
     }
 
@@ -157,27 +158,31 @@ abstract class Effect
         return $this->colors;
     }
 
-    public function setTimingsRaw(float $off, float $fadein, float $on, float $fadeout, float $rotation, float $offset)
+    public function setTimingsRaw(array $timing)
     {
-        $this->setTimings(self::convertToTiming($off), self::convertToTiming($fadein), self::convertToTiming($on),
-            self::convertToTiming($fadeout), self::convertToTiming($rotation), self::convertToTiming($offset));
+        $t = [];
+        foreach($timing as $i => $value)
+        {
+            $t[$i] = Effect::convertToTiming($timing[$i]);
+        }
+        $this->setTimings($t);
     }
 
-    public function setTimings(int $off, int $fadein, int $on, int $fadeout, int $rotation, int $offset)
+    public function setTimings(array $timing)
     {
-        if($off > 255 || $off < 0 || $fadein > 255 || $fadein < 0 ||
-            $on > 255 || $on < 0 || $fadeout > 255 || $fadeout < 0 ||
-            $rotation > 255 || $rotation < 0 || $offset > 255 || $offset < 0)
+        if($timing[0] > 255 || $timing[0] < 0 || $timing[1] > 255 || $timing[1] < 0 ||
+            $timing[2] > 255 || $timing[2] < 0 || $timing[3] > 255 || $timing[3] < 0 ||
+            $timing[4] > 255 || $timing[4] < 0 || $timing[5] > 255 || $timing[5] < 0)
         {
             throw new InvalidArgumentException("Timings have to be in range 0-255");
         }
 
-        $this->timings[0] = $off;
-        $this->timings[1] = $fadein;
-        $this->timings[2] = $on;
-        $this->timings[3] = $fadeout;
-        $this->timings[4] = $rotation;
-        $this->timings[5] = $offset;
+        $this->timings[0] = $timing[0];
+        $this->timings[1] = $timing[1];
+        $this->timings[2] = $timing[2];
+        $this->timings[3] = $timing[3];
+        $this->timings[4] = $timing[4];
+        $this->timings[5] = $timing[5];
     }
 
     /**
@@ -319,7 +324,7 @@ abstract class Effect
         return $data;
     }
 
-    public function getTimingStrings()
+    protected function getTimingStrings()
     {
         return ["off", "fadein", "on", "fadeout", "rotation", "offset"];
     }
@@ -360,9 +365,10 @@ abstract class Effect
     public abstract function getMinColors();
 
     /**
+     * @param string $device_id
      * @return Effect
      */
-    public static abstract function getDefault();
+    public static abstract function getDefault(string $device_id);
 
     public static function getTiming(int $x)
     {
@@ -477,5 +483,54 @@ abstract class Effect
             $a[$i] = self::getIncrementTiming($i);
         }
         return $a;
+    }
+
+    public static function getColorsForEffect(int $effect_id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT color FROM devices_colors WHERE effect_id = ? ORDER BY `order` ASC";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $effect_id);
+        $stmt->bind_result($color);
+        $stmt->execute();
+        $arr = [];
+        while($stmt->fetch())
+        {
+            $arr[] = $color;
+        }
+        $stmt->close();
+        return $arr;
+    }
+
+    public static function forProfile(int $profile_id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, device_id, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4 
+                FROM devices_effects WHERE profile_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $profile_id);
+        $stmt->bind_result($id, $d_id, $e, $t0, $t1, $t2, $t3, $t4, $t5, $a0, $a1, $a2, $a3, $a4);
+        $stmt->execute();
+        $arr = [];
+        while($stmt->fetch())
+        {
+            $c = Effect::getColorsForEffect($id);
+            switch($e)
+            {
+                case Effect::EFFECT_OFF:
+                    $arr[] = new Off($d_id, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
+                    break;
+                case Effect::EFFECT_STATIC:
+                    $arr[] = new Fixed($d_id, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
+                    break;
+                case Effect::EFFECT_BREATHING:
+                    $arr[] = new Breathe($d_id, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
+                    break;
+                default:
+                    throw new UnexpectedValueException("Invalid effect id: $e");
+            }
+        }
+        $stmt->close();
+        return $arr;
     }
 }

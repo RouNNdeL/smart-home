@@ -26,74 +26,50 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-06-11
- * Time: 17:47
+ * Date: 2018-06-20
+ * Time: 17:44
  */
-class Off extends Effect
+
+
+class Profile
 {
+    /** @var  */
+    private $id;
+
+    /** @var  */
+    private $name;
+
+    /** @var Effect[] */
+    private $effects;
 
     /**
-     * @return int
+     * Profile constructor.
+     * @param $id
+     * @param $name
+     * @param Effect[] $effects
      */
-    public function getTimingsForEffect()
+    private function __construct($id, $name, array $effects)
     {
-        return 0;
+        $this->id = $id;
+        $this->name = $name;
+        $this->effects = $effects;
     }
 
-    /**
-     * @return array
-     */
-    public function argsToArray()
+    public static function fromId(int $profile_id)
     {
-        return [];
-    }
-
-    /**
-     * @return array
-     */
-    public function argList()
-    {
-        return [];
-    }
-
-    /**
-     * @return int
-     */
-    public function avrEffect()
-    {
-        return Effect::AVR_EFFECT_BREATHE;
-    }
-
-    /**
-     * @return int
-     */
-    public function getEffectId()
-    {
-        return Effect::EFFECT_OFF;
-    }
-
-    /**
-     * @param string $device_id
-     * @return Effect
-     */
-    public static function getDefault(string $device_id)
-    {
-        return new Off($device_id, [0x000000], [1, 0, 0, 0, 0, 0]);
-    }
-
-    /**
-     * @return int
-     */
-    public function getMaxColors()
-    {
-        return 0;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMinColors()
-    {
-        return 0;
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT name FROM device_profiles WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $profile_id);
+        $stmt->bind_result($name);
+        $stmt->execute();
+        if($stmt->fetch())
+        {
+            $stmt->close();
+            $effects = Effect::forProfile($profile_id);
+            return new Profile($profile_id, $name, $effects);
+        }
+        $stmt->close();
+        return null;
     }
 }
