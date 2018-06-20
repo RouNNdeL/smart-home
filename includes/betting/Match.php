@@ -386,7 +386,7 @@ HTML;
             </div>
         </div>
         <div class="card-footer $footer_class">
-            <a target="_blank" href="$google_link"><span class="$more_info_class $bold">This match in Google</span></a>
+            <a target="_blank" href="$google_link"><small class="$more_info_class $bold">This match in Google</small></a>
             $pick_lock_span
         </div>
     </div>
