@@ -3,6 +3,8 @@ ErrorDocument 500 /web/error/500.php
 
 RewriteEngine on
 
+RewriteCond %{SERVER_NAME} !dev.zdul.xyz
+RewriteCond %{SERVER_NAME} !bets.zdul.xyz
 RewriteCond %{SERVER_NAME} !home.zdul.xyz
 RewriteCond %{SERVER_NAME} !192.168.1.10
 RewriteRule ^ https://home.zdul.xyz%{REQUEST_URI} [END,R=permanent]
@@ -29,7 +31,7 @@ RewriteRule ^bootstrap-switch/(.*) /node_modules/bootstrap-switch/$1 [L]
 RewriteRule ^tether/(.*) /node_modules/tether/$1 [L]
 RewriteRule ^iconic/(.*) /node_modules/open-iconic/$1 [L]
 
-RewriteRule ^(.*?\.(png|jpeg|jpg|svg))$ web/resources/$1 [L]
+RewriteRule ^(?!web/)(.*?\.(png|jpeg|jpg|svg))$ web/resources/$1 [L]
 
 RewriteRule (?!web/)js/(.*?)\.js$ web/js/$1.js [L]
 RewriteRule (?!web/)css/(.*?)\.css$ web/css/$1.css [L]
