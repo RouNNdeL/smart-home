@@ -107,6 +107,9 @@ abstract class Effect
 
     const HIDDEN_TEMPLATE = "<input type=\"hidden\" name=\"\$name\" value=\"\$value\">";
 
+    /** @var int */
+    private $id;
+
     /** @var string */
     private $device_id;
 
@@ -122,15 +125,17 @@ abstract class Effect
     /**
      * RgbDevice constructor. <b>Note:</b> Timings are interpreted as raw values input by user,
      * unless <code>$t_converted</code> is explicitly set to <code>true</code>
+     * @param int $id
      * @param string $device_id
      * @param array $colors
      * @param array $timing
      * @param array $args
      * @param bool $t_converted
      */
-    public function __construct(string $device_id, array $colors, array $timing, array $args = array(), bool $t_converted = false
+    public function __construct(int $id, string $device_id, array $colors, array $timing, array $args = array(), bool $t_converted = false
     )
     {
+        $this->id = $id;
         $this->device_id = $device_id;
         $this->colors = $colors;
         $t_converted ? $this->setTimings($timing) : $this->setTimingsRaw($timing);
@@ -485,6 +490,27 @@ abstract class Effect
         return $a;
     }
 
+    public function toDatabase(int $profile_id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "INSERT INTO devices_effects 
+                (id, profile_id, device_id, effect, time0, time1, time2, time3, time4, time5, 
+                arg0, arg1, arg2, arg3, arg4) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                ON DUPLICATE KEY UPDATE effect = ?, time0 = ?, time1 = ?, time2 = ?, time3 = ?, time4 = ?, time5 = ?, 
+                arg0 = ?, arg2 = ?, arg3 = ?, arg4 = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iisiiiiiiiiiiiiiiiiiiiiiiii",$this->id, $profile_id, $this->device_id,
+            $this->getEffectId(), $this->timings[0], $this->timings[1], $this->timings[2], $this->timings[3],
+            $this->timings[4], $this->timings[5], $this->args[0], $this->args[1], $this->args[2], $this->args[3],
+            $this->args[4], $this->getEffectId(), $this->timings[0], $this->timings[1], $this->timings[2],
+            $this->timings[3], $this->timings[4], $this->timings[5], $this->args[0], $this->args[1], $this->args[2],
+            $this->args[3], $this->args[4]
+        );
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
+
     public static function getColorsForEffect(int $effect_id)
     {
         $conn = DbUtils::getConnection();
@@ -518,13 +544,13 @@ abstract class Effect
             switch($e)
             {
                 case Effect::EFFECT_OFF:
-                    $arr[] = new Off($d_id, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
+                    $arr[] = new Off($id, $d_id, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
                     break;
                 case Effect::EFFECT_STATIC:
-                    $arr[] = new Fixed($d_id, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
+                    $arr[] = new Fixed($id, $d_id, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
                     break;
                 case Effect::EFFECT_BREATHING:
-                    $arr[] = new Breathe($d_id, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
+                    $arr[] = new Breathe($id, $d_id, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
                     break;
                 default:
                     throw new UnexpectedValueException("Invalid effect id: $e");
