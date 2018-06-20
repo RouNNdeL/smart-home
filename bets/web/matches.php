@@ -36,7 +36,7 @@ $manager = GlobalManager::withSessionManager(false);
 
 if(!$manager->getSessionManager()->isLoggedIn())
 {
-    $params = ["next" => "https://bets.zdul.xyz" . $_SERVER["REQUEST_URI"]];
+    $params = ["next" => "https://".$_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"]];
     header("Location: https://home.zdul.xyz/login?" . http_build_query($params));
     exit(0);
 }
