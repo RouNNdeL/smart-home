@@ -284,29 +284,40 @@ class Match
         $scores = $this->scoreA !== null && $this->scoreB !== null ? "$this->scoreA ‒ $this->scoreB" : "TBD";
         $time = $this->getTimeString();
 
+        $user_picked = true;
         if($this->picksOpen())
         {
-            $rows = [MatchUtils::getPredictionPointsForUserAndMatch($user_id, $this->id)];
+            $user_pick = MatchUtils::getPredictionPointsForUserAndMatch($user_id, $this->id);
+            if($user_pick === null)
+                $user_picked = false;
+            $rows = [$user_pick];
         }
         else
         {
             $rows = MatchUtils::getUserNamesIdsAndPredictionForMatch($this->id);
         }
 
-        if(sizeof($rows) > 0)
+        $table_rows = "";
+        if($user_picked)
         {
-            $table_rows = "";
-            foreach($rows as $row)
+            if(sizeof($rows) > 0)
             {
-                $table_rows .= MatchUtils::predictionRow(
-                    $row["name"], $row["score"], $row["points"],
-                    $user_id === $row["user_id"]
-                );
+                foreach($rows as $row)
+                {
+                    $table_rows .= MatchUtils::predictionRow(
+                        $row["name"], $row["score"], $row["points"],
+                        $user_id === $row["user_id"]
+                    );
+                }
+            }
+            else
+            {
+                $table_rows .= "<tr><td colspan='3'>No predictions for this match</td></tr>";
             }
         }
         else
         {
-            $table_rows = "";
+            $table_rows .= "<tr><td colspan='3'>You have not placed a pick for this match yet</td></tr>";
         }
 
         if($this->picksOpen())
