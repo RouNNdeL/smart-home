@@ -343,7 +343,7 @@ HTML;
 
         $google_link = "https://google.com/search?q=" .
             urlencode("2018 Russia World Cup " . $this->teamA->getName() . " vs " . $this->teamB->getName());
-        $pick_lock_span = $this->getPickLock("span");
+        $pick_lock_span = $this->getPickLock();
         $show_danger = $this->warnPicks() && $this->picksOpen();
         $footer_class = $show_danger ? "bg-danger" : "";
         $more_info_class = $show_danger ? "text-light" : "text-muted";
