@@ -59,7 +59,7 @@
     border-radius: 7px;
 }
 
-.slider.slider-horizontal
+.slider-container
 {
     width: 100%; !important;
     max-width: 164px;

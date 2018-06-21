@@ -37,9 +37,10 @@ class StyleSheetEntry extends HeadEntry
     const BOOTSTRAP = "/bootstrap/dist/css/bootstrap";
     const ICONIC = "/iconic/font/css/open-iconic-bootstrap";
     const TETHER = "/tether/dist/css/tether";
-    const COLOR_PICKER = "/bootstrap-colorpicker/dist/css/bootstrap-colorpicker";
-    const SLIDER = "/bootstrap-slider/dist/css/bootstrap-slider";
-    const SWITCH = "/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch";
+    const COLOR_PICKER = "/colorpicker/dist/css/bootstrap-colorpicker";
+    const SLIDER = "/slider/css/ion.rangeSlider.css";
+    const SLIDER_STYLE = "/slider/css/ion.rangeSlider.skinFlat.css";
+    const SWITCH = "/switch/dist/css/bootstrap3/bootstrap-switch";
     const MAIN = "/css/main";
     const DEVICE_SETTINGS = "/css/device_settings";
 

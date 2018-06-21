@@ -136,8 +136,8 @@ class SimpleRgbDevice extends VirtualDevice
             $name = $device_html;
         else
             $name = $this->device_name;
-        $checked = $this->on ? "checked" :"";
-        $color = "#".str_pad(dechex($this->color), 6, '0', STR_PAD_LEFT);
+        $checked = $this->on ? "checked" : "";
+        $color = "#" . str_pad(dechex($this->color), 6, '0', STR_PAD_LEFT);
         return <<<HTML
         <form>
             <div class="card-header">
@@ -153,18 +153,13 @@ class SimpleRgbDevice extends VirtualDevice
                 <div class="row">
                     <div class="col">
                         <p class="mb-0">Brightness</p>
-                        <div> 
+                        <div class="m-5" class="slider-container"> 
                             <input
                                 class="slider change-listen"
                                 type="text"
                                 name="brightness"
                                 id="brightness-$this->device_id"
-                                data-provide="slider"
-                                data-slider-ticks="[0, 100]"
-                                data-slider-min="0"
-                                data-slider-max="100"
-                                data-slider-step="1"
-                                data-slider-value="$this->brightness">
+                                value="$this->brightness">
                         </div>
                         <div class="color-container row mt-3">
                             <div class="col px-1">

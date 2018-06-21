@@ -38,9 +38,9 @@ class JavaScriptEntry extends HeadEntry
     const TETHER = "/tether/dist/js/tether";
     const BOOTSTRAP = "/bootstrap/dist/js/bootstrap";
     const JQUERY_UI = "/jqueryui/jquery-ui";
-    const COLOR_PICKER = "/bootstrap-colorpicker/dist/js/bootstrap-colorpicker";
-    const SLIDER = "/bootstrap-slider/dist/bootstrap-slider";
-    const SWITCH = "/bootstrap-switch/dist/js/bootstrap-switch";
+    const COLOR_PICKER = "/colorpicker/dist/js/bootstrap-colorpicker";
+    const SLIDER = "/slider/js/ion.rangeSlider";
+    const SWITCH = "/switch/dist/js/bootstrap-switch";
     const CAPTCHA = "https://www.google.com/recaptcha/api.js";
     const GOOGLE_PLATFORM = "https://apis.google.com/js/platform";
     const LOGIN = "/js/login";
