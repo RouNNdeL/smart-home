@@ -31,12 +31,12 @@
  */
 
 require_once __DIR__ . "/../database/DeviceDbHelper.php";
-require_once __DIR__ . "/RgbProfilesDevice.php";
+require_once __DIR__ . "/RgbEffectDevice.php";
 
 /**
  * To be used with an ESP8266 WiFi Led Controller: https://github.com/RouNNdeL/esp8266-leds
  */
-class EspWifiLedController extends RgbProfilesDevice
+class EspWifiLedController extends RgbEffectDevice
 {
 
     private $request_id = null;
@@ -106,7 +106,7 @@ class EspWifiLedController extends RgbProfilesDevice
         for($i = 0; $i < sizeof($this->virtual_devices); $i++)
         {
             $virtual_device = $this->virtual_devices[$i];
-            if(!($virtual_device instanceof RgbEffectDevice))
+            if(!($virtual_device instanceof BaseEffectDevice))
                 throw new UnexpectedValueException("Children of EspWifiLedController should be of type RgbEffectDevice");
             $virtual_device->setBrightness(ceil($state["brightness"][$i] * 100 / 255));
             $virtual_device->setOn($state["flags"][$i] & (1 << 0));
@@ -129,7 +129,7 @@ class EspWifiLedController extends RgbProfilesDevice
         {
             $device = $this->virtual_devices[$i];
             $class_name = get_class($this);
-            if(!$device instanceof RgbEffectDevice)
+            if(!$device instanceof BaseEffectDevice)
                 throw new UnexpectedValueException("Children of $class_name should be of type RgbEffectDevice");
 
             /* We disable the effects in order to show the color */

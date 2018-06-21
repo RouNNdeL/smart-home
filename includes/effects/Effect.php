@@ -113,6 +113,9 @@ abstract class Effect
     /** @var string */
     private $device_id;
 
+    /** @var string */
+    private $name;
+
     /** @var int[] */
     protected $timings;
 
@@ -127,16 +130,19 @@ abstract class Effect
      * unless <code>$t_converted</code> is explicitly set to <code>true</code>
      * @param int $id
      * @param string $device_id
+     * @param string $name
      * @param array $colors
      * @param array $timing
      * @param array $args
      * @param bool $t_converted
      */
-    public function __construct(int $id, string $device_id, array $colors, array $timing, array $args = array(), bool $t_converted = false
+    public function __construct(int $id, string $device_id, string $name, array $colors, array $timing,
+                                array $args = array(), bool $t_converted = false
     )
     {
         $this->id = $id;
         $this->device_id = $device_id;
+        $this->name = $name;
         $this->colors = $colors;
         $t_converted ? $this->setTimings($timing) : $this->setTimingsRaw($timing);
         $this->args = $args;
@@ -490,16 +496,16 @@ abstract class Effect
         return $a;
     }
 
-    public function toDatabase(int $profile_id)
+    public function toDatabase()
     {
         $conn = DbUtils::getConnection();
         $sql = "INSERT INTO devices_effects 
-                (id, profile_id, device_id, effect, time0, time1, time2, time3, time4, time5, 
-                arg0, arg1, arg2, arg3, arg4) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                (id, device_id, effect, time0, time1, time2, time3, time4, time5, 
+                arg0, arg1, arg2, arg3, arg4) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
                 ON DUPLICATE KEY UPDATE effect = ?, time0 = ?, time1 = ?, time2 = ?, time3 = ?, time4 = ?, time5 = ?, 
                 arg0 = ?, arg2 = ?, arg3 = ?, arg4 = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iisiiiiiiiiiiiiiiiiiiiiiiii",$this->id, $profile_id, $this->device_id,
+        $stmt->bind_param("isiiiiiiiiiiiiiiiiiiiiiiii", $this->id, $this->device_id,
             $this->getEffectId(), $this->timings[0], $this->timings[1], $this->timings[2], $this->timings[3],
             $this->timings[4], $this->timings[5], $this->args[0], $this->args[1], $this->args[2], $this->args[3],
             $this->args[4], $this->getEffectId(), $this->timings[0], $this->timings[1], $this->timings[2],
@@ -528,14 +534,39 @@ abstract class Effect
         return $arr;
     }
 
+    public static function forDevice(string $device_id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, device_id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4 
+                FROM devices_effects WHERE device_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $device_id);
+        $arr = Effect::arrayFromStatement($stmt);
+        $stmt->close();
+        return $arr;
+    }
+
     public static function forProfile(int $profile_id)
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, device_id, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4 
+        $sql = "SELECT id, device_id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4 
                 FROM devices_effects WHERE profile_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $profile_id);
-        $stmt->bind_result($id, $d_id, $e, $t0, $t1, $t2, $t3, $t4, $t5, $a0, $a1, $a2, $a3, $a4);
+        $arr = Effect::arrayFromStatement($stmt);
+        $stmt->close();
+        return $arr;
+    }
+
+    /**
+     * Columns required in order:
+     * id, device_id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4
+     * @param mysqli_stmt $stmt
+     * @return Effect[]
+     */
+    private static function arrayFromStatement(mysqli_stmt & $stmt)
+    {
+        $stmt->bind_result($id, $d_id, $n, $e, $t0, $t1, $t2, $t3, $t4, $t5, $a0, $a1, $a2, $a3, $a4);
         $stmt->execute();
         $arr = [];
         while($stmt->fetch())
@@ -544,19 +575,18 @@ abstract class Effect
             switch($e)
             {
                 case Effect::EFFECT_OFF:
-                    $arr[] = new Off($id, $d_id, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
+                    $arr[] = new Off($id, $d_id, $n, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
                     break;
                 case Effect::EFFECT_STATIC:
-                    $arr[] = new Fixed($id, $d_id, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
+                    $arr[] = new Fixed($id, $d_id, $n, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
                     break;
                 case Effect::EFFECT_BREATHING:
-                    $arr[] = new Breathe($id, $d_id, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
+                    $arr[] = new Breathe($id, $d_id, $n, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
                     break;
                 default:
                     throw new UnexpectedValueException("Invalid effect id: $e");
             }
         }
-        $stmt->close();
         return $arr;
     }
 }

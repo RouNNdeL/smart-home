@@ -26,8 +26,8 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 5/31/2018
- * Time: 1:53 PM
+ * Date: 2018-06-21
+ * Time: 08:54
  */
 
 require_once __DIR__ . "/../../includes/GlobalManager.php";
@@ -43,8 +43,8 @@ if(!isset($_GET["device_id"]))
 
 $manager->loadUserDeviceManager();
 
-$device = $manager->getUserDeviceManager()->getPhysicalDeviceById($_GET["device_id"]);
-if($device === null)
+$device = $manager->getUserDeviceManager()->getVirtualDeviceById($_GET["device_id"]);
+if($device === null || !$device instanceof BaseEffectDevice)
 {
     require __DIR__ . "/../error/404.php";
     http_response_code(404);
@@ -53,16 +53,15 @@ if($device === null)
 
 if(isset($_GET["name"]) && $_GET["name"] === "false")
 {
-    header("Location: /device/" . urlencode($device->getDisplayName()) . "/" . urlencode($device->getId()));
+    header("Location: /device/" . urlencode($device->getDeviceName()) . "/" . urlencode($device->getDeviceId()));
 }
-$virtualDevices = $device->getVirtualDevices();
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <?php
 require_once __DIR__ . "/../../includes/head/HtmlHead.php";
-$head = new HtmlHead("Smart Home - " . $device->getDisplayName());
+$head = new HtmlHead("Smart Home - " . $device->getDeviceName());
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::COLOR_PICKER));
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::SLIDER));
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::SWITCH));
@@ -80,51 +79,15 @@ echo $head->toString();
 <div class="container-fluid">
     <div class="row device-settings-content">
         <div class="col-sm-12">
-            <div class="card <?php if(sizeof($virtualDevices) === 1) echo "device-parent"?>" <?php
-            $id = $virtualDevices[0]->getDeviceId();
-            if(sizeof($virtualDevices) == 1) echo "data-device-id=\"$id\""?>
-            >
-                <?php
-
-                if(sizeof($virtualDevices) > 1)
-                {
-                    $virtual_html = "";
-                    foreach($virtualDevices as $i => $virtualDevice)
-                    {
-                        $html = $virtualDevice->toHtml();
-                        $id = $virtualDevice->getDeviceId();
-                        $virtual_html .= <<<HTML
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 px-1 py-1">
-                            <div class="card device-parent" data-device-id="$id">
-                                $html
-                            </div> 
-                        </div>
-HTML;
-
-                    }
-
-                    $device_name = $device->getNameWithState();
-                    echo <<<HTML
-                    <div class="card-header">
-                        <h4>$device_name</h4>
-                    </div>
-                    <div class="card-body px-3 py-2">
-                        <div class="row px-2 py-0">
-                            $virtual_html
-                        </div>
-                    </div>
-HTML;
-
-                }
-                else
-                {
-                    echo $virtualDevices[0]->toHtml($device->getNameWithState());
-                }
-                ?>
-
+            <div class="card">
+                <div class="card-header">
+                    <h2>Mood Light</h2>
+                </div>
+                <div class="card-body">
+                    <? echo $device->toAdvancedHtml()?>
+                </div>
                 <div class="card-footer">
-                    <button id="device-settings-submit"
-                            class="btn btn-danger"><?php echo Utils::getString("device_reboot"); ?></button>
+                    <button class="btn btn-primary">Save</button>
                 </div>
             </div>
         </div>
