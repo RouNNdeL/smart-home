@@ -70,6 +70,9 @@ class GoogleOAuthService extends OAuthService
      */
     public function registerUser(array $requestTokens)
     {
-        // TODO: Implement registerUser() method.
+        $id_token = GoogleOAuthService::decodeIdToken($requestTokens["id_token"]);
+        if($id_token === null || isset($id_token["error_description"]))
+            return null;
+        return HomeUser::newUserWithGoogle($id_token["sub"], $id_token["given_name"], $id_token["family_name"]);
     }
 }

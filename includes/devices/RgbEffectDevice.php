@@ -26,162 +26,290 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-05-16
- * Time: 14:15
+ * Date: 2018-05-14
+ * Time: 19:03
  */
+require_once __DIR__ . "/VirtualDevice.php";
+require_once __DIR__ . "/PhysicalDevice.php";
+require_once __DIR__ . "/../database/DbUtils.php";
+require_once __DIR__ . "/../database/DeviceDbHelper.php";
 
-require_once __DIR__ . "/../Utils.php";
-
-abstract class RgbEffectDevice extends SimpleRgbDevice
+abstract class RgbEffectDevice extends PhysicalDevice
 {
-    const ACTIONS_TOGGLE_EFFECT = "ACTIONS_TOGGLE_EFFECT";
+    protected $current_profile;
+    protected $auto_increment;
 
-    /** @var Effect[] */
-    private $effects;
+    /** @var int[] */
+    protected $active_indexes;
+    /** @var int[] */
+    protected $inactive_indexes;
+    /** @var int[] */
+    protected $avr_indexes;
+    /** @var int[] */
+    protected $old_avr_indexes;
+    /** @var int[] */
+    protected $modified_profiles;
+    /** @var int[] */
+    protected $avr_order;
+    
+    /** @var int */
+    protected $active_profile_count;
+    
+    /** @var int */
+    protected $max_profile_count;
 
-    /** @var bool */
-    private $effects_enabled;
-
-    private $color_count;
-
-    public $current_profile;
+    /** @var Profile[] */
+    protected $profiles;
 
     /**
-     * RgbEffectDevice constructor.
-     * @param string $device_id
-     * @param string $device_name
-     * @param array $synonyms
-     * @param bool $home_actions
-     * @param bool $will_report_state
-     * @param int $color
-     * @param int $brightness
-     * @param bool $on
-     * @param array $effects
-     * @param bool $effects_enabled
+     * @param string $id
+     * @param int $owner_id
+     * @param string $display_name
+     * @param string $hostname
      * @param int $current_profile
+     * @param bool $enabled
+     * @param int $auto_increment
+     * @param array $profiles
+     * @param array $virtual_devices
      */
-    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions,
-                                bool $will_report_state, int $color = 0xffffff, int $brightness = 100,
-                                bool $on = true, $effects = [], $effects_enabled = true, $current_profile = 0
-    )
+    protected function __construct(string $id, int $owner_id, string $display_name, string $hostname, int $current_profile, bool $enabled, int $auto_increment,
+                                   array $profiles, array $virtual_devices)
     {
-        parent::__construct($device_id, $device_name, $synonyms, $home_actions, $will_report_state, $color, $brightness, $on);
-        $this->effects = $effects;
-        $this->effects_enabled = $effects_enabled;
+        parent::__construct($id, $owner_id, $display_name, $hostname, $virtual_devices);
+
         $this->current_profile = $current_profile;
-
-    }
-
-    public function getTraits()
-    {
-        $array = parent::getTraits();
-        array_push($array, self::DEVICE_TRAIT_TOGGLES);
-        return $array;
-    }
-
-    public function getAttributes()
-    {
-        $name_values = [];
-        foreach(Utils::AVAILABLE_LANGUAGES as $i => $lang)
+        $this->auto_increment = $auto_increment;
+        $this->profiles = $profiles;
+        $this->max_profile_count = DeviceDbHelper::getMaxProfileCount(DbUtils::getConnection(), $id);
+        $this->active_profile_count = DeviceDbHelper::getActiveProfileCount(DbUtils::getConnection(), $id);
+        if($this->max_profile_count === null || $this->active_profile_count === null)
         {
-            $utils = new Utils($lang);
-            $name_values[$i] = ["lang" => $lang, "name_synonym" => [
-                $utils->_getString("actions_toggle_effect1"),
-                $utils->_getString("actions_toggle_effect2")]
-            ];
+            throw new UnexpectedValueException("Missing max_profile_count or active_profile_count for $id, 
+            please add the appropriate record in the database");
         }
-        return ["availableToggles" => [
-            ["name" => self::ACTIONS_TOGGLE_EFFECT, "name_values" => $name_values]
-        ]];
+        if (sizeof($profiles) <= $this->max_profile_count) {
+            $this->active_indexes = range(0, sizeof($profiles) - 1);
+            $this->inactive_indexes = array();
+        } else {
+            $this->active_indexes = range(0,$this->max_profile_count - 1);
+            $this->inactive_indexes = range($this->max_profile_count, sizeof($profiles) - $this->active_profile_count - 1);
+        }
+        $this->avr_indexes = $this->active_indexes;
+        $this->avr_order = $this->getAvrOrder();
+        $this->modified_profiles = array();
+    }
+
+    public function getProfileCount()
+    {
+        return sizeof($this->profiles);
+    }
+
+    public function addProfile(Profile $profile)
+    {
+        if (sizeof($this->profiles) >= $this->max_profile_count)
+            return false;
+        array_push($this->profiles, $profile);
+        if (sizeof($this->active_indexes) < $this->active_profile_count) {
+            array_push($this->active_indexes, $this->getMaxIndex());
+            for ($i = 0; $i < $this->active_profile_count; $i++) {
+                if (!isset($this->avr_indexes[$i])) {
+                    $this->avr_indexes[$i] = $this->getMaxIndex();
+                    break;
+                }
+            }
+            $this->avr_order = $this->getAvrOrder();
+            return true;
+        }
+        array_push($this->inactive_indexes, $this->getMaxIndex());
+        return true;
+    }
+
+    public function setCurrentProfile($n, $raw = false)
+    {
+        $this->current_profile = $raw ? $n : array_search(array_search($n, $this->avr_indexes), $this->avr_order);
+    }
+
+    public function setOrder($active, $inactive)
+    {
+        $new_profiles = array();
+        foreach ($this->active_indexes as $item) {
+            if (array_search($item, $active) === false) {
+                if ($this->getActiveProfileIndex() === $item) {
+                    $this->setCurrentProfile($active[0]);
+                }
+                unset($this->avr_indexes[array_search($item, $this->avr_indexes)]);
+            }
+        }
+        foreach ($active as $item) {
+            if (array_search($item, $this->active_indexes) === false) {
+                for ($i = 0; $i < $this->active_profile_count; $i++) {
+                    if (!isset($this->avr_indexes[$i])) {
+                        $this->avr_indexes[$i] = $item;
+                        $avr_i = $i;
+                        break;
+                    }
+                }
+                if (!isset($avr_i))
+                    throw new UnexpectedValueException("Cannot insert profile, avr_indexes full");
+                $new_profiles[$avr_i] = $item;
+            }
+        }
+        $previous_active = $this->getActiveProfileIndex();
+        $this->active_indexes = $active;
+        $this->inactive_indexes = $inactive;
+        $this->avr_order = $this->getAvrOrder();
+        $this->setCurrentProfile($previous_active);
+
+        return $new_profiles;
+    }
+
+    public function getCurrentProfile()
+    {
+        return $this->current_profile;
+    }
+
+    public function removeProfile(int $index)
+    {
+        if (sizeof($this->profiles) == 1)
+            return false;
+        if (isset($this->profiles[$index])) {
+            unset($this->profiles[$index]);
+            if (($key = array_search($index, $this->active_indexes)) !== false) {
+                array_splice($this->active_indexes, $key, 1);
+            }
+            if (($key = array_search($index, $this->avr_indexes)) !== false) {
+                unset($this->avr_indexes[$key]);
+                if ($this->current_profile === array_search($key, $this->avr_order)) {
+                    $this->current_profile -= 1;
+                }
+            }
+            if (($key = array_search($index, $this->inactive_indexes)) !== false) {
+                array_splice($this->inactive_indexes, $key, 1);
+            }
+            $this->avr_order = $this->getAvrOrder();
+            return true;
+        }
+        return false;
     }
 
     /**
-     * @param string $device_html
-     * @return string
+     * @return Profile[]
      */
-    public function toHtml($device_html = null)
+    public function getProfiles()
     {
-        //TODO: Add a link to Effects edit page
-        return parent::toHtml($device_html);
-        $device = $this->device_id;
-        $html = "<form id=\"device-form-$device\">";
-        $profile_colors = Utils::getString("profile_colors");
-        $profile_effect = Utils::getString("profile_effect");
-        $profile_color_input = Utils::getString("profile_color_input");
-        $profile_add_color = Utils::getString("profile_add_color");
-        $color_limit = $this->color_count;
-        $current_effect = $this->effects[$this->current_profile];
+        return $this->profiles;
+    }
 
-        $colors_html = $current_effect->colorsHtml($color_limit);
-        $effects_html = "";
+    public function getMaxIndex()
+    {
+        return max(array_keys($this->profiles));
+    }
 
-        foreach($this->getAvailableEffects() as $id => $effect)
-        {
-            $string = Utils::getString("profile_" . $effect);
-            $effects_html .= "<option value=\"$id\" " . ($id == $current_effect ? " selected" : "") . ">$string</option>";
+    /**
+     * @return Profile[]
+     */
+    public function getActiveProfilesInOrder()
+    {
+        $arr = array();
+        foreach ($this->active_indexes as $index) {
+            $arr[$index] = $this->profiles[$index];
+        }
+        return $arr;
+    }
+
+    /**
+     * @return Profile[]
+     */
+    public function getInactiveProfilesInOrder()
+    {
+        $arr = array();
+        foreach ($this->inactive_indexes as $index) {
+            $arr[$index] = $this->profiles[$index];
+        }
+        return $arr;
+    }
+
+    public function getActiveIndex($n)
+    {
+        return array_search($n, array_keys($this->profiles));
+    }
+
+    public function getHighlightIndex()
+    {
+        return array_search($this->avr_indexes[$this->avr_order[$this->current_profile]], array_keys($this->profiles));
+    }
+
+    public function getActiveProfileIndex()
+    {
+        return $this->avr_indexes[$this->avr_order[$this->current_profile]];
+    }
+
+    public function getAvrIndex($n)
+    {
+        return array_search($n, $this->avr_indexes);
+    }
+
+    public function getProfile($n)
+    {
+        return isset($this->profiles[$n]) ? $this->profiles[$n] : false;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAutoIncrement()
+    {
+        return Effect::getIncrementTiming($this->auto_increment);
+    }
+
+    /**
+     * @param $value
+     * @return float|int
+     */
+    public function setAutoIncrement($value)
+    {
+        $timing = Effect::convertIncrementToTiming($value);
+        $this->auto_increment = $timing;
+        return Effect::getIncrementTiming($timing);
+    }
+
+    public function updateOldVars()
+    {
+        $this->old_avr_indexes = $this->avr_indexes;
+        $this->modified_profiles = array();
+    }
+
+    public function getNewProfiles()
+    {
+        var_dump($this->modified_profiles);
+        $new_profiles = array();
+
+        foreach ($this->avr_indexes as $i => $item) {
+            if (array_search($item, $this->old_avr_indexes) === false) {
+                $new_profiles[$i] = $item;
+            }
+        }
+        foreach ($this->modified_profiles as $modified_profile) {
+            if (($key = array_search($modified_profile, $this->avr_indexes)) !== false) {
+                $new_profiles[$key] = $modified_profile;
+            }
         }
 
-        $btn_class = sizeof($current_effect->getColors()) >= $color_limit ? " hidden-xs-up" : "";
-        $html .= "<div class=\"main-container row m-2\">
-        <div class=\"col-12 col-sm-6 col-lg-4 col-xl-3 mb-3 mb-lg-0\">
-        <div class=\"form-group\">
-            <h3>$profile_effect</h3>
-            <select class=\"form-control effect-select\" name=\"effect\" id=\"effect-select-$device\">
-                $effects_html
-            </select>
-        </div>
-        <div class=\"row\">
-            <div class=\"col pr-0\"><h3 class=\"header-colors\">$profile_colors</h3></div>
-            <div class=\"col-auto pr-3\">
-                <button class=\"add-color-btn btn btn-primary btn-sm color-swatch$btn_class\" 
-                        type=\"button\">$profile_add_color</button>
-            </div>
-        </div>
-        <div class=\"swatches-container\" data-color-limit=\"$color_limit\">
-            $colors_html
-        </div>
-
-    </div>";
-        $html .= $current_effect->timingArgHtml();
-        $html .= "</form></div>";
-
-        return $html;
+        return $new_profiles;
     }
 
-    public function addEffect($effect)
+    public function addModified($index)
     {
-
+        array_push($this->modified_profiles, $index);
+        $this->modified_profiles = array_unique($this->modified_profiles);
     }
 
-    public abstract function getAvailableEffects();
-
-    public function toDatabase()
+    public function getAvrOrder()
     {
-        $conn = DbUtils::getConnection();
-        $state = $this->on ? 1 : 0;
-        $toggles = (($this->effects_enabled ? 1 : 0) << 0);
-        $sql = "UPDATE devices_virtual SET 
-                  color = $this->color,
-                  brightness = $this->brightness, 
-                  state = $state,
-                  toggles = $toggles 
-                WHERE id = '$this->device_id'";
-        $conn->query($sql);
-    }
-
-    /**
-     * @return bool
-     */
-    public function areEffectsEnabled(): bool
-    {
-        return $this->effects_enabled;
-    }
-
-    /**
-     * @param bool $effects_enabled
-     */
-    public function setEffectsEnabled(bool $effects_enabled)
-    {
-        $this->effects_enabled = $effects_enabled;
+        $arr = array();
+        foreach ($this->active_indexes as $i => $active_index) {
+            $arr[$i] = array_search($active_index, $this->avr_indexes);
+        }
+        return $arr;
     }
 }

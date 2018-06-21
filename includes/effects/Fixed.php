@@ -74,11 +74,12 @@ class Fixed extends Effect
     }
 
     /**
+     * @param string $device_id
      * @return Effect
      */
-    public static function getDefault()
+    public static function getDefault(string $device_id)
     {
-        return new Fixed([0xff0000], 0, 0, 1, 0, 0, 0);
+        return new Fixed($device_id, [0xff0000], [0, 0, 1, 0, 0, 0]);
     }
 
     /**

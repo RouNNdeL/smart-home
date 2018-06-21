@@ -31,14 +31,15 @@
  */
 
 require_once __DIR__ . "/SimpleRgbDevice.php";
-require_once __DIR__ . "/SimpleEffectDevice.php";
+require_once __DIR__ . "/BaseEffectDevice.php";
+require_once __DIR__ . "/AnalogEffectDevice.php";
 require_once __DIR__ . "/LampAnalog.php";
 require_once __DIR__ . "/LampSimple.php";
 
 abstract class VirtualDevice
 {
     const DEVICE_TYPE_RGB = "DEVICE_RGB";
-    const DEVICE_TYPE_EFFECTS_RGB_SIMPLE = "DEVICE_EFFECTS_RGB_SIMPLE";
+    const DEVICE_TYPE_EFFECTS_RGB_ANALOG = "DEVICE_EFFECTS_RGB_ANALOG";
     const DEVICE_TYPE_EFFECTS_RGB_ADVANCED = "DEVICE_EFFECTS_RGB_ADVANCED";
     const DEVICE_TYPE_LAMP = "DEVICE_LAMP";
     const DEVICE_TYPE_LAMP_ANALOG = "DEVICE_LAMP_ANALOG";
@@ -57,11 +58,6 @@ abstract class VirtualDevice
     const DEVICE_COMMAND_BRIGHTNESS_ABSOLUTE = "action.devices.commands.BrightnessAbsolute";
     const DEVICE_COMMAND_COLOR_ABSOLUTE = "action.devices.commands.ColorAbsolute";
     const DEVICE_COMMAND_ON_OFF = "action.devices.commands.OnOff";
-
-    const DEVICE_ID_PC_PC = 0;
-    const DEVICE_ID_PC_GPU = 1;
-    const DEVICE_ID_PC_CPU_FAN = 2;
-    const DEVICE_ID_PC_UNDERGLOW = 3;
 
     /** @var string */
     protected $device_type;
@@ -177,8 +173,8 @@ abstract class VirtualDevice
                     $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["will_report_state"],
                     $row["color"], $row["brightness"], $row["state"]
                 );
-            case self::DEVICE_TYPE_EFFECTS_RGB_SIMPLE:
-                return new SimpleEffectDevice(
+            case self::DEVICE_TYPE_EFFECTS_RGB_ANALOG:
+                return new AnalogEffectDevice(
                     $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["will_report_state"],
                     $row["color"], $row["brightness"], $row["state"]
                 );

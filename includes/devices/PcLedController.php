@@ -30,8 +30,8 @@
  * Time: 19:41
  */
 
-require_once __DIR__."/RgbProfilesDevice.php";
-class PcLedController extends RgbProfilesDevice
+require_once __DIR__."/RgbEffectDevice.php";
+class PcLedController extends RgbEffectDevice
 {
 
     const SAVE_PATH = "/_data/pc_controller.dat";
@@ -101,21 +101,9 @@ class PcLedController extends RgbProfilesDevice
 
     public static function load(string $id, int $owner_id, string $display_name, string $hostname)
     {
-        $path = $_SERVER["DOCUMENT_ROOT"] . self::SAVE_PATH;
-        $contents = file_get_contents($path);
-        $unserialize = unserialize($contents);
-        // TODO: Load device names from database
-        if($unserialize)
-            return $unserialize;
 
-        $virtual_devices = [
-            new SimpleRgbDevice(VirtualDevice::DEVICE_ID_PC_PC, null, 0x000000, 100, false),
-            new SimpleRgbDevice(VirtualDevice::DEVICE_ID_PC_GPU, null, 0x000000, 100, false),
-            new SimpleRgbDevice(VirtualDevice::DEVICE_ID_PC_CPU_FAN, null, 0x000000, 100, false),
-            new SimpleRgbDevice(VirtualDevice::DEVICE_ID_PC_UNDERGLOW, null, 0x000000, 100, false),
-        ];
-        $profiles = [new Profile(Utils::getString("default_profile_name"), 4, 2)];
-        return new PcLedController($owner_id, $display_name, $hostname, 0, true, 1, 0, true, $profiles, $virtual_devices);
+
+        return new PcLedController($owner_id, $display_name, $hostname, 0, true, 1, 0, true, [], []);
     }
 
     function tcp_send($string = null)

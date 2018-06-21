@@ -1,4 +1,5 @@
-/*
+<?php
+/**
  * MIT License
  *
  * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
@@ -22,4 +23,21 @@
  * SOFTWARE.
  */
 
-.color-input{font-family:monospace;font-size:1.2rem;width:184px}.colorpicker-big .colorpicker-saturation{width:150px;height:150px}.colorpicker-big .colorpicker-hue,.colorpicker-big .colorpicker-alpha{width:20px;height:150px}.colorpicker-big .colorpicker-color,.colorpicker-big .colorpicker-color div{height:20px}.colorpicker-big .colorpicker-preview,.colorpicker-big .colorpicker-preview div{height:20px;font-size:12px;line-height:120%}.colorpicker-big .colorpicker-saturation .colorpicker-guide,.colorpicker-big .colorpicker-saturation .colorpicker-guide i{height:7px;width:7px;border-radius:7px}.slider.slider-horizontal{width:100%;!important;max-width:164px}.device-settings-content{padding-top:12px;height:100%}.vertical-align{display:inline-block;vertical-align:middle;float:none}
+/**
+ * Created by PhpStorm.
+ * User: Krzysiek
+ * Date: 2018-05-17
+ * Time: 20:18
+ */
+
+require_once __DIR__ . "/BaseEffectDevice.php";
+require_once __DIR__."/../effects/Effect.php";
+
+class AnalogEffectDevice extends BaseEffectDevice
+{
+
+    public function getAvailableEffects()
+    {
+        return [Effect::EFFECT_OFF, Effect::EFFECT_STATIC, Effect::EFFECT_BREATHING];
+    }
+}

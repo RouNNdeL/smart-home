@@ -32,6 +32,12 @@ $(function()
     let last_call_time = 0;
     let update_timeout = 0;
 
+    $(".slider").ionRangeSlider({
+        min: 0,
+        max: 100,
+        grid: true,
+        postfix: "%"
+    });
     $(".checkbox-switch").bootstrapSwitch().on('switchChange.bootstrapSwitch', update);
     $(".color-picker-init").on('changeColor', function(e)
     {

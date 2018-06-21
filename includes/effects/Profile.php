@@ -1,4 +1,5 @@
-/*
+<?php
+/**
  * MIT License
  *
  * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
@@ -21,4 +22,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-"use strict";$(function(){$(".debug-button").click(function(e){const a=$(this).data("action");const t=$(this).data("value");if(a==="pause"){$("#debug-pause-icon").toggleClass("oi-media-pause oi-media-play");$(this).data("value",t?0:1)}$.ajax({url:"/api/debug/control",data:JSON.stringify({action:a,value:t}),method:"POST",dataType:"json",contentType:"application/json"})});if(typeof EventSource!=="undefined"){const e=new EventSource("/api/debug/stream");e.addEventListener("debug_info",({data:e})=>{const a=JSON.parse(e);if(a.debug_json!==null){$("#debug-data").html(a.debug_html);if(a.debug_json.flag_debug_enabled===true){$("#debug-pause-icon").addClass("oi-media-play").removeClass("oi-media-pause")}else{$("#debug-pause-icon").addClass("oi-media-pause").removeClass("oi-media-play")}}})}});
+
+/**
+ * Created by PhpStorm.
+ * User: Krzysiek
+ * Date: 2018-06-20
+ * Time: 17:44
+ */
+
+
+class Profile
+{
+    /** @var  */
+    private $id;
+
+    /** @var  */
+    private $name;
+
+    /** @var Effect[] */
+    private $effects;
+
+    /**
+     * Profile constructor.
+     * @param $id
+     * @param $name
+     * @param Effect[] $effects
+     */
+    private function __construct($id, $name, array $effects)
+    {
+        $this->id = $id;
+        $this->name = $name;
+        $this->effects = $effects;
+    }
+
+    public static function fromId(int $profile_id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT name FROM device_profiles WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $profile_id);
+        $stmt->bind_result($name);
+        $stmt->execute();
+        if($stmt->fetch())
+        {
+            $stmt->close();
+            $effects = Effect::forProfile($profile_id);
+            return new Profile($profile_id, $name, $effects);
+        }
+        $stmt->close();
+        return null;
+    }
+}

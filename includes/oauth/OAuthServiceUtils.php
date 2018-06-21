@@ -31,7 +31,7 @@
  */
 class OAuthServiceUtils
 {
-    const REDIRECT_URI = "https://home.zdul.xyz/oauth/response.php";
+    const REDIRECT_URI = "https://dev.zdul.xyz/oauth/response.php";
 
     /**
      * @param mysqli $conn
