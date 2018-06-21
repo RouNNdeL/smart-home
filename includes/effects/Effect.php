@@ -31,6 +31,9 @@
  */
 
 require_once __DIR__ . "/../database/DbUtils.php";
+require_once __DIR__ . "/Off.php";
+require_once __DIR__ . "/Statiic.php";
+require_once __DIR__ . "/Breathe.php";
 
 abstract class Effect
 {
@@ -136,16 +139,24 @@ abstract class Effect
      * @param array $args
      * @param bool $t_converted
      */
-    public function __construct(int $id, string $device_id, string $name, array $colors, array $timing,
-                                array $args = array(), bool $t_converted = false
+    public function __construct(int $id, string $device_id, array $colors, array $timing,
+                                array $args = array(), bool $t_converted = false, string $name = null
     )
     {
+        if($name === null)
+            $this->name = Utils::getString("profile_default_name") . " $id";
+        else
+            $this->name = $name;
         $this->id = $id;
         $this->device_id = $device_id;
         $this->name = $name;
         $this->colors = $colors;
         $t_converted ? $this->setTimings($timing) : $this->setTimingsRaw($timing);
-        $this->args = $args;
+        $this->args = [];
+        foreach($this->argList() as $i => $name)
+        {
+            $this->args[$name] = $args[$i];
+        }
     }
 
     /**
@@ -204,12 +215,15 @@ abstract class Effect
     {
         $colors_html = "";
 
-        for($i = 0; $i < min(sizeof($this->getColors(), $color_limit)); $i++)
+        $max = $this->getMaxColors() === Effect::COLOR_COUNT_UNLIMITED ? min(sizeof($this->colors), $color_limit) :
+            min(min(sizeof($this->colors), $color_limit), $this->getMaxColors());
+        for($i = $this->getMinColors() - 1; $i < $max; $i++)
         {
+            $c_str = str_pad(dechex($this->colors[$i]), 6, "0", STR_PAD_LEFT);
             $template = self::COLOR_TEMPLATE;
             $template = str_replace("\$active", $i == 0 ? "checked" : "", $template);
             $template = str_replace("\$label", "color-$i", $template);
-            $template = str_replace("\$color", "#" . strtolower($this->getColors()[$i]), $template);
+            $template = str_replace("\$color", "#" . $c_str, $template);
             $template = str_replace("\$title_delete", Utils::getString("profile_btn_hint_delete"), $template);
             $template = str_replace("\$title_jump", Utils::getString("profile_btn_hint_jump"), $template);
             $colors_html .= $template;
@@ -222,7 +236,7 @@ abstract class Effect
     {
         $html = "";
 
-        $timings = $this->getTimingsForEffect() | (1 << Effect::TIME_DELAY);
+        $timings = $this->getTimingsForEffect();
         $timing_strings = $this->getTimingStrings();
         $profile_timing = Utils::getString("profile_timing");
         $profile_arguments = Utils::getString("profile_arguments");
@@ -286,11 +300,12 @@ abstract class Effect
 
         for($i = 0; $i < 6; $i++)
         {
-            if(($timings & (1 << (5 - $i))) > 0)
+            if(($timings & (1 << $i) > 0))
             {
                 $t = self::getTiming($this->timings[$i]);
                 $template = self::INPUT_TEMPLATE_TIMES;
-                $template = str_replace("\$label", Utils::getString("profile_timing_$timing_strings[i]"), $template);
+                $t_str = $timing_strings[$i];
+                $template = str_replace("\$label", Utils::getString("profile_timing_$t_str"), $template);
                 $template = str_replace("\$name", "time_" . $timing_strings[$i], $template);
                 $template = str_replace("\$placeholder", $t, $template);
                 $template = str_replace("\$value", $t, $template);
@@ -305,7 +320,7 @@ abstract class Effect
             }
         }
 
-        if($timings != 0)
+        if($timings !== 0)
         {
             $html .= "<div class=\"timing-container col-12 col-sm-6 col-lg-4 mb-3 mb-sm-0\"><h3>$profile_timing</h3>
                         <div class=\"row mx-0\">$timing_html</div></div>";
@@ -376,10 +391,11 @@ abstract class Effect
     public abstract function getMinColors();
 
     /**
+     * @param int $id
      * @param string $device_id
      * @return Effect
      */
-    public static abstract function getDefault(string $device_id);
+    public static abstract function getDefault(int $id, string $device_id);
 
     public static function getTiming(int $x)
     {
@@ -520,10 +536,10 @@ abstract class Effect
     public static function getColorsForEffect(int $effect_id)
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT color FROM devices_colors WHERE effect_id = ? ORDER BY `order` ASC";
+        $sql = "SELECT color, `order` FROM devices_colors WHERE effect_id = ? ORDER BY `order` ASC";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $effect_id);
-        $stmt->bind_result($color);
+        $stmt->bind_result($color, $order);
         $stmt->execute();
         $arr = [];
         while($stmt->fetch())
@@ -537,11 +553,12 @@ abstract class Effect
     public static function forDevice(string $device_id)
     {
         $conn = DbUtils::getConnection();
+        $colors = Effect::getColorsForEffectIdsByDeviceId($device_id);
         $sql = "SELECT id, device_id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4 
                 FROM devices_effects WHERE device_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $device_id);
-        $arr = Effect::arrayFromStatement($stmt);
+        $arr = Effect::arrayFromStatement($stmt, $colors);
         $stmt->close();
         return $arr;
     }
@@ -549,12 +566,53 @@ abstract class Effect
     public static function forProfile(int $profile_id)
     {
         $conn = DbUtils::getConnection();
+        $colors = Effect::getColorsForEffectIdsByProfileId($profile_id);
         $sql = "SELECT id, device_id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4 
                 FROM devices_effects WHERE profile_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $profile_id);
-        $arr = Effect::arrayFromStatement($stmt);
+        $arr = Effect::arrayFromStatement($stmt, $colors);
         $stmt->close();
+        return $arr;
+    }
+
+    private static function getColorsForEffectIdsByDeviceId(string $device_id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id FROM devices_effects WHERE device_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $device_id);
+        $arr = Effect::getEffectIdsColorsFromStatement($stmt);
+        $stmt->close();
+        return $arr;
+    }
+
+    private static function getColorsForEffectIdsByProfileId(int $profile_id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id FROM devices_effects WHERE profile_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $profile_id);
+        $arr = Effect::getEffectIdsColorsFromStatement($stmt);
+        $stmt->close();
+        return $arr;
+    }
+
+    private static function getEffectIdsColorsFromStatement(mysqli_stmt & $stmt)
+    {
+        $stmt->bind_result($profile_id);
+        $stmt->execute();
+        $ids = [];
+        while($stmt->fetch())
+        {
+            $ids[] = $profile_id;
+        }
+
+        $arr = [];
+        foreach($ids as $id)
+        {
+            $arr[$id] = Effect::getColorsForEffect($id);
+        }
         return $arr;
     }
 
@@ -562,26 +620,26 @@ abstract class Effect
      * Columns required in order:
      * id, device_id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4
      * @param mysqli_stmt $stmt
+     * @param array $colors
      * @return Effect[]
      */
-    private static function arrayFromStatement(mysqli_stmt & $stmt)
+    private static function arrayFromStatement(mysqli_stmt & $stmt, array $colors)
     {
         $stmt->bind_result($id, $d_id, $n, $e, $t0, $t1, $t2, $t3, $t4, $t5, $a0, $a1, $a2, $a3, $a4);
         $stmt->execute();
         $arr = [];
         while($stmt->fetch())
         {
-            $c = Effect::getColorsForEffect($id);
             switch($e)
             {
                 case Effect::EFFECT_OFF:
-                    $arr[] = new Off($id, $d_id, $n, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
+                    $arr[] = new Off($id, $d_id, $colors[$id], [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true, $n);
                     break;
                 case Effect::EFFECT_STATIC:
-                    $arr[] = new Fixed($id, $d_id, $n, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
+                    $arr[] = new Statiic($id, $d_id, $colors[$id], [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true, $n);
                     break;
                 case Effect::EFFECT_BREATHING:
-                    $arr[] = new Breathe($id, $d_id, $n, $c, [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true);
+                    $arr[] = new Breathe($id, $d_id, $colors[$id], [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true, $n);
                     break;
                 default:
                     throw new UnexpectedValueException("Invalid effect id: $e");

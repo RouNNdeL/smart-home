@@ -127,13 +127,14 @@ class SimpleRgbDevice extends VirtualDevice
     }
 
     /**
-     * @param string $device_html
+     * @param string $header_name
+     * @param string $footer_html
      * @return string
      */
-    public function toHtml($device_html = null)
+    public function toHtml($header_name = null, $footer_html = "")
     {
-        if($device_html !== null)
-            $name = $device_html;
+        if($header_name !== null)
+            $name = $header_name;
         else
             $name = $this->device_name;
         $checked = $this->on ? "checked" : "";

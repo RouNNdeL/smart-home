@@ -30,7 +30,8 @@
  * Time: 17:54
  */
 
-class Fixed extends Effect
+/* Typo on purpose (static is a reserved keyword) */
+class Statiic extends Effect
 {
 
     /**
@@ -74,12 +75,13 @@ class Fixed extends Effect
     }
 
     /**
+     * @param int $id
      * @param string $device_id
      * @return Effect
      */
-    public static function getDefault(string $device_id)
+    public static function getDefault(int $id, string $device_id)
     {
-        return new Fixed($device_id, [0xff0000], [0, 0, 1, 0, 0, 0]);
+        return new Statiic($id, $device_id, [0xff0000], [0, 0, 1, 0, 0, 0]);
     }
 
     /**
