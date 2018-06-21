@@ -421,9 +421,9 @@ HTML;
         $text = $pick_warn ? "text-light" : "text-muted";
         $lock_time = $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
         return $this->picksOpen() ?
-            "<$element class='pick-lock-time $text float-right $bold' data-match-start='$lock_time'>Picks lock in " .
+            "<$element class='pick-lock-time $text float-right $bold align-middle' data-match-start='$lock_time'>Picks lock in " .
             MatchUtils::formatDuration($lock_time - time()) . "</$element>" :
-            "<$element class='text-muted float-right'>Locked</$element>";
+            "<$element class='text-muted float-right align-middle'>Locked</$element>";
     }
 
     public function warnPicks()
