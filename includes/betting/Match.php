@@ -567,11 +567,11 @@ HTML;
                                 </div> 
                                 <div class="row">
                                     <div class="col-4 offset-1">
-                                        <input class="form-control text-center" type="number" value="$pickA"
+                                        <input class="form-control text-center score-input" type="number" value="$pickA"
                                         min="0" name="teamA" $disabled>
                                     </div>
                                     <div class="col-4 offset-2">
-                                        <input class="form-control text-center" type="number" value="$pickB"
+                                        <input class="form-control text-center score-input" type="number" value="$pickB"
                                         min="0" name="teamB" $disabled>
                                     </div>
                                 </div>

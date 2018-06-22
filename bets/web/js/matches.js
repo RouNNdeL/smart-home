@@ -53,7 +53,7 @@
             $(this).data("interval-id", setInterval(updateTime.bind(this), 1000));
         });
 
-        $("input[type=text]").on("input",function(e)
+        $("input.score-input").on("input",function(e)
         {
             const form = $(this).parents("form");
             const array = serializeToAssociative(form.serializeArray());
