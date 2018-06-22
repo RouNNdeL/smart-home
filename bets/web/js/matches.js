@@ -57,7 +57,7 @@
         {
             const form = $(this).parents("form");
             const array = serializeToAssociative(form.serializeArray());
-            const draw = array["teamA"] === array["teamB"];
+            const draw = !isNaN(parseInt(array["teamA"])) && array["teamA"] === array["teamB"];
             const radios = form.find("input[type=radio]");
 
             radios.toggleClass("invisible", !draw);
