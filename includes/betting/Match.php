@@ -67,10 +67,10 @@ class Match
     private $can_draw;
 
     /** @var bool|null */
-    private $penalties;
+    private $final_win;
 
     /** @var int */
-    private $final_win;
+    private $final_win_prediction;
 
     /**
      * Match constructor.
@@ -82,10 +82,10 @@ class Match
      * @param int|null $scoreB
      * @param string $stage
      * @param bool $can_draw
-     * @param $penalties
+     * @param $final_win
      */
     public function __construct(int $id, Team $teamA, Team $teamB, int $start_date, $scoreA, $scoreB,
-                                string $stage, bool $can_draw, $penalties
+                                string $stage, bool $can_draw, $final_win
     )
     {
         $this->id = $id;
@@ -96,7 +96,7 @@ class Match
         $this->scoreB = $scoreB;
         $this->stage = $stage;
         $this->can_draw = $can_draw;
-        $this->penalties = $penalties;
+        $this->final_win = $final_win;
     }
 
     /**
@@ -262,14 +262,16 @@ class Match
      */
     public function getPoints()
     {
+        $points = !$this->can_draw && $this->final_win !== null &&
+                    $this->final_win === $this->final_win_prediction ? 1 : 0;
         if($this->scoreA === null || $this->scoreB === null)
             return null;
         if($this->predictionA === null || $this->predictionB === null)
             return 0;
         if($this->predictionA === $this->scoreA && $this->predictionB === $this->scoreB)
-            return 4;
+            return $points+4;
         if($this->predictionA - $this->predictionB === $this->scoreA - $this->scoreB)
-            return 2;
+            return $points+2;
         if($this->scoreA === $this->scoreB || $this->predictionA === $this->predictionB)
             return 0;
         if(!($this->predictionA > $this->predictionB xor $this->scoreA > $this->scoreB))
@@ -284,13 +286,13 @@ class Match
         {
             $this->predictionA = null;
             $this->predictionB = null;
-            $this->final_win = null;
+            $this->final_win_prediction = null;
         }
         else
         {
             $this->predictionA = $prediction["a"];
             $this->predictionB = $prediction["b"];
-            $this->final_win = $prediction["final_win"];
+            $this->final_win_prediction = $prediction["final_win"];
         }
     }
 
@@ -516,8 +518,8 @@ HTML;
         $invisible = $this->can_draw || $this->predictionA !== $this->predictionB ||
         $this->predictionA === null || $this->predictionB === null ? "invisible" : "";
 
-        $selectedA = $this->final_win === MatchUtils::TEAM_A ? "checked" : "";
-        $selectedB = $this->final_win === MatchUtils::TEAM_B ? "checked" : "";
+        $selectedA = $this->final_win_prediction === MatchUtils::TEAM_A ? "checked" : "";
+        $selectedB = $this->final_win_prediction === MatchUtils::TEAM_B ? "checked" : "";
 
         $a = MatchUtils::TEAM_A;
         $b = MatchUtils::TEAM_B;
