@@ -58,6 +58,9 @@ abstract class RgbEffectDevice extends PhysicalDevice
     /** @var int */
     protected $max_profile_count;
 
+    /** @var int */
+    protected $max_color_count;
+
     /** @var Profile[] */
     protected $profiles;
 
@@ -82,6 +85,7 @@ abstract class RgbEffectDevice extends PhysicalDevice
         $this->profiles = $profiles;
         $this->max_profile_count = DeviceDbHelper::getMaxProfileCount(DbUtils::getConnection(), $id);
         $this->active_profile_count = DeviceDbHelper::getActiveProfileCount(DbUtils::getConnection(), $id);
+        $this->max_color_count = DeviceDbHelper::getMaxColorCount(DbUtils::getConnection(), $id);
         if($this->max_profile_count === null || $this->active_profile_count === null)
         {
             throw new UnexpectedValueException("Missing max_profile_count or active_profile_count for $id, 
@@ -311,5 +315,13 @@ abstract class RgbEffectDevice extends PhysicalDevice
             $arr[$i] = array_search($active_index, $this->avr_indexes);
         }
         return $arr;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxColorCount(): int
+    {
+        return $this->max_color_count;
     }
 }

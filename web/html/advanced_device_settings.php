@@ -43,14 +43,21 @@ if(!isset($_GET["device_id"]))
 
 $manager->loadUserDeviceManager();
 
-$device = $manager->getUserDeviceManager()->getVirtualDeviceById($_GET["device_id"]);
+$physical = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($_GET["device_id"]);
+if($physical === null || !$physical instanceof RgbEffectDevice)
+{
+    require __DIR__ . "/../error/404.php";
+    http_response_code(404);
+    exit(0);
+}
+$device = $physical->getVirtualDeviceById($_GET["device_id"]);
 if($device === null || !$device instanceof BaseEffectDevice)
 {
     require __DIR__ . "/../error/404.php";
     http_response_code(404);
     exit(0);
 }
-
+$device->setMaxColorCount($physical->getMaxColorCount());
 if(isset($_GET["name"]) && $_GET["name"] === "false")
 {
     header("Location: /device/" . urlencode($device->getDeviceName()) . "/" . urlencode($device->getDeviceId()));
@@ -84,7 +91,7 @@ echo $head->toString();
                     <h2>Mood Light</h2>
                 </div>
                 <div class="card-body">
-                    <? echo $device->toAdvancedHtml()?>
+                    <?php echo $device->toAdvancedHtml(0)?>
                 </div>
                 <div class="card-footer">
                     <button class="btn btn-primary">Save</button>

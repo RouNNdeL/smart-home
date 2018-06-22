@@ -37,7 +37,8 @@ class Breathe extends Effect
 
     public function getTimingsForEffect()
     {
-        return (1 << Effect::TIME_OFF) | (1 << Effect::TIME_FADEIN) | (1 << Effect::TIME_ON) | (1 << Effect::TIME_FADEOUT);
+        return (1 << Effect::TIME_OFF) | (1 << Effect::TIME_FADEIN) | (1 << Effect::TIME_ON) |
+            (1 << Effect::TIME_FADEOUT) | (1 << Effect::TIME_DELAY);
     }
 
     public function argsToArray()
@@ -63,9 +64,9 @@ class Breathe extends Effect
         return self::EFFECT_BREATHING;
     }
 
-    public static function getDefault(string $device_id)
+    public static function getDefault(int $id, string $device_id)
     {
-        return new Breathe($device_id, [0xff0000, 0x00ff00, 0x0000ff], [0, 1, 0, 1, 0, 0], [1, 0, 255]);
+        return new Breathe($id, $device_id, [0xff0000, 0x00ff00, 0x0000ff], [0, 1, 0, 1, 0, 0], [1, 0, 255]);
     }
 
     /**

@@ -73,6 +73,7 @@ $head->addEntry(new StyleSheetEntry(StyleSheetEntry::SLIDER_STYLE));
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::SWITCH));
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::MAIN));
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICE_SETTINGS));
+$head->setMinified(false);
 echo $head->toString();
 
 ?>
@@ -80,12 +81,8 @@ echo $head->toString();
 <div class="container-fluid">
     <div class="row device-settings-content">
         <div class="col-sm-12">
-            <div class="card <?php if(sizeof($virtualDevices) === 1) echo "device-parent"?>" <?php
-            $id = $virtualDevices[0]->getDeviceId();
-            if(sizeof($virtualDevices) == 1) echo "data-device-id=\"$id\""?>
-            >
                 <?php
-
+                $reboot_string = Utils::getString("device_reboot");
                 if(sizeof($virtualDevices) > 1)
                 {
                     $virtual_html = "";
@@ -105,12 +102,18 @@ HTML;
 
                     $device_name = $device->getNameWithState();
                     echo <<<HTML
-                    <div class="card-header">
-                        <h4>$device_name</h4>
-                    </div>
-                    <div class="card-body px-3 py-2">
-                        <div class="row px-2 py-0">
-                            $virtual_html
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>$device_name</h4>
+                        </div>
+                        <div class="card-body px-3 py-2">
+                            <div class="row px-2 py-0">
+                                $virtual_html
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                        <button id="device-settings-submit"
+                            class="btn btn-danger">$reboot_string</button>
                         </div>
                     </div>
 HTML;
@@ -118,14 +121,20 @@ HTML;
                 }
                 else
                 {
-                    echo $virtualDevices[0]->toHtml($device->getNameWithState());
+                    $footer = <<<HTML
+                    <button id="device-settings-submit" class="btn btn-sm btn-danger float-right">$reboot_string</button>
+HTML;
+
+                    $virtual_html = $virtualDevices[0]->toHtml($device->getNameWithState(), $footer);
+                    $id = $virtualDevices[0]->getDeviceId();
+                    echo <<<HTML
+                    <div class="card device-parent" data-device-id="$id">
+                            $virtual_html
+                    </div> 
+HTML;
+
                 }
                 ?>
-
-                <div class="card-footer">
-                    <button id="device-settings-submit"
-                            class="btn btn-danger"><?php echo Utils::getString("device_reboot"); ?></button>
-                </div>
             </div>
         </div>
     </div>

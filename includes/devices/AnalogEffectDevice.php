@@ -38,6 +38,6 @@ class AnalogEffectDevice extends BaseEffectDevice
 
     public function getAvailableEffects()
     {
-        return [Effect::EFFECT_OFF, Effect::EFFECT_STATIC, Effect::EFFECT_BREATHING];
+        return [Effect::EFFECT_OFF => "off", Effect::EFFECT_STATIC => "static", Effect::EFFECT_BREATHING => "breathe"];
     }
 }

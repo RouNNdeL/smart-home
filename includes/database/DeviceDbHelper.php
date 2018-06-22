@@ -168,10 +168,26 @@ class DeviceDbHelper
         return null;
     }
 
-
     public static function getMaxProfileCount(mysqli $conn, string $physical_device_id)
     {
         $sql = "SELECT max_profile_count FROM devices_effect_properties WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $physical_device_id);
+        $stmt->bind_result($value);
+        $stmt->execute();
+        if($stmt->fetch())
+        {
+            $stmt->close();
+            return $value;
+        }
+        else $stmt->close();
+
+        return null;
+    }
+
+    public static function getMaxColorCount(mysqli $conn, string $physical_device_id)
+    {
+        $sql = "SELECT color_count FROM devices_effect_properties WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $physical_device_id);
         $stmt->bind_result($value);

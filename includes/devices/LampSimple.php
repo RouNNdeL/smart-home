@@ -96,10 +96,11 @@ class LampSimple extends VirtualDevice
     }
 
     /**
-     * @param null $device_name
+     * @param null $header_name
+     * @param string $footer_html
      * @return string
      */
-    public function toHtml($device_name = null)
+    public function toHtml($header_name = null, $footer_html = "")
     {
         // TODO: Implement toHTML() method.
         return "";

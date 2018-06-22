@@ -116,10 +116,11 @@ abstract class VirtualDevice
     public abstract function getStateJson(bool $online = false);
 
     /**
-     * @param string $device_html
+     * @param string $header_name
+     * @param string $footer_html
      * @return string
      */
-    public abstract function toHtml($device_html = null);
+    public abstract function toHtml($header_name = null, $footer_html = "");
 
     public function getSyncJson()
     {

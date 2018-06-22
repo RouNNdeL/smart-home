@@ -42,7 +42,8 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
     /** @var bool */
     private $effects_enabled;
 
-    private $color_count;
+    /** @var int */
+    private $max_color_count;
 
     public $current_profile;
 
@@ -69,7 +70,7 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
         $this->effects = $effects;
         $this->effects_enabled = $effects_enabled;
         $this->current_profile = $current_profile;
-
+        $this->loadEffects();
     }
 
     public function getTraits()
@@ -95,16 +96,21 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
         ]];
     }
 
-    public function toHtml($device_html = null)
+    /**
+     * @param string $header_name
+     * @param string $footer_html
+     * @return string
+     */
+    public function toHtml($header_name = null, $footer_html = "")
     {
-        if($device_html !== null)
-            $name = $device_html;
+        if($header_name !== null)
+            $name = $header_name;
         else
             $name = $this->device_name;
         $id = urlencode($this->device_id);
         $display_name = urlencode($this->device_name);
-        $checked = $this->on ? "checked" :"";
-        $color = "#".str_pad(dechex($this->color), 6, '0', STR_PAD_LEFT);
+        $checked = $this->on ? "checked" : "";
+        $color = "#" . str_pad(dechex($this->color), 6, '0', STR_PAD_LEFT);
         return <<<HTML
         <form>
             <div class="card-header">
@@ -139,13 +145,17 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
                 </div>
             </div>
             <div class="card-footer">
-                <a href="/effect/$display_name/$id"
+                <div class="row">
+                    <div class="col">
+                        <a href="/effect/$display_name/$id"><small class="align-middle text-muted">Effect settings</small></a>$footer_html 
+                    </div>
+                </div>
             </div>
     </form>
 HTML;
     }
 
-    public function toAdvancedHtml()
+    public function toAdvancedHtml(int $effect)
     {
         $device = $this->device_id;
         $html = "<form id=\"device-form-$device\">";
@@ -153,16 +163,16 @@ HTML;
         $profile_effect = Utils::getString("profile_effect");
         $profile_color_input = Utils::getString("profile_color_input");
         $profile_add_color = Utils::getString("profile_add_color");
-        $color_limit = $this->color_count;
-        $current_effect = $this->effects[$this->current_profile];
+        $color_limit = $this->max_color_count;
+        $current_effect = $this->effects[$effect];
 
         $colors_html = $current_effect->colorsHtml($color_limit);
         $effects_html = "";
 
         foreach($this->getAvailableEffects() as $id => $effect)
         {
-            $string = Utils::getString("profile_" . $effect);
-            $effects_html .= "<option value=\"$id\" " . ($id == $current_effect ? " selected" : "") . ">$string</option>";
+            $string = Utils::getString("profile_effect_" . $effect);
+            $effects_html .= "<option value=\"$id\" " . ($id == $current_effect->getEffectId() ? " selected" : "") . ">$string</option>";
         }
 
         $btn_class = sizeof($current_effect->getColors()) >= $color_limit ? " hidden-xs-up" : "";
@@ -242,5 +252,13 @@ HTML;
     public function setEffectsEnabled(bool $effects_enabled)
     {
         $this->effects_enabled = $effects_enabled;
+    }
+
+    /**
+     * @param int $max_color_count
+     */
+    public function setMaxColorCount(int $max_color_count)
+    {
+        $this->max_color_count = $max_color_count;
     }
 }

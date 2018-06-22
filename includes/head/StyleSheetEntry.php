@@ -67,6 +67,7 @@ class StyleSheetEntry extends HeadEntry
     {
         preg_match("/.css$/", $this->url, $output_array);
         $url = sizeof($output_array) ? $this->url : $this->url . ($minified ? ".min.css" : ".css");
+        $url .= "?v=" . HtmlHead::VERSION;
         return "<link rel='stylesheet' href='$url'>";
     }
 
