@@ -80,6 +80,7 @@ class JavaScriptEntry extends HeadEntry
         $defer = $this->defer ? "defer" : "";
         preg_match("/.js$/", $this->url, $output_array);
         $url = sizeof($output_array) ? $this->url : $this->url . ($minified ? ".min.js" : ".js");
+        $url .= "?v=" . HtmlHead::VERSION;
         return "<script src='$url' $async $defer></script>";
     }
 
