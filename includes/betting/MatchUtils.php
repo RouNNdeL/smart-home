@@ -138,7 +138,7 @@ class MatchUtils
             return false;
         $conn = DbUtils::getConnection();
         $sql = "INSERT INTO bet_predictions (user_id, match_id, scoreA, scoreB, final_win) VALUES (?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE scoreA = ?, scoreB = ?, final_win = ?";
+                ON DUPLICATE KEY UPDATE scoreA = ?, scoreB = ?, final_win = ?, date = NOW()";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iiiiiiii", $user_id, $match_id, $scoreA, $scoreB, $final_win, $scoreA, $scoreB, $final_win);
         $result = $stmt->execute();
@@ -176,7 +176,7 @@ class MatchUtils
            JOIN bet_teams ta ON bet_matches.teamA = ta.id
            JOIN bet_teams tb ON bet_matches.teamB = tb.id
          WHERE match_id = ? AND user_id = ?
-         ORDER BY points DESC, bet_predictions.id ASC";
+         ORDER BY points DESC, bet_predictions.date ASC, bet_predictions.id ASC";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ii", $match_id, $user_id);
         $stmt->bind_result($user_id, $name, $score, $points);
@@ -203,7 +203,7 @@ class MatchUtils
            JOIN bet_teams ta ON bet_matches.teamA = ta.id
            JOIN bet_teams tb ON bet_matches.teamB = tb.id
          WHERE match_id = ?
-         ORDER BY points DESC, bet_predictions.id ASC";
+         ORDER BY points DESC, bet_predictions.date ASC, bet_predictions.id ASC";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $match_id);
         $stmt->bind_result($user_id, $name, $score, $points);
