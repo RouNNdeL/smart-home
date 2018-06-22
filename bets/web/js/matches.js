@@ -79,7 +79,7 @@
         function updateTime()
         {
             const time = parseInt($(this).data("match-start"));
-            const time_left = Math.round((time * 1000 - Date.now() - time_diff) / 1000);
+            const time_left = Math.round((time * 1000 - Date.now() + time_diff) / 1000);
 
             let str = "";
             const days = Math.floor(time_left / 86400);

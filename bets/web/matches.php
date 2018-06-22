@@ -50,7 +50,6 @@ $head = new HtmlHead("2018 World Cup Betting");
 $head->addEntry(new FaviconEntry(FaviconEntry::WORLD_CUP));
 $head->addEntry(new StyleSheetEntry("/css/matches"));
 $head->addEntry(new JavaScriptEntry("/js/matches"));
-$head->setMinified(false);
 echo $head->toString();
 
 ?>
