@@ -53,6 +53,21 @@
             $(this).data("interval-id", setInterval(updateTime.bind(this), 1000));
         });
 
+        $("input[type=text]").on("input",function(e)
+        {
+            const form = $(this).parents("form");
+            const array = serializeToAssociative(form.serializeArray());
+            const draw = array["teamA"] === array["teamB"];
+            const radios = form.find("input[type=radio]");
+
+            radios.toggleClass("invisible", !draw);
+            if(draw && !radios[0].checked && !radios[1].checked)
+            {
+                radios[0].checked = true;
+            }
+
+        });
+
         function showSnackbar(text, duration = 2500)
         {
             const snackbar = $("#snackbar");

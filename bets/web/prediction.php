@@ -50,11 +50,16 @@ if($json === false || !isset($json["match_id"]) || !isset($json["teamA"]) || !is
     exit();
 }
 
+$scoreA = $json["teamA"];
+$scoreB = $json["teamB"];
+$final_win = $scoreA === $scoreB ? $json["final"] : null;
+
 $success = MatchUtils::insertPrediction(
     $manager->getSessionManager()->getUserId(),
     $json["match_id"],
-    $json["teamA"],
-    $json["teamB"]
+    $scoreA,
+    $scoreB,
+    $final_win
 );
 $response = [
     "status" => $success ? "success" : "failure",

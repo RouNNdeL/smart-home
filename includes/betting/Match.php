@@ -63,6 +63,15 @@ class Match
     /** @var int|null */
     private $predictionB;
 
+    /** @var bool */
+    private $can_draw;
+
+    /** @var bool|null */
+    private $penalties;
+
+    /** @var int */
+    private $final_win;
+
     /**
      * Match constructor.
      * @param int $id
@@ -72,8 +81,12 @@ class Match
      * @param int|null $scoreA
      * @param int|null $scoreB
      * @param string $stage
+     * @param bool $can_draw
+     * @param $penalties
      */
-    public function __construct(int $id, Team $teamA, Team $teamB, int $start_date, $scoreA, $scoreB, string $stage)
+    public function __construct(int $id, Team $teamA, Team $teamB, int $start_date, $scoreA, $scoreB,
+                                string $stage, bool $can_draw, $penalties
+    )
     {
         $this->id = $id;
         $this->teamA = $teamA;
@@ -82,6 +95,8 @@ class Match
         $this->scoreA = $scoreA;
         $this->scoreB = $scoreB;
         $this->stage = $stage;
+        $this->can_draw = $can_draw;
+        $this->penalties = $penalties;
     }
 
     /**
@@ -91,7 +106,7 @@ class Match
     public static function byId(int $match_id)
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE id = ?";
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage, can_draw, penalties FROM bet_matches WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $match_id);
         $stmt->execute();
@@ -116,7 +131,9 @@ class Match
         $teamA = Team::byId($row["teamA"]);
         $teamB = Team::byId($row["teamB"]);
         $date = strtotime($row["date"]);
-        return new Match($row["id"], $teamA, $teamB, $date, $row["scoreA"], $row["scoreB"], $row["stage"]);
+        return new Match($row["id"], $teamA, $teamB, $date, $row["scoreA"], $row["scoreB"], $row["stage"],
+            $row["can_draw"], $row["penalties"]
+        );
     }
 
     /**
@@ -127,7 +144,7 @@ class Match
     {
         $order = $reverse ? "DESC" : "ASC";
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches 
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage, can_draw, penalties FROM bet_matches 
                 WHERE scoreB IS NOT NULL  AND scoreA IS NOT NULL ORDER BY date $order";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
@@ -150,7 +167,7 @@ class Match
     public static function today()
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches 
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage, can_draw, penalties FROM bet_matches 
                 WHERE DATE(date) = DATE(NOW())
                 ORDER BY date ASC";
         $stmt = $conn->prepare($sql);
@@ -174,7 +191,7 @@ class Match
     public static function todayAndUpcoming()
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches 
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage, can_draw, penalties FROM bet_matches 
                 WHERE DATE(date) >= DATE(NOW()) 
                 ORDER BY date ASC";
         $stmt = $conn->prepare($sql);
@@ -198,7 +215,8 @@ class Match
     public static function upcoming()
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches WHERE date > NOW() ORDER BY date ASC";
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage, can_draw, penalties FROM bet_matches
+                WHERE date > NOW() ORDER BY date ASC";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $arr = [];
@@ -222,7 +240,8 @@ class Match
     {
         $order = $reverse ? "DESC" : "ASC";
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage FROM bet_matches ORDER BY date $order";
+        $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage, can_draw, penalties 
+                FROM bet_matches ORDER BY date $order";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $arr = [];
@@ -265,11 +284,13 @@ class Match
         {
             $this->predictionA = null;
             $this->predictionB = null;
+            $this->final_win = null;
         }
         else
         {
             $this->predictionA = $prediction["a"];
             $this->predictionB = $prediction["b"];
+            $this->final_win = $prediction["final_win"];
         }
     }
 
@@ -331,8 +352,8 @@ class Match
             <thead>
                 <tr>
                     <th scope="col" class="col-6">Name</th>
-                    <th scope="col">Score</th>
-                    <th scope="col">Points</th>
+                    <th scope="col" class="text-center">Score</th>
+                    <th scope="col" class="text-center">Points</th>
                 </tr>
             </thead>
             <tbody>
@@ -492,6 +513,24 @@ HTML;
         $more_info_class = $show_danger ? "text-light" : "text-muted";
         $bold = $show_danger ? "font-weight-bold" : "";
 
+        $invisible = $this->can_draw || $this->predictionA !== $this->predictionB ||
+        $this->predictionA === null || $this->predictionB === null ? "invisible" : "";
+
+        $selectedA = $this->final_win === MatchUtils::TEAM_A ? "checked" : "";
+        $selectedB = $this->final_win === MatchUtils::TEAM_B ? "checked" : "";
+
+        $a = MatchUtils::TEAM_A;
+        $b = MatchUtils::TEAM_B;
+
+        $prediction_div = "";
+        if(!$this->can_draw)
+            $prediction_div .= "<input type=\"radio\" class=\"form-check-input $invisible\" $disabled name=\"final\" $selectedA value=\"$a\">";
+
+        $prediction_div .= "<span class=\"text-center mb-2 mx-auto\">$prediction_text</span>";
+
+        if(!$this->can_draw)
+            $prediction_div .= "<input type=\"radio\" class=\"form-check-input mr-0 ml-2 $invisible\" $disabled name=\"final\" $selectedB value=\"$b\"> ";
+
         return <<< HTML
 <div class="card">
         <div class="card-body">
@@ -519,7 +558,11 @@ HTML;
                             <input type="hidden" name="match_id" value="$this->id">
                             <div class="col">
                                 <p class="text-center">$this->stage</p>
-                                <p class="text-center mb-1">$prediction_text</p>
+                                <div class="row">
+                                    <div class="col mb-1">
+                                        $prediction_div
+                                    </div>
+                                </div> 
                                 <div class="row">
                                     <div class="col-4 offset-1">
                                         <input class="form-control text-center" type="text" value="$pickA"

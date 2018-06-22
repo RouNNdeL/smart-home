@@ -34,6 +34,9 @@ require_once __DIR__ . "/Match.php";
 
 class MatchUtils
 {
+    const TEAM_A = 0;
+    const TEAM_B = 1;
+
     const PICK_LOCK_MINUTES = 15;
     const PICK_LOCK_WARNING = 60;
 
@@ -104,10 +107,10 @@ class MatchUtils
     public static function getPredictionForUserAndMatch(int $user_id, int $match_id)
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT scoreA, scoreB FROM bet_predictions WHERE user_id = ? AND match_id = ?";
+        $sql = "SELECT scoreA, scoreB, final_win FROM bet_predictions WHERE user_id = ? AND match_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ii", $user_id, $match_id);
-        $stmt->bind_result($scoreA, $scoreB);
+        $stmt->bind_result($scoreA, $scoreB, $final_win);
         $stmt->execute();
         if(!$stmt->fetch())
         {
@@ -115,7 +118,7 @@ class MatchUtils
             return null;
         }
         $stmt->close();
-        return ["a" => $scoreA, "b" => $scoreB];
+        return ["a" => $scoreA, "b" => $scoreB, "final_win" => $final_win];
     }
 
     public static function updatePredictionPoints(int $prediction_id, int $points)
@@ -129,15 +132,15 @@ class MatchUtils
         return $result;
     }
 
-    public static function insertPrediction(int $user_id, int $match_id, int $scoreA, int $scoreB)
+    public static function insertPrediction(int $user_id, int $match_id, int $scoreA, int $scoreB, $final_win)
     {
         if(!Match::byId($match_id)->picksOpen())
             return false;
         $conn = DbUtils::getConnection();
-        $sql = "INSERT INTO bet_predictions (user_id, match_id, scoreA, scoreB) VALUES (?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE scoreA = ?, scoreB = ?";
+        $sql = "INSERT INTO bet_predictions (user_id, match_id, scoreA, scoreB, final_win) VALUES (?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE scoreA = ?, scoreB = ?, final_win = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iiiiii", $user_id, $match_id, $scoreA, $scoreB, $scoreA, $scoreB);
+        $stmt->bind_param("iiiiiiii", $user_id, $match_id, $scoreA, $scoreB, $final_win, $scoreA, $scoreB, $final_win);
         $result = $stmt->execute();
         $stmt->close();
         return $result;
@@ -163,11 +166,17 @@ class MatchUtils
     public static function getPredictionPointsForUserAndMatch(int $user_id, int $match_id)
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT user_id, concat(first_name, ' ', last_name), 
-                       concat(scoreA, '-', scoreB), IF(points IS NULL, 'TBD', points) 
-                FROM bet_predictions 
-                JOIN home_users ON bet_predictions.user_id = home_users.id WHERE match_id = ? AND user_id = ?
-                ORDER BY points DESC, bet_predictions.id ASC";
+        $sql = "SELECT user_id, concat(first_name, ' ', last_name),
+  concat(bet_predictions.scoreA, '-', bet_predictions.scoreB,
+         IF(can_draw = 0 AND final_win IS NOT NULL, concat(' (', IF(final_win = 0, ta.name, tb.name),')') ,'')),
+         IF(points IS NULL, 'TBD', points)
+         FROM bet_predictions
+         JOIN home_users ON bet_predictions.user_id = home_users.id
+          JOIN bet_matches ON bet_matches.id = bet_predictions.match_id
+           JOIN bet_teams ta ON bet_matches.teamA = ta.id
+           JOIN bet_teams tb ON bet_matches.teamB = tb.id
+         WHERE match_id = ? AND user_id = ?
+         ORDER BY points DESC, bet_predictions.id ASC";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ii", $match_id, $user_id);
         $stmt->bind_result($user_id, $name, $score, $points);
@@ -184,11 +193,17 @@ class MatchUtils
     public static function getUserNamesIdsAndPredictionForMatch(int $match_id)
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT user_id, concat(first_name, ' ', last_name), 
-                       concat(scoreA, '-', scoreB), IF(points IS NULL, 'TBD', points) 
-                FROM bet_predictions 
-                JOIN home_users ON bet_predictions.user_id = home_users.id WHERE match_id = ?
-                ORDER BY points DESC, bet_predictions.id ASC";
+        $sql = "SELECT user_id, concat(first_name, ' ', last_name),
+  concat(bet_predictions.scoreA, '-', bet_predictions.scoreB,
+         IF(can_draw = 0 AND final_win IS NOT NULL, concat(' (', IF(final_win = 0, ta.name, tb.name),')') ,'')),
+         IF(points IS NULL, 'TBD', points)
+         FROM bet_predictions
+         JOIN home_users ON bet_predictions.user_id = home_users.id
+          JOIN bet_matches ON bet_matches.id = bet_predictions.match_id
+           JOIN bet_teams ta ON bet_matches.teamA = ta.id
+           JOIN bet_teams tb ON bet_matches.teamB = tb.id
+         WHERE match_id = ?
+         ORDER BY points DESC, bet_predictions.id ASC";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $match_id);
         $stmt->bind_result($user_id, $name, $score, $points);
