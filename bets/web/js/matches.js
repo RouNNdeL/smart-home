@@ -42,10 +42,13 @@
                 dataType: "json",
                 contentType: "json",
                 data: JSON.stringify(array)
-            }).done(response =>
+            }).done(resp =>
             {
-                showSnackbar(response["message"]);
-            })
+                showSnackbar(resp["message"]);
+            }).fail(resp => {
+                if(resp.hasOwnProperty("responseJSON"))
+                    showSnackbar(resp.responseJSON["message"]);
+            });
         });
 
         $(".pick-lock-time").each(function()

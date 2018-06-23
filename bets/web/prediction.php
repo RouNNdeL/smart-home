@@ -43,12 +43,15 @@ if($_SERVER["REQUEST_METHOD"] !== "POST")
 }
 
 $json = json_decode(file_get_contents("php://input"), true);
-if($json === false || !isset($json["match_id"]) || !isset($json["teamA"]) || !isset($json["teamB"]))
+if($json === false || !isset($json["match_id"]) || !isset($json["teamA"]) || !isset($json["teamB"])
+    || !ctype_digit($json["teamA"]) || !ctype_digit($json["teamB"]) || !ctype_digit($json["match_id"]))
 {
-    $response = ["error" => "invalid_json"];
+    $response = ["error" => "invalid_json", "message" => "Invalid input!"];
     http_response_code(400);
+    echo json_encode($response);
     exit();
 }
+
 
 $scoreA = $json["teamA"];
 $scoreB = $json["teamB"];
