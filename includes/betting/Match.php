@@ -381,7 +381,7 @@ HTML;
             <div class="row text-center">
                 <div class="ml-sm-0 ml-xs-05 col-4 px-1 px-sm-3">
                     <div class="float-right">
-                        <img src="$logoTeamA" class="team-icon-big mb-2">
+                        <img src="$logoTeamA" class="team-icon icon-big mb-2">
                         <h4 class="d-none d-md-block">$nameTeamA</h4>
                         <h5 class="d-md-none">$nameTeamA</h5>
                     </div>
@@ -393,7 +393,7 @@ HTML;
                 </div>
                 <div class="col-4 px-1 px-sm-3">
                     <div class="float-left">
-                        <img src="$logoTeamB" class="team-icon-big mb-2">
+                        <img src="$logoTeamB" class="team-icon icon-big mb-2">
                         <h4 class="d-none d-md-block">$nameTeamB</h4>
                         <h5 class="d-md-none">$nameTeamB</h5>
                     </div>

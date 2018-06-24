@@ -1,0 +1,106 @@
+// MIT License
+//
+// Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+@import 'snackbar';
+@import 'utils';
+@import '../../node_modules/bootstrap/scss/mixins';
+$team-icon-border-color: rgba(0, 0, 0, .5);
+
+.btn-mock {
+  height: 38px;
+}
+
+.team-icon {
+  border: 1px solid $team-icon-border-color;
+  width: auto;
+}
+
+.score-big {
+  position: relative;
+}
+
+@include media-breakpoint-up('xs') {
+  .team-icon {
+    height: 50px;
+
+    &.icon-big {
+      height: 70px;
+    }
+  }
+
+  .score-big {
+    top: 19px;
+  }
+
+  .match-time {
+    font-size: large;
+  }
+}
+
+@include media-breakpoint-only('sm') {
+  .team-icon {
+    height: 50px;
+
+    &.icon-big {
+      height: 80px;
+    }
+  }
+
+  .score-big {
+    top: 24px;
+  }
+
+  .match-time {
+    font-size: large;
+  }
+}
+
+@include media-breakpoint-only('md') {
+  .score-big {
+    top: 16px;
+  }
+
+  .team-icon {
+    height: 50px;
+
+    &.icon-big {
+      height: 80px;
+    }
+  }
+}
+
+@include media-breakpoint-up('lg') {
+  .score-big {
+    top: 36px;
+  }
+
+  .team-icon {
+    height: 60px;
+
+    &.icon-big {
+      height: 120px;
+    }
+  }
+
+  .match-time {
+    font-size: larger;
+  }
+}
