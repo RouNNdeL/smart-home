@@ -1,0 +1,9 @@
+{
+  "only": [
+    "src/*"
+  ],
+  "presets": [
+    "env"
+  ],
+  "sourceMaps": false
+}

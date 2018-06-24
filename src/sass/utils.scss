@@ -37,18 +37,31 @@ input {
 
 $half-grid: (
         // sass-lint:disable-block indentation
+        '0': 0 / 24 * 100%,
         '05': 1 / 24 * 100%,
+        '1': 2 / 24 * 100%,
         '15': 3 / 24 * 100%,
+        '2': 4 / 24 * 100%,
         '25': 5 / 24 * 100%,
+        '3': 6 / 24 * 100%,
         '35': 7 / 24 * 100%,
+        '4': 8 / 24 * 100%,
         '45': 9 / 24 * 100%,
+        '5': 10 / 24 * 100%,
         '55': 11 / 24 * 100%,
+        '6': 12 / 24 * 100%,
         '65': 13 / 24 * 100%,
+        '7': 14 / 24 * 100%,
         '75': 15 / 24 * 100%,
+        '8': 16 / 24 * 100%,
         '85': 17 / 24 * 100%,
+        '9': 18 / 24 * 100%,
         '95': 19 / 24 * 100%,
+        '10': 20 / 24 * 100%,
         '105': 21 / 24 * 100%,
+        '11': 22 / 24 * 100%,
         '115': 23 / 24 * 100%,
+        '12': 24 / 24 * 100%,
 );
 
 @each $breakpoint in map-keys($grid-breakpoints) {
@@ -59,27 +72,27 @@ $half-grid: (
       @each $size, $length in $half-grid {
 
         // sass-lint:disable-block no-important
-        .#{$abbrev}#{$infix}-#{$size} {
+        .#{$abbrev}#{$infix}-#{$size}p {
           #{$prop}: $length !important;
         }
 
-        .#{$abbrev}t#{$infix}-#{$size},
-        .#{$abbrev}y#{$infix}-#{$size} {
+        .#{$abbrev}t#{$infix}-#{$size}p,
+        .#{$abbrev}y#{$infix}-#{$size}p {
           #{$prop}-top: $length !important;
         }
 
-        .#{$abbrev}r#{$infix}-#{$size},
-        .#{$abbrev}x#{$infix}-#{$size} {
+        .#{$abbrev}r#{$infix}-#{$size}p,
+        .#{$abbrev}x#{$infix}-#{$size}p {
           #{$prop}-right: $length !important;
         }
 
-        .#{$abbrev}b#{$infix}-#{$size},
-        .#{$abbrev}y#{$infix}-#{$size} {
+        .#{$abbrev}b#{$infix}-#{$size}p,
+        .#{$abbrev}y#{$infix}-#{$size}p {
           #{$prop}-bottom: $length !important;
         }
 
-        .#{$abbrev}l#{$infix}-#{$size},
-        .#{$abbrev}x#{$infix}-#{$size} {
+        .#{$abbrev}l#{$infix}-#{$size}p,
+        .#{$abbrev}x#{$infix}-#{$size}p {
           #{$prop}-left: $length !important;
         }
       }

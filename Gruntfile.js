@@ -27,21 +27,25 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
         clean: {
             all: ["dist"],
-            js: ["dist/js", "dist/build/js"],
-            css: ["dist/css", "dist/build/css"]
+            js: ["dist/js"],
+            css: ["dist/css"]
         },
         browserify: {
-            options: {
-                alias: {
-                    'jQuery': 'jquery'
-                }
-            },
             build: {
+                options: {
+                    alias: {
+                        'jQuery': 'jquery'
+                    },
+                    browserifyOptions:{
+                        debug: true
+                    },
+                    transform: [["babelify"]],
+                },
                 files: [{
                     expand: true,
-                    cwd: "dist/build/js/es5",
+                    cwd: "src/js",
                     src: ["*.js"],
-                    dest: 'dist/build/js/browserify',
+                    dest: 'dist/js',
                 }]
             }
         },
@@ -56,7 +60,7 @@ module.exports = function(grunt) {
                 },
                 files: [{
                     expand: true,
-                    cwd: "dist/build/js/browserify",
+                    cwd: "dist/js",
                     src: ["*.js", "!*.min.js"],
                     dest: "dist/js",
                     ext: ".min.js"
@@ -68,21 +72,6 @@ module.exports = function(grunt) {
                 "esversion": 6
             },
             build: ["Gruntfile.js", "src/js/*.js"]
-        },
-        babel: {
-            options: {
-                sourceMap: true,
-                presets: ["env"]
-            },
-            build: {
-                files: [{
-                    expand: true,
-                    cwd: 'src/js',
-                    src: ['*.js', '!*.min.js'],
-                    dest: 'dist/build/js/es5',
-                    ext: '.js'
-                }]
-            }
         },
         csscomb: {
             build: {
@@ -108,7 +97,7 @@ module.exports = function(grunt) {
         },
         sass: {
             build: {
-                options:{
+                options: {
                     style: "compressed"
                 },
                 files: [{
@@ -132,8 +121,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-csscomb');
 
-    grunt.registerTask('default', ['clean:all', 'jshint', 'babel', 'browserify', 'uglify', 'csscomb', 'sasslint', 'sass']);
+    grunt.registerTask('default', ['clean:all', 'jshint', 'browserify', 'uglify', 'csscomb', 'sasslint', 'sass']);
     grunt.registerTask('css', ['clean:css', 'csscomb', 'sasslint', 'sass']);
-    grunt.registerTask('js', ['clean:js', 'jshint', 'babel', 'browserify', 'uglify']);
-    grunt.registerTask('nolint', ['clean:all', 'browserify', 'babel', 'uglify', 'sass']);
+    grunt.registerTask('js', ['clean:js', 'jshint', 'browserify', 'uglify']);
+    grunt.registerTask('nolint', ['clean:all', 'browserify', 'uglify', 'sass']);
 };
