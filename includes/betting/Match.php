@@ -379,7 +379,7 @@ HTML;
                 <div class="col"><p class="match-time">$time</p></div>
             </div>
             <div class="row text-center">
-                <div class="ml-sm-0 ml-xs-05 col-4 px-1 px-sm-3">
+                <div class="ml-sm-0 ml-05p m-sm-0p col-4 px-1 px-sm-3">
                     <div class="float-right">
                         <img src="$logoTeamA" class="team-icon icon-big mb-2">
                         <h4 class="d-none d-md-block">$nameTeamA</h4>
