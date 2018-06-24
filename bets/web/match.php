@@ -73,8 +73,7 @@ if(isset($_GET["name"]) && $_GET["name"] === "false")
 require_once __DIR__ . "/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("");
 $head->addEntry(new FaviconEntry(FaviconEntry::WORLD_CUP));
-$head->addEntry(new StyleSheetEntry("/dist/css/matches"));
-$head->addEntry(new JavaScriptEntry("/dist/js/matches"));
+$head->addEntry(new JavaScriptEntry("/dist/js/core"));
 echo $head->toString();
 
 ?>
