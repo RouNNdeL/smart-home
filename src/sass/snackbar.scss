@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-@import '../../lib/sass-css3-mixins/css3-mixins.scss';
+@import '../../lib/sass-css3-mixins/css3-mixins.scss'; //sass-lint:disable-line clean-import-paths
 $snackbar-bottom-offset: 30px;
 $snackbar-min-width: 250px;
 $snackbar-background-color: #333;
