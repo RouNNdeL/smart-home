@@ -46,7 +46,7 @@ class JavaScriptEntry extends HeadEntry
     const LOGIN = "/js/login";
     const DEVICE_SETTINGS = "/js/device_settings";
 
-    const DEFAULT = [JavaScriptEntry::JQUERY, JavaScriptEntry::TETHER, JavaScriptEntry::BOOTSTRAP];
+    const DEFAULT = [];
 
     /** @var string */
     private $url;

@@ -22,10 +22,13 @@
  * SOFTWARE.
  */
 
+import $ from 'jquery';
+import 'tether';
+import 'bootstrap';
+
 $(function()
 {
     const redirect_uri = $("input[name=redirect_uri]").val();
-    console.log(redirect_uri);
     $(".service-signin-button").click(function()
     {
         let service_id = $(this).data("service-id");

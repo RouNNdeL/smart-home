@@ -1,0 +1,6 @@
+[submodule "lib/bootstrap-colorpicker"]
+	path = lib/bootstrap-colorpicker
+	url = https://github.com/farbelous/bootstrap-colorpicker
+[submodule "lib/sass-css3-mixins"]
+	path = lib/sass-css3-mixins
+	url = https://github.com/matthieua/sass-css3-mixins

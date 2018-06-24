@@ -22,11 +22,17 @@
  * SOFTWARE.
  */
 
+import $ from 'jquery';
+import 'tether';
+import 'bootstrap';
+import 'ion-rangeslider';
+import 'bootstrap-switch';
+import '../../../../lib/bootstrap-colorpicker';
+
 const MIN_UPDATE_DELAY = 500;
 const UPDATE_URL = "/api/save_device.php";
 
-$(function()
-{
+$(function() {
     let last_update = Date.now();
     let last_call = 0;
     let last_call_time = 0;
@@ -38,9 +44,9 @@ $(function()
         grid: true,
         postfix: "%"
     });
+
     $(".checkbox-switch").bootstrapSwitch().on('switchChange.bootstrapSwitch', update);
-    $(".color-picker-init").on('changeColor', function(e)
-    {
+    $(".color-picker-init").on('changeColor', function(e) {
         $(this).find("input").val(e.value);
         update(e);
     }).colorpicker({
@@ -65,11 +71,9 @@ $(function()
 
     $(".change-listen").change(update);
 
-    function serializeToAssociative(array)
-    {
+    function serializeToAssociative(array) {
         const obj = {};
-        for(let i = 0; i < array.length; i++)
-        {
+        for(let i = 0; i < array.length; i++) {
             obj[array[i].name] = array[i].value;
         }
         return obj;
@@ -79,13 +83,11 @@ $(function()
      *
      * @param {String} id
      */
-    function updateById(id)
-    {
+    function updateById(id) {
         const parent = $(`.device-parent[data-device-id="${id}"]`);
         const form = serializeToAssociative(parent.find("form").serializeArray());
-        form["device_id"] = id;
-        parent.find("input[type=checkbox]").each(function()
-        {
+        form.device_id = id;
+        parent.find("input[type=checkbox]").each(function() {
             form[$(this).attr("name")] = $(this)[0].checked;
         });
         last_call = Date.now();
@@ -94,8 +96,7 @@ $(function()
             dataType: "json",
             contentType: "application/json",
             data: JSON.stringify(form)
-        }).done(function(repsonse)
-        {
+        }).done(function(repsonse) {
             last_call_time = Date.now() - last_call;
         });
     }
@@ -104,27 +105,21 @@ $(function()
      *
      * @param {Event} e
      */
-    function update(e)
-    {
-        let update_delay = Math.max(MIN_UPDATE_DELAY, 2*last_call_time);
-        if(Date.now() > last_update + update_delay)
-        {
-            if(e !== undefined && e.target !== undefined)
-            {
+    function update(e) {
+        let update_delay = Math.max(MIN_UPDATE_DELAY, 2 * last_call_time);
+        if(Date.now() > last_update + update_delay) {
+            if(e !== undefined && e.target !== undefined) {
                 const id = $(e.target).parents(".device-parent").data("device-id");
                 updateById(id);
             }
-            else
-            {
-                $(".device-parent").each(function()
-                {
+            else {
+                $(".device-parent").each(function() {
                     updateById($(this).data("device-id"));
                 });
             }
             last_update = Date.now();
         }
-        else
-        {
+        else {
             clearTimeout(update_timeout);
             update_timeout = setTimeout(update, last_update + MIN_UPDATE_DELAY - Date.now());
         }

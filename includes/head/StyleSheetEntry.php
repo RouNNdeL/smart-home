@@ -41,7 +41,8 @@ class StyleSheetEntry extends HeadEntry
     const SLIDER = "/slider/css/ion.rangeSlider.css";
     const SLIDER_STYLE = "/slider/css/ion.rangeSlider.skinFlat.css";
     const SWITCH = "/switch/dist/css/bootstrap3/bootstrap-switch";
-    const MAIN = "/css/main";
+    const LOGIN = "/css/login";
+    const DEVICES = "/css/devices";
     const DEVICE_SETTINGS = "/css/device_settings";
 
     const DEFAULT = [StyleSheetEntry::BOOTSTRAP, StyleSheetEntry::TETHER, StyleSheetEntry::ICONIC];

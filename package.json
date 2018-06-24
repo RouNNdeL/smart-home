@@ -2,15 +2,31 @@
   "name": "SmartHome",
   "version": "1.0.0",
   "dependencies": {
-    "bootstrap-colorpicker": "^2.5.2",
+    "bootstrap": "^4.1.1",
     "bootstrap-switch": "^3.3.4",
     "ion-rangeslider": "^2.2.0",
+    "jquery": "latest",
     "mathjs": "^5.0.0",
     "open-iconic": "^1.1.1",
+    "popper.js": "^1.14.3",
     "tether": "1.4.4"
   },
   "devDependencies": {
-    "uglify-js": "^3.4.0",
-    "uglifycss": "0.0.29"
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "grunt": "^1.0.3",
+    "grunt-babel": "^7.0.0",
+    "grunt-browserify": "^5.3.0",
+    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-cssmin": "^2.2.1",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-sass": "^1.0.0",
+    "grunt-contrib-uglify-es": "^3.3.0",
+    "grunt-csscomb": "^3.1.1",
+    "grunt-sass-lint": "^0.2.4",
+    "jshint": "^2.9.5"
+  },
+  "scripts": {
+    "lint": "jshint web/js"
   }
 }

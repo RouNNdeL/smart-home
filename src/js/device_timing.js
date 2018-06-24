@@ -22,9 +22,7 @@
  * SOFTWARE.
  */
 
-"use strict";
-
-function getTiming(x)
+export function getTiming(x)
 {
     if(x < 0 || x > 255)
     {
@@ -57,7 +55,7 @@ function getTiming(x)
     return 60 * x - 14400;
 }
 
-function convertToTiming(float)
+export function convertToTiming(float)
 {
     const timings = getTimings();
     if(float < 0)
@@ -69,7 +67,7 @@ function convertToTiming(float)
     return 255;
 }
 
-function getTimings()
+export function getTimings()
 {
     const arr = [];
     for(let i = 0; i < 256; i++)
@@ -79,7 +77,7 @@ function getTimings()
     return arr;
 }
 
-function getIncrementTiming(x)
+export function getIncrementTiming(x)
 {
     if(x < 0 || x > 255)
     {
@@ -117,7 +115,7 @@ function getIncrementTiming(x)
     return 21600;
 }
 
-function convertIncrementToTiming(float)
+export function convertIncrementToTiming(float)
 {
     const timings = getIncrementTimings();
     if(float < 0)
@@ -129,7 +127,7 @@ function convertIncrementToTiming(float)
     return 255;
 }
 
-function getIncrementTimings()
+export function getIncrementTimings()
 {
     const arr = [];
     for(let i = 0; i < 256; i++)
