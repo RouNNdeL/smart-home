@@ -27,8 +27,8 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
         clean: {
             all: ["dist"],
-            js: ["dist/js", "dist/build"],
-            css: ["dist/css", "dist/build"]
+            js: ["dist/js", "dist/build/js"],
+            css: ["dist/css", "dist/build/css"]
         },
         browserify: {
             options: {
@@ -52,7 +52,7 @@ module.exports = function(grunt) {
                         drop_console: true,
                         dead_code: true
                     },
-                    sourceMap: false
+                    sourceMap: true
                 },
                 files: [{
                     expand: true,
@@ -60,17 +60,6 @@ module.exports = function(grunt) {
                     src: ["*.js", "!*.min.js"],
                     dest: "dist/js",
                     ext: ".min.js"
-                }]
-            }
-        },
-        cssmin: {
-            build: {
-                files: [{
-                    expand: true,
-                    cwd: 'dist/build/css',
-                    src: ['*.css', '!*.min.css'],
-                    dest: 'dist/css',
-                    ext: '.min.css'
                 }]
             }
         },
@@ -119,12 +108,15 @@ module.exports = function(grunt) {
         },
         sass: {
             build: {
+                options:{
+                    style: "compressed"
+                },
                 files: [{
                     expand: true,
                     cwd: 'src/sass',
                     src: ['*.scss'],
-                    dest: 'dist/build/css',
-                    ext: '.css'
+                    dest: 'dist/css',
+                    ext: '.min.css'
                 }]
             }
         }
@@ -140,8 +132,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-csscomb');
 
-    grunt.registerTask('default', ['clean:all', 'jshint', 'babel', 'browserify', 'uglify', 'csscomb', 'sasslint', 'sass', 'cssmin']);
-    grunt.registerTask('css', ['clean:css', 'csscomb', 'sasslint', 'sass', 'cssmin']);
+    grunt.registerTask('default', ['clean:all', 'jshint', 'babel', 'browserify', 'uglify', 'csscomb', 'sasslint', 'sass']);
+    grunt.registerTask('css', ['clean:css', 'csscomb', 'sasslint', 'sass']);
     grunt.registerTask('js', ['clean:js', 'jshint', 'babel', 'browserify', 'uglify']);
-    grunt.registerTask('nolint', ['clean:all', 'browserify', 'babel', 'uglify', 'sass', 'cssmin']);
+    grunt.registerTask('nolint', ['clean:all', 'browserify', 'babel', 'uglify', 'sass']);
 };
