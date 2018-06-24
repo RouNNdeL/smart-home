@@ -23,6 +23,8 @@
  */
 
 import $ from 'jquery';
+import 'tether';
+import 'bootstrap';
 
 $(function() {
     let time_diff = 0;
