@@ -140,6 +140,6 @@ HTML;
         ?>
     </div>
 </div>
-<div id="snackbar"></div>
+<div class="snackbar"></div>
 </body>
 </html>

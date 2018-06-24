@@ -67,7 +67,7 @@ $(function() {
     });
 
     function showSnackbar(text, duration = 2500) {
-        const snackbar = $("#snackbar");
+        const snackbar = $(".snackbar");
         snackbar.text(text);
         snackbar.addClass("show");
         setTimeout(() => snackbar.removeClass("show"), duration);
