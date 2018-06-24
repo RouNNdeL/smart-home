@@ -1,0 +1,74 @@
+// MIT License
+//
+// Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+@import '../../lib/sass-css3-mixins/css3-mixins.scss';
+$snackbar-bottom-offset: 30px;
+$snackbar-min-width: 250px;
+$snackbar-background-color: #333;
+$snackbar-text-color: #fff;
+
+// Credit: https://www.w3schools.com/howto/howto_js_snackbar.asp
+// Show the snackbar when clicking on a button (class added with JavaScript)
+
+.snackbar {
+  position: fixed;
+  bottom: $snackbar-bottom-offset;
+  left: 50%;
+  z-index: 1;
+  visibility: hidden;
+  margin-left: $snackbar-min-width / -2;
+  padding: 16px;
+  min-width: $snackbar-min-width;
+  border-radius: 2px;
+  background-color: $snackbar-background-color;
+  color: $snackbar-text-color;
+  text-align: center;
+
+  &.show {
+    @include animation('fadein 0.5s, fadeout 0.5s 2.5s');
+    visibility: visible;
+  }
+}
+
+@include keyframes(fadein) {
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+
+  to {
+    bottom: $snackbar-bottom-offset;
+    opacity: 1;
+  }
+}
+
+@include keyframes(fadeout) {
+  from {
+    bottom: $snackbar-bottom-offset;
+    opacity: 1;
+  }
+
+  to {
+    bottom: 0;
+    opacity: 0;
+  }
+}

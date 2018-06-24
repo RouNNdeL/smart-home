@@ -41,7 +41,7 @@ $manager = GlobalManager::all();
 <?php
 require_once __DIR__."/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("Smart Home Devices");
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::MAIN));
+$head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICES));
 echo $head->toString();
 
 

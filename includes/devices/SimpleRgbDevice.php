@@ -143,7 +143,7 @@ class SimpleRgbDevice extends VirtualDevice
         <form>
             <div class="card-header">
                 <div class="row">
-                    <div class="col"><h6 class="vertical-align mb-0">$name</h6></div>
+                    <div class="col"><h6 class="align-middle mb-0">$name</h6></div>
                     <div class="col-auto float-right pl-0">
                         <input class="checkbox-switch change-listen" type="checkbox" name="state" $checked
                             data-size="small" data-label-width="10" id="state-$this->device_id">

@@ -109,7 +109,7 @@ if($manager->getSessionManager()->isLoggedIn())
 
 require_once __DIR__."/../includes/head/HtmlHead.php";
 $head = new HtmlHead("Login to Smart Home");
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::MAIN));
+$head->addEntry(new StyleSheetEntry(StyleSheetEntry::LOGIN));
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::CAPTCHA));
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::LOGIN));
 echo $head->toString();
