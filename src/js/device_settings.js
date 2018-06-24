@@ -27,7 +27,7 @@ import 'tether';
 import 'bootstrap';
 import 'ion-rangeslider';
 import 'bootstrap-switch';
-import '../../../../lib/bootstrap-colorpicker';
+import '../../lib/bootstrap-colorpicker';
 
 const MIN_UPDATE_DELAY = 500;
 const UPDATE_URL = "/api/save_device.php";
