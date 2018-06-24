@@ -48,6 +48,7 @@ if(!$manager->getSessionManager()->isLoggedIn())
 require_once __DIR__ . "/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("World Cup Betting Leaderboard");
 $head->addEntry(new FaviconEntry(FaviconEntry::WORLD_CUP));
+$head->addEntry(new JavaScriptEntry('/dist/js/leaderboard'));
 echo $head->toString();
 
 
