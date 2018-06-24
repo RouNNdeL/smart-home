@@ -38,7 +38,7 @@ require_once __DIR__."/FaviconEntry.php";
 
 class HtmlHead
 {
-    const VERSION = "1.3";
+    const VERSION = "1.4";
 
     /** @var string */
     private $title;
