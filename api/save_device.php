@@ -74,5 +74,7 @@ echo json_encode($response);
 
 if($json["report_state"])
 {
-    $manager->getUserDeviceManager()->sendReportState();
+    $user_id = $manager->getSessionManager()->getUserId();
+    $script = __DIR__."/../scripts/report_state.php";
+    exec ("php $script $user_id >/dev/null &");
 }
