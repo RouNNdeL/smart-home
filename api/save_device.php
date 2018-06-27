@@ -58,18 +58,19 @@ foreach($json["devices"] as $id => $device)
         $response = ["status" => "error", "error" => "invalid_device_id"];
         http_response_code(400);
         echo json_encode($response);
+        exit();
     }
 
     $virtualDevice = $physical_device->getVirtualDeviceById($id);
-    $virtualDevice->handleSaveJson($json["devices"]["id"]);
+    $virtualDevice->handleSaveJson($json["devices"][$id]);
 
     if($physical_device->save(true))
         $response[$id] = "success";
     else
         $response[$id] = "offline";
-    echo json_encode($response);
 
 }
+echo json_encode($response);
 
 if($json["report_state"])
 {
