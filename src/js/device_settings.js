@@ -86,17 +86,39 @@ $(function() {
     function updateById(id) {
         const parent = $(`.device-parent[data-device-id="${id}"]`);
         const form = serializeToAssociative(parent.find("form").serializeArray());
-        form.device_id = id;
         parent.find("input[type=checkbox]").each(function() {
             form[$(this).attr("name")] = $(this)[0].checked;
+        });
+        const all = {report_state: false, devices: {}};
+        all.devices[id] = form;
+        last_call = Date.now();
+        $.ajax(UPDATE_URL, {
+            method: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify(all)
+        }).done(() => {
+            last_call_time = Date.now() - last_call;
+        });
+    }
+
+    function updateAll() {
+        const all = {report_state: true, devices: {}};
+        $(".device-parent").each(function() {
+            const id = $(this).data("device-id");
+            const form = serializeToAssociative($(this).find("form").serializeArray());
+            $(this).find("input[type=checkbox]").each(function() {
+                form[$(this).attr("name")] = $(this)[0].checked;
+            });
+            all.devices[id] = form;
         });
         last_call = Date.now();
         $.ajax(UPDATE_URL, {
             method: "POST",
             dataType: "json",
             contentType: "application/json",
-            data: JSON.stringify(form)
-        }).done(function(repsonse) {
+            data: JSON.stringify(all)
+        }).done(() => {
             last_call_time = Date.now() - last_call;
         });
     }
@@ -113,9 +135,7 @@ $(function() {
                 updateById(id);
             }
             else {
-                $(".device-parent").each(function() {
-                    updateById($(this).data("device-id"));
-                });
+                updateAll();
             }
             last_update = Date.now();
         }
