@@ -30,13 +30,15 @@ import 'bootstrap-switch';
 import '../../lib/bootstrap-colorpicker';
 
 const MIN_UPDATE_DELAY = 500;
+const REPORT_STATE_DELAY = 2500;
 const UPDATE_URL = "/api/save_device.php";
 
 $(function() {
     let last_update = Date.now();
     let last_call = 0;
     let last_call_time = 0;
-    let update_timeout = 0;
+    const update_timeouts = [];
+    let update_timeout_global = 0;
 
     $(".slider").ionRangeSlider({
         min: 0,
@@ -71,6 +73,10 @@ $(function() {
 
     $(".change-listen").change(update);
 
+    $(window).on("unload", function() {
+        reportState(false);
+    });
+
     function serializeToAssociative(array) {
         const obj = {};
         for(let i = 0; i < array.length; i++) {
@@ -86,18 +92,43 @@ $(function() {
     function updateById(id) {
         const parent = $(`.device-parent[data-device-id="${id}"]`);
         const form = serializeToAssociative(parent.find("form").serializeArray());
-        form.device_id = id;
         parent.find("input[type=checkbox]").each(function() {
             form[$(this).attr("name")] = $(this)[0].checked;
+        });
+        const all = {report_state: false, devices: {}};
+        all.devices[id] = form;
+        last_call = Date.now();
+        $.ajax(UPDATE_URL, {
+            method: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify(all)
+        }).done(() => {
+            last_call_time = Date.now() - last_call;
+        });
+    }
+
+    function reportState(async = true) {
+        console.log("Began");
+        const all = {report_state: true, devices: {}};
+        $(".device-parent").each(function() {
+            const id = $(this).data("device-id");
+            const form = serializeToAssociative($(this).find("form").serializeArray());
+            $(this).find("input[type=checkbox]").each(function() {
+                form[$(this).attr("name")] = $(this)[0].checked;
+            });
+            all.devices[id] = form;
         });
         last_call = Date.now();
         $.ajax(UPDATE_URL, {
             method: "POST",
             dataType: "json",
             contentType: "application/json",
-            data: JSON.stringify(form)
-        }).done(function(repsonse) {
+            data: JSON.stringify(all),
+            async: async
+        }).done(() => {
             last_call_time = Date.now() - last_call;
+            console.log("Finished");
         });
     }
 
@@ -106,22 +137,21 @@ $(function() {
      * @param {Event} e
      */
     function update(e) {
+        if(e === undefined || e.target === undefined) {
+            throw new Error("This function requires an event with a valid target");
+        }
         let update_delay = Math.max(MIN_UPDATE_DELAY, 2 * last_call_time);
+        const id = $(e.target).parents(".device-parent").data("device-id");
         if(Date.now() > last_update + update_delay) {
-            if(e !== undefined && e.target !== undefined) {
-                const id = $(e.target).parents(".device-parent").data("device-id");
-                updateById(id);
-            }
-            else {
-                $(".device-parent").each(function() {
-                    updateById($(this).data("device-id"));
-                });
-            }
+
+            updateById(id);
             last_update = Date.now();
         }
         else {
-            clearTimeout(update_timeout);
-            update_timeout = setTimeout(update, last_update + MIN_UPDATE_DELAY - Date.now());
+            clearTimeout(update_timeouts[id]);
+            update_timeouts[id] = setTimeout(update.bind(this, e), last_update + MIN_UPDATE_DELAY - Date.now());
         }
+        clearTimeout(update_timeout_global);
+        update_timeout_global = setTimeout(reportState, REPORT_STATE_DELAY);
     }
 });

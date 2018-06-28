@@ -36,6 +36,20 @@ module.exports = function(grunt) {
                     alias: {
                         'jQuery': 'jquery'
                     },
+                    transform: [["babelify"]],
+                },
+                files: [{
+                    expand: true,
+                    cwd: "src/js",
+                    src: ["*.js"],
+                    dest: 'dist/js',
+                }]
+            },
+            dev: {
+                options: {
+                    alias: {
+                        'jQuery': 'jquery'
+                    },
                     browserifyOptions:{
                         debug: true
                     },
@@ -46,6 +60,7 @@ module.exports = function(grunt) {
                     cwd: "src/js",
                     src: ["*.js"],
                     dest: 'dist/js',
+                    ext: ".min.js"
                 }]
             }
         },
@@ -121,8 +136,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-csscomb');
 
-    grunt.registerTask('default', ['clean:all', 'jshint', 'browserify', 'uglify', 'csscomb', 'sasslint', 'sass']);
+    grunt.registerTask('default', ['clean:all', 'jshint', 'browserify:build', 'uglify', 'csscomb', 'sasslint', 'sass']);
     grunt.registerTask('css', ['clean:css', 'csscomb', 'sasslint', 'sass']);
-    grunt.registerTask('js', ['clean:js', 'jshint', 'browserify', 'uglify']);
+    grunt.registerTask('js', ['clean:js', 'jshint', 'browserify:build', 'uglify']);
+    grunt.registerTask('js-dev', ['clean:js', 'jshint', 'browserify:dev']);
     grunt.registerTask('nolint', ['clean:all', 'browserify', 'uglify', 'sass']);
 };

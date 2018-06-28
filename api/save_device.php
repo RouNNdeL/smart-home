@@ -37,31 +37,44 @@ if($_SERVER["REQUEST_METHOD"] !== "POST")
     echo json_encode($response);
 }
 
-require_once __DIR__."/../includes/GlobalManager.php";
+require_once __DIR__ . "/../includes/GlobalManager.php";
 
 $manager = GlobalManager::all();
 
 $json = json_decode(file_get_contents("php://input"), true);
-if($json === false || !isset($json["device_id"]))
+if($json === false || !isset($json["devices"])|| !isset($json["report_state"]))
 {
     $response = ["status" => "error", "error" => "invalid_json"];
     http_response_code(400);
     echo json_encode($response);
 }
 
-$physical_device = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($json["device_id"]);
-if($physical_device === null)
+$response = [];
+foreach($json["devices"] as $id => $device)
 {
-    $response = ["status" => "error", "error" => "invalid_device_id"];
-    http_response_code(400);
-    echo json_encode($response);
+    $physical_device = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($id);
+    if($physical_device === null)
+    {
+        $response = ["status" => "error", "error" => "invalid_device_id"];
+        http_response_code(400);
+        echo json_encode($response);
+        exit();
+    }
+
+    $virtualDevice = $physical_device->getVirtualDeviceById($id);
+    $virtualDevice->handleSaveJson($json["devices"][$id]);
+
+    if($physical_device->save(true))
+        $response[$id] = "success";
+    else
+        $response[$id] = "offline";
+
 }
-
-$virtualDevice = $physical_device->getVirtualDeviceById($json["device_id"]);
-$virtualDevice->handleSaveJson($json);
-
-if($physical_device->save(true))
-    $response = ["status" => "success"];
-else
-    $response = ["status" => "offline"];
 echo json_encode($response);
+
+if($json["report_state"])
+{
+    $user_id = $manager->getSessionManager()->getUserId();
+    $script = __DIR__."/../scripts/report_state.php";
+    exec ("php $script $user_id >/dev/null &");
+}
