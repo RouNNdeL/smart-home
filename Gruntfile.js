@@ -50,7 +50,7 @@ module.exports = function(grunt) {
                     alias: {
                         'jQuery': 'jquery'
                     },
-                    browserifyOptions:{
+                    browserifyOptions: {
                         debug: true
                     },
                     transform: [["babelify"]],
@@ -60,7 +60,18 @@ module.exports = function(grunt) {
                     cwd: "src/js",
                     src: ["*.js"],
                     dest: 'dist/js',
-                    ext: ".min.js"
+                    ext: ".js"
+                }]
+            }
+        },
+        exorcise: {
+            dev: {
+                files: [{
+                    expand: true,
+                    cwd: "dist/js",
+                    src: ["*.js"],
+                    dest: 'dist/js',
+                    ext: ".js.map"
                 }]
             }
         },
@@ -70,6 +81,25 @@ module.exports = function(grunt) {
                     compress: {
                         drop_console: true,
                         dead_code: true
+                    },
+                    sourceMap: false
+                },
+                files: [{
+                    expand: true,
+                    cwd: "dist/js",
+                    src: ["*.js", "!*.min.js"],
+                    dest: "dist/js",
+                    ext: ".min.js"
+                }]
+            },
+            dev: {
+                options: {
+                    sourceMapIn: function(n) {
+                        return n + ".map";
+                    },
+                    compress: {
+                        drop_console: false,
+                        dead_code: false
                     },
                     sourceMap: true
                 },
@@ -113,7 +143,21 @@ module.exports = function(grunt) {
         sass: {
             build: {
                 options: {
-                    style: "compressed"
+                    style: "compressed",
+                    sourcemap: "none"
+                },
+                files: [{
+                    expand: true,
+                    cwd: 'src/sass',
+                    src: ['*.scss'],
+                    dest: 'dist/css',
+                    ext: '.min.css'
+                }]
+            },
+            dev: {
+                options: {
+                    style: "compressed",
+                    sourcemap: "auto"
                 },
                 files: [{
                     expand: true,
@@ -135,10 +179,10 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-sass-lint');
     grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-csscomb');
+    grunt.loadNpmTasks('grunt-exorcise');
 
-    grunt.registerTask('default', ['clean:all', 'jshint', 'browserify:build', 'uglify', 'csscomb', 'sasslint', 'sass']);
-    grunt.registerTask('css', ['clean:css', 'csscomb', 'sasslint', 'sass']);
-    grunt.registerTask('js', ['clean:js', 'jshint', 'browserify:build', 'uglify']);
-    grunt.registerTask('js-dev', ['clean:js', 'jshint', 'browserify:dev']);
-    grunt.registerTask('nolint', ['clean:all', 'browserify', 'uglify', 'sass']);
+    grunt.registerTask('default', ['clean:all', 'jshint', 'browserify:build', 'uglify:build', 'csscomb', 'sasslint', 'sass:build']);
+    grunt.registerTask('dev', ['clean:all', 'jshint', 'browserify:dev', "exorcise:dev", 'uglify:dev', 'csscomb', 'sasslint', 'sass:dev']);
+    grunt.registerTask('css', ['clean:css', 'csscomb', 'sasslint', 'sass:build']);
+    grunt.registerTask('js', ['clean:js', 'jshint', 'browserify:build', 'uglify:build']);
 };

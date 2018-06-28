@@ -24,10 +24,11 @@
     "grunt-contrib-sass": "^1.0.0",
     "grunt-contrib-uglify-es": "^3.3.0",
     "grunt-csscomb": "^3.1.1",
+    "grunt-exorcise": "^2.1.1",
     "grunt-sass-lint": "^0.2.4",
     "jshint": "^2.9.5"
   },
   "scripts": {
-    "lint": "jshint web/js"
+    "build": "grunt"
   }
 }

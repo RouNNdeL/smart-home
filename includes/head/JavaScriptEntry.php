@@ -43,8 +43,8 @@ class JavaScriptEntry extends HeadEntry
     const SWITCH = "/switch/dist/js/bootstrap-switch";
     const CAPTCHA = "https://www.google.com/recaptcha/api.js";
     const GOOGLE_PLATFORM = "https://apis.google.com/js/platform";
-    const LOGIN = "/js/login";
-    const DEVICE_SETTINGS = "/js/device_settings";
+    const LOGIN = "/dist/js/login";
+    const DEVICE_SETTINGS = "/dist/js/device_settings";
 
     const DEFAULT = [];
 
