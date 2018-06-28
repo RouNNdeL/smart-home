@@ -26,56 +26,31 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-06-17
- * Time: 13:09
+ * Date: 2018-06-28
+ * Time: 12:18
  */
-
 require_once __DIR__ . "/../../includes/GlobalManager.php";
+
 
 $manager = GlobalManager::withSessionManager(false);
 
 if(!$manager->getSessionManager()->isLoggedIn())
 {
-    $params = ["next" => "https://bets.zdul.xyz" . $_SERVER["REQUEST_URI"]];
+    $params = ["next" => "https://bets.zdul.xyz/leaderboard"];
     header("Location: https://home.zdul.xyz/login?" . http_build_query($params));
     exit(0);
 }
-
-if(!isset($_GET["id"]))
-{
-    echo "Invalid request";
-    http_response_code(400);
-    exit();
-}
-
-require_once __DIR__ . "/../../includes/betting/Match.php";
-
-$match = Match::byId($_GET["id"]);
-if($match === null)
-{
-    require __DIR__."/../../web/error/404.php";
-    http_response_code(404);
-    exit(0);
-}
-
-if(isset($_GET["name"]) && $_GET["name"] === "false")
-{
-    require_once __DIR__ . "/../../includes/Utils.php";
-    $name = urlencode($match->getTeamString());
-    header("Location: /match/$name/$_GET[id]");
-    exit();
-}
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <?php
 require_once __DIR__ . "/../../includes/head/HtmlHead.php";
-$head = new HtmlHead("");
+$head = new HtmlHead("World Cup Betting Leaderboard");
 $head->addEntry(new FaviconEntry(FaviconEntry::WORLD_CUP));
-$head->addEntry(new StyleSheetEntry("/dist/css/matches"));
-$head->addEntry(new JavaScriptEntry("/dist/js/core"));
+$head->addEntry(new JavaScriptEntry('/dist/js/bet_top'));
+$head->addEntry(new StyleSheetEntry('/dist/css/bet_top'));
 echo $head->toString();
+
 
 ?>
 <body>
@@ -90,6 +65,7 @@ echo $head->toString();
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav mr-auto">
+
             <li class="nav-item">
                 <a class="nav-link" href="/matches">Upcoming</a>
             </li>
@@ -99,7 +75,7 @@ echo $head->toString();
             <li class="nav-item">
                 <a class="nav-link" href="/matches/all">All</a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item active">
                 <a class="nav-link" href="/top">Top 3</a>
             </li>
             <li class="nav-item">
@@ -129,13 +105,38 @@ echo $head->toString();
 </nav>
 <div class="container mt-3">
     <div class="row">
-        <div class="col">
-            <?php
-            echo $match->toBigHtml($manager->getSessionManager()->getUserId());
-            ?>
+        <div class="col col-lg-6 offset-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5>Choose the top 3 teams (order is ambiguous)</h5>
+                    <br>
+                    <form>
+                    <?php
+                    require_once __DIR__ . "/../../includes/betting/MatchUtils.php";
+                    require_once __DIR__ . "/../../includes/betting/Team.php";
+
+                    $chosen_ids = MatchUtils::getTopPrediction($manager->getSessionManager()->getUserId());
+
+                    for($i = 0; $i < 3; $i++)
+                    {
+                        $teamsOptions = MatchUtils::getTeamsOptions(Team::getAll(), $chosen_ids[$i]);
+                        $options = "<option value='null'>Select a team</option>" . $teamsOptions;
+
+                        echo <<<HTML
+                    <div class="form-group">
+                        <select name="team_$i" class="form-control top-team-select">$options</select>
+                    </div>
+HTML;
+                    }
+
+                    ?>
+                        <button id="top-submit-btn" class="btn btn-primary" role="button" type="button">Save</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-<div id="snackbar"></div>
+<div class="snackbar"></div>
 </body>
 </html>

@@ -75,6 +75,9 @@ echo $head->toString();
             <li class="nav-item">
                 <a class="nav-link" href="/matches/all">All</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/top">Top 3</a>
+            </li>
             <li class="nav-item active">
                 <a class="nav-link" href="/leaderboard">Leaderboard</a>
             </li>
@@ -134,7 +137,5 @@ echo $head->toString();
         </div>
     </div>
 </div>
-</div>
-<div id="snackbar"></div>
 </body>
 </html>

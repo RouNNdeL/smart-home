@@ -85,6 +85,9 @@ echo $head->toString();
 HTML;
             ?>
             <li class="nav-item">
+                <a class="nav-link" href="/top">Top 3</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="/leaderboard">Leaderboard</a>
             </li>
             <li class="nav-item d-md-none">

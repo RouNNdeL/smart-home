@@ -25,6 +25,7 @@
 import $ from 'jquery';
 import 'tether';
 import 'bootstrap';
+import {serializeToAssociative, showSnackbar} from './utils';
 
 $(function() {
     let time_diff = 0;
@@ -66,13 +67,6 @@ $(function() {
 
     });
 
-    function showSnackbar(text, duration = 2500) {
-        const snackbar = $(".snackbar");
-        snackbar.text(text);
-        snackbar.addClass("show");
-        setTimeout(() => snackbar.removeClass("show"), duration);
-    }
-
     function updateTime() {
         const time = parseInt($(this).data("match-start"));
         const time_left = Math.round((time * 1000 - Date.now() + time_diff) / 1000);
@@ -103,11 +97,3 @@ $(function() {
         $(this).text("Picks lock in " + str);
     }
 });
-
-function serializeToAssociative(array) {
-    const obj = {};
-    for(let i = 0; i < array.length; i++) {
-        obj[array[i].name] = array[i].value;
-    }
-    return obj;
-}

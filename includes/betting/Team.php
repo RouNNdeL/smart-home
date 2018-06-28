@@ -79,6 +79,22 @@ class Team
         return null;
     }
 
+    public static function getAll()
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, name, short_name, logo FROM bet_teams WHERE id != 0";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_result($id, $name, $short_name, $logo);
+        $stmt->execute();
+        $arr = [];
+        while($stmt->fetch())
+        {
+            $arr[] = new Team($id, $name, $short_name, $logo);
+        }
+        $stmt->close();
+        return $arr;
+    }
+
     /**
      * @return string
      */
@@ -101,5 +117,13 @@ class Team
     public function getLogo(): string
     {
         return Team::LOGO_PATH.$this->logo;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
     }
 }

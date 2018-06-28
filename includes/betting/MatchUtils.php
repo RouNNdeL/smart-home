@@ -39,6 +39,7 @@ class MatchUtils
 
     const PICK_LOCK_MINUTES = 15;
     const PICK_LOCK_WARNING = 60;
+    const TOP_LOCK_MATCH_ID = 50;
 
     public static function formatDate(int $dateTime)
     {
@@ -254,5 +255,61 @@ HTML;
         </tr>
 HTML;
 
+    }
+
+    /**
+     * @param Team[] $teams
+     * @param int|null $selected_id
+     * @return string
+     */
+    public static function getTeamsOptions(array $teams, $selected_id = null)
+    {
+        $str = "";
+        foreach($teams as $team)
+        {
+            $name = $team->getName();
+            $id = $team->getId();
+            $selected = $id === $selected_id ? "selected" : "";
+            $str.="<option value='$id' $selected>$name</option>";
+        }
+        return $str;
+    }
+
+    /**
+     * @param int $user_id
+     * @param int $team0
+     * @param int $team1
+     * @param int $team2
+     * @return bool
+     */
+    public static function insertTopPrediction(int $user_id, int $team0, int $team1, int $team2)
+    {
+        if(!Match::byId(MatchUtils::TOP_LOCK_MATCH_ID)->picksOpen())
+            return false;
+        $conn = DbUtils::getConnection();
+        $sql = "INSERT INTO bet_top_predictions (user_id, team0, team1, team2) VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE team0 = ?, team1 = ?, team2 = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iiiiiii", $user_id, $team0, $team1, $team2, $team0, $team1, $team2);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
+
+    public static function getTopPrediction(int $user_id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT team0, team1, team2 FROM bet_top_predictions WHERE user_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $user_id);
+        $stmt->bind_result($team0, $team1, $team2);
+        $stmt->execute();
+        if($stmt->fetch())
+        {
+            $stmt->close();
+            return [$team0, $team1, $team2];
+        }
+        $stmt->close();
+        return [null, null, null];
     }
 }
