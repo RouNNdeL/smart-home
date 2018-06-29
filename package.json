@@ -31,6 +31,6 @@
     "node-sass": "^4.9.0"
   },
   "scripts": {
-    "build": "grunt"
+    "build": "grunt vendor && grunt"
   }
 }
