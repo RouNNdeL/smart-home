@@ -46,7 +46,7 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: "src/js",
-                    src: ["*.js", "!core.js"],
+                    src: ["*.js"],
                     dest: 'dist/js',
                 }]
             },
@@ -60,7 +60,7 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: "src/js",
-                    src: ["*.js", "!core.js"],
+                    src: ["*.js"],
                     dest: 'dist/js',
                     ext: ".js"
                 }]
@@ -235,7 +235,7 @@ module.exports = function(grunt) {
     grunt.registerTask('default', [
         'clean:all',
         'jshint', 'browserify:build', 'uglify:build',
-        'csscomb', 'sasslint', 'sass:build',
+        'sasslint', 'sass:build',
         'copy:build'
     ]);
     grunt.registerTask('dev', [
