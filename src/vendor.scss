@@ -19,25 +19,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-@import 'color_picker';
-@import 'devices';
-@import '../../node_modules/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch';
-@import '../../node_modules/ion-rangeslider/css/ion.rangeSlider';
-@import '../../node_modules/ion-rangeslider/css/ion.rangeSlider.skinFlat';
-$color-input-size: 184px;
 
-.color-input {
-  width: $color-input-size;
-  font-size: 1.2rem;
-  font-family: monospace;
-}
+$icon-font-path: "/iconic/font/fonts/";
 
-.slider-container {
-  max-width: $color-input-size + 20px;
-  width: 100%;
-}
-
-.device-settings-content {
-  padding-top: 12px;
-  height: 100%;
-}
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import "../node_modules/tether/src/css/tether";
+@import "../node_modules/open-iconic/font/css/open-iconic-bootstrap.scss";

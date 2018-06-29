@@ -148,7 +148,7 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: 'src/sass',
-                    src: ['*.scss', '!mixins.scss'],
+                    src: ['*.scss'],
                     dest: 'src/sass'
                 }]
             }
@@ -161,15 +161,18 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: 'src/sass',
-                    src: ['*.scss', '!mixins.scss']
+                    src: ['*.scss']
                 }]
             }
         },
         sass: {
+            options: {
+                outputStyle: "compressed",
+                implementation: require("node-sass"),
+            },
             build: {
                 options: {
-                    style: "compressed",
-                    sourcemap: "none"
+                    sourceMap: false
                 },
                 files: [{
                     expand: true,
@@ -181,8 +184,7 @@ module.exports = function(grunt) {
             },
             dev: {
                 options: {
-                    style: "compressed",
-                    sourcemap: "auto"
+                    sourceMap: true
                 },
                 files: [{
                     expand: true,
@@ -190,6 +192,28 @@ module.exports = function(grunt) {
                     src: ['*.scss'],
                     dest: 'dist/css',
                     ext: '.min.css'
+                }]
+            },
+            vendor: {
+                options: {
+                    sourceMap: false
+                },
+                files: [{
+                    expand: true,
+                    cwd: 'src/',
+                    src: ['vendor.scss'],
+                    dest: 'dist/vendor/css',
+                    ext: '.min.css'
+                }]
+            }
+        },
+        copy: {
+            build: {
+                files: [{
+                    expand: true,
+                    cwd: "node_modules/ion-rangeslider/img",
+                    src: ['*.png'],
+                    dest: 'dist/img'
                 }]
             }
         }
@@ -200,15 +224,26 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify-es');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-sass');
+    grunt.loadNpmTasks('grunt-sass');
     grunt.loadNpmTasks('grunt-sass-lint');
     grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-csscomb');
     grunt.loadNpmTasks('grunt-exorcise');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
-    grunt.registerTask('default', ['clean:all', 'jshint', 'browserify:build', 'uglify:build', 'csscomb', 'sasslint', 'sass:build']);
-    grunt.registerTask('vendor', ['clean:vendor', 'browserify:vendor', 'uglify:vendor']);
-    grunt.registerTask('dev', ['clean:all', 'jshint', 'browserify:dev', "exorcise:dev", 'uglify:dev', 'csscomb', 'sasslint', 'sass:dev']);
+    grunt.registerTask('vendor', ['clean:vendor', 'browserify:vendor', 'uglify:vendor', 'sass:vendor']);
+    grunt.registerTask('default', [
+        'clean:all',
+        'jshint', 'browserify:build', 'uglify:build',
+        'csscomb', 'sasslint', 'sass:build',
+        'copy:build'
+    ]);
+    grunt.registerTask('dev', [
+        'clean:all',
+        'jshint', 'browserify:dev', "exorcise:dev", 'uglify:dev',
+        'csscomb', 'sasslint', 'sass:dev',
+        'copy:build'
+    ]);
     grunt.registerTask('css', ['clean:css', 'csscomb', 'sasslint', 'sass:build']);
     grunt.registerTask('js', ['clean:js', 'jshint', 'browserify:build', 'uglify:build']);
 };

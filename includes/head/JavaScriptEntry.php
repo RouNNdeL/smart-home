@@ -34,13 +34,6 @@ require_once __DIR__ . "/HeadEntry.php";
 
 class JavaScriptEntry extends HeadEntry
 {
-    const JQUERY = "/jquery/jquery";
-    const TETHER = "/tether/dist/js/tether";
-    const BOOTSTRAP = "/bootstrap/dist/js/bootstrap";
-    const JQUERY_UI = "/jqueryui/jquery-ui";
-    const COLOR_PICKER = "/colorpicker/dist/js/bootstrap-colorpicker";
-    const SLIDER = "/slider/js/ion.rangeSlider";
-    const SWITCH = "/switch/dist/js/bootstrap-switch";
     const CAPTCHA = "https://www.google.com/recaptcha/api.js";
     const GOOGLE_PLATFORM = "https://apis.google.com/js/platform";
     const LOGIN = "/dist/js/login";

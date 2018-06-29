@@ -64,10 +64,6 @@ $virtualDevices = $device->getVirtualDevices();
 require_once __DIR__ . "/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("Smart Home - " . $device->getDisplayName());
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICE_SETTINGS));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::COLOR_PICKER));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::SLIDER));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::SLIDER_STYLE));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::SWITCH));
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICE_SETTINGS));
 echo $head->toString();
 
