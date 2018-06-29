@@ -26,42 +26,51 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         clean: {
-            all: ["dist"],
+            all: ["dist/*", "!dist/vendor/**"],
+            vendor: ["dist/vendor"],
             js: ["dist/js"],
             css: ["dist/css"]
         },
         browserify: {
+            options: {
+                transform: [["babelify"]],
+                alias: {
+                    'jQuery': 'jquery'
+                }
+
+            },
             build: {
                 options: {
-                    alias: {
-                        'jQuery': 'jquery'
-                    },
-                    transform: [["babelify"]],
+                    external: ["jQuery", "tether", "bootstrap"]
                 },
                 files: [{
                     expand: true,
                     cwd: "src/js",
-                    src: ["*.js"],
+                    src: ["*.js", "!core.js"],
                     dest: 'dist/js',
                 }]
             },
             dev: {
                 options: {
-                    alias: {
-                        'jQuery': 'jquery'
-                    },
                     browserifyOptions: {
                         debug: true
                     },
-                    transform: [["babelify"]],
+                    external: ["jQuery", "tether", "bootstrap"]
                 },
                 files: [{
                     expand: true,
                     cwd: "src/js",
-                    src: ["*.js"],
+                    src: ["*.js", "!core.js"],
                     dest: 'dist/js',
                     ext: ".js"
                 }]
+            },
+            vendor: {
+                options: {
+                    require: ['jquery', "tether", "bootstrap"]
+                },
+                src: [],
+                dest: 'dist/vendor/js/vendor.js',
             }
         },
         exorcise: {
@@ -94,9 +103,6 @@ module.exports = function(grunt) {
             },
             dev: {
                 options: {
-                    sourceMapIn: function(n) {
-                        return n + ".map";
-                    },
                     compress: {
                         drop_console: false,
                         dead_code: false
@@ -108,6 +114,22 @@ module.exports = function(grunt) {
                     cwd: "dist/js",
                     src: ["*.js", "!*.min.js"],
                     dest: "dist/js",
+                    ext: ".min.js"
+                }]
+            },
+            vendor: {
+                options: {
+                    compress: {
+                        drop_console: true,
+                        dead_code: true
+                    },
+                    sourceMap: false
+                },
+                files: [{
+                    expand: true,
+                    cwd: "dist/vendor/js",
+                    src: ["*.js", "!*.min.js"],
+                    dest: 'dist/vendor/js',
                     ext: ".min.js"
                 }]
             }
@@ -182,6 +204,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-exorcise');
 
     grunt.registerTask('default', ['clean:all', 'jshint', 'browserify:build', 'uglify:build', 'csscomb', 'sasslint', 'sass:build']);
+    grunt.registerTask('vendor', ['clean:vendor', 'browserify:vendor', 'uglify:vendor']);
     grunt.registerTask('dev', ['clean:all', 'jshint', 'browserify:dev', "exorcise:dev", 'uglify:dev', 'csscomb', 'sasslint', 'sass:dev']);
     grunt.registerTask('css', ['clean:css', 'csscomb', 'sasslint', 'sass:build']);
     grunt.registerTask('js', ['clean:js', 'jshint', 'browserify:build', 'uglify:build']);

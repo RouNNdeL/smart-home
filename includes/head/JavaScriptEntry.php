@@ -46,7 +46,9 @@ class JavaScriptEntry extends HeadEntry
     const LOGIN = "/dist/js/login";
     const DEVICE_SETTINGS = "/dist/js/device_settings";
 
-    const DEFAULT = [];
+    const VENDOR = "/dist/vendor/js/vendor";
+
+    const DEFAULT = [JavaScriptEntry::VENDOR];
 
     /** @var string */
     private $url;
