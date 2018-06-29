@@ -103,6 +103,9 @@ module.exports = function(grunt) {
             },
             dev: {
                 options: {
+                    sourceMapIn: function(n) {
+                        return n + ".map";
+                    },
                     compress: {
                         drop_console: false,
                         dead_code: false
