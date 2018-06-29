@@ -28,6 +28,7 @@ import 'bootstrap';
 import 'ion-rangeslider';
 import 'bootstrap-switch';
 import '../../lib/bootstrap-colorpicker';
+import {serializeToAssociative} from "./utils";
 
 const MIN_UPDATE_DELAY = 500;
 const REPORT_STATE_DELAY = 2500;
@@ -36,9 +37,9 @@ const UPDATE_URL = "/api/save_device.php";
 $(function() {
     let last_update = Date.now();
     let last_call = 0;
-    let last_call_time = 0;
+    let last_call_duration = 0;
     const update_timeouts = [];
-    let update_timeout_global = 0;
+    let update_timeout_global = -1;
 
     $(".slider").ionRangeSlider({
         min: 0,
@@ -74,16 +75,10 @@ $(function() {
     $(".change-listen").change(update);
 
     $(window).on("unload", function() {
-        reportState(false);
+        /* Only call when there's a pending timeout */
+        if(update_timeout_global !== -1)
+            reportState(false);
     });
-
-    function serializeToAssociative(array) {
-        const obj = {};
-        for(let i = 0; i < array.length; i++) {
-            obj[array[i].name] = array[i].value;
-        }
-        return obj;
-    }
 
     /**
      *
@@ -104,12 +99,11 @@ $(function() {
             contentType: "application/json",
             data: JSON.stringify(all)
         }).done(() => {
-            last_call_time = Date.now() - last_call;
+            last_call_duration = Date.now() - last_call;
         });
     }
 
     function reportState(async = true) {
-        console.log("Began");
         const all = {report_state: true, devices: {}};
         $(".device-parent").each(function() {
             const id = $(this).data("device-id");
@@ -127,8 +121,8 @@ $(function() {
             data: JSON.stringify(all),
             async: async
         }).done(() => {
-            last_call_time = Date.now() - last_call;
-            console.log("Finished");
+            last_call_duration = Date.now() - last_call;
+            update_timeout_global = -1;
         });
     }
 
@@ -140,7 +134,7 @@ $(function() {
         if(e === undefined || e.target === undefined) {
             throw new Error("This function requires an event with a valid target");
         }
-        let update_delay = Math.max(MIN_UPDATE_DELAY, 2 * last_call_time);
+        let update_delay = Math.max(MIN_UPDATE_DELAY, 2 * last_call_duration);
         const id = $(e.target).parents(".device-parent").data("device-id");
         if(Date.now() > last_update + update_delay) {
 

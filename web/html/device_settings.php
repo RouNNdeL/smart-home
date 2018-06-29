@@ -64,10 +64,6 @@ $virtualDevices = $device->getVirtualDevices();
 require_once __DIR__ . "/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("Smart Home - " . $device->getDisplayName());
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICE_SETTINGS));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::COLOR_PICKER));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::SLIDER));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::SLIDER_STYLE));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::SWITCH));
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICE_SETTINGS));
 echo $head->toString();
 
@@ -76,16 +72,16 @@ echo $head->toString();
 <div class="container-fluid">
     <div class="row device-settings-content">
         <div class="col-sm-12">
-                <?php
-                $reboot_string = Utils::getString("device_reboot");
-                if(sizeof($virtualDevices) > 1)
+            <?php
+            $reboot_string = Utils::getString("device_reboot");
+            if(sizeof($virtualDevices) > 1)
+            {
+                $virtual_html = "";
+                foreach($virtualDevices as $i => $virtualDevice)
                 {
-                    $virtual_html = "";
-                    foreach($virtualDevices as $i => $virtualDevice)
-                    {
-                        $html = $virtualDevice->toHtml();
-                        $id = $virtualDevice->getDeviceId();
-                        $virtual_html .= <<<HTML
+                    $html = $virtualDevice->toHtml();
+                    $id = $virtualDevice->getDeviceId();
+                    $virtual_html .= <<<HTML
                         <div class="col-12 col-sm-6 col-md-4 col-lg-3 px-1 py-1">
                             <div class="card device-parent" data-device-id="$id">
                                 $html
@@ -93,10 +89,10 @@ echo $head->toString();
                         </div>
 HTML;
 
-                    }
+                }
 
-                    $device_name = $device->getNameWithState();
-                    echo <<<HTML
+                $device_name = $device->getNameWithState();
+                echo <<<HTML
                     <div class="card">
                         <div class="card-header">
                             <h4>$device_name</h4>
@@ -113,24 +109,23 @@ HTML;
                     </div>
 HTML;
 
-                }
-                else
-                {
-                    $footer = <<<HTML
+            }
+            else
+            {
+                $footer = <<<HTML
                     <button id="device-settings-submit" class="btn btn-sm btn-danger float-right">$reboot_string</button>
 HTML;
 
-                    $virtual_html = $virtualDevices[0]->toHtml($device->getNameWithState(), $footer);
-                    $id = $virtualDevices[0]->getDeviceId();
-                    echo <<<HTML
+                $virtual_html = $virtualDevices[0]->toHtml($device->getNameWithState(), $footer);
+                $id = $virtualDevices[0]->getDeviceId();
+                echo <<<HTML
                     <div class="card device-parent" data-device-id="$id">
                             $virtual_html
                     </div> 
 HTML;
 
-                }
-                ?>
-            </div>
+            }
+            ?>
         </div>
     </div>
 </div>

@@ -69,15 +69,7 @@ if(isset($_GET["name"]) && $_GET["name"] === "false")
 <?php
 require_once __DIR__ . "/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("Smart Home - " . $device->getDeviceName());
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::COLOR_PICKER));
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::SLIDER));
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::SWITCH));
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICE_SETTINGS));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::COLOR_PICKER));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::SLIDER));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::SLIDER_STYLE));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::SWITCH));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::MAIN));
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICE_SETTINGS));
 echo $head->toString();
 

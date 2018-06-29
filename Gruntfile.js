@@ -26,41 +26,61 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         clean: {
-            all: ["dist"],
+            all: ["dist/*", "!dist/vendor/**"],
+            vendor: ["dist/vendor"],
             js: ["dist/js"],
             css: ["dist/css"]
         },
         browserify: {
+            options: {
+                transform: [["babelify"]],
+                alias: {
+                    'jQuery': 'jquery'
+                }
+
+            },
             build: {
                 options: {
-                    alias: {
-                        'jQuery': 'jquery'
-                    },
-                    transform: [["babelify"]],
+                    external: ["jQuery", "tether", "bootstrap"]
                 },
                 files: [{
                     expand: true,
                     cwd: "src/js",
-                    src: ["*.js"],
+                    src: ["*.js", "!core.js"],
                     dest: 'dist/js',
                 }]
             },
             dev: {
                 options: {
-                    alias: {
-                        'jQuery': 'jquery'
-                    },
-                    browserifyOptions:{
+                    browserifyOptions: {
                         debug: true
                     },
-                    transform: [["babelify"]],
+                    external: ["jQuery", "tether", "bootstrap"]
                 },
                 files: [{
                     expand: true,
                     cwd: "src/js",
+                    src: ["*.js", "!core.js"],
+                    dest: 'dist/js',
+                    ext: ".js"
+                }]
+            },
+            vendor: {
+                options: {
+                    require: ['jquery', "tether", "bootstrap"]
+                },
+                src: [],
+                dest: 'dist/vendor/js/vendor.js',
+            }
+        },
+        exorcise: {
+            dev: {
+                files: [{
+                    expand: true,
+                    cwd: "dist/js",
                     src: ["*.js"],
                     dest: 'dist/js',
-                    ext: ".min.js"
+                    ext: ".js.map"
                 }]
             }
         },
@@ -71,6 +91,25 @@ module.exports = function(grunt) {
                         drop_console: true,
                         dead_code: true
                     },
+                    sourceMap: false
+                },
+                files: [{
+                    expand: true,
+                    cwd: "dist/js",
+                    src: ["*.js", "!*.min.js"],
+                    dest: "dist/js",
+                    ext: ".min.js"
+                }]
+            },
+            dev: {
+                options: {
+                    sourceMapIn: function(n) {
+                        return n + ".map";
+                    },
+                    compress: {
+                        drop_console: false,
+                        dead_code: false
+                    },
                     sourceMap: true
                 },
                 files: [{
@@ -78,6 +117,22 @@ module.exports = function(grunt) {
                     cwd: "dist/js",
                     src: ["*.js", "!*.min.js"],
                     dest: "dist/js",
+                    ext: ".min.js"
+                }]
+            },
+            vendor: {
+                options: {
+                    compress: {
+                        drop_console: true,
+                        dead_code: true
+                    },
+                    sourceMap: false
+                },
+                files: [{
+                    expand: true,
+                    cwd: "dist/vendor/js",
+                    src: ["*.js", "!*.min.js"],
+                    dest: 'dist/vendor/js',
                     ext: ".min.js"
                 }]
             }
@@ -93,7 +148,7 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: 'src/sass',
-                    src: ['*.scss', '!mixins.scss'],
+                    src: ['*.scss'],
                     dest: 'src/sass'
                 }]
             }
@@ -106,14 +161,18 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: 'src/sass',
-                    src: ['*.scss', '!mixins.scss']
+                    src: ['*.scss']
                 }]
             }
         },
         sass: {
+            options: {
+                outputStyle: "compressed",
+                implementation: require("node-sass"),
+            },
             build: {
                 options: {
-                    style: "compressed"
+                    sourceMap: false
                 },
                 files: [{
                     expand: true,
@@ -121,6 +180,40 @@ module.exports = function(grunt) {
                     src: ['*.scss'],
                     dest: 'dist/css',
                     ext: '.min.css'
+                }]
+            },
+            dev: {
+                options: {
+                    sourceMap: true
+                },
+                files: [{
+                    expand: true,
+                    cwd: 'src/sass',
+                    src: ['*.scss'],
+                    dest: 'dist/css',
+                    ext: '.min.css'
+                }]
+            },
+            vendor: {
+                options: {
+                    sourceMap: false
+                },
+                files: [{
+                    expand: true,
+                    cwd: 'src/',
+                    src: ['vendor.scss'],
+                    dest: 'dist/vendor/css',
+                    ext: '.min.css'
+                }]
+            }
+        },
+        copy: {
+            build: {
+                files: [{
+                    expand: true,
+                    cwd: "node_modules/ion-rangeslider/img",
+                    src: ['*.png'],
+                    dest: 'dist/img'
                 }]
             }
         }
@@ -131,14 +224,26 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify-es');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-sass');
+    grunt.loadNpmTasks('grunt-sass');
     grunt.loadNpmTasks('grunt-sass-lint');
     grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-csscomb');
+    grunt.loadNpmTasks('grunt-exorcise');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
-    grunt.registerTask('default', ['clean:all', 'jshint', 'browserify:build', 'uglify', 'csscomb', 'sasslint', 'sass']);
-    grunt.registerTask('css', ['clean:css', 'csscomb', 'sasslint', 'sass']);
-    grunt.registerTask('js', ['clean:js', 'jshint', 'browserify:build', 'uglify']);
-    grunt.registerTask('js-dev', ['clean:js', 'jshint', 'browserify:dev']);
-    grunt.registerTask('nolint', ['clean:all', 'browserify', 'uglify', 'sass']);
+    grunt.registerTask('vendor', ['clean:vendor', 'browserify:vendor', 'uglify:vendor', 'sass:vendor']);
+    grunt.registerTask('default', [
+        'clean:all',
+        'jshint', 'browserify:build', 'uglify:build',
+        'csscomb', 'sasslint', 'sass:build',
+        'copy:build'
+    ]);
+    grunt.registerTask('dev', [
+        'clean:all',
+        'jshint', 'browserify:dev', "exorcise:dev", 'uglify:dev',
+        'csscomb', 'sasslint', 'sass:dev',
+        'copy:build'
+    ]);
+    grunt.registerTask('css', ['clean:css', 'csscomb', 'sasslint', 'sass:build']);
+    grunt.registerTask('js', ['clean:js', 'jshint', 'browserify:build', 'uglify:build']);
 };
