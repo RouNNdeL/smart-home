@@ -86,17 +86,17 @@ abstract class Effect
     const /** @noinspection CssInvalidPropertyValue */
         COLOR_TEMPLATE =
         "<div class=\"color-container row mb-1\">
-            <div class=\"col-auto ml-3\">
+            <div class=\"col-auto ml-3 px-0\">
                 <button class=\"btn btn-danger color-delete-btn\" type=\"button\" role=\"button\" title=\"\$title_delete\"><span class=\"oi oi-trash\"></span></button>
             </div>
-            <div class=\"col-auto ml-1\">
+            <div class=\"col-auto px-1\">
                 <button class=\"btn color-jump-btn\" type=\"button\" role=\"button\" title=\"\$title_jump\"><span class=\"oi oi-action-redo\"></span></button>
             </div>
-            <div class=\"col pl-1\">
+            <div class=\"col pl-0\">
                 <div class=\"input-group colorpicker-component\">
                     <input type=\"text\" class=\"form-control color-input\" value=\"\$color\" autocomplete=\"off\" 
                     aria-autocomplete=\"none\" spellcheck=\"false\"/>
-                    <span class=\"input-group-addon color-swatch-handle\"><i></i></span>
+                    <div class='input-group-append'><span class=\"input-group-text color-swatch-handle add-on\"><i></i></span></div>
                 </div>
             </div>
         </div>";
@@ -105,7 +105,7 @@ abstract class Effect
                             <input class=\"form-control\" type=\"text\" name=\"\$name\" 
                                     placeholder=\"\$placeholder\" value=\"\$value\"></div>";
     const INPUT_TEMPLATE_TIMES = "<div class=\"col-sm-6 col-md-6 col-lg-4 col-xl-3 form-group px-1 mb-1\"><label class=\"mb-0\">\$label</label>
-                            <input class=\"form-control\" type=\"text\" name=\"\$name\" placeholder=\"\$placeholder\"
+                            <input class=\"form-control input-time\" type=\"text\" name=\"\$name\" placeholder=\"\$placeholder\"
                              value=\"\$value\"></div>";
 
     const HIDDEN_TEMPLATE = "<input type=\"hidden\" name=\"\$name\" value=\"\$value\">";
@@ -214,6 +214,8 @@ abstract class Effect
     public function colorsHtml(int $color_limit)
     {
         $colors_html = "";
+        if($this->getMinColors() === 0)
+            return null;
 
         $max = $this->getMaxColors() === Effect::COLOR_COUNT_UNLIMITED ? min(sizeof($this->colors), $color_limit) :
             min(min(sizeof($this->colors), $color_limit), $this->getMaxColors());
@@ -646,5 +648,36 @@ abstract class Effect
             }
         }
         return $arr;
+    }
+
+    public static function getDefaultForEffectId(int $effect_id, int $id, string $device_id)
+    {
+        switch($effect_id)
+        {
+            case Effect::EFFECT_OFF:
+                return Off::getDefault($id, $device_id);
+            case Effect::EFFECT_STATIC:
+                return Statiic::getDefault($id, $device_id);
+            case Effect::EFFECT_BREATHING:
+                return Breathe::getDefault($id, $device_id);
+            default:
+                throw new UnexpectedValueException("Invalid effect id: $effect_id");
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
     }
 }

@@ -69,21 +69,60 @@ if(isset($_GET["name"]) && $_GET["name"] === "false")
 <?php
 require_once __DIR__ . "/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("Smart Home - " . $device->getDeviceName());
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICE_SETTINGS));
+$head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICE_ADVANCED));
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICE_SETTINGS));
 echo $head->toString();
 
 ?>
 <body>
 <div class="container-fluid">
-    <div class="row device-settings-content">
+    <div class="row device-settings-content" data-device-id="<?php echo $device->getDeviceId() ?>">
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-header">
                     <h2>Mood Light</h2>
                 </div>
                 <div class="card-body">
-                    <?php echo $device->toAdvancedHtml(0)?>
+                    <?php
+                    $effects = $device->getEffects();
+                    ?>
+                    <ul class="nav nav-tabs" role="tablist">
+                        <?php
+                        foreach($effects as $i => $effect)
+                        {
+                            $active = $i ? "" : "active";
+                            $name = $effect->getName();
+                            $name_sanitized = Utils::sanitizeString($name);
+                            echo <<<HTML
+                        <li class="nav-item">
+                            <a class="nav-link $active" id="$name_sanitized-tab" data-toggle="tab" href="#$name_sanitized" 
+                            role="tab" aria-controls="$name_sanitized" aria-selected="false">$name</a>
+                        </li>
+HTML;
+                        }
+                        ?>
+                    </ul>
+                    <div class="tab-content">
+                        <?php
+                        foreach($effects as $i => $effect)
+                        {
+                            $active = $i ? "" : "show active";
+                            $name_sanitized = Utils::sanitizeString($effect->getName());
+                            $effect_id = $effect->getId();
+                            $max_colors = $effect->getMaxColors() === Effect::COLOR_COUNT_UNLIMITED ?
+                                $physical->getMaxColorCount() : min($physical->getMaxColorCount(), $effect->getMaxColors());
+                            $min_colors = $effect->getMinColors();
+                            $effectHtml = $device->toAdvancedHtml($i);
+                            echo <<<HTML
+                        <div class="tab-pane fade $active effect-parent" id="$name_sanitized" 
+                         role="tabpanel" aria-labelledby="$name_sanitized-tab"
+                         data-effect-id="$effect_id" data-max-colors="$max_colors" data-min-colors="$min_colors">
+                            $effectHtml
+                        </div>
+HTML;
+                        }
+                        ?>
+                    </div>
                 </div>
                 <div class="card-footer">
                     <button class="btn btn-primary">Save</button>

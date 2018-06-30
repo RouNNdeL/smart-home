@@ -6,6 +6,7 @@
     "bootstrap-switch": "^3.3.4",
     "ion-rangeslider": "^2.2.0",
     "jquery": "latest",
+    "math-expression-evaluator": "^1.2.17",
     "mathjs": "^5.0.0",
     "open-iconic": "^1.1.1",
     "popper.js": "^1.14.3",

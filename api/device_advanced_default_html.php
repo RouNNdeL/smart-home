@@ -26,11 +26,11 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-06-12
- * Time: 09:49
+ * Date: 2018-06-30
+ * Time: 18:43
  */
 
-if($_SERVER["REQUEST_METHOD"] !== "POST")
+if($_SERVER["REQUEST_METHOD"] !== "GET")
 {
     $response = ["status" => "error", "error" => "invalid_request"];
     http_response_code(400);
@@ -41,40 +41,33 @@ require_once __DIR__ . "/../includes/GlobalManager.php";
 
 $manager = GlobalManager::all();
 
-$json = json_decode(file_get_contents("php://input"), true);
-if($json === false || !isset($json["devices"])|| !isset($json["report_state"]))
+$json = $_GET;
+if($json === false || !isset($json["device_id"]) || !isset($json["effect"]))
 {
     $response = ["status" => "error", "error" => "invalid_json"];
     http_response_code(400);
     echo json_encode($response);
+    exit();
 }
 
-$response = [];
-foreach($json["devices"] as $id => $device)
+$physical = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($_GET["device_id"]);
+if($physical === null || !$physical instanceof RgbEffectDevice)
 {
-    $physical_device = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($id);
-    if($physical_device === null)
-    {
-        $response = ["status" => "error", "error" => "invalid_device_id"];
-        http_response_code(400);
-        echo json_encode($response);
-        exit();
-    }
-
-    $virtualDevice = $physical_device->getVirtualDeviceById($id);
-    $virtualDevice->handleSaveJson($json["devices"][$id]);
-
-    if($physical_device->save(true))
-        $response[$id] = "success";
-    else
-        $response[$id] = "offline";
-
+    $response = ["status" => "error", "error" => "invalid_device_id"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
 }
+$device = $physical->getVirtualDeviceById($_GET["device_id"]);
+if($device === null || !$device instanceof BaseEffectDevice)
+{
+    $response = ["status" => "error", "error" => "invalid_device_id"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
+$device->setMaxColorCount($physical->getMaxColorCount());
+
+$device->setEffect(0, Effect::getDefaultForEffectId($json["effect"], $json["effect_id"], $json["device_id"]));
+$response = ["status" => "success", "html" => $device->toAdvancedHtml(0)];
 echo json_encode($response);
-
-if($json["report_state"])
-{
-    $user_id = $manager->getSessionManager()->getUserId();
-    $script = __DIR__."/../scripts/report_state.php";
-    exec ("php $script $user_id >/dev/null &");
-}

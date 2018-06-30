@@ -158,7 +158,6 @@ HTML;
     public function toAdvancedHtml(int $effect)
     {
         $device = $this->device_id;
-        $html = "<form id=\"device-form-$device\">";
         $profile_colors = Utils::getString("profile_colors");
         $profile_effect = Utils::getString("profile_effect");
         $profile_color_input = Utils::getString("profile_color_input");
@@ -166,8 +165,20 @@ HTML;
         $color_limit = $this->max_color_count;
         $current_effect = $this->effects[$effect];
 
-        $colors_html = $current_effect->colorsHtml($color_limit);
+        $colors_html_e = $current_effect->colorsHtml($color_limit);
+        $colors_html = $colors_html_e === null ? "" :
+            "<div class=\"row\">
+                <div class=\"col pr-0\"><h3 class=\"header-colors\">$profile_colors</h3></div>
+                <div class=\"col-auto pr-3\">
+                    <button class=\"add-color-btn btn btn-primary btn-sm color-swatch$btn_class\" 
+                            type=\"button\">$profile_add_color</button>
+                </div>
+            </div>
+            <div class=\"swatches-container\" data-color-limit=\"$color_limit\">
+                $colors_html_e
+            </div>";
         $effects_html = "";
+        $html = "<form>";
 
         foreach($this->getAvailableEffects() as $id => $effect)
         {
@@ -178,24 +189,14 @@ HTML;
         $btn_class = sizeof($current_effect->getColors()) >= $color_limit ? " hidden-xs-up" : "";
         $html .= "<div class=\"main-container row m-2\">
         <div class=\"col-12 col-sm-6 col-lg-4 col-xl-3 mb-3 mb-lg-0\">
-        <div class=\"form-group\">
-            <h3>$profile_effect</h3>
-            <select class=\"form-control effect-select\" name=\"effect\" id=\"effect-select-$device\">
-                $effects_html
-            </select>
-        </div>
-        <div class=\"row\">
-            <div class=\"col pr-0\"><h3 class=\"header-colors\">$profile_colors</h3></div>
-            <div class=\"col-auto pr-3\">
-                <button class=\"add-color-btn btn btn-primary btn-sm color-swatch$btn_class\" 
-                        type=\"button\">$profile_add_color</button>
+            <div class=\"form-group\">
+                <h3>$profile_effect</h3>
+                <select class=\"form-control effect-select\" name=\"effect\" id=\"effect-select-$device\">
+                    $effects_html
+                </select>
             </div>
-        </div>
-        <div class=\"swatches-container\" data-color-limit=\"$color_limit\">
             $colors_html
-        </div>
-
-    </div>";
+        </div>";
         $html .= $current_effect->timingArgHtml();
         $html .= "</form></div>";
 
@@ -260,5 +261,18 @@ HTML;
     public function setMaxColorCount(int $max_color_count)
     {
         $this->max_color_count = $max_color_count;
+    }
+
+    /**
+     * @return Effect[]
+     */
+    public function getEffects(): array
+    {
+        return $this->effects;
+    }
+
+    public function setEffect(int $index, Effect $effect)
+    {
+        $this->effects[$index] = $effect;
     }
 }

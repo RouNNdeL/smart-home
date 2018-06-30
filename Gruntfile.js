@@ -65,6 +65,21 @@ module.exports = function(grunt) {
                     ext: ".js"
                 }]
             },
+            "dev-fast": {
+                options: {
+                    browserifyOptions: {
+                        debug: true
+                    },
+                    external: ["jQuery", "tether", "bootstrap"]
+                },
+                files: [{
+                    expand: true,
+                    cwd: "src/js",
+                    src: ["*.js"],
+                    dest: 'dist/js',
+                    ext: ".min.js"
+                }]
+            },
             vendor: {
                 options: {
                     require: ['jquery', "tether", "bootstrap"]
@@ -241,6 +256,12 @@ module.exports = function(grunt) {
     grunt.registerTask('dev', [
         'clean:all',
         'jshint', 'browserify:dev', "exorcise:dev", 'uglify:dev',
+        'csscomb', 'sasslint', 'sass:dev',
+        'copy:build'
+    ]);
+    grunt.registerTask('dev-fast', [
+        'clean:all',
+        'jshint', 'browserify:dev-fast', "exorcise:dev",
         'csscomb', 'sasslint', 'sass:dev',
         'copy:build'
     ]);

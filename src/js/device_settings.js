@@ -32,7 +32,7 @@ import {serializeToAssociative} from "./utils";
 
 const MIN_UPDATE_DELAY = 500;
 const REPORT_STATE_DELAY = 2500;
-const UPDATE_URL = "/api/save_device.php";
+const UPDATE_URL = "/api/device_save.php";
 
 $(function() {
     let last_update = Date.now();
