@@ -23,13 +23,18 @@
  */
 
 module.exports = function(grunt) {
+    const external = ["jQuery", "tether", "bootstrap"];
+    const dist_js = "dist/js";
+    const dist_css = "dist/css";
+    const src_js = "src/js";
+    const src_sass = 'src/sass';
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         clean: {
             all: ["dist/*", "!dist/vendor/**"],
             vendor: ["dist/vendor"],
-            js: ["dist/js"],
-            css: ["dist/css"]
+            js: [dist_js],
+            css: [dist_css]
         },
         browserify: {
             options: {
@@ -41,13 +46,13 @@ module.exports = function(grunt) {
             },
             build: {
                 options: {
-                    external: ["jQuery", "tether", "bootstrap"]
+                    external: external
                 },
                 files: [{
                     expand: true,
-                    cwd: "src/js",
+                    cwd: src_js,
                     src: ["*.js"],
-                    dest: 'dist/js',
+                    dest: dist_js,
                 }]
             },
             dev: {
@@ -55,13 +60,13 @@ module.exports = function(grunt) {
                     browserifyOptions: {
                         debug: true
                     },
-                    external: ["jQuery", "tether", "bootstrap"]
+                    external: external
                 },
                 files: [{
                     expand: true,
-                    cwd: "src/js",
+                    cwd: src_js,
                     src: ["*.js"],
-                    dest: 'dist/js',
+                    dest: dist_js,
                     ext: ".js"
                 }]
             },
@@ -70,19 +75,19 @@ module.exports = function(grunt) {
                     browserifyOptions: {
                         debug: true
                     },
-                    external: ["jQuery", "tether", "bootstrap"]
+                    external: external
                 },
                 files: [{
                     expand: true,
-                    cwd: "src/js",
+                    cwd: src_js,
                     src: ["*.js"],
-                    dest: 'dist/js',
+                    dest: dist_js,
                     ext: ".min.js"
                 }]
             },
             vendor: {
                 options: {
-                    require: ['jquery', "tether", "bootstrap"]
+                    require: ['jquery', "tether", "bootstrap", "jquery-ui"]
                 },
                 src: [],
                 dest: 'dist/vendor/js/vendor.js',
@@ -92,9 +97,9 @@ module.exports = function(grunt) {
             dev: {
                 files: [{
                     expand: true,
-                    cwd: "dist/js",
+                    cwd: dist_js,
                     src: ["*.js"],
-                    dest: 'dist/js',
+                    dest: dist_js,
                     ext: ".js.map"
                 }]
             }
@@ -110,9 +115,9 @@ module.exports = function(grunt) {
                 },
                 files: [{
                     expand: true,
-                    cwd: "dist/js",
+                    cwd: dist_js,
                     src: ["*.js", "!*.min.js"],
-                    dest: "dist/js",
+                    dest: dist_js,
                     ext: ".min.js"
                 }]
             },
@@ -129,9 +134,9 @@ module.exports = function(grunt) {
                 },
                 files: [{
                     expand: true,
-                    cwd: "dist/js",
+                    cwd: dist_js,
                     src: ["*.js", "!*.min.js"],
-                    dest: "dist/js",
+                    dest: dist_js,
                     ext: ".min.js"
                 }]
             },
@@ -162,9 +167,9 @@ module.exports = function(grunt) {
             build: {
                 files: [{
                     expand: true,
-                    cwd: 'src/sass',
+                    cwd: src_sass,
                     src: ['*.scss'],
-                    dest: 'src/sass'
+                    dest: src_sass
                 }]
             }
         },
@@ -175,7 +180,7 @@ module.exports = function(grunt) {
             build: {
                 files: [{
                     expand: true,
-                    cwd: 'src/sass',
+                    cwd: src_sass,
                     src: ['*.scss']
                 }]
             }
@@ -191,9 +196,9 @@ module.exports = function(grunt) {
                 },
                 files: [{
                     expand: true,
-                    cwd: 'src/sass',
+                    cwd: src_sass,
                     src: ['*.scss'],
-                    dest: 'dist/css',
+                    dest: dist_css,
                     ext: '.min.css'
                 }]
             },
@@ -203,9 +208,9 @@ module.exports = function(grunt) {
                 },
                 files: [{
                     expand: true,
-                    cwd: 'src/sass',
+                    cwd: src_sass,
                     src: ['*.scss'],
-                    dest: 'dist/css',
+                    dest: dist_css,
                     ext: '.min.css'
                 }]
             },

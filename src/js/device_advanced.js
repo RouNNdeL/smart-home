@@ -22,7 +22,9 @@
  * SOFTWARE.
  */
 
-import $ from 'jquery';
+/* Workaround for jQuery UI not working properly with module imports */
+window.jQuery = window.$ = require('jquery');
+require('jquery-ui');
 import 'bootstrap';
 import 'tether';
 import '../../lib/bootstrap-colorpicker';
@@ -60,8 +62,9 @@ $(function() {
     });
 
     function refreshListeners(parent) {
-        $(parent).find("*").not(".colorpicker-element *").off();
+        $(parent).find("*").off();
 
+        const parent_id = $(parent).attr("id");
         const form = $(parent).find("form");
         const effect_id = form.data("effect-id");
         const max_colors = form.data("max-colors");
@@ -90,7 +93,18 @@ $(function() {
 
         $(parent).find(".colorpicker-component")
             .not(".color-swatch-template .colorpicker-component")
-            .colorpicker(COLORPICKER_OPTIONS);
+            .not(".colorpicker-element")
+            .each(function() {
+                const options = COLORPICKER_OPTIONS;
+                let picker_id;
+                do {
+                    picker_id = `picker-${Math.floor(Math.random() * 10e15)}`;
+                }
+                while($("body").find(`.${picker_id}`).length > 0);
+                $(this).data("picker-id", picker_id);
+                options.customClass = picker_id;
+                $(this).colorpicker(options);
+            });
         $(parent).find(".effect-select").change(function() {
             const effect = $(this).val();
             $.ajax(URL_EFFECT_HTML, {
@@ -121,7 +135,10 @@ $(function() {
             if(color_count <= min_colors)
                 return;
 
-            $(this).parents(".color-container").remove();
+            const swatch_parent = $(this).parents(".color-container");
+            const picker_id = swatch_parent.find(".colorpicker-component").data("picker-id");
+            $("body").find(`.colorpicker.${picker_id}`).remove();
+            swatch_parent.remove();
             color_count--;
 
             disableEnableButtons();
