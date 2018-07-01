@@ -24,7 +24,7 @@
 
 /* Workaround for jQuery UI not working properly with module imports */
 window.jQuery = window.$ = require('jquery');
-require('jquery-ui');
+require('../../lib/jquery-ui/jquery-ui');
 import 'bootstrap';
 import 'tether';
 import '../../lib/bootstrap-colorpicker';
@@ -55,16 +55,19 @@ const COLORPICKER_OPTIONS = {
 
 $(function() {
     const device_id = $(".device-settings-content").data("device-id");
-    const parents = $(".effect-parent");
     let last_default_color = 0;
-    parents.each(function() {
+
+    $(".swatch-container").sortable({
+        handle: ".color-swatch-handle"
+    });
+
+    $(".effect-parent").each(function() {
         refreshListeners(this);
     });
 
     function refreshListeners(parent) {
         $(parent).find("*").off();
 
-        const parent_id = $(parent).attr("id");
         const form = $(parent).find("form");
         const effect_id = form.data("effect-id");
         const max_colors = form.data("max-colors");
@@ -87,9 +90,19 @@ $(function() {
 
             if(color_count < max_colors)
                 add_color_btn.attr("disabled", false);
+
+            if(color_count <= 1)
+                $(parent).find(".swatch-container.ui-sortable").sortable("destroy");
         }
 
         disableEnableButtons();
+
+        $(parent).find(".swatch-container.ui-sortable").sortable("destroy");
+        if(color_count > 1) {
+            swatch_container.sortable({
+                handle: ".color-swatch-handle"
+            });
+        }
 
         $(parent).find(".colorpicker-component")
             .not(".color-swatch-template .colorpicker-component")
