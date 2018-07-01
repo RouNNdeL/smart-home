@@ -23,12 +23,13 @@
  */
 
 /* Workaround for jQuery UI not working properly with module imports */
-window.jQuery = window.$ = require('jquery');
-require('../../lib/jquery-ui/jquery-ui');
+import $ from './_jquery';
+import '../../lib/jquery-ui/jquery-ui';
+import {serializeToAssociative, showSnackbar} from "./_utils";
 import 'bootstrap';
 import 'tether';
 import '../../lib/bootstrap-colorpicker';
-import {roundTime, timeToString} from "./device_timing";
+import {roundTime, timeToString} from "./_device_timing";
 import Mexp from 'math-expression-evaluator';
 
 const URL_EFFECT_HTML = "/api/device_advanced_default_html.php";
@@ -57,12 +58,58 @@ $(function() {
     const device_id = $(".device-settings-content").data("device-id");
     let last_default_color = 0;
 
+    if(window.location.hash)
+        $(`#${window.location.hash.substring(1)}-tab`).click();
+
     $(".swatch-container").sortable({
         handle: ".color-swatch-handle"
     });
 
     $(".effect-parent").each(function() {
         refreshListeners(this);
+    });
+
+    $(".nav-link ").click(function() {
+        window.location.hash = $(this).attr("href");
+    });
+
+    $("#effect-save-btn").click(function() {
+        const active_form = $(".effect-parent.active").find("form");
+
+        const form = serializeToAssociative(active_form.serializeArray());
+        form.id = active_form.data("effect-id");
+        form.device_id = device_id;
+        form.colors = getColors(active_form);
+        form.args = {};
+        form.times = {};
+        for(let k in form) {
+            if(!form.hasOwnProperty(k))
+                continue;
+
+            const arg_match = k.match(/arg_(.*)/);
+            if(arg_match !== null) {
+                form.args[arg_match[1]] = parseInt(form[k]) || 0;
+                delete form[k];
+            }
+
+            const time_match = k.match(/time_(.*)/);
+            if(time_match !== null) {
+                form.times[time_match[1]] = parseFloat(form[k]) || 0;
+                delete form[k];
+            }
+        }
+
+        $.ajax("/api/device_advanced_save.php", {
+            method: "POST",
+            dataType: "json",
+            contentType: "json",
+            data: JSON.stringify(form)
+        }).done(resp => {
+            showSnackbar(resp.message);
+        }).fail(resp => {
+            if(resp.hasOwnProperty("responseJSON"))
+                showSnackbar(resp.responseJSON.message);
+        });
     });
 
     function refreshListeners(parent) {
@@ -159,6 +206,9 @@ $(function() {
 
             disableEnableButtons();
         });
+        $(parent).find(".effect-name-input").on("input", function() {
+            $(`#${$(parent).attr("id")}-tab`).text($(this).val() || $(this).attr("placeholder"));
+        });
         add_color_btn.click(function() {
             if(color_count >= max_colors)
                 return;
@@ -174,5 +224,19 @@ $(function() {
 
             refreshListeners(parent);
         });
+    }
+
+    function getColors(form) {
+        const array = [];
+
+        form.find(".color-input").each(function() {
+            let val = $(this).val().replace(/\s/g, "");
+            if(val.match(/^#[\da-fA-F]{6}$/))
+                array.push(parseInt(val.substring(1), 16));
+            else if(val.match(/^#[\da-fA-F]{3}/))
+                array.push(parseInt(val[1].repeat(2) + val[2].repeat(2) + val[3].repeat(2), 16));
+        });
+
+        return array;
     }
 });

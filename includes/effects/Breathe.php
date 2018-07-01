@@ -46,7 +46,7 @@ class Breathe extends Effect
         $array = [];
         $array[1] = $this->args[Breathe::ARG_MIN_VALUE];
         $array[2] = $this->args[Breathe::ARG_MAX_VALUE];
-        $array[6] = $this->args[Breathe::ARG_COLOR_CYCLES];
+        $array[5] = $this->args[Breathe::ARG_COLOR_CYCLES];
         return $array;
     }
 

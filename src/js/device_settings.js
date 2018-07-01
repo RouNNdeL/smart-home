@@ -28,7 +28,7 @@ import 'bootstrap';
 import 'ion-rangeslider';
 import 'bootstrap-switch';
 import '../../lib/bootstrap-colorpicker';
-import {serializeToAssociative} from "./utils";
+import {serializeToAssociative} from "./_utils";
 
 const MIN_UPDATE_DELAY = 500;
 const REPORT_STATE_DELAY = 2500;

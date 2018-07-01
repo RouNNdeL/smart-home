@@ -111,6 +111,13 @@ abstract class Effect
 
     const HIDDEN_TEMPLATE = "<input type=\"hidden\" name=\"\$name\" value=\"\$value\">";
 
+    const TIMING_MODE_RAW = 0;
+    const TIMING_MODE_SECONDS = 1;
+    const TIMING_MODE_JSON = 2;
+
+    const ARG_MODE_ARRAY = 0;
+    const ARG_MODE_JSON = 1;
+
     /** @var int */
     private $id;
 
@@ -138,25 +145,48 @@ abstract class Effect
      * @param array $colors
      * @param array $timing
      * @param array $args
-     * @param bool $t_converted
+     * @param bool $t_json
      */
     public function __construct(int $id, string $device_id, array $colors, array $timing,
-                                array $args = array(), bool $t_converted = false, string $name = null
+                                array $args = array(), string $name = null,
+                                int $timing_mode = Effect::TIMING_MODE_SECONDS,
+                                int $arg_mode = Effect::ARG_MODE_ARRAY
     )
     {
         if($name === null)
-            $this->name = Utils::getString("profile_default_name") . " $id";
+            $this->name = Utils::getString("effect_default_name") . " $id";
         else
             $this->name = $name;
         $this->id = $id;
         $this->device_id = $device_id;
-        $this->name = $name;
         $this->colors = $colors;
-        $t_converted ? $this->setTimings($timing) : $this->setTimingsRaw($timing);
-        $this->args = [];
-        foreach($this->argList() as $i => $name)
+
+        switch($timing_mode)
         {
-            $this->args[$name] = $args[$i];
+            case Effect::TIMING_MODE_JSON:
+                $this->setTimings($this->timingJsonToArray($timing));
+                break;
+            case Effect::TIMING_MODE_RAW:
+                $this->setTimingsRaw($timing);
+                break;
+            case Effect::TIMING_MODE_SECONDS:
+                $this->setTimings($timing);
+                break;
+            default:
+                throw new InvalidArgumentException("Invalid timing_mode: $timing_mode");
+        }
+
+        if($arg_mode === Effect::ARG_MODE_ARRAY)
+        {
+            $this->args = [];
+            foreach($this->argList() as $i => $name)
+            {
+                $this->args[$name] = $args[$i];
+            }
+        }
+        else
+        {
+            $this->args = $args;
         }
     }
 
@@ -181,17 +211,17 @@ abstract class Effect
         return $this->colors;
     }
 
-    public function setTimingsRaw(array $timing)
+    public function setTimings(array $timing)
     {
         $t = [];
         foreach($timing as $i => $value)
         {
             $t[$i] = Effect::convertToTiming($timing[$i]);
         }
-        $this->setTimings($t);
+        $this->setTimingsRaw($t);
     }
 
-    public function setTimings(array $timing)
+    public function setTimingsRaw(array $timing)
     {
         if($timing[0] > 255 || $timing[0] < 0 || $timing[1] > 255 || $timing[1] < 0 ||
             $timing[2] > 255 || $timing[2] < 0 || $timing[3] > 255 || $timing[3] < 0 ||
@@ -272,8 +302,8 @@ abstract class Effect
                         $selected1 = $argument ? "" : " selected";
                         $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
                                             <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . Effect::DIRECTION_CW . "\"$selected0>$str_cw</option>
-                                                <option value=\"" . Effect::DIRECTION_CCW . "\"$selected1>$str_ccw</option>
+                                                <option value=\"" . Effect::DIRECTION_CW . "\" $selected0>$str_cw</option>
+                                                <option value=\"" . Effect::DIRECTION_CCW . "\" $selected1>$str_ccw</option>
                                             </select></div>";
                         break;
                     case "smooth":
@@ -287,8 +317,8 @@ abstract class Effect
                         $selected1 = $argument ? "" : " selected";
                         $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
                                             <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . 1 . "\"$selected0>$str_yes</option>
-                                                <option value=\"" . 0 . "\"$selected1>$str_no</option>
+                                                <option value=\"" . 1 . "\" $selected0>$str_yes</option>
+                                                <option value=\"" . 0 . "\" $selected1>$str_no</option>
                                             </select></div>";
                         break;
                     case "two_halves_color_count":
@@ -297,8 +327,8 @@ abstract class Effect
                         $selected1 = $argument === 1 ? "" : " selected";
                         $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
                                             <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . 1 . "\"$selected0>1</option>
-                                                <option value=\"" . 2 . "\"$selected1>2</option>
+                                                <option value=\"" . 1 . "\" $selected0>1</option>
+                                                <option value=\"" . 2 . "\" $selected1>2</option>
                                             </select></div>";
                         break;
                     default:
@@ -336,7 +366,7 @@ abstract class Effect
 
         if($timings !== 0)
         {
-            $html .= "<div class=\"timing-container col-12 col-sm-6 col-lg-4 mb-3 mb-sm-0\"><h3>$profile_timing</h3>
+            $html .= "<div class=\"timing-container col-12 col-sm-6 col-lg-4 mb-3 mb-sm-0\"><h4>$profile_timing</h4>
                         <div class=\"row mx-0\">$timing_html</div></div>";
         }
         else
@@ -344,7 +374,7 @@ abstract class Effect
             $html .= "$timing_html";
         }
         if(sizeof($this->args) > 0)
-            $html .= "<div class=\"args-container col-12 col-lg-4 col-xl-5\"><h3>$profile_arguments</h3>
+            $html .= "<div class=\"args-container col-12 col-lg-4 col-xl-5\"><h4>$profile_arguments</h4>
                         <div class=\"row mx-0\">$arguments_html</div></div>";
 
         return $html;
@@ -526,25 +556,62 @@ abstract class Effect
         return $a;
     }
 
+    public function timingJsonToArray($json)
+    {
+        $arr = [];
+        $strings = $this->getTimingStrings();
+        foreach($json as $key => $value)
+        {
+            $arr[array_search($key, $strings)] = $value;
+        }
+        return $arr;
+    }
+
     public function toDatabase()
     {
+        $arr = $this->argsToArray();
+        $args = [];
+        for($i = 0; $i < 6; $i++)
+        {
+            $args[$i] = isset($arr[$i]) ? $arr[$i] : 0;
+        }
         $conn = DbUtils::getConnection();
         $sql = "INSERT INTO devices_effects 
-                (id, device_id, effect, time0, time1, time2, time3, time4, time5, 
-                arg0, arg1, arg2, arg3, arg4, arg5) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
-                ON DUPLICATE KEY UPDATE effect = ?, time0 = ?, time1 = ?, time2 = ?, time3 = ?, time4 = ?, time5 = ?, 
-                arg0 = ?, arg2 = ?, arg3 = ?, arg4 = ?, arg5 = ?";
+                (id, device_id, effect, name, time0, time1, time2, time3, time4, time5, 
+                arg0, arg1, arg2, arg3, arg4, arg5) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                ON DUPLICATE KEY UPDATE effect = ?, name = ?, time0 = ?, time1 = ?, time2 = ?, time3 = ?, time4 = ?, time5 = ?, 
+                arg0 = ?, arg1 = ?, arg2 = ?, arg3 = ?, arg4 = ?, arg5 = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("isiiiiiiiiiiiiiiiiiiiiiiiiii", $this->id, $this->device_id,
-            $this->getEffectId(), $this->timings[0], $this->timings[1], $this->timings[2], $this->timings[3],
-            $this->timings[4], $this->timings[5], $this->args[0], $this->args[1], $this->args[2], $this->args[3],
-            $this->args[4], $this->args[5], $this->getEffectId(), $this->timings[0], $this->timings[1], $this->timings[2],
-            $this->timings[3], $this->timings[4], $this->timings[5], $this->args[0], $this->args[1], $this->args[2],
-            $this->args[3], $this->args[4], $this->args[5]
+        $stmt->bind_param("isisiiiiiiiiiiiiisiiiiiiiiiiii", $this->id, $this->device_id,
+            $this->getEffectId(), $this->name, $this->timings[0], $this->timings[1], $this->timings[2], $this->timings[3],
+            $this->timings[4], $this->timings[5], $args[0], $args[1], $args[2], $args[3],
+            $args[4], $args[5], $this->getEffectId(), $this->name, $this->timings[0], $this->timings[1], $this->timings[2],
+            $this->timings[3], $this->timings[4], $this->timings[5], $args[0], $args[1], $args[2],
+            $args[3], $args[4], $args[5]
         );
         $result = $stmt->execute();
         $stmt->close();
+        $this->saveColors();
         return $result;
+    }
+
+    private function saveColors()
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "DELETE FROM devices_colors WHERE effect_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $this->id);
+        $stmt->execute();
+        $stmt->close();
+
+        $sql = "INSERT INTO devices_colors (effect_id, color, `order`) VALUES (?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        foreach($this->colors as $i => $color)
+        {
+            $stmt->bind_param("iii", $this->id, $color, $i);
+            $stmt->execute();
+        }
+        $stmt->close();
     }
 
     public static function getColorsForEffect(int $effect_id)
@@ -651,20 +718,20 @@ abstract class Effect
                 case Effect::EFFECT_OFF:
                     $arr[] = new Off($id, $d_id, $colors[$id],
                         [$t0, $t1, $t2, $t3, $t4, $t5],
-                        [$a0, $a1, $a2, $a3, $a4, $a5],
-                        true, $n);
+                        [$a0, $a1, $a2, $a3, $a4, $a5], $n,
+                        Effect::TIMING_MODE_RAW);
                     break;
                 case Effect::EFFECT_STATIC:
                     $arr[] = new Statiic($id, $d_id, $colors[$id],
                         [$t0, $t1, $t2, $t3, $t4, $t5],
-                        [$a0, $a1, $a2, $a3, $a4, $a5],
-                        true, $n);
+                        [$a0, $a1, $a2, $a3, $a4, $a5], $n,
+                        Effect::TIMING_MODE_RAW);
                     break;
                 case Effect::EFFECT_BREATHING:
                     $arr[] = new Breathe($id, $d_id, $colors[$id],
                         [$t0, $t1, $t2, $t3, $t4, $t5],
-                        [$a0, $a1, $a2, $a3, $a4, $a5],
-                        true, $n);
+                        [$a0, $a1, $a2, $a3, $a4, $a5], $n,
+                        Effect::TIMING_MODE_RAW);
                     break;
                 default:
                     throw new UnexpectedValueException("Invalid effect id: $e");
@@ -685,6 +752,34 @@ abstract class Effect
                 return Breathe::getDefault($id, $device_id);
             default:
                 throw new UnexpectedValueException("Invalid effect id: $effect_id");
+        }
+    }
+
+    public static function fromJson(array $json)
+    {
+        $times = $json["times"];
+        $args = $json["args"];
+        $colors = $json["colors"];
+        $effect = $json["effect"];
+        $name = $json["profile_name"];
+        $id = $json["id"];
+        $device_id = $json["device_id"];
+        switch($effect)
+        {
+            case Effect::EFFECT_OFF:
+                return new Off($id, $device_id, $colors, $times, $args,
+                    $name, Effect::TIMING_MODE_JSON, Effect::ARG_MODE_JSON);
+                break;
+            case Effect::EFFECT_STATIC:
+                return new Statiic($id, $device_id, $colors, $times, $args,
+                    $name, Effect::TIMING_MODE_JSON, Effect::ARG_MODE_JSON);
+                break;
+            case Effect::EFFECT_BREATHING:
+                return new Breathe($id, $device_id, $colors, $times, $args,
+                    $name, Effect::TIMING_MODE_JSON, Effect::ARG_MODE_JSON);
+                break;
+            default:
+                throw new UnexpectedValueException("Invalid effect id: $effect");
         }
     }
 

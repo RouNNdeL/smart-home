@@ -160,10 +160,11 @@ HTML;
         $device = $this->device_id;
         $profile_colors = Utils::getString("profile_colors");
         $profile_effect = Utils::getString("profile_effect");
-        $profile_color_input = Utils::getString("profile_color_input");
+        $profile_name = Utils::getString("effect_name");
         $profile_add_color = Utils::getString("profile_add_color");
         $max_colors = $this->max_color_count;
         $current_effect = $this->effects[$effect];
+        $effect_name = $current_effect->getName();
 
         $effect_id = $current_effect->getId();
         $max_colors = $current_effect->getMaxColors() === Effect::COLOR_COUNT_UNLIMITED ?
@@ -176,7 +177,7 @@ HTML;
         $colors_html_e = $current_effect->colorsHtml($max_colors);
         $colors_html = $colors_html_e === null ? "" :
             "<div class=\"row\">
-                <div class=\"col pr-0\"><h3 class=\"header-colors\">$profile_colors</h3></div>
+                <div class=\"col pr-0\"><h4 class=\"header-colors\">$profile_colors</h4></div>
                 <div class=\"col-auto pr-3\">
                     <button class=\"add-color-btn btn btn-primary btn-sm color-swatch\" 
                             type=\"button\" $disabled>$profile_add_color</button>
@@ -194,11 +195,15 @@ HTML;
             $effects_html .= "<option value=\"$id\" " . ($id == $current_effect->getEffectId() ? " selected" : "") . ">$string</option>";
         }
 
-        $btn_class = sizeof($current_effect->getColors()) >= $max_colors ? " hidden-xs-up" : "";
+        $name_placeholder = Utils::getString("effect_default_name") . " $effect_id";
         $html .= "<div class=\"main-container row m-2\">
         <div class=\"col-12 col-sm-6 col-lg-4 col-xl-3 mb-3 mb-lg-0\">
             <div class=\"form-group\">
-                <h3>$profile_effect</h3>
+                <h4>$profile_name</h4>
+                <input class='form-control effect-name-input' name='profile_name' value='$effect_name' placeholder='$name_placeholder'>
+            </div>
+            <div class=\"form-group\">
+                <h4>$profile_effect</h4>
                 <select class=\"form-control effect-select\" name=\"effect\" id=\"effect-select-$device\">
                     $effects_html
                 </select>

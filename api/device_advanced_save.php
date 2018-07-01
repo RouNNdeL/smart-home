@@ -26,55 +26,34 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-06-11
- * Time: 11:40
+ * Date: 2018-07-01
+ * Time: 18:19
  */
 
-require_once __DIR__ . "/HeadEntry.php";
-
-class StyleSheetEntry extends HeadEntry
+if($_SERVER["REQUEST_METHOD"] !== "POST")
 {
-    const LOGIN = "/dist/css/login";
-    const DEVICES = "/dist/css/devices";
-    const DEVICE_SETTINGS = "/dist/css/device_settings";
-    const DEVICE_ADVANCED = "/dist/css/device_advanced";
-
-    const VENDOR = "/dist/vendor/css/vendor";
-
-    const DEFAULT = [StyleSheetEntry::VENDOR];
-
-    /** @var string */
-    private $url;
-
-    /**
-     * StylesheetEntry constructor.
-     * @param string $url
-     */
-    public function __construct(string $url)
-    {
-        $this->url = $url;
-    }
-
-
-    /**
-     * @param bool $minified
-     * @return string
-     */
-    public function toString(bool $minified)
-    {
-        preg_match("/.css$/", $this->url, $output_array);
-        $url = sizeof($output_array) ? $this->url : $this->url . ($minified ? ".min.css" : ".css");
-        $url .= "?v=" . HtmlHead::VERSION;
-        return "<link rel='stylesheet' href='$url'>";
-    }
-
-    public static function getDefaults()
-    {
-        $arr = [];
-        foreach(StyleSheetEntry::DEFAULT as $item)
-        {
-            $arr[] = new StyleSheetEntry($item);
-        }
-        return $arr;
-    }
+    $response = ["status" => "error", "error" => "invalid_request"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
 }
+
+require_once __DIR__ . "/../includes/GlobalManager.php";
+
+$manager = GlobalManager::all();
+
+$json = json_decode(file_get_contents("php://input"), true);
+if($json === false || !isset($json["effect"]) || !isset($json["times"])
+    || !isset($json["args"]) || !isset($json["colors"]))
+{
+    $response = ["status" => "error", "error" => "invalid_json"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
+
+
+$success = Effect::fromJson($json)->toDatabase();
+$response = ["status" => $success ? "success" : "error",
+    "message" => $success ? "Saved successfully!" : "An error occurred!"];
+echo json_encode($response);

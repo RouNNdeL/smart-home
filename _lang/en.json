@@ -58,7 +58,7 @@
   "profile_effect": "Effect",
   "profile_effect_off": "Turned Off",
   "profile_effect_static": "Static",
-  "profile_effect_breathing": "Breathing",
+  "profile_effect_breathe": "Breathing",
   "profile_effect_blinking": "Blinking",
   "profile_effect_fading": "Fading",
   "profile_effect_rainbow": "Rainbow",
@@ -121,5 +121,7 @@
   "device_status_offline": "Offline",
   "device_devices": "Devices",
   "device_owner_you": "You",
-  "device_owner": "Owner"
+  "device_owner": "Owner",
+  "effect_name": "Effect name",
+  "effect_default_name": "Effect"
 }

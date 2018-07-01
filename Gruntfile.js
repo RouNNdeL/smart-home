@@ -51,7 +51,7 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: src_js,
-                    src: ["*.js"],
+                    src: ["*.js", "!_*.js"],
                     dest: dist_js,
                 }]
             },
@@ -65,7 +65,7 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: src_js,
-                    src: ["*.js"],
+                    src: ["*.js", "!_*.js"],
                     dest: dist_js,
                     ext: ".js"
                 }]
@@ -80,7 +80,7 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     cwd: src_js,
-                    src: ["*.js"],
+                    src: ["*.js", "!_*.js"],
                     dest: dist_js,
                     ext: ".min.js"
                 }]
