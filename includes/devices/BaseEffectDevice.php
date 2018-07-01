@@ -162,24 +162,31 @@ HTML;
         $profile_effect = Utils::getString("profile_effect");
         $profile_color_input = Utils::getString("profile_color_input");
         $profile_add_color = Utils::getString("profile_add_color");
-        $color_limit = $this->max_color_count;
+        $max_colors = $this->max_color_count;
         $current_effect = $this->effects[$effect];
 
+        $effect_id = $current_effect->getId();
+        $max_colors = $current_effect->getMaxColors() === Effect::COLOR_COUNT_UNLIMITED ?
+            $max_colors : min($max_colors, $current_effect->getMaxColors());
+        $min_colors = $current_effect->getMinColors();
+
+        $disabled = sizeof($current_effect->getColors()) >= $max_colors ? "disabled" : "";
+
         $color_template = Effect::getColorTemplateLocalized();
-        $colors_html_e = $current_effect->colorsHtml($color_limit);
+        $colors_html_e = $current_effect->colorsHtml($max_colors);
         $colors_html = $colors_html_e === null ? "" :
             "<div class=\"row\">
                 <div class=\"col pr-0\"><h3 class=\"header-colors\">$profile_colors</h3></div>
                 <div class=\"col-auto pr-3\">
-                    <button class=\"add-color-btn btn btn-primary btn-sm color-swatch$btn_class\" 
-                            type=\"button\">$profile_add_color</button>
+                    <button class=\"add-color-btn btn btn-primary btn-sm color-swatch\" 
+                            type=\"button\" $disabled>$profile_add_color</button>
                 </div>
             </div>
-            <div class=\"swatch-container\" data-color-limit=\"$color_limit\">
+            <div class=\"swatch-container\" data-color-limit=\"$max_colors\">
                 $colors_html_e
             </div><div class='color-swatch-template d-none'>$color_template</div> ";
         $effects_html = "";
-        $html = "<form>";
+        $html = "<form data-effect-id=\"$effect_id\" data-max-colors=\"$max_colors\" data-min-colors=\"$min_colors\">";
 
         foreach($this->getAvailableEffects() as $id => $effect)
         {
@@ -187,7 +194,7 @@ HTML;
             $effects_html .= "<option value=\"$id\" " . ($id == $current_effect->getEffectId() ? " selected" : "") . ">$string</option>";
         }
 
-        $btn_class = sizeof($current_effect->getColors()) >= $color_limit ? " hidden-xs-up" : "";
+        $btn_class = sizeof($current_effect->getColors()) >= $max_colors ? " hidden-xs-up" : "";
         $html .= "<div class=\"main-container row m-2\">
         <div class=\"col-12 col-sm-6 col-lg-4 col-xl-3 mb-3 mb-lg-0\">
             <div class=\"form-group\">

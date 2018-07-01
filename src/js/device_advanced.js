@@ -60,14 +60,31 @@ $(function() {
     function refreshListeners(parent) {
         $(parent).find("*").off();
 
-        const effect_id = $(parent).data("effect-id");
-        const max_colors = $(parent).data("max-colors");
-        const min_colors = $(parent).data("min-colors");
+        const form = $(parent).find("form");
+        const effect_id = form.data("effect-id");
+        const max_colors = form.data("max-colors");
+        const min_colors = form.data("min-colors");
 
         const swatch_container = $(parent).find(".swatch-container");
         const add_color_btn = $(parent).find(".add-color-btn");
         let color_count = $(parent).find(".color-container")
             .not(".color-swatch-template .color-container").length;
+
+        function disableEnableButtons() {
+            if(color_count >= max_colors)
+                add_color_btn.attr("disabled", true);
+
+            if(color_count > min_colors)
+                $(parent).find(".color-delete-btn").attr("disabled", false);
+
+            if(color_count <= min_colors)
+                $(parent).find(".color-delete-btn").attr("disabled", true);
+
+            if(color_count < max_colors)
+                add_color_btn.attr("disabled", false);
+        }
+
+        disableEnableButtons();
 
         $(parent).find(".effect-select").change(function() {
             const effect = $(this).val();
@@ -107,7 +124,7 @@ $(function() {
             last_default_color = (last_default_color + 1) % DEFAULT_COLORS.length;
             color_count++;
 
-            showHideButtons();
+            disableEnableButtons();
 
             refreshListeners(parent);
         });
@@ -118,21 +135,7 @@ $(function() {
             $(this).parents(".color-container").remove();
             color_count--;
 
-            showHideButtons();
+            disableEnableButtons();
         });
-
-        function showHideButtons() {
-            if(color_count >= max_colors)
-                add_color_btn.attr("disabled", true);
-
-            if(color_count > min_colors)
-                $(parent).find(".color-delete-btn").attr("disabled", false);
-
-            if(color_count <= min_colors)
-                $(parent).find(".color-delete-btn").attr("disabled", true);
-
-            if(color_count < max_colors)
-                add_color_btn.attr("disabled", false);
-        }
     }
 });

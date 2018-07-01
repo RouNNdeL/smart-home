@@ -108,15 +108,10 @@ HTML;
                         {
                             $active = $i ? "" : "show active";
                             $name_sanitized = Utils::sanitizeString($effect->getName());
-                            $effect_id = $effect->getId();
-                            $max_colors = $effect->getMaxColors() === Effect::COLOR_COUNT_UNLIMITED ?
-                                $physical->getMaxColorCount() : min($physical->getMaxColorCount(), $effect->getMaxColors());
-                            $min_colors = $effect->getMinColors();
                             $effectHtml = $device->toAdvancedHtml($i);
                             echo <<<HTML
                         <div class="tab-pane fade $active effect-parent" id="$name_sanitized" 
-                         role="tabpanel" aria-labelledby="$name_sanitized-tab"
-                         data-effect-id="$effect_id" data-max-colors="$max_colors" data-min-colors="$min_colors">
+                         role="tabpanel" aria-labelledby="$name_sanitized-tab">
                             $effectHtml
                         </div>
 HTML;
