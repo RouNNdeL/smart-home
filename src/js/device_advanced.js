@@ -34,6 +34,8 @@ const DEFAULT_COLORS = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "
 const COLORPICKER_OPTIONS = {
     useAlpha: false,
     component: ".color-swatch-handle",
+    format: "hex",
+    fallbackColor: "#ff0000",
     extensions: [{
         name: "swatches",
         colors: {
@@ -58,7 +60,7 @@ $(function() {
     });
 
     function refreshListeners(parent) {
-        $(parent).find("*").off();
+        $(parent).find("*").not(".colorpicker-element *").off();
 
         const form = $(parent).find("form");
         const effect_id = form.data("effect-id");
@@ -86,6 +88,9 @@ $(function() {
 
         disableEnableButtons();
 
+        $(parent).find(".colorpicker-component")
+            .not(".color-swatch-template .colorpicker-component")
+            .colorpicker(COLORPICKER_OPTIONS);
         $(parent).find(".effect-select").change(function() {
             const effect = $(this).val();
             $.ajax(URL_EFFECT_HTML, {
@@ -99,7 +104,6 @@ $(function() {
                 refreshListeners(parent);
             });
         });
-        $(parent).find(".colorpicker-component").colorpicker(COLORPICKER_OPTIONS);
         $(parent).find(".input-time").change(function() {
             try {
                 let val = $(this).val();
@@ -112,6 +116,15 @@ $(function() {
             catch(e) {
                 $(this).val($(this).data("previous-value") || "0");
             }
+        });
+        $(parent).find(".color-delete-btn").click(function() {
+            if(color_count <= min_colors)
+                return;
+
+            $(this).parents(".color-container").remove();
+            color_count--;
+
+            disableEnableButtons();
         });
         add_color_btn.click(function() {
             if(color_count >= max_colors)
@@ -127,15 +140,6 @@ $(function() {
             disableEnableButtons();
 
             refreshListeners(parent);
-        });
-        $(parent).find(".color-delete-btn").click(function() {
-            if(color_count <= min_colors)
-                return;
-
-            $(this).parents(".color-container").remove();
-            color_count--;
-
-            disableEnableButtons();
         });
     }
 });
