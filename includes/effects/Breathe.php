@@ -44,14 +44,15 @@ class Breathe extends Effect
     public function argsToArray()
     {
         $array = [];
-        $array[1] = $this->args[self::ARG_MIN_VALUE];
-        $array[2] = $this->args[self::ARG_MAX_VALUE];
+        $array[1] = $this->args[Breathe::ARG_MIN_VALUE];
+        $array[2] = $this->args[Breathe::ARG_MAX_VALUE];
+        $array[6] = $this->args[Breathe::ARG_COLOR_CYCLES];
         return $array;
     }
 
     public function argList()
     {
-        return [self::ARG_MIN_VALUE, self::ARG_MAX_VALUE, Effect::ARG_COLOR_CYCLES];
+        return [1 => Breathe::ARG_MIN_VALUE, 2 => Breathe::ARG_MAX_VALUE, 5 => Effect::ARG_COLOR_CYCLES];
     }
 
     public function avrEffect()
@@ -61,7 +62,7 @@ class Breathe extends Effect
 
     public function getEffectId()
     {
-        return self::EFFECT_BREATHING;
+        return Effect::EFFECT_BREATHING;
     }
 
     public static function getDefault(int $id, string $device_id)

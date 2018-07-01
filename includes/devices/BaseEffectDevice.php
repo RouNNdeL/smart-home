@@ -165,6 +165,7 @@ HTML;
         $color_limit = $this->max_color_count;
         $current_effect = $this->effects[$effect];
 
+        $color_template = Effect::getColorTemplateLocalized();
         $colors_html_e = $current_effect->colorsHtml($color_limit);
         $colors_html = $colors_html_e === null ? "" :
             "<div class=\"row\">
@@ -174,9 +175,9 @@ HTML;
                             type=\"button\">$profile_add_color</button>
                 </div>
             </div>
-            <div class=\"swatches-container\" data-color-limit=\"$color_limit\">
+            <div class=\"swatch-container\" data-color-limit=\"$color_limit\">
                 $colors_html_e
-            </div>";
+            </div><div class='color-swatch-template d-none'>$color_template</div> ";
         $effects_html = "";
         $html = "<form>";
 

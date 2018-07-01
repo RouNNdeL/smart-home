@@ -207,6 +207,14 @@ abstract class Effect
         $this->timings[5] = $timing[5];
     }
 
+    public static function getColorTemplateLocalized()
+    {
+        $template = self::COLOR_TEMPLATE;
+        $template = str_replace("\$title_delete", Utils::getString("profile_btn_hint_delete"), $template);
+        $template = str_replace("\$title_jump", Utils::getString("profile_btn_hint_jump"), $template);
+        return $template;
+    }
+
     /**
      * @param int $color_limit
      * @return string
@@ -223,7 +231,6 @@ abstract class Effect
         {
             $c_str = str_pad(dechex($this->colors[$i]), 6, "0", STR_PAD_LEFT);
             $template = self::COLOR_TEMPLATE;
-            $template = str_replace("\$active", $i == 0 ? "checked" : "", $template);
             $template = str_replace("\$label", "color-$i", $template);
             $template = str_replace("\$color", "#" . $c_str, $template);
             $template = str_replace("\$title_delete", Utils::getString("profile_btn_hint_delete"), $template);
@@ -519,16 +526,16 @@ abstract class Effect
         $conn = DbUtils::getConnection();
         $sql = "INSERT INTO devices_effects 
                 (id, device_id, effect, time0, time1, time2, time3, time4, time5, 
-                arg0, arg1, arg2, arg3, arg4) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                arg0, arg1, arg2, arg3, arg4, arg5) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
                 ON DUPLICATE KEY UPDATE effect = ?, time0 = ?, time1 = ?, time2 = ?, time3 = ?, time4 = ?, time5 = ?, 
-                arg0 = ?, arg2 = ?, arg3 = ?, arg4 = ?";
+                arg0 = ?, arg2 = ?, arg3 = ?, arg4 = ?, arg5 = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("isiiiiiiiiiiiiiiiiiiiiiiii", $this->id, $this->device_id,
+        $stmt->bind_param("isiiiiiiiiiiiiiiiiiiiiiiiiii", $this->id, $this->device_id,
             $this->getEffectId(), $this->timings[0], $this->timings[1], $this->timings[2], $this->timings[3],
             $this->timings[4], $this->timings[5], $this->args[0], $this->args[1], $this->args[2], $this->args[3],
-            $this->args[4], $this->getEffectId(), $this->timings[0], $this->timings[1], $this->timings[2],
+            $this->args[4], $this->args[5], $this->getEffectId(), $this->timings[0], $this->timings[1], $this->timings[2],
             $this->timings[3], $this->timings[4], $this->timings[5], $this->args[0], $this->args[1], $this->args[2],
-            $this->args[3], $this->args[4]
+            $this->args[3], $this->args[4], $this->args[5]
         );
         $result = $stmt->execute();
         $stmt->close();
@@ -556,7 +563,8 @@ abstract class Effect
     {
         $conn = DbUtils::getConnection();
         $colors = Effect::getColorsForEffectIdsByDeviceId($device_id);
-        $sql = "SELECT id, device_id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4 
+        $sql = "SELECT id, device_id, name, effect, time0, time1, time2, time3, time4, time5, 
+                arg0, arg1, arg2, arg3, arg4, arg5
                 FROM devices_effects WHERE device_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $device_id);
@@ -569,7 +577,8 @@ abstract class Effect
     {
         $conn = DbUtils::getConnection();
         $colors = Effect::getColorsForEffectIdsByProfileId($profile_id);
-        $sql = "SELECT id, device_id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4 
+        $sql = "SELECT id, device_id, name, effect, time0, time1, time2, time3, time4, time5, 
+                arg0, arg1, arg2, arg3, arg4, arg5
                 FROM devices_effects WHERE profile_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $profile_id);
@@ -620,14 +629,14 @@ abstract class Effect
 
     /**
      * Columns required in order:
-     * id, device_id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4
+     * id, device_id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4, arg5
      * @param mysqli_stmt $stmt
      * @param array $colors
      * @return Effect[]
      */
     private static function arrayFromStatement(mysqli_stmt & $stmt, array $colors)
     {
-        $stmt->bind_result($id, $d_id, $n, $e, $t0, $t1, $t2, $t3, $t4, $t5, $a0, $a1, $a2, $a3, $a4);
+        $stmt->bind_result($id, $d_id, $n, $e, $t0, $t1, $t2, $t3, $t4, $t5, $a0, $a1, $a2, $a3, $a4, $a5);
         $stmt->execute();
         $arr = [];
         while($stmt->fetch())
@@ -635,13 +644,22 @@ abstract class Effect
             switch($e)
             {
                 case Effect::EFFECT_OFF:
-                    $arr[] = new Off($id, $d_id, $colors[$id], [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true, $n);
+                    $arr[] = new Off($id, $d_id, $colors[$id],
+                        [$t0, $t1, $t2, $t3, $t4, $t5],
+                        [$a0, $a1, $a2, $a3, $a4, $a5],
+                        true, $n);
                     break;
                 case Effect::EFFECT_STATIC:
-                    $arr[] = new Statiic($id, $d_id, $colors[$id], [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true, $n);
+                    $arr[] = new Statiic($id, $d_id, $colors[$id],
+                        [$t0, $t1, $t2, $t3, $t4, $t5],
+                        [$a0, $a1, $a2, $a3, $a4, $a5],
+                        true, $n);
                     break;
                 case Effect::EFFECT_BREATHING:
-                    $arr[] = new Breathe($id, $d_id, $colors[$id], [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true, $n);
+                    $arr[] = new Breathe($id, $d_id, $colors[$id],
+                        [$t0, $t1, $t2, $t3, $t4, $t5],
+                        [$a0, $a1, $a2, $a3, $a4, $a5],
+                        true, $n);
                     break;
                 default:
                     throw new UnexpectedValueException("Invalid effect id: $e");

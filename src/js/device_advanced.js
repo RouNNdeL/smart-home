@@ -30,6 +30,7 @@ import {roundTime, timeToString} from "./device_timing";
 import Mexp from 'math-expression-evaluator';
 
 const URL_EFFECT_HTML = "/api/device_advanced_default_html.php";
+const DEFAULT_COLORS = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ffffff"];
 const COLORPICKER_OPTIONS = {
     useAlpha: false,
     component: ".color-swatch-handle",
@@ -51,14 +52,23 @@ const COLORPICKER_OPTIONS = {
 $(function() {
     const device_id = $(".device-settings-content").data("device-id");
     const parents = $(".effect-parent");
+    let last_default_color = 0;
     parents.each(function() {
         refreshListeners(this);
     });
 
     function refreshListeners(parent) {
+        $(parent).find("*").off();
+
         const effect_id = $(parent).data("effect-id");
-        const max_colors = $(parent).data("mac-colors");
+        const max_colors = $(parent).data("max-colors");
         const min_colors = $(parent).data("min-colors");
+
+        const swatch_container = $(parent).find(".swatch-container");
+        const add_color_btn = $(parent).find(".add-color-btn");
+        let color_count = $(parent).find(".color-container")
+            .not(".color-swatch-template .color-container").length;
+
         $(parent).find(".effect-select").change(function() {
             const effect = $(this).val();
             $.ajax(URL_EFFECT_HTML, {
@@ -86,5 +96,43 @@ $(function() {
                 $(this).val($(this).data("previous-value") || "0");
             }
         });
+        add_color_btn.click(function() {
+            if(color_count >= max_colors)
+                return;
+
+            const swatch = $(parent).find(".color-swatch-template").children().eq(0).clone();
+            swatch.find("input").val(DEFAULT_COLORS[last_default_color]);
+            swatch_container.append(swatch);
+
+            last_default_color = (last_default_color + 1) % DEFAULT_COLORS.length;
+            color_count++;
+
+            showHideButtons();
+
+            refreshListeners(parent);
+        });
+        $(parent).find(".color-delete-btn").click(function() {
+            if(color_count <= min_colors)
+                return;
+
+            $(this).parents(".color-container").remove();
+            color_count--;
+
+            showHideButtons();
+        });
+
+        function showHideButtons() {
+            if(color_count >= max_colors)
+                add_color_btn.attr("disabled", true);
+
+            if(color_count > min_colors)
+                $(parent).find(".color-delete-btn").attr("disabled", false);
+
+            if(color_count <= min_colors)
+                $(parent).find(".color-delete-btn").attr("disabled", true);
+
+            if(color_count < max_colors)
+                add_color_btn.attr("disabled", false);
+        }
     }
 });
