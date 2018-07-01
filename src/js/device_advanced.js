@@ -33,21 +33,19 @@ const URL_EFFECT_HTML = "/api/device_advanced_default_html.php";
 const COLORPICKER_OPTIONS = {
     useAlpha: false,
     component: ".color-swatch-handle",
-    extensions: [
-        {
-            name: "swatches",
-            colors: {
-                "white": "#ffffff",
-                "red": "#ff0000",
-                "green": "#00ff00",
-                "blue": "#0000ff",
-                "magenta": "#ff00ff",
-                "yellow": "#ffff00",
-                "cyan": "#00ffff",
-            },
-            namesAsValues: false
-        }
-    ],
+    extensions: [{
+        name: "swatches",
+        colors: {
+            "white": "#ffffff",
+            "red": "#ff0000",
+            "green": "#00ff00",
+            "blue": "#0000ff",
+            "magenta": "#ff00ff",
+            "yellow": "#ffff00",
+            "cyan": "#00ffff",
+        },
+        namesAsValues: false
+    }],
 };
 
 $(function() {
@@ -80,9 +78,13 @@ $(function() {
                 let val = $(this).val();
                 val = timeToString(val);
                 val = Mexp.eval(val);
-                $(this).val(roundTime(val));
+                val = roundTime(val);
+                $(this).val(val);
+                $(this).data("previous-value", val);
             }
-            catch(e){}
+            catch(e) {
+                $(this).val($(this).data("previous-value") || "0");
+            }
         });
     }
 });

@@ -103,10 +103,10 @@ abstract class Effect
 
     const INPUT_TEMPLATE_ARGUMENTS = "<div class=\"col-sm-6 col-md-6 col-lg-4 col-xl-3 form-group px-1 mb-1\"><label class=\"mb-0\">\$label</label>
                             <input class=\"form-control\" type=\"text\" name=\"\$name\" 
-                                    placeholder=\"\$placeholder\" value=\"\$value\"></div>";
+                                    placeholder=\"\$placeholder\" value=\"\$value\" data-previous-value='\$value'></div>";
     const INPUT_TEMPLATE_TIMES = "<div class=\"col-sm-6 col-md-6 col-lg-4 col-xl-3 form-group px-1 mb-1\"><label class=\"mb-0\">\$label</label>
                             <input class=\"form-control input-time\" type=\"text\" name=\"\$name\" placeholder=\"\$placeholder\"
-                             value=\"\$value\"></div>";
+                             value=\"\$value\" data-previous-value='\$value'></div>";
 
     const HIDDEN_TEMPLATE = "<input type=\"hidden\" name=\"\$name\" value=\"\$value\">";
 
