@@ -84,6 +84,7 @@ abstract class Effect
     const COLOR_COUNT_UNLIMITED = -1;
 
     const /** @noinspection CssInvalidPropertyValue */
+        /** @noinspection HtmlUnknownAttribute */
         COLOR_TEMPLATE =
         "<div class=\"color-container row mb-1\">
             <div class=\"col-auto ml-3 px-0\">

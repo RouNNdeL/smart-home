@@ -46,7 +46,7 @@ class Breathe extends Effect
         $array = [];
         $array[1] = $this->args[Breathe::ARG_MIN_VALUE];
         $array[2] = $this->args[Breathe::ARG_MAX_VALUE];
-        $array[5] = $this->args[Breathe::ARG_COLOR_CYCLES];
+        $array[5] = $this->args[Effect::ARG_COLOR_CYCLES];
         return $array;
     }
 
@@ -67,7 +67,7 @@ class Breathe extends Effect
 
     public static function getDefault(int $id, string $device_id)
     {
-        return new Breathe($id, $device_id, [0xff0000, 0x00ff00, 0x0000ff], [0, 1, 0, 1, 0, 0], [1, 0, 255]);
+        return new Breathe($id, $device_id, [0xff0000, 0x00ff00, 0x0000ff], [0, 1, 0, 1, 0, 0], [1, 0, 255, 0, 0, 1]);
     }
 
     /**
