@@ -73,6 +73,8 @@ $(function() {
         const max_colors = form.data("max-colors");
         const min_colors = form.data("min-colors");
 
+        const parent_picker_class = `picker-p-${effect_id}`;
+
         const swatch_container = $(parent).find(".swatch-container");
         const add_color_btn = $(parent).find(".add-color-btn");
         let color_count = $(parent).find(".color-container")
@@ -115,7 +117,7 @@ $(function() {
                 }
                 while($("body").find(`.${picker_id}`).length > 0);
                 $(this).data("picker-id", picker_id);
-                options.customClass = picker_id;
+                options.customClass = `${picker_id} ${parent_picker_class}`;
                 $(this).colorpicker(options);
             });
         $(parent).find(".effect-select").change(function() {
@@ -128,6 +130,7 @@ $(function() {
             }).done(function(response) {
                 let html = $.parseHTML(response.html);
                 $(parent).html(html);
+                $(`.${parent_picker_class}`).remove();
                 refreshListeners(parent);
             });
         });
