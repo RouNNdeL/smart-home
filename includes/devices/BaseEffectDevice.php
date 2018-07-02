@@ -125,7 +125,7 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
             <div class="card-body">
                 <div class="row">
                     <div class="col">
-                        <p class="mb-0">Brightness</p>
+                        <p class="mb-2">Brightness</p>
                         <div class="slider-container"> 
                             <input
                                 class="slider change-listen"
@@ -135,7 +135,7 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
                                 value="$this->brightness">
                         </div>
                         <div class="color-container row mt-3">
-                            <div class="col px-1">
+                            <div class="col">
                                 <div class="color-picker-init" >
                                     <input id="color-$this->device_id" name="color" type="text change-listen" class="form-control color-input" value="$color"/>
                                 </div>
