@@ -273,7 +273,7 @@ abstract class Effect
 
         $max = $this->getMaxColors() === Effect::COLOR_COUNT_UNLIMITED ? min(sizeof($this->colors), $color_limit) :
             min(min(sizeof($this->colors), $color_limit), $this->getMaxColors());
-        for($i = 0; $i < min($this->getMinColors(), $max); $i++)
+        for($i = 0; $i < max($this->getMinColors(), $max); $i++)
         {
             $c = isset($this->colors[$i]) ? $this->colors[$i] : 0xff0000;
             $c_str = Utils::intToHex($c, 3);
