@@ -58,6 +58,7 @@ if($physical === null || !$physical instanceof RgbEffectDevice)
     echo json_encode($response);
     exit();
 }
+
 $device = $physical->getVirtualDeviceById($_GET["device_id"]);
 if($device === null || !$device instanceof BaseEffectDevice)
 {
@@ -68,7 +69,7 @@ if($device === null || !$device instanceof BaseEffectDevice)
 }
 
 $device->setMaxColorCount($physical->getMaxColorCount());
-$device->setEffect(0, Effect::getDefaultForEffectId($json["effect"], $json["effect_id"], $json["device_id"]));
+$index = $device->updateEffect(Effect::getDefaultForEffectId($json["effect_id"], $json["effect"], $json["device_id"]));
 
-$response = ["status" => "success", "html" => $device->toAdvancedHtml(0)];
+$response = ["status" => "success", "html" => $device->toAdvancedHtml($index)];
 echo json_encode($response);
