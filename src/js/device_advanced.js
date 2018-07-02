@@ -113,7 +113,7 @@ $(function() {
     });
 
     function refreshListeners(parent) {
-        $(parent).find("*").off();
+        $(parent).find("*").not(".colorpicker-element *").off();
 
         const form = $(parent).find("form");
         const effect_id = form.data("effect-id");
@@ -158,12 +158,15 @@ $(function() {
             .not(".colorpicker-element")
             .each(function() {
                 const options = COLORPICKER_OPTIONS;
+
                 let picker_id;
                 do {
                     picker_id = `picker-${Math.floor(Math.random() * 10e15)}`;
                 }
                 while($("body").find(`.${picker_id}`).length > 0);
+
                 $(this).data("picker-id", picker_id);
+
                 options.customClass = `${picker_id} ${parent_picker_class}`;
                 $(this).colorpicker(options);
             });
