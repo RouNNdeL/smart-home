@@ -34,6 +34,8 @@ require_once __DIR__ . "/../database/DbUtils.php";
 require_once __DIR__ . "/Off.php";
 require_once __DIR__ . "/Statiic.php";
 require_once __DIR__ . "/Breathe.php";
+require_once __DIR__ . "/Fade.php";
+require_once __DIR__ . "/Blink.php";
 
 abstract class Effect
 {
@@ -271,9 +273,10 @@ abstract class Effect
 
         $max = $this->getMaxColors() === Effect::COLOR_COUNT_UNLIMITED ? min(sizeof($this->colors), $color_limit) :
             min(min(sizeof($this->colors), $color_limit), $this->getMaxColors());
-        for($i = $this->getMinColors() - 1; $i < $max; $i++)
+        for($i = 0; $i < min($this->getMinColors(), $max); $i++)
         {
-            $c_str = str_pad(dechex($this->colors[$i]), 6, "0", STR_PAD_LEFT);
+            $c = isset($this->colors[$i]) ? $this->colors[$i] : 0xff0000;
+            $c_str = Utils::intToHex($c, 3);
             $template = self::COLOR_TEMPLATE;
             $template = str_replace("\$label", "color-$i", $template);
             $template = str_replace("\$color", "#" . $c_str, $template);
@@ -357,7 +360,7 @@ abstract class Effect
         for($i = 0; $i < 6; $i++)
         {
             $t = self::getTiming($this->timings[$i]);
-            if(($timings & (1 << $i) > 0))
+            if(($timings & (1 << $i)) > 0)
             {
                 $template = self::INPUT_TEMPLATE_TIMES;
                 $t_str = $timing_strings[$i];
@@ -744,46 +747,24 @@ abstract class Effect
         $arr = [];
         while($stmt->fetch())
         {
-            switch($e)
-            {
-                case Effect::EFFECT_OFF:
-                    $arr[] = new Off($id, $d_id, $colors[$id],
-                        [$t0, $t1, $t2, $t3, $t4, $t5],
-                        [$a0, $a1, $a2, $a3, $a4, $a5], $n,
-                        Effect::TIMING_MODE_RAW);
-                    break;
-                case Effect::EFFECT_STATIC:
-                    $arr[] = new Statiic($id, $d_id, $colors[$id],
-                        [$t0, $t1, $t2, $t3, $t4, $t5],
-                        [$a0, $a1, $a2, $a3, $a4, $a5], $n,
-                        Effect::TIMING_MODE_RAW);
-                    break;
-                case Effect::EFFECT_BREATHING:
-                    $arr[] = new Breathe($id, $d_id, $colors[$id],
-                        [$t0, $t1, $t2, $t3, $t4, $t5],
-                        [$a0, $a1, $a2, $a3, $a4, $a5], $n,
-                        Effect::TIMING_MODE_RAW);
-                    break;
-                default:
-                    throw new UnexpectedValueException("Invalid effect id: $e");
-            }
+            $class = Effect::getClassForEffectId($e);
+            if(!class_exists($class) || !is_subclass_of($class, Effect::class ))
+                throw new InvalidArgumentException("$class is not a valid Effect class name");
+
+            $arr[] = new $class($id, $d_id, $colors[$id],
+                [$t0, $t1, $t2, $t3, $t4, $t5],
+                [$a0, $a1, $a2, $a3, $a4, $a5], $n,
+                Effect::TIMING_MODE_RAW);
         }
         return $arr;
     }
 
-    public static function getDefaultForEffectId(int $effect_id, int $id, string $device_id)
+    public static function getDefaultForEffectId(int $effect_id, int $effect, string $device_id)
     {
-        switch($effect_id)
-        {
-            case Effect::EFFECT_OFF:
-                return Off::getDefault($id, $device_id);
-            case Effect::EFFECT_STATIC:
-                return Statiic::getDefault($id, $device_id);
-            case Effect::EFFECT_BREATHING:
-                return Breathe::getDefault($id, $device_id);
-            default:
-                throw new UnexpectedValueException("Invalid effect id: $effect_id");
-        }
+        $class = Effect::getClassForEffectId($effect);
+        if(!class_exists($class) || !is_subclass_of($class, Effect::class ))
+            throw new InvalidArgumentException("$class is not a valid Effect class name");
+        return $class::getDefault($effect_id, $device_id);
     }
 
     public static function fromJson(array $json)
@@ -795,23 +776,12 @@ abstract class Effect
         $name = $json["profile_name"];
         $id = $json["effect_id"];
         $device_id = $json["device_id"];
-        switch($effect)
-        {
-            case Effect::EFFECT_OFF:
-                return new Off($id, $device_id, $colors, $times, $args,
-                    $name, Effect::TIMING_MODE_JSON, Effect::ARG_MODE_JSON);
-                break;
-            case Effect::EFFECT_STATIC:
-                return new Statiic($id, $device_id, $colors, $times, $args,
-                    $name, Effect::TIMING_MODE_JSON, Effect::ARG_MODE_JSON);
-                break;
-            case Effect::EFFECT_BREATHING:
-                return new Breathe($id, $device_id, $colors, $times, $args,
-                    $name, Effect::TIMING_MODE_JSON, Effect::ARG_MODE_JSON);
-                break;
-            default:
-                throw new UnexpectedValueException("Invalid effect id: $effect");
-        }
+
+        $class = Effect::getClassForEffectId($json["effect"]);
+        if(!class_exists($class) || !is_subclass_of($class, Effect::class ))
+            throw new InvalidArgumentException("$class is not a valid Effect class name");
+        return new $class($id, $device_id, $colors, $times, $args,
+            $name, Effect::TIMING_MODE_JSON, Effect::ARG_MODE_JSON);
     }
 
     /**
@@ -836,5 +806,28 @@ abstract class Effect
     public function getTimes(): array
     {
         return $this->timings;
+    }
+
+    /**
+     * @param int $id
+     * @return string
+     */
+    private static function getClassForEffectId(int $id)
+    {
+        switch($id)
+        {
+            case Effect::EFFECT_OFF:
+                return Off::class;
+            case Effect::EFFECT_STATIC:
+                return Statiic::class;
+            case Effect::EFFECT_BREATHING:
+                return Breathe::class;
+            case Effect::EFFECT_FADING:
+                return Fade::class;
+            case Effect::EFFECT_BLINKING:
+                return Blink::class;
+            default:
+                throw new UnexpectedValueException("Invalid effect id: $id");
+        }
     }
 }
