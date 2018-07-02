@@ -45,7 +45,7 @@ class Off extends Effect
      */
     public function argsToArray()
     {
-        return [1 => 0, 5 => 1];
+        return [1 => 0, 2 => 0xff, 5 => 1];
     }
 
     /**
@@ -101,6 +101,8 @@ class Off extends Effect
     public function overwriteValues()
     {
         $this->timings[Effect::TIME_OFF] = 1;
+        $this->timings[Effect::TIME_ON] = 0;
         $this->timings[Effect::TIME_ROTATION] = 0;
+        $this->colors = [0];
     }
 }

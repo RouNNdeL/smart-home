@@ -104,5 +104,8 @@ class Statiic extends Effect
     {
         $this->timings[Effect::TIME_ON] = 1;
         $this->timings[Effect::TIME_ROTATION] = 0;
+        if(!isset($this->colors[0]))
+            $this->colors[0] = 0;
+        $this->colors = [$this->colors[0]]; //Remove any unn
     }
 }

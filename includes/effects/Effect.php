@@ -135,7 +135,7 @@ abstract class Effect
     protected $args;
 
     /** @var  int[] */
-    private $colors;
+    protected $colors;
 
     /**
      * RgbDevice constructor. <b>Note:</b> Timings are interpreted as raw values input by user,
