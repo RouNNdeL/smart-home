@@ -41,7 +41,7 @@ class Fade extends Effect
      */
     public function getTimingsForEffect()
     {
-        return (1 << Fade::TIME_FADE) | (1 << Effect::TIME_ON);
+        return (1 << Fade::TIME_FADE) | (1 << Effect::TIME_ON) | (1 << Effect::TIME_DELAY);
     }
 
     /**

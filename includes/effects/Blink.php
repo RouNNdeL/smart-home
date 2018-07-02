@@ -40,7 +40,7 @@ class Blink extends Effect
      */
     public function getTimingsForEffect()
     {
-        return (1 << Effect::TIME_ON) | (1 << Effect::TIME_OFF);
+        return (1 << Effect::TIME_ON) | (1 << Effect::TIME_OFF) | (1 << Effect::TIME_DELAY);
     }
 
     /**
