@@ -236,6 +236,18 @@ module.exports = function(grunt) {
                     dest: 'dist/img'
                 }]
             }
+        },
+        jsonlint: {
+            build: {
+                files: [{
+                    expand: true,
+                    src: ['*.json', ".babelrc", ".sasslintrc"]
+                }, {
+                    expand: true,
+                    cwd: "_lang",
+                    src: ["**/*.json"]
+                }]
+            }
         }
     });
 
@@ -250,26 +262,30 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-csscomb');
     grunt.loadNpmTasks('grunt-exorcise');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-jsonlint');
 
-    grunt.registerTask('vendor', ['clean:vendor', 'browserify:vendor', 'uglify:vendor', 'sass:vendor']);
+    grunt.registerTask('vendor', ['jsonlint', 'clean:vendor', 'browserify:vendor', 'uglify:vendor', 'sass:vendor']);
     grunt.registerTask('default', [
+        'jsonlint',
         'clean:all',
         'jshint', 'browserify:build', 'uglify:build',
         'sasslint', 'sass:build',
         'copy:build'
     ]);
     grunt.registerTask('dev', [
+        'jsonlint',
         'clean:all',
         'jshint', 'browserify:dev', "exorcise:dev", 'uglify:dev',
         'csscomb', 'sasslint', 'sass:dev',
         'copy:build'
     ]);
     grunt.registerTask('dev-fast', [
+        'jsonlint',
         'clean:all',
         'jshint', 'browserify:dev-fast', "exorcise:dev",
         'csscomb', 'sasslint', 'sass:dev',
         'copy:build'
     ]);
-    grunt.registerTask('css', ['clean:css', 'csscomb', 'sasslint', 'sass:build']);
-    grunt.registerTask('js', ['clean:js', 'jshint', 'browserify:build', 'uglify:build']);
+    grunt.registerTask('css', ['jsonlint', 'clean:css', 'csscomb', 'sasslint', 'sass:build']);
+    grunt.registerTask('js', ['jsonlint', 'clean:js', 'jshint', 'browserify:build', 'uglify:build']);
 };
