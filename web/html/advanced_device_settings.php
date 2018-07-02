@@ -80,7 +80,7 @@ echo $head->toString();
         <div class="col-sm-12 mt-3">
             <div class="card">
                 <div class="card-header">
-                    <h2>Mood Light</h2>
+                    <h2><?php echo $device->getDeviceName()?></h2>
                 </div>
                 <div class="card-body">
                     <?php

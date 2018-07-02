@@ -29,7 +29,6 @@
  * Date: 2018-05-16
  * Time: 13:46
  */
-
 class Breathe extends Effect
 {
     const ARG_MIN_VALUE = "breathe_min_val";
@@ -84,5 +83,16 @@ class Breathe extends Effect
     public function getMinColors()
     {
         return 1;
+    }
+
+    public function overwriteValues()
+    {
+        $this->timings[Effect::TIME_ROTATION] = 0;
+
+        if($this->args[Breathe::ARG_MAX_VALUE] < $this->args[Breathe::ARG_MIN_VALUE] ||
+            $this->args[Breathe::ARG_MAX_VALUE] == 0)
+        {
+            $this->args[Breathe::ARG_MAX_VALUE] = 0xff;
+        }
     }
 }

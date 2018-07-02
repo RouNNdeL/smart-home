@@ -148,13 +148,8 @@ class PcLedController extends RgbEffectDevice
         return json_encode(array("type" => "globals_update", "data" => $array));
     }
 
-    /**
-     * @param array $action
-     * @param string $request_id
-     * @return void - ex. ["status" => "SUCCESS", "ids" => [2, 5, 9]]
-     */
-    public function handleAssistantAction(array $action, string $request_id)
+    public function saveEffectForDevice(string $device_id, int $index)
     {
-        // TODO: Implement handleAssistantAction() method.
+        // TODO: Implement saveEffectForDevice() method.
     }
 }

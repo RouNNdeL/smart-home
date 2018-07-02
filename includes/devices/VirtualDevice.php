@@ -166,7 +166,6 @@ abstract class VirtualDevice
 
         if(!$row["home_actions"])
             $row["will_report_state"] = 0;
-        // TODO: Add more device types when their classes get created
         switch($row["type"])
         {
             case self::DEVICE_TYPE_RGB:

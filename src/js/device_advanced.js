@@ -77,7 +77,7 @@ $(function() {
         const active_form = $(".effect-parent.active").find("form");
 
         const form = serializeToAssociative(active_form.serializeArray());
-        form.id = active_form.data("effect-id");
+        form.effect_id = active_form.data("effect-id");
         form.device_id = device_id;
         form.colors = getColors(active_form);
         form.args = {};

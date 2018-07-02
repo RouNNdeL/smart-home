@@ -43,7 +43,7 @@ require_once __DIR__ . "/../includes/GlobalManager.php";
 $manager = GlobalManager::all();
 
 $json = json_decode(file_get_contents("php://input"), true);
-if($json === false || !isset($json["effect"]) || !isset($json["times"])
+if($json === false || !isset($json["effect"]) || !isset($json["effect_id"]) || !isset($json["times"])
     || !isset($json["args"]) || !isset($json["colors"]))
 {
     $response = ["status" => "error", "error" => "invalid_json"];
@@ -52,8 +52,26 @@ if($json === false || !isset($json["effect"]) || !isset($json["times"])
     exit();
 }
 
+$physical = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($json["device_id"]);
+if($physical === null || !$physical instanceof RgbEffectDevice)
+{
+    $response = ["status" => "error", "error" => "invalid_device_id"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
 
-$success = Effect::fromJson($json)->toDatabase();
+$device = $physical->getVirtualDeviceById($json["device_id"]);
+if($device === null || !$device instanceof BaseEffectDevice)
+{
+    $response = ["status" => "error", "error" => "invalid_device_id"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
+
+$index = $device->updateEffect(Effect::fromJson($json));
+$success = $physical->saveEffectForDevice($json["device_id"], $index);
 $response = ["status" => $success ? "success" : "error",
     "message" => $success ? "Saved successfully!" : "An error occurred!"];
 echo json_encode($response);

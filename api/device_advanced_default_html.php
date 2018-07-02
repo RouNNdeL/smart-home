@@ -66,8 +66,9 @@ if($device === null || !$device instanceof BaseEffectDevice)
     echo json_encode($response);
     exit();
 }
-$device->setMaxColorCount($physical->getMaxColorCount());
 
+$device->setMaxColorCount($physical->getMaxColorCount());
 $device->setEffect(0, Effect::getDefaultForEffectId($json["effect"], $json["effect_id"], $json["device_id"]));
+
 $response = ["status" => "success", "html" => $device->toAdvancedHtml(0)];
 echo json_encode($response);

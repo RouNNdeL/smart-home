@@ -45,7 +45,7 @@ class Off extends Effect
      */
     public function argsToArray()
     {
-        return [];
+        return [1 => 0, 5 => 1];
     }
 
     /**
@@ -79,7 +79,7 @@ class Off extends Effect
      */
     public static function getDefault(int $id, string $device_id)
     {
-        return new Off($id, $device_id, [0x000000], [1, 0, 0, 0, 0, 0]);
+        return new Off($id, $device_id, [], [1, 0, 0, 0, 0, 0]);
     }
 
     /**
@@ -96,5 +96,11 @@ class Off extends Effect
     public function getMinColors()
     {
         return 0;
+    }
+
+    public function overwriteValues()
+    {
+        $this->timings[Effect::TIME_OFF] = 1;
+        $this->timings[Effect::TIME_ROTATION] = 0;
     }
 }

@@ -47,7 +47,7 @@ class Statiic extends Effect
      */
     public function argsToArray()
     {
-        return [];
+        return [2 => 0xff, 5 => 1];
     }
 
     /**
@@ -98,5 +98,11 @@ class Statiic extends Effect
     public function getMinColors()
     {
         return 1;
+    }
+
+    public function overwriteValues()
+    {
+        $this->timings[Effect::TIME_ON] = 1;
+        $this->timings[Effect::TIME_ROTATION] = 0;
     }
 }

@@ -216,6 +216,30 @@ HTML;
         return $html;
     }
 
+    public function updateEffect(Effect $effect)
+    {
+        foreach($this->effects as $i => $e)
+        {
+            if($e->getId() === $effect->getId())
+            {
+                $this->effects[$i] = $effect;
+                $effect->toDatabase();
+                return $i;
+            }
+        }
+        return -1;
+    }
+
+    public function getEffectById(int $effect_id)
+    {
+        foreach($this->effects as $effect)
+        {
+            if($effect->getId() === $effect_id)
+                return $effect;
+        }
+        return null;
+    }
+
     public function addEffect($effect)
     {
         $this->effects[] = $effect;

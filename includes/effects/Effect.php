@@ -189,6 +189,8 @@ abstract class Effect
         {
             $this->args = $args;
         }
+
+        $this->overwriteValues();
     }
 
     /**
@@ -230,6 +232,15 @@ abstract class Effect
         {
             throw new InvalidArgumentException("Timings have to be in range 0-255");
         }
+
+        $zeros = true;
+        foreach($timing as $item)
+        {
+            if($item > 0)
+                $zeros = false;
+        }
+        if($zeros)
+            $timing[2] = 1;
 
         $this->timings[0] = $timing[0];
         $this->timings[1] = $timing[1];
@@ -345,9 +356,9 @@ abstract class Effect
 
         for($i = 0; $i < 6; $i++)
         {
+            $t = self::getTiming($this->timings[$i]);
             if(($timings & (1 << $i) > 0))
             {
-                $t = self::getTiming($this->timings[$i]);
                 $template = self::INPUT_TEMPLATE_TIMES;
                 $t_str = $timing_strings[$i];
                 $template = str_replace("\$label", Utils::getString("profile_timing_$t_str"), $template);
@@ -360,7 +371,7 @@ abstract class Effect
             {
                 $template = self::HIDDEN_TEMPLATE;
                 $template = str_replace("\$name", "time_" . $timing_strings[$i], $template);
-                $template = str_replace("\$value", 0, $template);
+                $template = str_replace("\$value", $t, $template);
                 $timing_html .= $template;
             }
         }
@@ -434,6 +445,8 @@ abstract class Effect
      * @return int
      */
     public abstract function getMinColors();
+
+    public abstract function overwriteValues();
 
     /**
      * @param int $id
@@ -568,7 +581,18 @@ abstract class Effect
         return $arr;
     }
 
-    public function toDatabase()
+    public function getSanitizedColors(int $color_count)
+    {
+        $arr = $this->getColors();
+        $args = [];
+        for($i = 0; $i < $color_count; $i++)
+        {
+            $args[$i] = isset($arr[$i]) ? $arr[$i] : 0;
+        }
+        return $args;
+    }
+
+    public function getSanitizedArgs()
     {
         $arr = $this->argsToArray();
         $args = [];
@@ -576,6 +600,12 @@ abstract class Effect
         {
             $args[$i] = isset($arr[$i]) ? $arr[$i] : 0;
         }
+        return $args;
+    }
+
+    public function toDatabase()
+    {
+        $args = $this->getSanitizedArgs();
         $conn = DbUtils::getConnection();
         $sql = "INSERT INTO devices_effects 
                 (id, device_id, effect, name, time0, time1, time2, time3, time4, time5, 
@@ -763,7 +793,7 @@ abstract class Effect
         $colors = $json["colors"];
         $effect = $json["effect"];
         $name = $json["profile_name"];
-        $id = $json["id"];
+        $id = $json["effect_id"];
         $device_id = $json["device_id"];
         switch($effect)
         {
@@ -798,5 +828,13 @@ abstract class Effect
     public function getId(): int
     {
         return $this->id;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getTimes(): array
+    {
+        return $this->timings;
     }
 }

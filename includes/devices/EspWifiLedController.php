@@ -30,6 +30,7 @@
  * Time: 14:44
  */
 
+require_once __DIR__ . "/../Utils.php";
 require_once __DIR__ . "/../database/DeviceDbHelper.php";
 require_once __DIR__ . "/RgbEffectDevice.php";
 
@@ -132,13 +133,11 @@ class EspWifiLedController extends RgbEffectDevice
             if(!$device instanceof BaseEffectDevice)
                 throw new UnexpectedValueException("Children of $class_name should be of type RgbEffectDevice");
 
-            /* We disable the effects in order to show the color */
-            $device->setEffectsEnabled(false);
             $flags = (($device->isOn() ? 1 : 0) << 0) | (($device->areEffectsEnabled() ? 1 : 0) << 2);
 
-            $str_b .= str_pad(dechex($device->getBrightness() / 100 * 255), 2, '0', STR_PAD_LEFT);
-            $str_f .= str_pad(dechex($flags), 2, '0', STR_PAD_LEFT);
-            $str_c .= str_pad(dechex($device->getColor()), 6, '0', STR_PAD_LEFT);
+            $str_b .= Utils::intToHex($device->getBrightness() / 100 * 255);
+            $str_f .= Utils::intToHex($flags);
+            $str_c .= Utils::intToHex($device->getColor(), 3);
         }
 
         return $str_b . $str_f . $str_c;
@@ -159,6 +158,33 @@ class EspWifiLedController extends RgbEffectDevice
         return $str;
     }
 
+    private function getEffectHex(Effect $effect)
+    {
+        $str = Utils::intToHex($effect->avrEffect());
+        $str .= Utils::intToHex(sizeof($effect->getColors()));
+
+        foreach($effect->getTimes() as $arg)
+        {
+            $str .= Utils::intToHex($arg);
+        }
+        foreach($effect->getSanitizedArgs() as $arg)
+        {
+            $str .= Utils::intToHex($arg);
+        }
+        foreach($effect->getSanitizedColors($this->max_color_count) as $color)
+        {
+            $r = $color >> 16 & 0xff;
+            $g = $color >> 8 & 0xff;
+            $b = $color >> 0 & 0xff;
+
+            $str .= Utils::intToHex($g);
+            $str .= Utils::intToHex($r);
+            $str .= Utils::intToHex($b);
+        }
+
+        return $str;
+    }
+
     /**
      * @param string $device_id
      * @param int $owner_id
@@ -169,7 +195,37 @@ class EspWifiLedController extends RgbEffectDevice
     public static function load(string $device_id, int $owner_id, string $display_name, string $hostname)
     {
         $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
-        //TODO: Fetch profiles from DB
         return new EspWifiLedController($device_id, $owner_id, $display_name, $hostname, 0, true, 0, [], $virtual);
+    }
+
+    public function saveEffectForDevice(string $device_id, int $index)
+    {
+        $device = $this->getVirtualDeviceById($device_id);
+        $class_name = get_class($this);
+        if(!$device instanceof BaseEffectDevice)
+            throw new UnexpectedValueException("Children of $class_name should be of type RgbEffectDevice");
+        $hex = Utils::intToHex($index);
+        $hex .= Utils::intToHex($this->getVirtualDeviceIndexById($device_id));
+        $hex .= $this->getEffectHex($device->getEffects()[$index]);
+
+        if($this->isOnline())
+        {
+            $headers = array(
+                "Content-Type: application/json",
+                "Content-Length: " . strlen($hex)
+            );
+
+            $ch = curl_init("http://" . $this->hostname . "/profile");
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $hex);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_exec($ch);
+            curl_close($ch);
+
+            return true;
+        }
+        return false;
     }
 }

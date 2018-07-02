@@ -34,6 +34,8 @@ require_once __DIR__ . "/PhysicalDevice.php";
 require_once __DIR__ . "/../database/DbUtils.php";
 require_once __DIR__ . "/../database/DeviceDbHelper.php";
 
+
+//TODO: Rewrite effect indexing
 abstract class RgbEffectDevice extends PhysicalDevice
 {
     protected $current_profile;
@@ -324,4 +326,6 @@ abstract class RgbEffectDevice extends PhysicalDevice
     {
         return $this->max_color_count;
     }
+
+    public abstract function saveEffectForDevice(string $device_id, int $index);
 }
