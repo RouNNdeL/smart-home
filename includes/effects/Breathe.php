@@ -94,5 +94,8 @@ class Breathe extends Effect
         {
             $this->args[Breathe::ARG_MAX_VALUE] = 0xff;
         }
+
+        if($this->args[Effect::ARG_COLOR_CYCLES] < 1)
+            $this->args[Effect::ARG_COLOR_CYCLES] = 1;
     }
 }
