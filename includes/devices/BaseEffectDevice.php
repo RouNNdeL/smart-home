@@ -77,6 +77,12 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
         $this->effects_enabled = $json["effects_enabled"];
     }
 
+    public function handleAssistantAction($command)
+    {
+        parent::handleAssistantAction($command);
+        $this->effects_enabled = false;
+    }
+
     public function getTraits()
     {
         $array = parent::getTraits();
@@ -116,6 +122,9 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
         $checked = $this->on ? "checked" : "";
         $checked_effects = $this->effects_enabled ? "checked" : "";
         $color = "#" . str_pad(dechex($this->color), 6, '0', STR_PAD_LEFT);
+
+        $center_row = strlen($footer_html) === 0 ? "justify-content-center" : "";
+        $center_col = strlen($footer_html) === 0 ? "col-auto" : "col";
         return <<<HTML
         <form>
             <div class="card-header">
@@ -128,8 +137,8 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
                 </div>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col">
+                <div class="row $center_row">
+                    <div class="$center_col">
                         <p class="mb-2">Brightness</p>
                         <div class="slider-container"> 
                             <input
