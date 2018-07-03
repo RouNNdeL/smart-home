@@ -47,7 +47,7 @@ class Fade extends Effect
     /**
      * @return array
      */
-    public function argsToArray()
+    public function packArgs()
     {
         return [2 => 0xff, 5 => 1];
     }
@@ -59,12 +59,9 @@ class Fade extends Effect
         return $strings;
     }
 
-    /**
-     * @return array
-     */
-    public function argList()
+    public function unpackArgs(array $args)
     {
-        return [];
+
     }
 
     /**

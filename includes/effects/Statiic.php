@@ -45,17 +45,14 @@ class Statiic extends Effect
     /**
      * @return array
      */
-    public function argsToArray()
+    public function packArgs()
     {
         return [2 => 0xff, 5 => 1];
     }
 
-    /**
-     * @return array
-     */
-    public function argList()
+    public function unpackArgs(array $args)
     {
-        return [];
+
     }
 
     /**

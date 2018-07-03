@@ -46,17 +46,14 @@ class Blink extends Effect
     /**
      * @return array
      */
-    public function argsToArray()
+    public function packArgs()
     {
         return [1 => 0, 2 => 0xff, 5 => $this->args[Effect::ARG_COLOR_CYCLES]];
     }
 
-    /**
-     * @return array
-     */
-    public function argList()
+    public function unpackArgs(array $args)
     {
-        return [5 => Effect::ARG_COLOR_CYCLES];
+        $this->args[Effect::ARG_COLOR_CYCLES] = $args[5];
     }
 
     /**

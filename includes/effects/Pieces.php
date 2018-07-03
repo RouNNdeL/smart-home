@@ -26,18 +26,30 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-06-11
- * Time: 17:47
+ * Date: 2018-07-03
+ * Time: 23:55
  */
-class Off extends Effect
+class Pieces extends Effect
 {
+    const TIME_FADE = 3;
+    const ARG_SMOOTH = "smooth";
+    const ARG_DIRECTION = "direction";
+    const ARG_PIECE_COUNT = "pieces_piece_count";
+    const ARG_COLOR_COUNT = "pieces_color_count";
 
     /**
      * @return int
      */
     public function getTimingsForEffect()
     {
-        return 0;
+        return (1 << Effect::TIME_ON) | (1 << Pieces::TIME_FADE) | (1 << Effect::TIME_ROTATION) | (1 << Effect::TIME_DELAY);
+    }
+
+    protected function getTimingStrings()
+    {
+        $strings = parent::getTimingStrings();
+        $strings[Fade::TIME_FADE] = "fade";
+        return $strings;
     }
 
     /**
@@ -45,12 +57,20 @@ class Off extends Effect
      */
     public function packArgs()
     {
-        return [1 => 0, 2 => 0xff, 5 => 1];
+        $args = [];
+        $args[0] = ($this->args[Pieces::ARG_DIRECTION] ? 1 : 0) << 0 | ($this->args[Pieces::ARG_SMOOTH] ? 1 : 0) << 1;
+        $args[1] = $this->args[Pieces::ARG_COLOR_COUNT];
+        $args[2] = $this->args[Pieces::ARG_PIECE_COUNT];
+        $args[5] = 1;
+        return $args;
     }
 
     public function unpackArgs(array $args)
     {
-
+        $this->args[Pieces::ARG_DIRECTION] = $args[0] & (1 << 0) ? true : false;
+        $this->args[Pieces::ARG_SMOOTH] = $args[0] & (1 << 1) ? true : false;
+        $this->args[Pieces::ARG_COLOR_COUNT] = $args[1];
+        $this->args[Pieces::ARG_PIECE_COUNT] = $args[2];
     }
 
     /**
@@ -58,7 +78,7 @@ class Off extends Effect
      */
     public function avrEffect()
     {
-        return Effect::AVR_EFFECT_BREATHE;
+        return Effect::AVR_EFFECT_PIECES;
     }
 
     /**
@@ -66,7 +86,29 @@ class Off extends Effect
      */
     public function getEffectId()
     {
-        return Effect::EFFECT_OFF;
+        return Effect::EFFECT_PIECES;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxColors()
+    {
+        return Effect::COLOR_COUNT_UNLIMITED;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMinColors()
+    {
+        return 1;
+    }
+
+    public function overwriteValues()
+    {
+        if($this->timings[Effect::TIME_ON] === 0 && $this->timings[Pieces::TIME_FADE] === 0)
+            $this->timings[Effect::TIME_ON] = 1;
     }
 
     /**
@@ -76,30 +118,6 @@ class Off extends Effect
      */
     public static function getDefault(int $id, string $device_id)
     {
-        return new Off($id, $device_id, [], [1, 0, 0, 0, 0, 0]);
-    }
-
-    /**
-     * @return int
-     */
-    public function getMaxColors()
-    {
-        return 0;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMinColors()
-    {
-        return 0;
-    }
-
-    public function overwriteValues()
-    {
-        $this->timings[Effect::TIME_OFF] = 1;
-        $this->timings[Effect::TIME_ON] = 0;
-        $this->timings[Effect::TIME_ROTATION] = 0;
-        $this->colors = [0];
+        return new Pieces($id, $device_id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 5], [2, 2, 2, 0, 0, 1]);
     }
 }

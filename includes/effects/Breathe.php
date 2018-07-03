@@ -40,7 +40,7 @@ class Breathe extends Effect
             (1 << Effect::TIME_FADEOUT) | (1 << Effect::TIME_DELAY);
     }
 
-    public function argsToArray()
+    public function packArgs()
     {
         $array = [];
         $array[1] = $this->args[Breathe::ARG_MIN_VALUE];
@@ -49,9 +49,11 @@ class Breathe extends Effect
         return $array;
     }
 
-    public function argList()
+    public function unpackArgs(array $args)
     {
-        return [1 => Breathe::ARG_MIN_VALUE, 2 => Breathe::ARG_MAX_VALUE, 5 => Effect::ARG_COLOR_CYCLES];
+        $this->args[Breathe::ARG_MIN_VALUE] = $args[1];
+        $this->args[Breathe::ARG_MAX_VALUE] = $args[2];
+        $this->args[Effect::ARG_COLOR_CYCLES] = $args[5];
     }
 
     public function avrEffect()

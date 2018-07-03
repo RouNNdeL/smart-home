@@ -36,6 +36,7 @@ require_once __DIR__ . "/Statiic.php";
 require_once __DIR__ . "/Breathe.php";
 require_once __DIR__ . "/Fade.php";
 require_once __DIR__ . "/Blink.php";
+require_once __DIR__ . "/Pieces.php";
 
 abstract class Effect
 {
@@ -164,6 +165,12 @@ abstract class Effect
         $this->device_id = $device_id;
         $this->colors = $colors;
 
+        for($i = 0; $i < 6; $i++)
+        {
+            if(!isset($timing[$i]))
+                $timing[$i] = 0;
+        }
+
         switch($timing_mode)
         {
             case Effect::TIMING_MODE_JSON:
@@ -181,11 +188,7 @@ abstract class Effect
 
         if($arg_mode === Effect::ARG_MODE_ARRAY)
         {
-            $this->args = [];
-            foreach($this->argList() as $i => $name)
-            {
-                $this->args[$name] = $args[$i];
-            }
+            $this->unpackArgs($args);
         }
         else
         {
@@ -404,7 +407,7 @@ abstract class Effect
         $data["colors"] = $this->colors;
         $data["color_cycles"] = isset($this->args["color_cycles"]) ? $this->args["color_cycles"] : 1;
         $data["effect"] = $this->avrEffect();
-        $data["args"] = $this->argsToArray();
+        $data["args"] = $this->packArgs();
 
         return $data;
     }
@@ -422,12 +425,9 @@ abstract class Effect
     /**
      * @return array
      */
-    public abstract function argsToArray();
+    public abstract function packArgs();
 
-    /**
-     * @return array
-     */
-    public abstract function argList();
+    public abstract function unpackArgs(array $args);
 
     /**
      * @return int
@@ -597,7 +597,7 @@ abstract class Effect
 
     public function getSanitizedArgs()
     {
-        $arr = $this->argsToArray();
+        $arr = $this->packArgs();
         $args = [];
         for($i = 0; $i < 6; $i++)
         {
@@ -826,6 +826,8 @@ abstract class Effect
                 return Fade::class;
             case Effect::EFFECT_BLINKING:
                 return Blink::class;
+            case Effect::EFFECT_PIECES:
+                return Pieces::class;
             default:
                 throw new UnexpectedValueException("Invalid effect id: $id");
         }
