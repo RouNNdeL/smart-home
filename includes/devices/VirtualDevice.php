@@ -176,7 +176,7 @@ abstract class VirtualDevice
             case self::DEVICE_TYPE_EFFECTS_RGB_ANALOG:
                 return new AnalogEffectDevice(
                     $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["will_report_state"],
-                    $row["color"], $row["brightness"], $row["state"]
+                    $row["color"], $row["brightness"], $row["state"], $row["toggles"]
                 );
             case self::DEVICE_TYPE_LAMP:
                 return new LampSimple(

@@ -35,6 +35,13 @@ input {
   }
 }
 
+.col.text-center-vertical
+{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 $half-grid: (
         // sass-lint:disable-block indentation
         '0': 0 / 24 * 100%,

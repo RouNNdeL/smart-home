@@ -36,6 +36,8 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
 {
     const ACTIONS_TOGGLE_EFFECT = "ACTIONS_TOGGLE_EFFECT";
 
+    const TOGGLE_EFFECT_BIT = 0;
+
     /** @var Effect[] */
     private $effects;
 
@@ -57,20 +59,22 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
      * @param int $color
      * @param int $brightness
      * @param bool $on
-     * @param array $effects
-     * @param bool $effects_enabled
-     * @param int $current_profile
+     * @param int $toggles
      */
     public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions,
                                 bool $will_report_state, int $color = 0xffffff, int $brightness = 100,
-                                bool $on = true, $effects = [], $effects_enabled = true, $current_profile = 0
+                                bool $on = true, int $toggles = 0
     )
     {
         parent::__construct($device_id, $device_name, $synonyms, $home_actions, $will_report_state, $color, $brightness, $on);
-        $this->effects = $effects;
-        $this->effects_enabled = $effects_enabled;
-        $this->current_profile = $current_profile;
+        $this->effects_enabled = $toggles & (1 << BaseEffectDevice::TOGGLE_EFFECT_BIT);
         $this->loadEffects();
+    }
+
+    public function handleSaveJson($json)
+    {
+        parent::handleSaveJson($json);
+        $this->effects_enabled = $json["effects_enabled"];
     }
 
     public function getTraits()
@@ -110,12 +114,13 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
         $id = urlencode($this->device_id);
         $display_name = urlencode($this->device_name);
         $checked = $this->on ? "checked" : "";
+        $checked_effects = $this->effects_enabled ? "checked" : "";
         $color = "#" . str_pad(dechex($this->color), 6, '0', STR_PAD_LEFT);
         return <<<HTML
         <form>
             <div class="card-header">
                 <div class="row">
-                    <div class="col"><h6 class="align-middle mb-0">$name</h6></div>
+                    <div class="col text-center-vertical"><h6 class="mb-0">$name</h6></div>
                     <div class="col-auto float-right pl-0">
                         <input class="checkbox-switch change-listen" type="checkbox" name="state" $checked
                             data-size="small" data-label-width="10" id="state-$this->device_id">
@@ -134,7 +139,15 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
                                 id="brightness-$this->device_id"
                                 value="$this->brightness">
                         </div>
-                        <div class="color-container row mt-3">
+                        <div class="input-group mt-3">
+                            <label for="effects-$this->device_id">Effects enabled
+                            <div class="ml-3 d-inline">
+                                <input class="checkbox-switch change-listen" type="checkbox" name="effects_enabled" $checked_effects
+                                data-size="mini" data-label-width="10" id="effects-$this->device_id">
+                            </label>
+                            </div>
+                        </div>
+                        <div class="color-container row">
                             <div class="col">
                                 <div class="color-picker-init" >
                                     <input id="color-$this->device_id" name="color" type="text change-listen" class="form-control color-input" value="$color"/>
@@ -144,11 +157,12 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
                     </div>
                 </div>
             </div>
-            <div class="card-footer">
+            <div class="card-footer py-2">
                 <div class="row">
-                    <div class="col">
-                        <a href="/effect/$display_name/$id"><small class="align-middle text-muted">Effect settings</small></a>$footer_html 
+                    <div class="col text-center-vertical">
+                        <a href="/effect/$display_name/$id" class="mb-1"><small class="align-middle text-muted">Effect settings</small></a> 
                     </div>
+                    $footer_html
                 </div>
             </div>
     </form>
@@ -257,7 +271,7 @@ HTML;
     {
         $conn = DbUtils::getConnection();
         $state = $this->on ? 1 : 0;
-        $toggles = (($this->effects_enabled ? 1 : 0) << 0);
+        $toggles = (($this->effects_enabled ? 1 : 0) << BaseEffectDevice::TOGGLE_EFFECT_BIT);
         $sql = "UPDATE devices_virtual SET 
                   color = ?,
                   brightness = ?, 

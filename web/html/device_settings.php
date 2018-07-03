@@ -103,7 +103,7 @@ HTML;
                             </div>
                         </div>
                         <div class="card-footer">
-                        <button id="device-settings-submit"
+                        <button id="device-reboot-btn"
                             class="btn btn-danger">$reboot_string</button>
                         </div>
                     </div>
@@ -113,7 +113,9 @@ HTML;
             else
             {
                 $footer = <<<HTML
-                    <button id="device-settings-submit" class="btn btn-sm btn-danger float-right">$reboot_string</button>
+                    <div class="col col-auto float-right"> 
+                        <button id="device-reboot-btn" class="btn btn-sm btn-danger">$reboot_string</button>
+                    </div>
 HTML;
 
                 $virtual_html = $virtualDevices[0]->toHtml($device->getNameWithState(), $footer);
