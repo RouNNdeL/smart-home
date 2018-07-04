@@ -70,7 +70,7 @@ echo $head->toString();
 ?>
 <body>
 <div class="container-fluid">
-    <div class="row device-settings-content">
+    <div class="row device-settings-content" data-device-id="<?php echo $device->getId()?>">
         <div class="col-sm-12">
             <?php
             $reboot_string = Utils::getString("device_reboot");
@@ -103,7 +103,7 @@ HTML;
                             </div>
                         </div>
                         <div class="card-footer">
-                        <button id="device-reboot-btn"
+                        <button id="device-reboot-btn" role="button" type="button"
                             class="btn btn-danger">$reboot_string</button>
                         </div>
                     </div>
@@ -114,7 +114,8 @@ HTML;
             {
                 $footer = <<<HTML
                     <div class="col col-auto float-right"> 
-                        <button id="device-reboot-btn" class="btn btn-sm btn-danger">$reboot_string</button>
+                        <button id="device-reboot-btn" class="btn btn-sm btn-danger" 
+                        role="button" type="button">$reboot_string</button>
                     </div>
 HTML;
 
@@ -131,5 +132,6 @@ HTML;
         </div>
     </div>
 </div>
+<div class="snackbar"></div>
 </body>
 </html>

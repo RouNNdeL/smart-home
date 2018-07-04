@@ -65,6 +65,19 @@ class EspWifiLedController extends RgbEffectDevice
         return parent::handleAssistantAction($action, $request_id);
     }
 
+    public function reboot()
+    {
+        if($this->isOnline())
+        {
+            $ch = curl_init("http://" . $this->hostname . "/restart");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_exec($ch);
+            curl_close($ch);
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @param bool $quick
      * @return bool - whether the device was online when calling save

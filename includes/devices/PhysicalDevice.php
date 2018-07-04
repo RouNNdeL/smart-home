@@ -88,6 +88,8 @@ abstract class PhysicalDevice
      */
     public static abstract function load(string $device_id, int $owner_id, string $display_name, string $hostname);
 
+    public abstract function reboot();
+
     /**
      * @param array $action
      * @param string $request_id

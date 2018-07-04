@@ -122,6 +122,7 @@
   "device_devices": "Devices",
   "device_owner_you": "You",
   "device_owner": "Owner",
+  "device_reboot": "Reboot",
   "effect_name": "Effect name",
   "effect_default_name": "Effect"
 }

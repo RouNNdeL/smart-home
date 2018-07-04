@@ -86,6 +86,13 @@ class PcLedController extends RgbEffectDevice
         return $this->tcp_send();
     }
 
+
+    public function reboot()
+    {
+        $request = ["type" => "reboot"];
+        return $this->tcp_send(json_encode($request));
+    }
+
     public function save(bool $quick)
     {
         $path = $_SERVER["DOCUMENT_ROOT"] . self::SAVE_PATH;

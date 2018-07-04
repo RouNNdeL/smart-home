@@ -24,6 +24,7 @@ $color-picker-big: true;
 $color-input-size: 184px;
 
 @import 'color_picker';
+@import 'snackbar';
 @import 'device_related';
 @import 'utils';
 @import '../../node_modules/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch';
