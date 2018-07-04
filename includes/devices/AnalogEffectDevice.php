@@ -42,7 +42,8 @@ class AnalogEffectDevice extends BaseEffectDevice
             Effect::EFFECT_STATIC => "static",
             Effect::EFFECT_BREATHING => "breathe",
             Effect::EFFECT_BLINKING => "blink",
-            Effect::EFFECT_FADING => "fade"
+            Effect::EFFECT_FADING => "fade",
+            Effect::EFFECT_SIMPLE_RAINBOW => "rainbow"
         ];
     }
 }

@@ -80,6 +80,7 @@
   "profile_timing_rotation": "Rotation",
   "profile_timing_offset": "Offset",
   "profile_timing_fade": "Fade",
+  "profile_timing_cycle": "Cycle",
   "profile_timing_particles_off": "Speed",
   "profile_timing_particles_fadein": "Delay",
   "profile_timing_particles_on": "Group",

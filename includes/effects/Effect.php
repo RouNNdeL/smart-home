@@ -37,6 +37,9 @@ require_once __DIR__ . "/Breathe.php";
 require_once __DIR__ . "/Fade.php";
 require_once __DIR__ . "/Blink.php";
 require_once __DIR__ . "/Pieces.php";
+require_once __DIR__ . "/Spectrum.php";
+require_once __DIR__ . "/SimpleRainbow.php";
+require_once __DIR__ . "/RotatingRainbow.php";
 
 abstract class Effect
 {
@@ -57,7 +60,7 @@ abstract class Effect
     const EFFECT_BREATHING = 2;
     const EFFECT_BLINKING = 3;
     const EFFECT_FADING = 4;
-    const EFFECT_RAINBOW = 5;
+    const EFFECT_SIMPLE_RAINBOW = 5;
     const EFFECT_FILLING = 6;
     const EFFECT_MARQUEE = 7;
     const EFFECT_ROTATING = 8;
@@ -67,7 +70,7 @@ abstract class Effect
     const EFFECT_HIGHS = 13;
     const EFFECT_SOURCES = 14;
     const EFFECT_PIECES = 15;
-    const EFFECT_RAINBOW_ROTATING = 16;
+    const EFFECT_ROTATING_RAINBOW = 16;
     const EFFECT_FILLING_FADE = 17;
     const EFFECT_SPECTRUM = 18;
     const EFFECT_TWO_HALVES = 19;
@@ -161,10 +164,13 @@ abstract class Effect
         $this->id = $id;
         $this->colors = $colors;
 
-        for($i = 0; $i < 6; $i++)
+        if($timing_mode !== Effect::TIMING_MODE_JSON)
         {
-            if(!isset($timing[$i]))
-                $timing[$i] = 0;
+            for($i = 0; $i < 6; $i++)
+            {
+                if(!isset($timing[$i]))
+                    $timing[$i] = 0;
+            }
         }
 
         switch($timing_mode)
@@ -560,7 +566,9 @@ abstract class Effect
         $strings = $this->getTimingStrings();
         foreach($json as $key => $value)
         {
-            $arr[array_search($key, $strings)] = $value;
+            $array_search = array_search($key, $strings);
+            if($array_search !== false)
+                $arr[$array_search] = $value;
         }
         return $arr;
     }
@@ -747,7 +755,6 @@ abstract class Effect
         $times = $json["times"];
         $args = $json["args"];
         $colors = $json["colors"];
-        $effect = $json["effect"];
         $name = $json["profile_name"];
         $id = $json["effect_id"];
 
@@ -817,6 +824,12 @@ abstract class Effect
                 return Blink::class;
             case Effect::EFFECT_PIECES:
                 return Pieces::class;
+            case Effect::EFFECT_SPECTRUM:
+                return Spectrum::class;
+            case Effect::EFFECT_SIMPLE_RAINBOW:
+                return SimpleRainbow::class;
+            case Effect::EFFECT_ROTATING_RAINBOW:
+                return RotatingRainbow::class;
             default:
                 throw new UnexpectedValueException("Invalid effect id: $id");
         }

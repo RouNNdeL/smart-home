@@ -43,7 +43,10 @@ class DigitalEffectDevice extends BaseEffectDevice
             Effect::EFFECT_BREATHING => "breathe",
             Effect::EFFECT_BLINKING => "blink",
             Effect::EFFECT_FADING => "fade",
-            Effect::EFFECT_PIECES => "pieces"
+            Effect::EFFECT_PIECES => "pieces",
+            Effect::EFFECT_SPECTRUM => "spectrum",
+            Effect::EFFECT_SIMPLE_RAINBOW => "rainbow",
+            Effect::EFFECT_ROTATING_RAINBOW => "rainbow_rotating"
         ];
     }
 }
