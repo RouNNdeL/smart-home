@@ -26,24 +26,42 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-05-17
- * Time: 20:18
+ * Date: 2018-07-04
+ * Time: 12:58
  */
 
-require_once __DIR__ . "/BaseEffectDevice.php";
-require_once __DIR__ . "/../effects/Effect.php";
-
-class AnalogEffectDevice extends BaseEffectDevice
+if($_SERVER["REQUEST_METHOD"] !== "POST")
 {
-
-    public function getAvailableEffects()
-    {
-        return [Effect::EFFECT_OFF => "off",
-            Effect::EFFECT_STATIC => "static",
-            Effect::EFFECT_BREATHING => "breathe",
-            Effect::EFFECT_BLINKING => "blink",
-            Effect::EFFECT_FADING => "fade",
-            Effect::EFFECT_SIMPLE_RAINBOW => "rainbow"
-        ];
-    }
+    $response = ["status" => "error", "error" => "invalid_request"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
 }
+
+require_once __DIR__ . "/../includes/GlobalManager.php";
+
+$manager = GlobalManager::all();
+
+$json = json_decode(file_get_contents("php://input"), true);
+if($json === false || !isset($json["device_id"]))
+{
+    $response = ["status" => "error", "error" => "invalid_json"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
+
+$physical = $manager->getUserDeviceManager()->getPhysicalDeviceById($json["device_id"]);
+if($physical === null)
+{
+    $response = ["status" => "error", "error" => "invalid_device_id"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
+
+$success = $physical->reboot();
+
+$response = ["status" => $success ? "success" : "error",
+    "message" => $success ? "The device will reboot shortly" : "An error occured!"];
+echo json_encode($response);

@@ -26,18 +26,30 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-06-11
- * Time: 17:47
+ * Date: 2018-07-04
+ * Time: 15:24
  */
-class Off extends Effect
+class Spectrum extends Effect
 {
+    const TIME_FADE = 3;
+    const ARG_SMOOTH = "smooth";
+    const ARG_DIRECTION = "direction";
+    const ARG_COLOR_COUNT = "spectrum_color_count";
 
     /**
      * @return int
      */
     public function getTimingsForEffect()
     {
-        return 0;
+        return (1 << Effect::TIME_ON) | (1 << Spectrum::TIME_FADE) |
+            (1 << Effect::TIME_ROTATION) | (1 << Effect::TIME_DELAY);
+    }
+
+    protected function getTimingStrings()
+    {
+        $strings = parent::getTimingStrings();
+        $strings[Fade::TIME_FADE] = "fade";
+        return $strings;
     }
 
     /**
@@ -45,12 +57,18 @@ class Off extends Effect
      */
     public function packArgs()
     {
-        return [1 => 0, 2 => 0xff, 5 => 1];
+        $args = [];
+        $args[0] = ($this->args[Spectrum::ARG_DIRECTION] ? 1 : 0) << 0 | ($this->args[Spectrum::ARG_SMOOTH] ? 1 : 0) << 1;
+        $args[1] = $this->args[Spectrum::ARG_COLOR_COUNT];
+        $args[5] = 1;
+        return $args;
     }
 
     public function unpackArgs(array $args)
     {
-
+        $this->args[Spectrum::ARG_DIRECTION] = $args[0] & (1 << 0) ? true : false;
+        $this->args[Spectrum::ARG_SMOOTH] = $args[0] & (1 << 1) ? true : false;
+        $this->args[Spectrum::ARG_COLOR_COUNT] = $args[1];
     }
 
     /**
@@ -58,7 +76,7 @@ class Off extends Effect
      */
     public function avrEffect()
     {
-        return Effect::AVR_EFFECT_BREATHE;
+        return Effect::AVR_EFFECT_SPECTRUM;
     }
 
     /**
@@ -66,17 +84,7 @@ class Off extends Effect
      */
     public function getEffectId()
     {
-        return Effect::EFFECT_OFF;
-    }
-
-    /**
-     * @param int $id
-     * @param string $device_id
-     * @return Effect
-     */
-    public static function getDefault(int $id)
-    {
-        return new Off($id, [], [1, 0, 0, 0, 0, 0]);
+        return Effect::EFFECT_SPECTRUM;
     }
 
     /**
@@ -84,7 +92,7 @@ class Off extends Effect
      */
     public function getMaxColors()
     {
-        return 0;
+        return Effect::COLOR_COUNT_UNLIMITED;
     }
 
     /**
@@ -92,14 +100,23 @@ class Off extends Effect
      */
     public function getMinColors()
     {
-        return 0;
+        return 2;
     }
 
+    /**
+     * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     */
     public function overwriteValues()
     {
-        $this->timings[Effect::TIME_OFF] = 1;
-        $this->timings[Effect::TIME_ON] = 0;
-        $this->timings[Effect::TIME_ROTATION] = 0;
-        $this->colors = [0];
+
+    }
+
+    /**
+     * @param int $id
+     * @return Effect
+     */
+    public static function getDefault(int $id)
+    {
+        return new Spectrum($id, [0xff0000, 0x0000ff], [0, 0, 4, 1], [2, 2]);
     }
 }

@@ -33,6 +33,7 @@
 require_once __DIR__ . "/SimpleRgbDevice.php";
 require_once __DIR__ . "/BaseEffectDevice.php";
 require_once __DIR__ . "/AnalogEffectDevice.php";
+require_once __DIR__ . "/DigitalEffectDevice.php";
 require_once __DIR__ . "/LampAnalog.php";
 require_once __DIR__ . "/LampSimple.php";
 
@@ -40,7 +41,7 @@ abstract class VirtualDevice
 {
     const DEVICE_TYPE_RGB = "DEVICE_RGB";
     const DEVICE_TYPE_EFFECTS_RGB_ANALOG = "DEVICE_EFFECTS_RGB_ANALOG";
-    const DEVICE_TYPE_EFFECTS_RGB_ADVANCED = "DEVICE_EFFECTS_RGB_ADVANCED";
+    const DEVICE_TYPE_EFFECTS_RGB_DIGITAL = "DEVICE_EFFECTS_RGB_DIGITAL";
     const DEVICE_TYPE_LAMP = "DEVICE_LAMP";
     const DEVICE_TYPE_LAMP_ANALOG = "DEVICE_LAMP_ANALOG";
     const DEVICE_TYPE_SWITCH = "DEVICE_SWITCH";
@@ -166,7 +167,6 @@ abstract class VirtualDevice
 
         if(!$row["home_actions"])
             $row["will_report_state"] = 0;
-        // TODO: Add more device types when their classes get created
         switch($row["type"])
         {
             case self::DEVICE_TYPE_RGB:
@@ -177,7 +177,12 @@ abstract class VirtualDevice
             case self::DEVICE_TYPE_EFFECTS_RGB_ANALOG:
                 return new AnalogEffectDevice(
                     $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["will_report_state"],
-                    $row["color"], $row["brightness"], $row["state"]
+                    $row["color"], $row["brightness"], $row["state"], $row["toggles"]
+                );
+            case self::DEVICE_TYPE_EFFECTS_RGB_DIGITAL:
+                return new DigitalEffectDevice(
+                    $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["will_report_state"],
+                    $row["color"], $row["brightness"], $row["state"], $row["toggles"]
                 );
             case self::DEVICE_TYPE_LAMP:
                 return new LampSimple(

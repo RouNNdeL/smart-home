@@ -26,18 +26,24 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-06-11
- * Time: 17:47
+ * Date: 2018-07-04
+ * Time: 20:37
  */
-class Off extends Effect
+
+
+class RotatingRainbow extends Effect
 {
+
+    const ARG_BRIGHTNESS = "rainbow_brightness";
+    const ARG_SOURCES = "rainbow_sources";
+    const ARG_MODE = "rainbow_mode";
 
     /**
      * @return int
      */
     public function getTimingsForEffect()
     {
-        return 0;
+        return (1 << Effect::TIME_ROTATION) | (1 << Effect::TIME_DELAY);
     }
 
     /**
@@ -45,12 +51,21 @@ class Off extends Effect
      */
     public function packArgs()
     {
-        return [1 => 0, 2 => 0xff, 5 => 1];
+        $args = [];
+
+        $args[0] = ($this->args[RotatingRainbow::ARG_MODE] ? 1 : 0) << 2 & ~(1 << 3);
+        $args[1] = $this->args[RotatingRainbow::ARG_BRIGHTNESS];
+        $args[2] = $this->args[RotatingRainbow::ARG_SOURCES];
+        $args[5] = 1;
+
+        return $args;
     }
 
     public function unpackArgs(array $args)
     {
-
+        $this->args[RotatingRainbow::ARG_MODE] = $args[0] & (1 << 2) ? true : false;
+        $this->args[RotatingRainbow::ARG_BRIGHTNESS] = $args[1];
+        $this->args[RotatingRainbow::ARG_SOURCES] = $args[2];
     }
 
     /**
@@ -58,7 +73,7 @@ class Off extends Effect
      */
     public function avrEffect()
     {
-        return Effect::AVR_EFFECT_BREATHE;
+        return Effect::AVR_EFFECT_RAINBOW;
     }
 
     /**
@@ -66,17 +81,7 @@ class Off extends Effect
      */
     public function getEffectId()
     {
-        return Effect::EFFECT_OFF;
-    }
-
-    /**
-     * @param int $id
-     * @param string $device_id
-     * @return Effect
-     */
-    public static function getDefault(int $id)
-    {
-        return new Off($id, [], [1, 0, 0, 0, 0, 0]);
+        return Effect::EFFECT_ROTATING_RAINBOW;
     }
 
     /**
@@ -95,11 +100,26 @@ class Off extends Effect
         return 0;
     }
 
+    /**
+     * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     */
     public function overwriteValues()
     {
-        $this->timings[Effect::TIME_OFF] = 1;
-        $this->timings[Effect::TIME_ON] = 0;
-        $this->timings[Effect::TIME_ROTATION] = 0;
-        $this->colors = [0];
+        if($this->args[RotatingRainbow::ARG_BRIGHTNESS] < 1)
+            $this->args[RotatingRainbow::ARG_BRIGHTNESS] = 255;
+
+        if($this->args[RotatingRainbow::ARG_SOURCES] < 1)
+            $this->args[RotatingRainbow::ARG_SOURCES] = 1;
+
+        $this->colors = [0]; /* Required in order to send color count >0*/
+    }
+
+    /**
+     * @param int $id
+     * @return Effect
+     */
+    public static function getDefault(int $id)
+    {
+        return new RotatingRainbow($id, [], [0,0,0,0,5], [0,0xff, 1]);
     }
 }

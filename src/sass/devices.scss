@@ -20,8 +20,5 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-$device-offline-text-color: #dc3545;
-
-.device-offline-text {
-  color: $device-offline-text-color;
-}
+@import 'device_related';
+@import 'utils';

@@ -92,4 +92,9 @@ class EspWiFiLamp extends PhysicalDevice
         $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
         return new EspWiFiLamp($device_id, $owner_id, $display_name, $hostname, $virtual);
     }
+
+    public function reboot()
+    {
+        // TODO: Implement reboot() method.
+    }
 }

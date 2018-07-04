@@ -21,39 +21,42 @@
 // SOFTWARE.
 
 @import '../../lib/bootstrap-colorpicker/src/sass/colorpicker';
-$color-picker-size: 150px;
-$color-picker-bar-size: 20px;
-$color-picker-guide-size: 7px;
+$color-picker-big: false !default;
+@if $color-picker-big == true {
+  $color-picker-size: 150px;
+  $color-picker-bar-size: 20px;
+  $color-picker-guide-size: 7px;
 
-.colorpicker-big {
-  .colorpicker-hue {
-    width: $color-picker-bar-size;
-    height: $color-picker-size;
-  }
+  .colorpicker-big {
+    .colorpicker-hue {
+      width: $color-picker-bar-size;
+      height: $color-picker-size;
+    }
 
-  .colorpicker-saturation {
-    width: $color-picker-size;
-    height: $color-picker-size;
+    .colorpicker-saturation {
+      width: $color-picker-size;
+      height: $color-picker-size;
 
-    .colorpicker-guide {
-      &,
-      i {
-        width: $color-picker-guide-size;
-        height: $color-picker-guide-size;
-        border-radius: $color-picker-guide-size;
+      .colorpicker-guide {
+        &,
+        i {
+          width: $color-picker-guide-size;
+          height: $color-picker-guide-size;
+          border-radius: $color-picker-guide-size;
+        }
       }
     }
-  }
 
-  .colorpicker-alpha {
-    width: $color-picker-bar-size;
-    height: $color-picker-size;
-  }
+    .colorpicker-alpha {
+      width: $color-picker-bar-size;
+      height: $color-picker-size;
+    }
 
-  .colorpicker-color {
-    &,
-    div {
-      height: $color-picker-bar-size;
+    .colorpicker-color {
+      &,
+      div {
+        height: $color-picker-bar-size;
+      }
     }
   }
 }

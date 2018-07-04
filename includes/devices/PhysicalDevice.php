@@ -88,6 +88,8 @@ abstract class PhysicalDevice
      */
     public static abstract function load(string $device_id, int $owner_id, string $display_name, string $hostname);
 
+    public abstract function reboot();
+
     /**
      * @param array $action
      * @param string $request_id
@@ -119,15 +121,28 @@ abstract class PhysicalDevice
 
     /**
      * @param string $id
-     * @return null|VirtualDevice
+     * @return null|&VirtualDevice
      */
     public function getVirtualDeviceById(string $id)
     {
-        foreach ($this->virtual_devices as $virtual_device) {
+        foreach ($this->virtual_devices as &$virtual_device) {
             if ($virtual_device->getDeviceId() === $id)
                 return $virtual_device;
         }
         return null;
+    }
+
+    /**
+     * @param string $id
+     * @return int
+     */
+    public function getVirtualDeviceIndexById(string $id)
+    {
+        foreach ($this->virtual_devices as $i => $virtual_device) {
+            if ($virtual_device->getDeviceId() === $id)
+                return $i;
+        }
+        return -1;
     }
 
     /**

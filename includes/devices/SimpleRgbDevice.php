@@ -139,6 +139,9 @@ class SimpleRgbDevice extends VirtualDevice
             $name = $this->device_name;
         $checked = $this->on ? "checked" : "";
         $color = "#" . str_pad(dechex($this->color), 6, '0', STR_PAD_LEFT);
+
+        $center_row = strlen($footer_html) === 0 ? "justify-content-center" : "";
+        $center_col = strlen($footer_html) === 0 ? "col-auto" : "col";
         return <<<HTML
         <form>
             <div class="card-header">
@@ -151,9 +154,9 @@ class SimpleRgbDevice extends VirtualDevice
                 </div>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col">
-                        <p class="mb-0">Brightness</p>
+                <div class="row $center_row">
+                    <div class="$center_col">
+                        <p class="mb-2">Brightness</p>
                         <div class="m-5" class="slider-container"> 
                             <input
                                 class="slider change-listen"
@@ -163,7 +166,7 @@ class SimpleRgbDevice extends VirtualDevice
                                 value="$this->brightness">
                         </div>
                         <div class="color-container row mt-3">
-                            <div class="col px-1">
+                            <div class="col">
                                 <div class="color-picker-init" >
                                     <input id="color-$this->device_id" name="color" type="text change-listen" class="form-control color-input" value="$color"/>
                                 </div>

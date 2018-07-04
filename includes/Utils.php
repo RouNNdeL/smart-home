@@ -101,4 +101,9 @@ class Utils
     {
         return self::getInstance()->_getString($name);
     }
+
+    public static function intToHex(int $n, int $bytes = 1)
+    {
+        return str_pad(dechex($n), $bytes*2, '0', STR_PAD_LEFT);
+    }
 }

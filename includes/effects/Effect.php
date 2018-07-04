@@ -34,6 +34,12 @@ require_once __DIR__ . "/../database/DbUtils.php";
 require_once __DIR__ . "/Off.php";
 require_once __DIR__ . "/Statiic.php";
 require_once __DIR__ . "/Breathe.php";
+require_once __DIR__ . "/Fade.php";
+require_once __DIR__ . "/Blink.php";
+require_once __DIR__ . "/Pieces.php";
+require_once __DIR__ . "/Spectrum.php";
+require_once __DIR__ . "/SimpleRainbow.php";
+require_once __DIR__ . "/RotatingRainbow.php";
 
 abstract class Effect
 {
@@ -54,7 +60,7 @@ abstract class Effect
     const EFFECT_BREATHING = 2;
     const EFFECT_BLINKING = 3;
     const EFFECT_FADING = 4;
-    const EFFECT_RAINBOW = 5;
+    const EFFECT_SIMPLE_RAINBOW = 5;
     const EFFECT_FILLING = 6;
     const EFFECT_MARQUEE = 7;
     const EFFECT_ROTATING = 8;
@@ -64,7 +70,7 @@ abstract class Effect
     const EFFECT_HIGHS = 13;
     const EFFECT_SOURCES = 14;
     const EFFECT_PIECES = 15;
-    const EFFECT_RAINBOW_ROTATING = 16;
+    const EFFECT_ROTATING_RAINBOW = 16;
     const EFFECT_FILLING_FADE = 17;
     const EFFECT_SPECTRUM = 18;
     const EFFECT_TWO_HALVES = 19;
@@ -84,37 +90,43 @@ abstract class Effect
     const COLOR_COUNT_UNLIMITED = -1;
 
     const /** @noinspection CssInvalidPropertyValue */
+        /** @noinspection HtmlUnknownAttribute */
         COLOR_TEMPLATE =
         "<div class=\"color-container row mb-1\">
-            <div class=\"col-auto ml-3\">
-                <button class=\"btn btn-danger color-delete-btn\" type=\"button\" role=\"button\" title=\"\$title_delete\"><span class=\"oi oi-trash\"></span></button>
+            <div class=\"col-auto ml-3 px-0\">
+                <button class=\"btn btn-danger color-delete-btn\" type=\"button\" role=\"button\" 
+                title=\"\$title_delete\"><span class=\"oi oi-trash\" \$disabled></span></button>
             </div>
-            <div class=\"col-auto ml-1\">
+            <div class=\"col-auto px-1\">
                 <button class=\"btn color-jump-btn\" type=\"button\" role=\"button\" title=\"\$title_jump\"><span class=\"oi oi-action-redo\"></span></button>
             </div>
-            <div class=\"col pl-1\">
+            <div class=\"col pl-0\">
                 <div class=\"input-group colorpicker-component\">
                     <input type=\"text\" class=\"form-control color-input\" value=\"\$color\" autocomplete=\"off\" 
                     aria-autocomplete=\"none\" spellcheck=\"false\"/>
-                    <span class=\"input-group-addon color-swatch-handle\"><i></i></span>
+                    <div class='input-group-append'><span class=\"input-group-text color-swatch-handle add-on\"><i></i></span></div>
                 </div>
             </div>
         </div>";
 
     const INPUT_TEMPLATE_ARGUMENTS = "<div class=\"col-sm-6 col-md-6 col-lg-4 col-xl-3 form-group px-1 mb-1\"><label class=\"mb-0\">\$label</label>
                             <input class=\"form-control\" type=\"text\" name=\"\$name\" 
-                                    placeholder=\"\$placeholder\" value=\"\$value\"></div>";
+                                    placeholder=\"\$placeholder\" value=\"\$value\" data-previous-value='\$value'></div>";
     const INPUT_TEMPLATE_TIMES = "<div class=\"col-sm-6 col-md-6 col-lg-4 col-xl-3 form-group px-1 mb-1\"><label class=\"mb-0\">\$label</label>
-                            <input class=\"form-control\" type=\"text\" name=\"\$name\" placeholder=\"\$placeholder\"
-                             value=\"\$value\"></div>";
+                            <input class=\"form-control input-time\" type=\"text\" name=\"\$name\" placeholder=\"\$placeholder\"
+                             value=\"\$value\" data-previous-value='\$value'></div>";
 
     const HIDDEN_TEMPLATE = "<input type=\"hidden\" name=\"\$name\" value=\"\$value\">";
 
+    const TIMING_MODE_RAW = 0;
+    const TIMING_MODE_SECONDS = 1;
+    const TIMING_MODE_JSON = 2;
+
+    const ARG_MODE_ARRAY = 0;
+    const ARG_MODE_JSON = 1;
+
     /** @var int */
     private $id;
-
-    /** @var string */
-    private $device_id;
 
     /** @var string */
     private $name;
@@ -126,7 +138,7 @@ abstract class Effect
     protected $args;
 
     /** @var  int[] */
-    private $colors;
+    protected $colors;
 
     /**
      * RgbDevice constructor. <b>Note:</b> Timings are interpreted as raw values input by user,
@@ -137,42 +149,55 @@ abstract class Effect
      * @param array $colors
      * @param array $timing
      * @param array $args
-     * @param bool $t_converted
+     * @param bool $t_json
      */
-    public function __construct(int $id, string $device_id, array $colors, array $timing,
-                                array $args = array(), bool $t_converted = false, string $name = null
+    public function __construct(int $id, array $colors, array $timing,
+                                array $args = array(), string $name = null,
+                                int $timing_mode = Effect::TIMING_MODE_SECONDS,
+                                int $arg_mode = Effect::ARG_MODE_ARRAY
     )
     {
         if($name === null)
-            $this->name = Utils::getString("profile_default_name") . " $id";
+            $this->name = Utils::getString("effect_default_name") . " $id";
         else
             $this->name = $name;
         $this->id = $id;
-        $this->device_id = $device_id;
-        $this->name = $name;
         $this->colors = $colors;
-        $t_converted ? $this->setTimings($timing) : $this->setTimingsRaw($timing);
-        $this->args = [];
-        foreach($this->argList() as $i => $name)
+
+        if($timing_mode !== Effect::TIMING_MODE_JSON)
         {
-            $this->args[$name] = $args[$i];
+            for($i = 0; $i < 6; $i++)
+            {
+                if(!isset($timing[$i]))
+                    $timing[$i] = 0;
+            }
         }
-    }
 
-    /**
-     * @param string $color
-     * @return bool|int - false if to many colors in the array, otherwise number of colors in the array
-     */
-    public function addColor(string $color)
-    {
-        if(sizeof($this->colors) >= 16)
-            return false;
-        return array_push($this->colors, $color);
-    }
+        switch($timing_mode)
+        {
+            case Effect::TIMING_MODE_JSON:
+                $this->setTimings($this->timingJsonToArray($timing));
+                break;
+            case Effect::TIMING_MODE_RAW:
+                $this->setTimingsRaw($timing);
+                break;
+            case Effect::TIMING_MODE_SECONDS:
+                $this->setTimings($timing);
+                break;
+            default:
+                throw new InvalidArgumentException("Invalid timing_mode: $timing_mode");
+        }
 
-    public function removeColor(int $pos)
-    {
-        unset($this->colors[$pos]);
+        if($arg_mode === Effect::ARG_MODE_ARRAY)
+        {
+            $this->unpackArgs($args);
+        }
+        else
+        {
+            $this->args = $args;
+        }
+
+        $this->overwriteValues();
     }
 
     public function getColors()
@@ -180,17 +205,17 @@ abstract class Effect
         return $this->colors;
     }
 
-    public function setTimingsRaw(array $timing)
+    public function setTimings(array $timing)
     {
         $t = [];
         foreach($timing as $i => $value)
         {
             $t[$i] = Effect::convertToTiming($timing[$i]);
         }
-        $this->setTimings($t);
+        $this->setTimingsRaw($t);
     }
 
-    public function setTimings(array $timing)
+    public function setTimingsRaw(array $timing)
     {
         if($timing[0] > 255 || $timing[0] < 0 || $timing[1] > 255 || $timing[1] < 0 ||
             $timing[2] > 255 || $timing[2] < 0 || $timing[3] > 255 || $timing[3] < 0 ||
@@ -198,6 +223,15 @@ abstract class Effect
         {
             throw new InvalidArgumentException("Timings have to be in range 0-255");
         }
+
+        $zeros = true;
+        foreach($timing as $item)
+        {
+            if($item > 0)
+                $zeros = false;
+        }
+        if($zeros)
+            $timing[2] = 1;
 
         $this->timings[0] = $timing[0];
         $this->timings[1] = $timing[1];
@@ -207,6 +241,15 @@ abstract class Effect
         $this->timings[5] = $timing[5];
     }
 
+    public static function getColorTemplateLocalized()
+    {
+        $template = self::COLOR_TEMPLATE;
+        $template = str_replace("\$title_delete", Utils::getString("profile_btn_hint_delete"), $template);
+        $template = str_replace("\$title_jump", Utils::getString("profile_btn_hint_jump"), $template);
+        $template = str_replace("\$color", "", $template);
+        return $template;
+    }
+
     /**
      * @param int $color_limit
      * @return string
@@ -214,18 +257,23 @@ abstract class Effect
     public function colorsHtml(int $color_limit)
     {
         $colors_html = "";
+        if($this->getMinColors() === 0)
+            return null;
 
         $max = $this->getMaxColors() === Effect::COLOR_COUNT_UNLIMITED ? min(sizeof($this->colors), $color_limit) :
             min(min(sizeof($this->colors), $color_limit), $this->getMaxColors());
-        for($i = $this->getMinColors() - 1; $i < $max; $i++)
+        for($i = 0; $i < max($this->getMinColors(), $max); $i++)
         {
-            $c_str = str_pad(dechex($this->colors[$i]), 6, "0", STR_PAD_LEFT);
+            $c = isset($this->colors[$i]) ? $this->colors[$i] : 0xff0000;
+            $c_str = Utils::intToHex($c, 3);
             $template = self::COLOR_TEMPLATE;
-            $template = str_replace("\$active", $i == 0 ? "checked" : "", $template);
             $template = str_replace("\$label", "color-$i", $template);
             $template = str_replace("\$color", "#" . $c_str, $template);
             $template = str_replace("\$title_delete", Utils::getString("profile_btn_hint_delete"), $template);
             $template = str_replace("\$title_jump", Utils::getString("profile_btn_hint_jump"), $template);
+            $template = str_replace("\$disabled",
+                sizeof($this->getColors()) <= $this->getMinColors() ? "disabled" : "",
+                $template);
             $colors_html .= $template;
         }
 
@@ -258,8 +306,8 @@ abstract class Effect
                         $selected1 = $argument ? "" : " selected";
                         $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
                                             <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . Effect::DIRECTION_CW . "\"$selected0>$str_cw</option>
-                                                <option value=\"" . Effect::DIRECTION_CCW . "\"$selected1>$str_ccw</option>
+                                                <option value=\"" . Effect::DIRECTION_CW . "\" $selected0>$str_cw</option>
+                                                <option value=\"" . Effect::DIRECTION_CCW . "\" $selected1>$str_ccw</option>
                                             </select></div>";
                         break;
                     case "smooth":
@@ -273,8 +321,8 @@ abstract class Effect
                         $selected1 = $argument ? "" : " selected";
                         $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
                                             <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . 1 . "\"$selected0>$str_yes</option>
-                                                <option value=\"" . 0 . "\"$selected1>$str_no</option>
+                                                <option value=\"" . 1 . "\" $selected0>$str_yes</option>
+                                                <option value=\"" . 0 . "\" $selected1>$str_no</option>
                                             </select></div>";
                         break;
                     case "two_halves_color_count":
@@ -283,8 +331,8 @@ abstract class Effect
                         $selected1 = $argument === 1 ? "" : " selected";
                         $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
                                             <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . 1 . "\"$selected0>1</option>
-                                                <option value=\"" . 2 . "\"$selected1>2</option>
+                                                <option value=\"" . 1 . "\" $selected0>1</option>
+                                                <option value=\"" . 2 . "\" $selected1>2</option>
                                             </select></div>";
                         break;
                     default:
@@ -300,9 +348,9 @@ abstract class Effect
 
         for($i = 0; $i < 6; $i++)
         {
-            if(($timings & (1 << $i) > 0))
+            $t = self::getSeconds($this->timings[$i]);
+            if(($timings & (1 << $i)) > 0)
             {
-                $t = self::getTiming($this->timings[$i]);
                 $template = self::INPUT_TEMPLATE_TIMES;
                 $t_str = $timing_strings[$i];
                 $template = str_replace("\$label", Utils::getString("profile_timing_$t_str"), $template);
@@ -315,14 +363,14 @@ abstract class Effect
             {
                 $template = self::HIDDEN_TEMPLATE;
                 $template = str_replace("\$name", "time_" . $timing_strings[$i], $template);
-                $template = str_replace("\$value", 0, $template);
+                $template = str_replace("\$value", $t, $template);
                 $timing_html .= $template;
             }
         }
 
         if($timings !== 0)
         {
-            $html .= "<div class=\"timing-container col-12 col-sm-6 col-lg-4 mb-3 mb-sm-0\"><h3>$profile_timing</h3>
+            $html .= "<div class=\"timing-container col-12 col-sm-6 col-lg-4 mb-3 mb-sm-0\"><h4>$profile_timing</h4>
                         <div class=\"row mx-0\">$timing_html</div></div>";
         }
         else
@@ -330,7 +378,7 @@ abstract class Effect
             $html .= "$timing_html";
         }
         if(sizeof($this->args) > 0)
-            $html .= "<div class=\"args-container col-12 col-lg-4 col-xl-5\"><h3>$profile_arguments</h3>
+            $html .= "<div class=\"args-container col-12 col-lg-4 col-xl-5\"><h4>$profile_arguments</h4>
                         <div class=\"row mx-0\">$arguments_html</div></div>";
 
         return $html;
@@ -340,12 +388,11 @@ abstract class Effect
     {
         $data = array();
 
-        $data["color_count"] = sizeof($this->colors);
-        $data["times"] = $this->timings;
+        $data["times"] = $this->getTimes(Effect::TIMING_MODE_JSON);
         $data["colors"] = $this->colors;
-        $data["color_cycles"] = isset($this->args["color_cycles"]) ? $this->args["color_cycles"] : 1;
-        $data["effect"] = $this->avrEffect();
-        $data["args"] = $this->argsToArray();
+        $data["effect"] = $this->getEffectId();
+        $data["args"] = $this->args;
+        $data["effect_id"] = $this->id;
 
         return $data;
     }
@@ -363,12 +410,9 @@ abstract class Effect
     /**
      * @return array
      */
-    public abstract function argsToArray();
+    public abstract function packArgs();
 
-    /**
-     * @return array
-     */
-    public abstract function argList();
+    public abstract function unpackArgs(array $args);
 
     /**
      * @return int
@@ -391,13 +435,17 @@ abstract class Effect
     public abstract function getMinColors();
 
     /**
+     * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     */
+    public abstract function overwriteValues();
+
+    /**
      * @param int $id
-     * @param string $device_id
      * @return Effect
      */
-    public static abstract function getDefault(int $id, string $device_id);
+    public static abstract function getDefault(int $id);
 
-    public static function getTiming(int $x)
+    public static function getSeconds(int $x)
     {
         if($x < 0 || $x > 255)
         {
@@ -447,7 +495,7 @@ abstract class Effect
         $a = array();
         for($i = 0; $i < 256; $i++)
         {
-            $a[$i] = self::getTiming($i);
+            $a[$i] = self::getSeconds($i);
         }
         return $a;
     }
@@ -512,25 +560,92 @@ abstract class Effect
         return $a;
     }
 
+    public function timingJsonToArray($json)
+    {
+        $arr = [];
+        $strings = $this->getTimingStrings();
+        foreach($json as $key => $value)
+        {
+            $array_search = array_search($key, $strings);
+            if($array_search !== false)
+                $arr[$array_search] = $value;
+        }
+        return $arr;
+    }
+
+    public function timingArrayToJson()
+    {
+        $arr = [];
+        $strings = $this->getTimingStrings();
+        foreach($this->timings as $i => $value)
+        {
+            $arr[$strings[$i]] = Effect::getSeconds($value);
+        }
+        return $arr;
+    }
+
+    public function getSanitizedColors(int $color_count)
+    {
+        $arr = $this->getColors();
+        $args = [];
+        for($i = 0; $i < $color_count; $i++)
+        {
+            $args[$i] = isset($arr[$i]) ? $arr[$i] : 0;
+        }
+        return $args;
+    }
+
+    public function getSanitizedArgs()
+    {
+        $arr = $this->packArgs();
+        $args = [];
+        for($i = 0; $i < 6; $i++)
+        {
+            $args[$i] = isset($arr[$i]) ? $arr[$i] : 0;
+        }
+        return $args;
+    }
+
     public function toDatabase()
     {
+        $args = $this->getSanitizedArgs();
         $conn = DbUtils::getConnection();
         $sql = "INSERT INTO devices_effects 
-                (id, device_id, effect, time0, time1, time2, time3, time4, time5, 
-                arg0, arg1, arg2, arg3, arg4) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
-                ON DUPLICATE KEY UPDATE effect = ?, time0 = ?, time1 = ?, time2 = ?, time3 = ?, time4 = ?, time5 = ?, 
-                arg0 = ?, arg2 = ?, arg3 = ?, arg4 = ?";
+                (id, effect, name, time0, time1, time2, time3, time4, time5, 
+                arg0, arg1, arg2, arg3, arg4, arg5) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                ON DUPLICATE KEY UPDATE effect = ?, name = ?, time0 = ?, time1 = ?, time2 = ?, time3 = ?, time4 = ?, time5 = ?, 
+                arg0 = ?, arg1 = ?, arg2 = ?, arg3 = ?, arg4 = ?, arg5 = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("isiiiiiiiiiiiiiiiiiiiiiiii", $this->id, $this->device_id,
-            $this->getEffectId(), $this->timings[0], $this->timings[1], $this->timings[2], $this->timings[3],
-            $this->timings[4], $this->timings[5], $this->args[0], $this->args[1], $this->args[2], $this->args[3],
-            $this->args[4], $this->getEffectId(), $this->timings[0], $this->timings[1], $this->timings[2],
-            $this->timings[3], $this->timings[4], $this->timings[5], $this->args[0], $this->args[1], $this->args[2],
-            $this->args[3], $this->args[4]
+        $stmt->bind_param("iisiiiiiiiiiiiiisiiiiiiiiiiii", $this->id,
+            $this->getEffectId(), $this->name, $this->timings[0], $this->timings[1], $this->timings[2], $this->timings[3],
+            $this->timings[4], $this->timings[5], $args[0], $args[1], $args[2], $args[3],
+            $args[4], $args[5], $this->getEffectId(), $this->name, $this->timings[0], $this->timings[1], $this->timings[2],
+            $this->timings[3], $this->timings[4], $this->timings[5], $args[0], $args[1], $args[2],
+            $args[3], $args[4], $args[5]
         );
         $result = $stmt->execute();
         $stmt->close();
+        $this->saveColors();
         return $result;
+    }
+
+    private function saveColors()
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "DELETE FROM devices_colors WHERE effect_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $this->id);
+        $stmt->execute();
+        $stmt->close();
+
+        $sql = "INSERT INTO devices_colors (effect_id, color, `order`) VALUES (?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        foreach($this->colors as $i => $color)
+        {
+            $stmt->bind_param("iii", $this->id, $color, $i);
+            $stmt->execute();
+        }
+        $stmt->close();
     }
 
     public static function getColorsForEffect(int $effect_id)
@@ -554,23 +669,13 @@ abstract class Effect
     {
         $conn = DbUtils::getConnection();
         $colors = Effect::getColorsForEffectIdsByDeviceId($device_id);
-        $sql = "SELECT id, device_id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4 
-                FROM devices_effects WHERE device_id = ?";
+        $sql = "SELECT devices_effects.id, name, effect, time0, time1, time2, time3, time4, time5, 
+                arg0, arg1, arg2, arg3, arg4, arg5
+                FROM devices_device_effects 
+                  JOIN devices_effects ON devices_device_effects.effect_id = devices_effects.id 
+                WHERE device_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $device_id);
-        $arr = Effect::arrayFromStatement($stmt, $colors);
-        $stmt->close();
-        return $arr;
-    }
-
-    public static function forProfile(int $profile_id)
-    {
-        $conn = DbUtils::getConnection();
-        $colors = Effect::getColorsForEffectIdsByProfileId($profile_id);
-        $sql = "SELECT id, device_id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4 
-                FROM devices_effects WHERE profile_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $profile_id);
         $arr = Effect::arrayFromStatement($stmt, $colors);
         $stmt->close();
         return $arr;
@@ -579,20 +684,11 @@ abstract class Effect
     private static function getColorsForEffectIdsByDeviceId(string $device_id)
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id FROM devices_effects WHERE device_id = ?";
+        $sql = "SELECT devices_effects.id FROM devices_device_effects 
+                  JOIN devices_effects ON devices_device_effects.effect_id = devices_effects.id 
+                WHERE device_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $device_id);
-        $arr = Effect::getEffectIdsColorsFromStatement($stmt);
-        $stmt->close();
-        return $arr;
-    }
-
-    private static function getColorsForEffectIdsByProfileId(int $profile_id)
-    {
-        $conn = DbUtils::getConnection();
-        $sql = "SELECT id FROM devices_effects WHERE profile_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $profile_id);
         $arr = Effect::getEffectIdsColorsFromStatement($stmt);
         $stmt->close();
         return $arr;
@@ -618,33 +714,124 @@ abstract class Effect
 
     /**
      * Columns required in order:
-     * id, device_id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4
+     * id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4, arg5
      * @param mysqli_stmt $stmt
      * @param array $colors
      * @return Effect[]
      */
     private static function arrayFromStatement(mysqli_stmt & $stmt, array $colors)
     {
-        $stmt->bind_result($id, $d_id, $n, $e, $t0, $t1, $t2, $t3, $t4, $t5, $a0, $a1, $a2, $a3, $a4);
+        $stmt->bind_result($id, $n, $e, $t0, $t1, $t2, $t3, $t4, $t5, $a0, $a1, $a2, $a3, $a4, $a5);
         $stmt->execute();
         $arr = [];
         while($stmt->fetch())
         {
-            switch($e)
-            {
-                case Effect::EFFECT_OFF:
-                    $arr[] = new Off($id, $d_id, $colors[$id], [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true, $n);
-                    break;
-                case Effect::EFFECT_STATIC:
-                    $arr[] = new Statiic($id, $d_id, $colors[$id], [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true, $n);
-                    break;
-                case Effect::EFFECT_BREATHING:
-                    $arr[] = new Breathe($id, $d_id, $colors[$id], [$t0, $t1, $t2, $t3, $t4, $t5], [$a0, $a1, $a2, $a3, $a4], true, $n);
-                    break;
-                default:
-                    throw new UnexpectedValueException("Invalid effect id: $e");
-            }
+            $class = Effect::getClassForEffectId($e);
+            if(!class_exists($class) || !is_subclass_of($class, Effect::class))
+                throw new InvalidArgumentException("$class is not a valid Effect class name");
+
+            $arr[] = new $class($id, $colors[$id],
+                [$t0, $t1, $t2, $t3, $t4, $t5],
+                [$a0, $a1, $a2, $a3, $a4, $a5], $n,
+                Effect::TIMING_MODE_RAW);
         }
         return $arr;
+    }
+
+    public static function getDefaultForEffectId(int $effect_id, int $effect)
+    {
+        $class = Effect::getClassForEffectId($effect);
+        if(!class_exists($class) || !is_subclass_of($class, Effect::class))
+            throw new InvalidArgumentException("$class is not a valid Effect class name");
+        return $class::getDefault($effect_id);
+    }
+
+    /**
+     * @param array $json
+     * @return Effect
+     */
+    public static function fromJson(array $json)
+    {
+        $times = $json["times"];
+        $args = $json["args"];
+        $colors = $json["colors"];
+        $name = $json["profile_name"];
+        $id = $json["effect_id"];
+
+        $class = Effect::getClassForEffectId($json["effect"]);
+        if(!class_exists($class) || !is_subclass_of($class, Effect::class))
+            throw new InvalidArgumentException("$class is not a valid Effect class name");
+        return new $class($id, $colors, $times, $args,
+            $name, Effect::TIMING_MODE_JSON, Effect::ARG_MODE_JSON);
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getTimes(int $mode = Effect::TIMING_MODE_SECONDS): array
+    {
+        switch($mode)
+        {
+            case Effect::TIMING_MODE_SECONDS:
+                $arr = [];
+                for($i = 0; $i < 6; $i++)
+                {
+                    $arr[$i] = Effect::getSeconds($this->timings[$i]);
+                }
+                return $arr;
+            case Effect::TIMING_MODE_RAW:
+                return $this->timings;
+            case Effect::TIMING_MODE_JSON:
+                return $this->timingArrayToJson();
+            default:
+                throw new InvalidArgumentException("Invalid mode: $mode");
+        }
+    }
+
+    /**
+     * @param int $id
+     * @return string
+     */
+    private static function getClassForEffectId(int $id)
+    {
+        switch($id)
+        {
+            case Effect::EFFECT_OFF:
+                return Off::class;
+            case Effect::EFFECT_STATIC:
+                return Statiic::class;
+            case Effect::EFFECT_BREATHING:
+                return Breathe::class;
+            case Effect::EFFECT_FADING:
+                return Fade::class;
+            case Effect::EFFECT_BLINKING:
+                return Blink::class;
+            case Effect::EFFECT_PIECES:
+                return Pieces::class;
+            case Effect::EFFECT_SPECTRUM:
+                return Spectrum::class;
+            case Effect::EFFECT_SIMPLE_RAINBOW:
+                return SimpleRainbow::class;
+            case Effect::EFFECT_ROTATING_RAINBOW:
+                return RotatingRainbow::class;
+            default:
+                throw new UnexpectedValueException("Invalid effect id: $id");
+        }
     }
 }

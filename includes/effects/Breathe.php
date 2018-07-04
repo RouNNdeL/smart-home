@@ -29,7 +29,6 @@
  * Date: 2018-05-16
  * Time: 13:46
  */
-
 class Breathe extends Effect
 {
     const ARG_MIN_VALUE = "breathe_min_val";
@@ -41,17 +40,20 @@ class Breathe extends Effect
             (1 << Effect::TIME_FADEOUT) | (1 << Effect::TIME_DELAY);
     }
 
-    public function argsToArray()
+    public function packArgs()
     {
         $array = [];
-        $array[1] = $this->args[self::ARG_MIN_VALUE];
-        $array[2] = $this->args[self::ARG_MAX_VALUE];
+        $array[1] = $this->args[Breathe::ARG_MIN_VALUE];
+        $array[2] = $this->args[Breathe::ARG_MAX_VALUE];
+        $array[5] = $this->args[Effect::ARG_COLOR_CYCLES];
         return $array;
     }
 
-    public function argList()
+    public function unpackArgs(array $args)
     {
-        return [self::ARG_MIN_VALUE, self::ARG_MAX_VALUE, Effect::ARG_COLOR_CYCLES];
+        $this->args[Breathe::ARG_MIN_VALUE] = $args[1];
+        $this->args[Breathe::ARG_MAX_VALUE] = $args[2];
+        $this->args[Effect::ARG_COLOR_CYCLES] = $args[5];
     }
 
     public function avrEffect()
@@ -61,12 +63,12 @@ class Breathe extends Effect
 
     public function getEffectId()
     {
-        return self::EFFECT_BREATHING;
+        return Effect::EFFECT_BREATHING;
     }
 
-    public static function getDefault(int $id, string $device_id)
+    public static function getDefault(int $id)
     {
-        return new Breathe($id, $device_id, [0xff0000, 0x00ff00, 0x0000ff], [0, 1, 0, 1, 0, 0], [1, 0, 255]);
+        return new Breathe($id, [0xff0000, 0x00ff00, 0x0000ff], [0, 1, 0, 1, 0, 0], [1, 0, 255, 0, 0, 1]);
     }
 
     /**
@@ -83,5 +85,19 @@ class Breathe extends Effect
     public function getMinColors()
     {
         return 1;
+    }
+
+    public function overwriteValues()
+    {
+        $this->timings[Effect::TIME_ROTATION] = 0;
+
+        if($this->args[Breathe::ARG_MAX_VALUE] < $this->args[Breathe::ARG_MIN_VALUE] ||
+            $this->args[Breathe::ARG_MAX_VALUE] == 0)
+        {
+            $this->args[Breathe::ARG_MAX_VALUE] = 0xff;
+        }
+
+        if($this->args[Effect::ARG_COLOR_CYCLES] < 1)
+            $this->args[Effect::ARG_COLOR_CYCLES] = 1;
     }
 }

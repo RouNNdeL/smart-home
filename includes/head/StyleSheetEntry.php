@@ -37,6 +37,7 @@ class StyleSheetEntry extends HeadEntry
     const LOGIN = "/dist/css/login";
     const DEVICES = "/dist/css/devices";
     const DEVICE_SETTINGS = "/dist/css/device_settings";
+    const DEVICE_ADVANCED = "/dist/css/device_advanced";
 
     const VENDOR = "/dist/vendor/css/vendor";
 

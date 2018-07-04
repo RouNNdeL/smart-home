@@ -20,18 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-@import 'utils';
-$login-button-width: 191px;
+$color-input-size: auto !default;
 
-.google-signin-button {
-  width: $login-button-width;
-  height: 46px;
-  background: url('/google_signin_button/1x/btn_google_signin_light_normal_web.png') no-repeat;
+.color-input {
+  width: $color-input-size;
+  font-size: 1.2rem;
+  font-family: monospace;
 }
 
-.facebook-signin-button {
-  width: $login-button-width;
-  height: 31px;
-  background: url('/facebook_login.png') no-repeat center;
-  background-size: cover;
+.slider-container {
+  max-width: $color-input-size;
+  width: 100%;
+}
+
+.device-settings-content {
+  padding-top: 12px;
+  height: 100%;
+}
+
+$device-offline-text-color: #dc3545 !default;
+
+.device-offline-text {
+  color: $device-offline-text-color;
 }

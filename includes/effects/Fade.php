@@ -26,18 +26,22 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-06-11
- * Time: 17:47
+ * Date: 2018-07-02
+ * Time: 16:45
  */
-class Off extends Effect
+
+require_once __DIR__ . "/Effect.php";
+
+class Fade extends Effect
 {
+    const TIME_FADE = 3;
 
     /**
      * @return int
      */
     public function getTimingsForEffect()
     {
-        return 0;
+        return (1 << Fade::TIME_FADE) | (1 << Effect::TIME_ON) | (1 << Effect::TIME_DELAY);
     }
 
     /**
@@ -45,7 +49,14 @@ class Off extends Effect
      */
     public function packArgs()
     {
-        return [1 => 0, 2 => 0xff, 5 => 1];
+        return [2 => 0xff, 5 => 1];
+    }
+
+    protected function getTimingStrings()
+    {
+        $strings = parent::getTimingStrings();
+        $strings[Fade::TIME_FADE] = "fade";
+        return $strings;
     }
 
     public function unpackArgs(array $args)
@@ -58,7 +69,7 @@ class Off extends Effect
      */
     public function avrEffect()
     {
-        return Effect::AVR_EFFECT_BREATHE;
+        return Effect::AVR_EFFECT_FADE;
     }
 
     /**
@@ -66,7 +77,33 @@ class Off extends Effect
      */
     public function getEffectId()
     {
-        return Effect::EFFECT_OFF;
+        return Effect::EFFECT_FADING;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxColors()
+    {
+        return Effect::COLOR_COUNT_UNLIMITED;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMinColors()
+    {
+        return 2;
+    }
+
+    public function overwriteValues()
+    {
+        $this->timings[Effect::TIME_OFF] = 0;
+        $this->timings[Effect::TIME_FADEIN] = 0;
+        $this->timings[Effect::TIME_ROTATION] = 0;
+        if(sizeof($this->colors) < 2)
+            $this->colors = [0xff0000, 0x0000ff];
+
     }
 
     /**
@@ -76,30 +113,6 @@ class Off extends Effect
      */
     public static function getDefault(int $id)
     {
-        return new Off($id, [], [1, 0, 0, 0, 0, 0]);
-    }
-
-    /**
-     * @return int
-     */
-    public function getMaxColors()
-    {
-        return 0;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMinColors()
-    {
-        return 0;
-    }
-
-    public function overwriteValues()
-    {
-        $this->timings[Effect::TIME_OFF] = 1;
-        $this->timings[Effect::TIME_ON] = 0;
-        $this->timings[Effect::TIME_ROTATION] = 0;
-        $this->colors = [0];
+        return new Fade($id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 0, 0]);
     }
 }

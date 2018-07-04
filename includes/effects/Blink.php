@@ -26,10 +26,13 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-06-11
- * Time: 17:47
+ * Date: 2018-07-02
+ * Time: 18:01
  */
-class Off extends Effect
+
+require_once __DIR__ . "/Effect.php";
+
+class Blink extends Effect
 {
 
     /**
@@ -37,7 +40,7 @@ class Off extends Effect
      */
     public function getTimingsForEffect()
     {
-        return 0;
+        return (1 << Effect::TIME_ON) | (1 << Effect::TIME_OFF) | (1 << Effect::TIME_DELAY);
     }
 
     /**
@@ -45,12 +48,12 @@ class Off extends Effect
      */
     public function packArgs()
     {
-        return [1 => 0, 2 => 0xff, 5 => 1];
+        return [1 => 0, 2 => 0xff, 5 => $this->args[Effect::ARG_COLOR_CYCLES]];
     }
 
     public function unpackArgs(array $args)
     {
-
+        $this->args[Effect::ARG_COLOR_CYCLES] = $args[5];
     }
 
     /**
@@ -66,7 +69,31 @@ class Off extends Effect
      */
     public function getEffectId()
     {
-        return Effect::EFFECT_OFF;
+        return Effect::EFFECT_BLINKING;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxColors()
+    {
+        return Effect::COLOR_COUNT_UNLIMITED;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMinColors()
+    {
+        return 1;
+    }
+
+    public function overwriteValues()
+    {
+        $this->timings[Effect::TIME_FADEIN] = 0;
+        $this->timings[Effect::TIME_FADEOUT] = 0;
+        if($this->args[Effect::ARG_COLOR_CYCLES] < 1)
+            $this->args[Effect::ARG_COLOR_CYCLES] = 1;
     }
 
     /**
@@ -76,30 +103,6 @@ class Off extends Effect
      */
     public static function getDefault(int $id)
     {
-        return new Off($id, [], [1, 0, 0, 0, 0, 0]);
-    }
-
-    /**
-     * @return int
-     */
-    public function getMaxColors()
-    {
-        return 0;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMinColors()
-    {
-        return 0;
-    }
-
-    public function overwriteValues()
-    {
-        $this->timings[Effect::TIME_OFF] = 1;
-        $this->timings[Effect::TIME_ON] = 0;
-        $this->timings[Effect::TIME_ROTATION] = 0;
-        $this->colors = [0];
+        return new Blink($id, [0xff0000], [1, 0, 1, 0, 0, 0]);
     }
 }

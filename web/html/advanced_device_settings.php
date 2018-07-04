@@ -69,28 +69,63 @@ if(isset($_GET["name"]) && $_GET["name"] === "false")
 <?php
 require_once __DIR__ . "/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("Smart Home - " . $device->getDeviceName());
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICE_SETTINGS));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICE_SETTINGS));
+$head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICE_ADVANCED));
+$head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICE_ADVANCED));
 echo $head->toString();
 
 ?>
 <body>
 <div class="container-fluid">
-    <div class="row device-settings-content">
-        <div class="col-sm-12">
+    <div class="row device-settings-content" data-device-id="<?php echo $device->getDeviceId() ?>">
+        <div class="col-sm-12 mt-3">
             <div class="card">
                 <div class="card-header">
-                    <h2>Mood Light</h2>
+                    <h2><?php echo $device->getDeviceName()?></h2>
                 </div>
                 <div class="card-body">
-                    <?php echo $device->toAdvancedHtml(0)?>
+                    <?php
+                    $effects = $device->getEffects();
+                    ?>
+                    <ul class="nav nav-tabs" role="tablist">
+                        <?php
+                        foreach($effects as $i => $effect)
+                        {
+                            $active = $i ? "" : "active";
+                            $name = $effect->getName();
+                            $effect_id = "e-".$effect->getId();
+                            echo <<<HTML
+                        <li class="nav-item">
+                            <a class="nav-link $active" id="$effect_id-tab" data-toggle="tab" href="#$effect_id" 
+                            role="tab" aria-controls="$effect_id" aria-selected="false">$name</a>
+                        </li>
+HTML;
+                        }
+                        ?>
+                    </ul>
+                    <div class="tab-content">
+                        <?php
+                        foreach($effects as $i => $effect)
+                        {
+                            $active = $i ? "" : "show active";
+                            $effect_id = "e-".$effect->getId();
+                            $effectHtml = $device->toAdvancedHtml($i);
+                            echo <<<HTML
+                        <div class="tab-pane fade $active effect-parent" id="$effect_id" 
+                         role="tabpanel" aria-labelledby="$effect_id-tab">
+                            $effectHtml
+                        </div>
+HTML;
+                        }
+                        ?>
+                    </div>
                 </div>
                 <div class="card-footer">
-                    <button class="btn btn-primary">Save</button>
+                    <button class="btn btn-primary" role="button" type="submit" id="effect-save-btn">Save</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<div class="snackbar"></div>
 </body>
 </html>

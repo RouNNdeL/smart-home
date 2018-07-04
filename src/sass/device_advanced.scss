@@ -20,18 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+
+@import 'snackbar';
+@import 'color_picker';
+@import 'device_related';
 @import 'utils';
-$login-button-width: 191px;
-
-.google-signin-button {
-  width: $login-button-width;
-  height: 46px;
-  background: url('/google_signin_button/1x/btn_google_signin_light_normal_web.png') no-repeat;
-}
-
-.facebook-signin-button {
-  width: $login-button-width;
-  height: 31px;
-  background: url('/facebook_login.png') no-repeat center;
-  background-size: cover;
-}

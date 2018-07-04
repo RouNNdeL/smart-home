@@ -1,5 +1,4 @@
-<?php
-/**
+/*
  * MIT License
  *
  * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
@@ -23,27 +22,8 @@
  * SOFTWARE.
  */
 
-/**
- * Created by PhpStorm.
- * User: Krzysiek
- * Date: 2018-05-17
- * Time: 20:18
- */
+import $ from 'jquery';
 
-require_once __DIR__ . "/BaseEffectDevice.php";
-require_once __DIR__ . "/../effects/Effect.php";
+window.jQuery = window.$ = $;
 
-class AnalogEffectDevice extends BaseEffectDevice
-{
-
-    public function getAvailableEffects()
-    {
-        return [Effect::EFFECT_OFF => "off",
-            Effect::EFFECT_STATIC => "static",
-            Effect::EFFECT_BREATHING => "breathe",
-            Effect::EFFECT_BLINKING => "blink",
-            Effect::EFFECT_FADING => "fade",
-            Effect::EFFECT_SIMPLE_RAINBOW => "rainbow"
-        ];
-    }
-}
+export default $;

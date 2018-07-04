@@ -23,13 +23,18 @@
  */
 
 module.exports = function(grunt) {
+    const external = ["jQuery", "tether", "bootstrap"];
+    const dist_js = "dist/js";
+    const dist_css = "dist/css";
+    const src_js = "src/js";
+    const src_sass = 'src/sass';
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         clean: {
             all: ["dist/*", "!dist/vendor/**"],
             vendor: ["dist/vendor"],
-            js: ["dist/js"],
-            css: ["dist/css"]
+            js: [dist_js],
+            css: [dist_css]
         },
         browserify: {
             options: {
@@ -41,13 +46,13 @@ module.exports = function(grunt) {
             },
             build: {
                 options: {
-                    external: ["jQuery", "tether", "bootstrap"]
+                    external: external
                 },
                 files: [{
                     expand: true,
-                    cwd: "src/js",
-                    src: ["*.js"],
-                    dest: 'dist/js',
+                    cwd: src_js,
+                    src: ["*.js", "!_*.js"],
+                    dest: dist_js,
                 }]
             },
             dev: {
@@ -55,19 +60,34 @@ module.exports = function(grunt) {
                     browserifyOptions: {
                         debug: true
                     },
-                    external: ["jQuery", "tether", "bootstrap"]
+                    external: external
                 },
                 files: [{
                     expand: true,
-                    cwd: "src/js",
-                    src: ["*.js"],
-                    dest: 'dist/js',
+                    cwd: src_js,
+                    src: ["*.js", "!_*.js"],
+                    dest: dist_js,
                     ext: ".js"
+                }]
+            },
+            "dev-fast": {
+                options: {
+                    browserifyOptions: {
+                        debug: true
+                    },
+                    external: external
+                },
+                files: [{
+                    expand: true,
+                    cwd: src_js,
+                    src: ["*.js", "!_*.js"],
+                    dest: dist_js,
+                    ext: ".min.js"
                 }]
             },
             vendor: {
                 options: {
-                    require: ['jquery', "tether", "bootstrap"]
+                    require: ['jquery', "tether", "bootstrap", "jquery-ui"]
                 },
                 src: [],
                 dest: 'dist/vendor/js/vendor.js',
@@ -77,9 +97,9 @@ module.exports = function(grunt) {
             dev: {
                 files: [{
                     expand: true,
-                    cwd: "dist/js",
+                    cwd: dist_js,
                     src: ["*.js"],
-                    dest: 'dist/js',
+                    dest: dist_js,
                     ext: ".js.map"
                 }]
             }
@@ -95,9 +115,9 @@ module.exports = function(grunt) {
                 },
                 files: [{
                     expand: true,
-                    cwd: "dist/js",
+                    cwd: dist_js,
                     src: ["*.js", "!*.min.js"],
-                    dest: "dist/js",
+                    dest: dist_js,
                     ext: ".min.js"
                 }]
             },
@@ -114,9 +134,9 @@ module.exports = function(grunt) {
                 },
                 files: [{
                     expand: true,
-                    cwd: "dist/js",
+                    cwd: dist_js,
                     src: ["*.js", "!*.min.js"],
-                    dest: "dist/js",
+                    dest: dist_js,
                     ext: ".min.js"
                 }]
             },
@@ -147,9 +167,9 @@ module.exports = function(grunt) {
             build: {
                 files: [{
                     expand: true,
-                    cwd: 'src/sass',
+                    cwd: src_sass,
                     src: ['*.scss'],
-                    dest: 'src/sass'
+                    dest: src_sass
                 }]
             }
         },
@@ -160,7 +180,7 @@ module.exports = function(grunt) {
             build: {
                 files: [{
                     expand: true,
-                    cwd: 'src/sass',
+                    cwd: src_sass,
                     src: ['*.scss']
                 }]
             }
@@ -176,9 +196,9 @@ module.exports = function(grunt) {
                 },
                 files: [{
                     expand: true,
-                    cwd: 'src/sass',
+                    cwd: src_sass,
                     src: ['*.scss'],
-                    dest: 'dist/css',
+                    dest: dist_css,
                     ext: '.min.css'
                 }]
             },
@@ -188,9 +208,9 @@ module.exports = function(grunt) {
                 },
                 files: [{
                     expand: true,
-                    cwd: 'src/sass',
+                    cwd: src_sass,
                     src: ['*.scss'],
-                    dest: 'dist/css',
+                    dest: dist_css,
                     ext: '.min.css'
                 }]
             },
@@ -216,6 +236,18 @@ module.exports = function(grunt) {
                     dest: 'dist/img'
                 }]
             }
+        },
+        jsonlint: {
+            build: {
+                files: [{
+                    expand: true,
+                    src: ['*.json', ".babelrc", ".sasslintrc"]
+                }, {
+                    expand: true,
+                    cwd: "_lang",
+                    src: ["**/*.json"]
+                }]
+            }
         }
     });
 
@@ -230,20 +262,30 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-csscomb');
     grunt.loadNpmTasks('grunt-exorcise');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-jsonlint');
 
-    grunt.registerTask('vendor', ['clean:vendor', 'browserify:vendor', 'uglify:vendor', 'sass:vendor']);
+    grunt.registerTask('vendor', ['jsonlint', 'clean:vendor', 'browserify:vendor', 'uglify:vendor', 'sass:vendor']);
     grunt.registerTask('default', [
+        'jsonlint',
         'clean:all',
         'jshint', 'browserify:build', 'uglify:build',
         'sasslint', 'sass:build',
         'copy:build'
     ]);
     grunt.registerTask('dev', [
+        'jsonlint',
         'clean:all',
         'jshint', 'browserify:dev', "exorcise:dev", 'uglify:dev',
         'csscomb', 'sasslint', 'sass:dev',
         'copy:build'
     ]);
-    grunt.registerTask('css', ['clean:css', 'csscomb', 'sasslint', 'sass:build']);
-    grunt.registerTask('js', ['clean:js', 'jshint', 'browserify:build', 'uglify:build']);
+    grunt.registerTask('dev-fast', [
+        'jsonlint',
+        'clean:all',
+        'jshint', 'browserify:dev-fast', "exorcise:dev",
+        'csscomb', 'sasslint', 'sass:dev',
+        'copy:build'
+    ]);
+    grunt.registerTask('css', ['jsonlint', 'clean:css', 'csscomb', 'sasslint', 'sass:build']);
+    grunt.registerTask('js', ['jsonlint', 'clean:js', 'jshint', 'browserify:build', 'uglify:build']);
 };

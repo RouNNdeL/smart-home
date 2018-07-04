@@ -45,17 +45,14 @@ class Statiic extends Effect
     /**
      * @return array
      */
-    public function argsToArray()
+    public function packArgs()
     {
-        return [];
+        return [2 => 0xff, 5 => 1];
     }
 
-    /**
-     * @return array
-     */
-    public function argList()
+    public function unpackArgs(array $args)
     {
-        return [];
+
     }
 
     /**
@@ -79,9 +76,9 @@ class Statiic extends Effect
      * @param string $device_id
      * @return Effect
      */
-    public static function getDefault(int $id, string $device_id)
+    public static function getDefault(int $id)
     {
-        return new Statiic($id, $device_id, [0xff0000], [0, 0, 1, 0, 0, 0]);
+        return new Statiic($id, [0xff0000], [0, 0, 1, 0, 0, 0]);
     }
 
     /**
@@ -98,5 +95,14 @@ class Statiic extends Effect
     public function getMinColors()
     {
         return 1;
+    }
+
+    public function overwriteValues()
+    {
+        $this->timings[Effect::TIME_ON] = 1;
+        $this->timings[Effect::TIME_ROTATION] = 0;
+        if(!isset($this->colors[0]))
+            $this->colors[0] = 0;
+        $this->colors = [$this->colors[0]]; //Remove any unn
     }
 }

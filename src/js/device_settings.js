@@ -28,13 +28,14 @@ import 'bootstrap';
 import 'ion-rangeslider';
 import 'bootstrap-switch';
 import '../../lib/bootstrap-colorpicker';
-import {serializeToAssociative} from "./utils";
+import {serializeToAssociative, showSnackbar} from "./_utils";
 
 const MIN_UPDATE_DELAY = 500;
 const REPORT_STATE_DELAY = 2500;
-const UPDATE_URL = "/api/save_device.php";
+const UPDATE_URL = "/api/device_save.php";
 
 $(function() {
+    const device_id = $(".device-settings-content").data("device-id");
     let last_update = Date.now();
     let last_call = 0;
     let last_call_duration = 0;
@@ -78,6 +79,20 @@ $(function() {
         /* Only call when there's a pending timeout */
         if(update_timeout_global !== -1)
             reportState(false);
+    });
+
+    $("#device-reboot-btn").click(function() {
+        $.ajax("/api/device_reboot.php", {
+            method: "POST",
+            dataType: "json",
+            contentType: "json",
+            data: JSON.stringify({device_id: device_id})
+        }).done(resp => {
+            showSnackbar(resp.message);
+        }).fail(resp => {
+            if(resp.hasOwnProperty("responseJSON"))
+                showSnackbar(resp.responseJSON.message);
+        });
     });
 
     /**
