@@ -25,7 +25,7 @@
 import $ from 'jquery';
 import 'tether';
 import 'bootstrap';
-import {serializeToAssociative, showSnackbar} from './utils';
+import {serializeToAssociative, showSnackbar} from './_utils';
 
 $(function() {
     let time_diff = 0;

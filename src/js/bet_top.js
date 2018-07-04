@@ -24,7 +24,7 @@
 
 import $ from "jquery";
 import "bootstrap";
-import {serializeToAssociative, showSnackbar} from "./utils";
+import {serializeToAssociative, showSnackbar} from "./_utils";
 
 $(function() {
     $(".top-team-select").change(function() {
