@@ -74,9 +74,9 @@ class Off extends Effect
      * @param string $device_id
      * @return Effect
      */
-    public static function getDefault(int $id, string $device_id)
+    public static function getDefault(int $id)
     {
-        return new Off($id, $device_id, [], [1, 0, 0, 0, 0, 0]);
+        return new Off($id, [], [1, 0, 0, 0, 0, 0]);
     }
 
     /**

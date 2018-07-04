@@ -126,9 +126,6 @@ abstract class Effect
     private $id;
 
     /** @var string */
-    private $device_id;
-
-    /** @var string */
     private $name;
 
     /** @var int[] */
@@ -151,7 +148,7 @@ abstract class Effect
      * @param array $args
      * @param bool $t_json
      */
-    public function __construct(int $id, string $device_id, array $colors, array $timing,
+    public function __construct(int $id, array $colors, array $timing,
                                 array $args = array(), string $name = null,
                                 int $timing_mode = Effect::TIMING_MODE_SECONDS,
                                 int $arg_mode = Effect::ARG_MODE_ARRAY
@@ -162,7 +159,6 @@ abstract class Effect
         else
             $this->name = $name;
         $this->id = $id;
-        $this->device_id = $device_id;
         $this->colors = $colors;
 
         for($i = 0; $i < 6; $i++)
@@ -196,22 +192,6 @@ abstract class Effect
         }
 
         $this->overwriteValues();
-    }
-
-    /**
-     * @param string $color
-     * @return bool|int - false if to many colors in the array, otherwise number of colors in the array
-     */
-    public function addColor(string $color)
-    {
-        if(sizeof($this->colors) >= 16)
-            return false;
-        return array_push($this->colors, $color);
-    }
-
-    public function removeColor(int $pos)
-    {
-        unset($this->colors[$pos]);
     }
 
     public function getColors()
@@ -362,7 +342,7 @@ abstract class Effect
 
         for($i = 0; $i < 6; $i++)
         {
-            $t = self::getTiming($this->timings[$i]);
+            $t = self::getSeconds($this->timings[$i]);
             if(($timings & (1 << $i)) > 0)
             {
                 $template = self::INPUT_TEMPLATE_TIMES;
@@ -402,12 +382,11 @@ abstract class Effect
     {
         $data = array();
 
-        $data["color_count"] = sizeof($this->colors);
-        $data["times"] = $this->timings;
+        $data["times"] = $this->getTimes(Effect::TIMING_MODE_JSON);
         $data["colors"] = $this->colors;
-        $data["color_cycles"] = isset($this->args["color_cycles"]) ? $this->args["color_cycles"] : 1;
-        $data["effect"] = $this->avrEffect();
-        $data["args"] = $this->packArgs();
+        $data["effect"] = $this->getEffectId();
+        $data["args"] = $this->args;
+        $data["effect_id"] = $this->id;
 
         return $data;
     }
@@ -449,16 +428,18 @@ abstract class Effect
      */
     public abstract function getMinColors();
 
+    /**
+     * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     */
     public abstract function overwriteValues();
 
     /**
      * @param int $id
-     * @param string $device_id
      * @return Effect
      */
-    public static abstract function getDefault(int $id, string $device_id);
+    public static abstract function getDefault(int $id);
 
-    public static function getTiming(int $x)
+    public static function getSeconds(int $x)
     {
         if($x < 0 || $x > 255)
         {
@@ -508,7 +489,7 @@ abstract class Effect
         $a = array();
         for($i = 0; $i < 256; $i++)
         {
-            $a[$i] = self::getTiming($i);
+            $a[$i] = self::getSeconds($i);
         }
         return $a;
     }
@@ -584,6 +565,17 @@ abstract class Effect
         return $arr;
     }
 
+    public function timingArrayToJson()
+    {
+        $arr = [];
+        $strings = $this->getTimingStrings();
+        foreach($this->timings as $i => $value)
+        {
+            $arr[$strings[$i]] = Effect::getSeconds($value);
+        }
+        return $arr;
+    }
+
     public function getSanitizedColors(int $color_count)
     {
         $arr = $this->getColors();
@@ -611,12 +603,12 @@ abstract class Effect
         $args = $this->getSanitizedArgs();
         $conn = DbUtils::getConnection();
         $sql = "INSERT INTO devices_effects 
-                (id, device_id, effect, name, time0, time1, time2, time3, time4, time5, 
-                arg0, arg1, arg2, arg3, arg4, arg5) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+                (id, effect, name, time0, time1, time2, time3, time4, time5, 
+                arg0, arg1, arg2, arg3, arg4, arg5) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
                 ON DUPLICATE KEY UPDATE effect = ?, name = ?, time0 = ?, time1 = ?, time2 = ?, time3 = ?, time4 = ?, time5 = ?, 
                 arg0 = ?, arg1 = ?, arg2 = ?, arg3 = ?, arg4 = ?, arg5 = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("isisiiiiiiiiiiiiisiiiiiiiiiiii", $this->id, $this->device_id,
+        $stmt->bind_param("iisiiiiiiiiiiiiisiiiiiiiiiiii", $this->id,
             $this->getEffectId(), $this->name, $this->timings[0], $this->timings[1], $this->timings[2], $this->timings[3],
             $this->timings[4], $this->timings[5], $args[0], $args[1], $args[2], $args[3],
             $args[4], $args[5], $this->getEffectId(), $this->name, $this->timings[0], $this->timings[1], $this->timings[2],
@@ -669,25 +661,13 @@ abstract class Effect
     {
         $conn = DbUtils::getConnection();
         $colors = Effect::getColorsForEffectIdsByDeviceId($device_id);
-        $sql = "SELECT id, device_id, name, effect, time0, time1, time2, time3, time4, time5, 
+        $sql = "SELECT devices_effects.id, name, effect, time0, time1, time2, time3, time4, time5, 
                 arg0, arg1, arg2, arg3, arg4, arg5
-                FROM devices_effects WHERE device_id = ?";
+                FROM devices_device_effects 
+                  JOIN devices_effects ON devices_device_effects.effect_id = devices_effects.id 
+                WHERE device_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $device_id);
-        $arr = Effect::arrayFromStatement($stmt, $colors);
-        $stmt->close();
-        return $arr;
-    }
-
-    public static function forProfile(int $profile_id)
-    {
-        $conn = DbUtils::getConnection();
-        $colors = Effect::getColorsForEffectIdsByProfileId($profile_id);
-        $sql = "SELECT id, device_id, name, effect, time0, time1, time2, time3, time4, time5, 
-                arg0, arg1, arg2, arg3, arg4, arg5
-                FROM devices_effects WHERE profile_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $profile_id);
         $arr = Effect::arrayFromStatement($stmt, $colors);
         $stmt->close();
         return $arr;
@@ -696,20 +676,11 @@ abstract class Effect
     private static function getColorsForEffectIdsByDeviceId(string $device_id)
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id FROM devices_effects WHERE device_id = ?";
+        $sql = "SELECT devices_effects.id FROM devices_device_effects 
+                  JOIN devices_effects ON devices_device_effects.effect_id = devices_effects.id 
+                WHERE device_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $device_id);
-        $arr = Effect::getEffectIdsColorsFromStatement($stmt);
-        $stmt->close();
-        return $arr;
-    }
-
-    private static function getColorsForEffectIdsByProfileId(int $profile_id)
-    {
-        $conn = DbUtils::getConnection();
-        $sql = "SELECT id FROM devices_effects WHERE profile_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $profile_id);
         $arr = Effect::getEffectIdsColorsFromStatement($stmt);
         $stmt->close();
         return $arr;
@@ -735,23 +706,23 @@ abstract class Effect
 
     /**
      * Columns required in order:
-     * id, device_id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4, arg5
+     * id, name, effect, time0, time1, time2, time3, time4, time5, arg0, arg1, arg2, arg3, arg4, arg5
      * @param mysqli_stmt $stmt
      * @param array $colors
      * @return Effect[]
      */
     private static function arrayFromStatement(mysqli_stmt & $stmt, array $colors)
     {
-        $stmt->bind_result($id, $d_id, $n, $e, $t0, $t1, $t2, $t3, $t4, $t5, $a0, $a1, $a2, $a3, $a4, $a5);
+        $stmt->bind_result($id, $n, $e, $t0, $t1, $t2, $t3, $t4, $t5, $a0, $a1, $a2, $a3, $a4, $a5);
         $stmt->execute();
         $arr = [];
         while($stmt->fetch())
         {
             $class = Effect::getClassForEffectId($e);
-            if(!class_exists($class) || !is_subclass_of($class, Effect::class ))
+            if(!class_exists($class) || !is_subclass_of($class, Effect::class))
                 throw new InvalidArgumentException("$class is not a valid Effect class name");
 
-            $arr[] = new $class($id, $d_id, $colors[$id],
+            $arr[] = new $class($id, $colors[$id],
                 [$t0, $t1, $t2, $t3, $t4, $t5],
                 [$a0, $a1, $a2, $a3, $a4, $a5], $n,
                 Effect::TIMING_MODE_RAW);
@@ -759,14 +730,18 @@ abstract class Effect
         return $arr;
     }
 
-    public static function getDefaultForEffectId(int $effect_id, int $effect, string $device_id)
+    public static function getDefaultForEffectId(int $effect_id, int $effect)
     {
         $class = Effect::getClassForEffectId($effect);
-        if(!class_exists($class) || !is_subclass_of($class, Effect::class ))
+        if(!class_exists($class) || !is_subclass_of($class, Effect::class))
             throw new InvalidArgumentException("$class is not a valid Effect class name");
-        return $class::getDefault($effect_id, $device_id);
+        return $class::getDefault($effect_id);
     }
 
+    /**
+     * @param array $json
+     * @return Effect
+     */
     public static function fromJson(array $json)
     {
         $times = $json["times"];
@@ -775,12 +750,11 @@ abstract class Effect
         $effect = $json["effect"];
         $name = $json["profile_name"];
         $id = $json["effect_id"];
-        $device_id = $json["device_id"];
 
         $class = Effect::getClassForEffectId($json["effect"]);
-        if(!class_exists($class) || !is_subclass_of($class, Effect::class ))
+        if(!class_exists($class) || !is_subclass_of($class, Effect::class))
             throw new InvalidArgumentException("$class is not a valid Effect class name");
-        return new $class($id, $device_id, $colors, $times, $args,
+        return new $class($id, $colors, $times, $args,
             $name, Effect::TIMING_MODE_JSON, Effect::ARG_MODE_JSON);
     }
 
@@ -803,9 +777,24 @@ abstract class Effect
     /**
      * @return int[]
      */
-    public function getTimes(): array
+    public function getTimes(int $mode = Effect::TIMING_MODE_SECONDS): array
     {
-        return $this->timings;
+        switch($mode)
+        {
+            case Effect::TIMING_MODE_SECONDS:
+                $arr = [];
+                for($i = 0; $i < 6; $i++)
+                {
+                    $arr[$i] = Effect::getSeconds($this->timings[$i]);
+                }
+                return $arr;
+            case Effect::TIMING_MODE_RAW:
+                return $this->timings;
+            case Effect::TIMING_MODE_JSON:
+                return $this->timingArrayToJson();
+            default:
+                throw new InvalidArgumentException("Invalid mode: $mode");
+        }
     }
 
     /**

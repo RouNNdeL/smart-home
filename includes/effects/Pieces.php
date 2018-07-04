@@ -108,7 +108,17 @@ class Pieces extends Effect
     public function overwriteValues()
     {
         if($this->timings[Effect::TIME_ON] === 0 && $this->timings[Pieces::TIME_FADE] === 0)
-            $this->timings[Effect::TIME_ON] = 1;
+            $this->timings[Effect::TIME_ON] = 0x10;
+        if($this->args[Pieces::ARG_COLOR_COUNT] > sizeof($this->colors))
+            $this->args[Pieces::ARG_COLOR_COUNT] = sizeof($this->colors);
+        while(sizeof($this->colors) % $this->args[Pieces::ARG_COLOR_COUNT] > 0)
+        {
+            $this->args[Pieces::ARG_COLOR_COUNT]++;
+        }
+        while($this->args[Pieces::ARG_PIECE_COUNT] % $this->args[Pieces::ARG_COLOR_COUNT] > 0)
+        {
+            $this->args[Pieces::ARG_PIECE_COUNT]++;
+        }
     }
 
     /**
@@ -116,8 +126,8 @@ class Pieces extends Effect
      * @param string $device_id
      * @return Effect
      */
-    public static function getDefault(int $id, string $device_id)
+    public static function getDefault(int $id)
     {
-        return new Pieces($id, $device_id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 5], [2, 2, 2, 0, 0, 1]);
+        return new Pieces($id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 5], [2, 2, 2, 0, 0, 1]);
     }
 }

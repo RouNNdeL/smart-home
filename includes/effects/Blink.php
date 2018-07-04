@@ -101,8 +101,8 @@ class Blink extends Effect
      * @param string $device_id
      * @return Effect
      */
-    public static function getDefault(int $id, string $device_id)
+    public static function getDefault(int $id)
     {
-        return new Blink($id, $device_id, [0xff0000], [1, 0, 1, 0, 0, 0]);
+        return new Blink($id, [0xff0000], [1, 0, 1, 0, 0, 0]);
     }
 }

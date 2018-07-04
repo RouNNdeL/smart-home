@@ -176,7 +176,7 @@ class EspWifiLedController extends RgbEffectDevice
         $str = Utils::intToHex($effect->avrEffect());
         $str .= Utils::intToHex(sizeof($effect->getColors()));
 
-        foreach($effect->getTimes() as $arg)
+        foreach($effect->getTimes(Effect::TIMING_MODE_RAW) as $arg)
         {
             $str .= Utils::intToHex($arg);
         }

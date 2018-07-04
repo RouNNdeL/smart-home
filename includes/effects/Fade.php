@@ -111,8 +111,8 @@ class Fade extends Effect
      * @param string $device_id
      * @return Effect
      */
-    public static function getDefault(int $id, string $device_id)
+    public static function getDefault(int $id)
     {
-        return new Fade($id, $device_id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 0, 0]);
+        return new Fade($id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 0, 0]);
     }
 }

@@ -70,8 +70,10 @@ if($device === null || !$device instanceof BaseEffectDevice)
     exit();
 }
 
-$index = $device->updateEffect(Effect::fromJson($json));
+$effect = Effect::fromJson($json);
+$index = $device->updateEffect($effect);
 $success = $physical->saveEffectForDevice($json["device_id"], $index);
 $response = ["status" => $success ? "success" : "error",
-    "message" => $success ? "Saved successfully!" : "An error occurred!"];
+    "message" => $success ? "Saved successfully!" : "An error occurred!",
+    "sanitized_effect" => $effect->toJson()];
 echo json_encode($response);

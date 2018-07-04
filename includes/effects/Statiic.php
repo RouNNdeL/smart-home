@@ -76,9 +76,9 @@ class Statiic extends Effect
      * @param string $device_id
      * @return Effect
      */
-    public static function getDefault(int $id, string $device_id)
+    public static function getDefault(int $id)
     {
-        return new Statiic($id, $device_id, [0xff0000], [0, 0, 1, 0, 0, 0]);
+        return new Statiic($id, [0xff0000], [0, 0, 1, 0, 0, 0]);
     }
 
     /**

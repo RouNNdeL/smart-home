@@ -106,11 +106,30 @@ $(function() {
             data: JSON.stringify(form)
         }).done(resp => {
             showSnackbar(resp.message);
+            updateFields(resp.sanitized_effect);
         }).fail(resp => {
             if(resp.hasOwnProperty("responseJSON"))
                 showSnackbar(resp.responseJSON.message);
         });
     });
+
+    function updateFields(json) {
+        const form = $(`form[data-effect-id=${json.effect_id}]`);
+
+        for(let k in json.times)
+        {
+            if(!json.times.hasOwnProperty(k))
+                continue;
+            form.find(`input[name=time_${k}]`).val(json.times[k]);
+        }
+
+        for(let k in json.args)
+        {
+            if(!json.args.hasOwnProperty(k))
+                continue;
+            form.find(`input[name=arg_${k}]`).val(json.args[k]);
+        }
+    }
 
     function refreshListeners(parent) {
         $(parent).find("*").not(".colorpicker-element *").off();

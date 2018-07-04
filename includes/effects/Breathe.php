@@ -66,9 +66,9 @@ class Breathe extends Effect
         return Effect::EFFECT_BREATHING;
     }
 
-    public static function getDefault(int $id, string $device_id)
+    public static function getDefault(int $id)
     {
-        return new Breathe($id, $device_id, [0xff0000, 0x00ff00, 0x0000ff], [0, 1, 0, 1, 0, 0], [1, 0, 255, 0, 0, 1]);
+        return new Breathe($id, [0xff0000, 0x00ff00, 0x0000ff], [0, 1, 0, 1, 0, 0], [1, 0, 255, 0, 0, 1]);
     }
 
     /**
