@@ -93,11 +93,11 @@ abstract class Effect
         /** @noinspection HtmlUnknownAttribute */
         COLOR_TEMPLATE =
         "<div class=\"color-container row mb-1\">
-            <div class=\"col-auto ml-3 px-0\">
+            <div class=\"col-auto ml-3 pl-0 pr-1\">
                 <button class=\"btn btn-danger color-delete-btn\" type=\"button\" role=\"button\" 
                 title=\"\$title_delete\"><span class=\"oi oi-trash\" \$disabled></span></button>
             </div>
-            <div class=\"col-auto px-1\">
+            <div class=\"col-auto pl-0 pr-1 d-none d-xs-block\">
                 <button class=\"btn color-jump-btn\" type=\"button\" role=\"button\" title=\"\$title_jump\"><span class=\"oi oi-action-redo\"></span></button>
             </div>
             <div class=\"col pl-0\">
@@ -109,11 +109,11 @@ abstract class Effect
             </div>
         </div>";
 
-    const INPUT_TEMPLATE_ARGUMENTS = "<div class=\"col-sm-6 col-md-6 col-lg-4 col-xl-3 form-group px-1 mb-1\"><label class=\"mb-0\">\$label</label>
-                            <input class=\"form-control\" type=\"text\" name=\"\$name\" 
+    const INPUT_TEMPLATE_ARGUMENTS = "<div class=\"col-auto form-group px-1 mb-1\"><label class=\"mb-0\">\$label</label>
+                            <input class=\"form-control input-args\" type=\"text\" name=\"\$name\" 
                                     placeholder=\"\$placeholder\" value=\"\$value\" data-previous-value='\$value'></div>";
-    const INPUT_TEMPLATE_TIMES = "<div class=\"col-sm-6 col-md-6 col-lg-4 col-xl-3 form-group px-1 mb-1\"><label class=\"mb-0\">\$label</label>
-                            <input class=\"form-control input-time\" type=\"text\" name=\"\$name\" placeholder=\"\$placeholder\"
+    const INPUT_TEMPLATE_TIMES = "<div class=\"col-auto form-group px-1 mb-1\"><label class=\"mb-0\">\$label</label>
+                            <input class=\"form-control input-times\" type=\"text\" name=\"\$name\" placeholder=\"\$placeholder\"
                              value=\"\$value\" data-previous-value='\$value'></div>";
 
     const HIDDEN_TEMPLATE = "<input type=\"hidden\" name=\"\$name\" value=\"\$value\">";
@@ -436,6 +436,7 @@ abstract class Effect
 
     /**
      * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     * The updated_effect JSON filed then contains those values and replaces them in the user interface
      */
     public abstract function overwriteValues();
 
