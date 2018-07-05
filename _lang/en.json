@@ -125,5 +125,8 @@
   "device_owner": "Owner",
   "device_reboot": "Reboot",
   "effect_name": "Effect name",
-  "effect_default_name": "Effect"
+  "effect_default_name": "Effect",
+  "navbar_devices": "Devices",
+  "navbar_effects": "Effects",
+  "navbar_logout": "Logout"
 }

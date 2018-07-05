@@ -26,40 +26,48 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-02-17
- * Time: 14:34
+ * Date: 2018-07-05
+ * Time: 17:52
  */
+class NavList extends NavItem implements NavPageSetListener
+{
+    /** @var NavItem[] */
+    private $items;
 
-require_once __DIR__ . "/../../includes/GlobalManager.php";
-
-$manager = GlobalManager::all();
-
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<?php
-require_once __DIR__."/../../includes/head/HtmlHead.php";
-$head = new HtmlHead("Smart Home Devices");
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICES));
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::CORE));
-echo $head->toString();
-
-
-?>
-<body>
-<?php
-require_once __DIR__."/../../includes/navbar/Nav.php";
-
-echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
-?>
-<div class="container ">
-
-    <?php
-    foreach ($manager->getUserDeviceManager()->getPhysicalDevices() as $physicalDevice) {
-        echo $physicalDevice->getRowHtml($manager->getSessionManager()->getUserId());
+    /**
+     * NavList constructor.
+     * @param NavItem[] $items
+     */
+    public function __construct(array $items = [], string $class = "")
+    {
+        parent::__construct($class);
+        $this->items = $items;
     }
-    ?>
-</div>
-</body>
-</html>
+
+    public function addItem(NavItem $item)
+    {
+        $this->items[] = $item;
+    }
+
+
+    /** @return string */
+    public function toString()
+    {
+        $html = " <ul class=\"navbar-nav $this->class\">";
+        foreach($this->items as $item)
+        {
+            $html .= $item->toString();
+        }
+        $html.="</ul>";
+        return $html;
+    }
+
+    function onPageSet(string $page)
+    {
+        foreach($this->items as $item)
+        {
+            if($item instanceof NavPageSetListener)
+                $item->onPageSet($page);
+        }
+    }
+}

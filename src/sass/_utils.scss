@@ -45,6 +45,10 @@ input {
   }
 }
 
+.full-width{
+  width: 100%;
+}
+
 $half-grid: (
   // sass-lint:disable-block indentation
         '0': 0 / 24 * 100%,

@@ -26,40 +26,44 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-02-17
- * Time: 14:34
+ * Date: 2018-07-05
+ * Time: 19:16
  */
+class NavBrand extends NavItem
+{
+    /** @var $url */
+    private $url;
+    /** @var string */
+    private $image;
 
-require_once __DIR__ . "/../../includes/GlobalManager.php";
+    /** @var string */
+    private $title;
 
-$manager = GlobalManager::all();
-
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<?php
-require_once __DIR__."/../../includes/head/HtmlHead.php";
-$head = new HtmlHead("Smart Home Devices");
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICES));
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::CORE));
-echo $head->toString();
-
-
-?>
-<body>
-<?php
-require_once __DIR__."/../../includes/navbar/Nav.php";
-
-echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
-?>
-<div class="container ">
-
-    <?php
-    foreach ($manager->getUserDeviceManager()->getPhysicalDevices() as $physicalDevice) {
-        echo $physicalDevice->getRowHtml($manager->getSessionManager()->getUserId());
+    /**
+     * NavBrand constructor.
+     * @param string $image
+     * @param string $title
+     */
+    public function __construct(string $title, string $url = null, string $image = null)
+    {
+        $this->title = $title;
+        $this->url = $url;
+        $this->image = $image;
     }
-    ?>
-</div>
-</body>
-</html>
+
+
+    /** @return string */
+    public function toString()
+    {
+        $href = $this->url !== null ? "href='$this->url'" : "";
+        $img = $this->image !== null ? "<img src=\"$this->image\" width=\"30\" 
+height=\"30\" class=\"d-inline-block align-top\" alt=\"\">" : "";
+        return <<<HTML
+<a class="navbar-brand" $href>
+    $img 
+    $this->title
+  </a>
+HTML;
+
+    }
+}

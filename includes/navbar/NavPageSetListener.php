@@ -26,40 +26,11 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-02-17
- * Time: 14:34
+ * Date: 2018-07-05
+ * Time: 19:26
  */
 
-require_once __DIR__ . "/../../includes/GlobalManager.php";
-
-$manager = GlobalManager::all();
-
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<?php
-require_once __DIR__."/../../includes/head/HtmlHead.php";
-$head = new HtmlHead("Smart Home Devices");
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICES));
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::CORE));
-echo $head->toString();
-
-
-?>
-<body>
-<?php
-require_once __DIR__."/../../includes/navbar/Nav.php";
-
-echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
-?>
-<div class="container ">
-
-    <?php
-    foreach ($manager->getUserDeviceManager()->getPhysicalDevices() as $physicalDevice) {
-        echo $physicalDevice->getRowHtml($manager->getSessionManager()->getUserId());
-    }
-    ?>
-</div>
-</body>
-</html>
+interface NavPageSetListener
+{
+    function onPageSet(string $page);
+}
