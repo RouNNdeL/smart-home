@@ -103,16 +103,17 @@ class RotatingRainbow extends Effect
 
     /**
      * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     * The updated_effect JSON filed then contains those values and replaces them in the user interface
      */
     public function overwriteValues()
     {
         if($this->args[RotatingRainbow::ARG_BRIGHTNESS] < 1)
-            $this->args[RotatingRainbow::ARG_BRIGHTNESS] = 255;
+            $this->args[RotatingRainbow::ARG_BRIGHTNESS] = 0xff;
 
         if($this->args[RotatingRainbow::ARG_SOURCES] < 1)
             $this->args[RotatingRainbow::ARG_SOURCES] = 1;
 
-        $this->colors = [0]; /* Required in order to send color count >0*/
+        $this->colors = [0]; /* Required in order to send color count greater then 0 */
     }
 
     /**

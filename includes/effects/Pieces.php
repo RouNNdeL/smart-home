@@ -105,13 +105,18 @@ class Pieces extends Effect
         return 1;
     }
 
+    /**
+     * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     * The updated_effect JSON filed then contains those values and replaces them in the user interface
+     */
     public function overwriteValues()
     {
         if($this->timings[Effect::TIME_ON] === 0 && $this->timings[Pieces::TIME_FADE] === 0)
             $this->timings[Effect::TIME_ON] = 0x10;
         if($this->args[Pieces::ARG_COLOR_COUNT] > sizeof($this->colors))
             $this->args[Pieces::ARG_COLOR_COUNT] = sizeof($this->colors);
-        while(sizeof($this->colors) % $this->args[Pieces::ARG_COLOR_COUNT] > 0)
+        while(sizeof($this->colors) % $this->args[Pieces::ARG_COLOR_COUNT] > 0 ||
+            $this->args[Pieces::ARG_COLOR_COUNT] < 2)
         {
             $this->args[Pieces::ARG_COLOR_COUNT]++;
         }

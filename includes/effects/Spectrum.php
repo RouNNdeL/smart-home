@@ -106,10 +106,24 @@ class Spectrum extends Effect
 
     /**
      * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     * The updated_effect JSON filed then contains those values and replaces them in the user interface
      */
     public function overwriteValues()
     {
+        if(sizeof($this->colors) < 2)
+            $this->colors = [0xff0000, 0x0000ff];
 
+        if($this->timings[Effect::TIME_ON] === 0 && $this->timings[Spectrum::TIME_FADE] === 0)
+            $this->timings[Effect::TIME_ON] = 0x10;
+
+        if($this->args[Spectrum::ARG_COLOR_COUNT] > sizeof($this->colors))
+            $this->args[Spectrum::ARG_COLOR_COUNT] = sizeof($this->colors);
+
+        while(sizeof($this->colors) % $this->args[Spectrum::ARG_COLOR_COUNT] > 0 ||
+            $this->args[Spectrum::ARG_COLOR_COUNT] < 2)
+        {
+            $this->args[Spectrum::ARG_COLOR_COUNT]++;
+        }
     }
 
     /**

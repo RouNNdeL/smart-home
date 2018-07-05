@@ -106,7 +106,7 @@ $(function() {
             data: JSON.stringify(form)
         }).done(resp => {
             showSnackbar(resp.message);
-            updateFields(resp.sanitized_effect);
+            updateFields(resp.updated_effect);
         }).fail(resp => {
             if(resp.hasOwnProperty("responseJSON"))
                 showSnackbar(resp.responseJSON.message);
@@ -203,7 +203,7 @@ $(function() {
                 refreshListeners(parent);
             });
         });
-        $(parent).find(".input-time").change(function() {
+        $(parent).find(".input-times").change(function() {
             try {
                 let val = $(this).val();
                 val = timeToString(val);
