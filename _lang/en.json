@@ -110,7 +110,7 @@
   "profile_arguments_pieces_color_count": "Color count",
   "profile_arguments_pieces_piece_count": "Piece count",
   "profile_arguments_spectrum_color_count": "Color count",
-  "profile_arguments_spectrum_modes": "Blend modes",
+  "profile_arguments_spectrum_blend_mode": "Blend modes",
   "profile_arguments_two_halves_color_count": "Color count",
   "profile_arguments_two_halves_return": "Return",
   "profile_arguments_particles_size": "Size",

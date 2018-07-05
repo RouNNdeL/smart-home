@@ -77,8 +77,8 @@ abstract class Effect
     const EFFECT_TWO_HALVES_FADE = 20;
     const EFFECT_PARTICLES = 21;
 
-    const DIRECTION_CW = 0;
-    const DIRECTION_CCW = 1;
+    const DIRECTION_CW = 1;
+    const DIRECTION_CCW = 0;
 
     const TIME_OFF = 0;
     const TIME_FADEIN = 1;

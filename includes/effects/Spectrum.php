@@ -32,9 +32,9 @@
 class Spectrum extends Effect
 {
     const TIME_FADE = 3;
-    const ARG_SMOOTH = "smooth";
     const ARG_DIRECTION = "direction";
     const ARG_COLOR_COUNT = "spectrum_color_count";
+    const ARG_BLEND_MODE = "spectrum_blend_mode";
 
     /**
      * @return int
@@ -58,17 +58,18 @@ class Spectrum extends Effect
     public function packArgs()
     {
         $args = [];
-        $args[0] = ($this->args[Spectrum::ARG_DIRECTION] ? 1 : 0) << 0 | ($this->args[Spectrum::ARG_SMOOTH] ? 1 : 0) << 1;
+        $args[0] = $this->args[Spectrum::ARG_DIRECTION] << 0;
         $args[1] = $this->args[Spectrum::ARG_COLOR_COUNT];
+        $args[2] = $this->args[Spectrum::ARG_BLEND_MODE];
         $args[5] = 1;
         return $args;
     }
 
     public function unpackArgs(array $args)
     {
-        $this->args[Spectrum::ARG_DIRECTION] = $args[0] & (1 << 0) ? true : false;
-        $this->args[Spectrum::ARG_SMOOTH] = $args[0] & (1 << 1) ? true : false;
+        $this->args[Spectrum::ARG_DIRECTION] = $args[0] & (1 << 0) ? 1 : 0;
         $this->args[Spectrum::ARG_COLOR_COUNT] = $args[1];
+        $this->args[Spectrum::ARG_BLEND_MODE] = $args[2];
     }
 
     /**
@@ -117,6 +118,6 @@ class Spectrum extends Effect
      */
     public static function getDefault(int $id)
     {
-        return new Spectrum($id, [0xff0000, 0x0000ff], [0, 0, 4, 1], [2, 2]);
+        return new Spectrum($id, [0xff0000, 0x0000ff], [0, 0, 4, 1], [2, 2, 0]);
     }
 }

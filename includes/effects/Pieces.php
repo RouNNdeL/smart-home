@@ -58,7 +58,7 @@ class Pieces extends Effect
     public function packArgs()
     {
         $args = [];
-        $args[0] = ($this->args[Pieces::ARG_DIRECTION] ? 1 : 0) << 0 | ($this->args[Pieces::ARG_SMOOTH] ? 1 : 0) << 1;
+        $args[0] = ($this->args[Pieces::ARG_DIRECTION] << 0) | ($this->args[Pieces::ARG_SMOOTH] << 1);
         $args[1] = $this->args[Pieces::ARG_COLOR_COUNT];
         $args[2] = $this->args[Pieces::ARG_PIECE_COUNT];
         $args[5] = 1;
@@ -67,8 +67,8 @@ class Pieces extends Effect
 
     public function unpackArgs(array $args)
     {
-        $this->args[Pieces::ARG_DIRECTION] = $args[0] & (1 << 0) ? true : false;
-        $this->args[Pieces::ARG_SMOOTH] = $args[0] & (1 << 1) ? true : false;
+        $this->args[Pieces::ARG_DIRECTION] = $args[0] & (1 << 0) ? 1 : 0;
+        $this->args[Pieces::ARG_SMOOTH] = $args[0] & (1 << 1) ? 1 : 0;
         $this->args[Pieces::ARG_COLOR_COUNT] = $args[1];
         $this->args[Pieces::ARG_PIECE_COUNT] = $args[2];
     }
