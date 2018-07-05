@@ -86,7 +86,7 @@ echo $head->toString();
                     <?php
                     $effects = $device->getEffects();
                     ?>
-                    <ul class="nav nav-tabs" role="tablist">
+                    <ul class="nav nav-pills" role="tablist">
                         <?php
                         foreach($effects as $i => $effect)
                         {
