@@ -132,7 +132,7 @@ class Spectrum extends Effect
      */
     public static function getDefault(int $id)
     {
-        return new Spectrum($id, [0xff0000, 0x0000ff], [0, 0, 4, 1], [2, 2, 0]);
+        return new Spectrum($id, [0xff0000, 0x0000ff], [0, 0, 4, 1], [3, 2, 0]);
     }
 
     /**

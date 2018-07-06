@@ -37,6 +37,6 @@ class DirectionArgument extends SelectArgument
     protected function getOptions()
     {
         return [Effect::DIRECTION_NORMAL => "profile_arguments_direction_normal",
-            Effect::DIRECTION_REVERSE => "profile_arguments_direction_normal"];
+            Effect::DIRECTION_REVERSE => "profile_arguments_direction_reversed"];
     }
 }

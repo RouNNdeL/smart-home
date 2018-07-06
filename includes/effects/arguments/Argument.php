@@ -43,7 +43,7 @@ class Argument
      * @param string $name
      * @param string $value
      */
-    public function __construct(string $name, string $value)
+    public function __construct(string $name, int $value)
     {
         $this->name = $name;
         $this->value = $value;

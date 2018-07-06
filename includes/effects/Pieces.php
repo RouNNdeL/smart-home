@@ -133,7 +133,7 @@ class Pieces extends Effect
      */
     public static function getDefault(int $id)
     {
-        return new Pieces($id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 5], [2, 2, 2, 0, 0, 1]);
+        return new Pieces($id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 5], [3, 2, 2, 0, 0, 1]);
     }
 
     /**

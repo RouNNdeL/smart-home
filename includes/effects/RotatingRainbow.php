@@ -122,7 +122,7 @@ class RotatingRainbow extends Effect
      */
     public static function getDefault(int $id)
     {
-        return new RotatingRainbow($id, [], [0, 0, 0, 0, 5], [0, 0xff, 1]);
+        return new RotatingRainbow($id, [], [0, 0, 0, 0, 5], [5, 0xff, 1]);
     }
 
     /**

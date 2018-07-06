@@ -127,7 +127,7 @@ class Particles extends Effect
      */
     public static function getDefault(int $id)
     {
-        return new Particles($id, [0xff0000], [2, 2], [2, 4]);
+        return new Particles($id, [0xff0000], [2, 2], [3, 4]);
     }
 
     /**
@@ -136,6 +136,15 @@ class Particles extends Effect
      */
     public function getArgumentClass($name)
     {
-        return new Argument($name, $this->args[$name]);
+
+        switch($name)
+        {
+            case Particles::ARG_DIRECTION:
+                return new DirectionArgument($name, $this->args[$name]);
+            case Particles::ARG_SMOOTH:
+                return new YesNoArgument($name, $this->args[$name]);
+            default:
+                return new Argument($name, $this->args[$name]);
+        }
     }
 }

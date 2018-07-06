@@ -41,7 +41,7 @@ abstract class SelectArgument extends Argument
         $options_html = "";
         foreach($this->getOptions() as $value => $name)
         {
-            $selected = $name === $this->value ? "selected" : "";
+            $selected = $value == $this->value ? "selected" : "";
             $str = Utils::getString($name);
             $options_html .= "<option value=\"$value\" $selected>$str</option>";
         }
