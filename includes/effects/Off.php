@@ -95,11 +95,24 @@ class Off extends Effect
         return 0;
     }
 
+    /**
+     * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     * The updated_effect JSON filed then contains those values and replaces them in the user interface
+     */
     public function overwriteValues()
     {
         $this->timings[Effect::TIME_OFF] = 1;
         $this->timings[Effect::TIME_ON] = 0;
         $this->timings[Effect::TIME_ROTATION] = 0;
         $this->colors = [0];
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name)
+    {
+        return null;
     }
 }

@@ -22,5 +22,6 @@
  * SOFTWARE.
  */
 
-import 'tether';
+import 'jquery';
 import 'bootstrap';
+import 'tether';

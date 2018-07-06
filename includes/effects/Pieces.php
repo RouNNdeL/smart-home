@@ -58,7 +58,7 @@ class Pieces extends Effect
     public function packArgs()
     {
         $args = [];
-        $args[0] = ($this->args[Pieces::ARG_DIRECTION] ? 1 : 0) << 0 | ($this->args[Pieces::ARG_SMOOTH] ? 1 : 0) << 1;
+        $args[0] = ($this->args[Pieces::ARG_DIRECTION] << 0) | ($this->args[Pieces::ARG_SMOOTH] << 1);
         $args[1] = $this->args[Pieces::ARG_COLOR_COUNT];
         $args[2] = $this->args[Pieces::ARG_PIECE_COUNT];
         $args[5] = 1;
@@ -67,8 +67,8 @@ class Pieces extends Effect
 
     public function unpackArgs(array $args)
     {
-        $this->args[Pieces::ARG_DIRECTION] = $args[0] & (1 << 0) ? true : false;
-        $this->args[Pieces::ARG_SMOOTH] = $args[0] & (1 << 1) ? true : false;
+        $this->args[Pieces::ARG_DIRECTION] = $args[0] & (1 << 0) ? 1 : 0;
+        $this->args[Pieces::ARG_SMOOTH] = $args[0] & (1 << 1) ? 1 : 0;
         $this->args[Pieces::ARG_COLOR_COUNT] = $args[1];
         $this->args[Pieces::ARG_PIECE_COUNT] = $args[2];
     }
@@ -105,13 +105,18 @@ class Pieces extends Effect
         return 1;
     }
 
+    /**
+     * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     * The updated_effect JSON filed then contains those values and replaces them in the user interface
+     */
     public function overwriteValues()
     {
         if($this->timings[Effect::TIME_ON] === 0 && $this->timings[Pieces::TIME_FADE] === 0)
             $this->timings[Effect::TIME_ON] = 0x10;
         if($this->args[Pieces::ARG_COLOR_COUNT] > sizeof($this->colors))
             $this->args[Pieces::ARG_COLOR_COUNT] = sizeof($this->colors);
-        while(sizeof($this->colors) % $this->args[Pieces::ARG_COLOR_COUNT] > 0)
+        while(sizeof($this->colors) % $this->args[Pieces::ARG_COLOR_COUNT] > 0 ||
+            $this->args[Pieces::ARG_COLOR_COUNT] < 2)
         {
             $this->args[Pieces::ARG_COLOR_COUNT]++;
         }
@@ -128,6 +133,23 @@ class Pieces extends Effect
      */
     public static function getDefault(int $id)
     {
-        return new Pieces($id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 5], [2, 2, 2, 0, 0, 1]);
+        return new Pieces($id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 5], [3, 2, 2, 0, 0, 1]);
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name)
+    {
+        switch($name)
+        {
+            case Pieces::ARG_DIRECTION:
+                return new DirectionArgument($name, $this->args[$name]);
+            case Pieces::ARG_SMOOTH:
+                return new YesNoArgument($name, $this->args[$name]);
+            default:
+                return new Argument($name, $this->args[$name]);
+        }
     }
 }

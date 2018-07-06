@@ -91,6 +91,16 @@ module.exports = function(grunt) {
                 },
                 src: [],
                 dest: 'dist/vendor/js/vendor.js',
+            },
+            "vendor-dev": {
+                options: {
+                    browserifyOptions: {
+                        debug: true
+                    },
+                    require: ['jquery', "tether", "bootstrap", "jquery-ui"]
+                },
+                src: [],
+                dest: 'dist/vendor/js/vendor.js',
             }
         },
         exorcise: {
@@ -102,9 +112,23 @@ module.exports = function(grunt) {
                     dest: dist_js,
                     ext: ".js.map"
                 }]
+            },
+            vendor: {
+                files: [{
+                    expand: true,
+                    cwd: "dist/vendor/js",
+                    src: ["*.js", "!*.min.js"],
+                    dest: 'dist/vendor/js',
+                    ext: ".js.map"
+                }]
             }
         },
         uglify: {
+            options: {
+                sourceMapIn: function(n) {
+                    return n + ".map";
+                }
+            },
             build: {
                 options: {
                     compress: {
@@ -123,9 +147,6 @@ module.exports = function(grunt) {
             },
             dev: {
                 options: {
-                    sourceMapIn: function(n) {
-                        return n + ".map";
-                    },
                     compress: {
                         drop_console: false,
                         dead_code: false
@@ -147,6 +168,22 @@ module.exports = function(grunt) {
                         dead_code: true
                     },
                     sourceMap: false
+                },
+                files: [{
+                    expand: true,
+                    cwd: "dist/vendor/js",
+                    src: ["*.js", "!*.min.js"],
+                    dest: 'dist/vendor/js',
+                    ext: ".min.js"
+                }]
+            },
+            "vendor-dev": {
+                options: {
+                    compress: {
+                        drop_console: false,
+                        dead_code: false
+                    },
+                    sourceMap: true
                 },
                 files: [{
                     expand: true,
@@ -225,6 +262,18 @@ module.exports = function(grunt) {
                     dest: 'dist/vendor/css',
                     ext: '.min.css'
                 }]
+            },
+            "vendor-dev": {
+                options: {
+                    sourceMap: true
+                },
+                files: [{
+                    expand: true,
+                    cwd: 'src/',
+                    src: ['vendor.scss'],
+                    dest: 'dist/vendor/css',
+                    ext: '.min.css'
+                }]
             }
         },
         copy: {
@@ -265,6 +314,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-jsonlint');
 
     grunt.registerTask('vendor', ['jsonlint', 'clean:vendor', 'browserify:vendor', 'uglify:vendor', 'sass:vendor']);
+    grunt.registerTask('vendor-dev', [
+        'jsonlint',
+        'clean:vendor',
+        'browserify:vendor-dev', "exorcise:vendor", 'uglify:vendor-dev',
+        'sass:vendor-dev'
+    ]);
     grunt.registerTask('default', [
         'jsonlint',
         'clean:all',

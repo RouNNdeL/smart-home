@@ -87,6 +87,10 @@ class Breathe extends Effect
         return 1;
     }
 
+    /**
+     * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     * The updated_effect JSON filed then contains those values and replaces them in the user interface
+     */
     public function overwriteValues()
     {
         $this->timings[Effect::TIME_ROTATION] = 0;
@@ -99,5 +103,14 @@ class Breathe extends Effect
 
         if($this->args[Effect::ARG_COLOR_CYCLES] < 1)
             $this->args[Effect::ARG_COLOR_CYCLES] = 1;
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name)
+    {
+        return new Argument($name, $this->args[$name]);
     }
 }

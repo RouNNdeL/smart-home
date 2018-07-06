@@ -26,40 +26,36 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-02-17
- * Time: 14:34
+ * Date: 2018-07-06
+ * Time: 20:10
  */
 
-require_once __DIR__ . "/../../includes/GlobalManager.php";
+class Argument
+{
+    /** @var string */
+    protected $name;
 
-$manager = GlobalManager::all();
+    /** @var string */
+    protected $value;
 
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<?php
-require_once __DIR__."/../../includes/head/HtmlHead.php";
-$head = new HtmlHead("Smart Home Devices");
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICES));
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::CORE));
-echo $head->toString();
-
-
-?>
-<body>
-<?php
-require_once __DIR__."/../../includes/navbar/Nav.php";
-
-echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
-?>
-<div class="container ">
-
-    <?php
-    foreach ($manager->getUserDeviceManager()->getPhysicalDevices() as $physicalDevice) {
-        echo $physicalDevice->getRowHtml($manager->getSessionManager()->getUserId());
+    /**
+     * Argument constructor.
+     * @param string $name
+     * @param string $value
+     */
+    public function __construct(string $name, int $value)
+    {
+        $this->name = $name;
+        $this->value = $value;
     }
-    ?>
-</div>
-</body>
-</html>
+
+    public function toString()
+    {
+        $template = Effect::INPUT_TEMPLATE_ARGUMENTS;
+        $template = str_replace("\$label", Utils::getString("profile_arguments_$this->name"), $template);
+        $template = str_replace("\$name", "arg_" . $this->name, $template);
+        $template = str_replace("\$placeholder", $this->value, $template);
+        $template = str_replace("\$value", $this->value, $template);
+        return $template;
+    }
+}

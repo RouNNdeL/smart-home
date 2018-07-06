@@ -88,6 +88,10 @@ class Blink extends Effect
         return 1;
     }
 
+    /**
+     * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     * The updated_effect JSON filed then contains those values and replaces them in the user interface
+     */
     public function overwriteValues()
     {
         $this->timings[Effect::TIME_FADEIN] = 0;
@@ -104,5 +108,14 @@ class Blink extends Effect
     public static function getDefault(int $id)
     {
         return new Blink($id, [0xff0000], [1, 0, 1, 0, 0, 0]);
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name)
+    {
+        return new Argument($name, $this->args[$name]);
     }
 }

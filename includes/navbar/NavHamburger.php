@@ -26,40 +26,41 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-02-17
- * Time: 14:34
+ * Date: 2018-07-05
+ * Time: 18:35
  */
 
-require_once __DIR__ . "/../../includes/GlobalManager.php";
+class NavHamburger extends NavItem
+{
 
-$manager = GlobalManager::all();
+    /** @var string */
+    private $toggles_id;
 
-?>
+    /** @var string */
+    private $label;
 
-<!DOCTYPE html>
-<html lang="en">
-<?php
-require_once __DIR__."/../../includes/head/HtmlHead.php";
-$head = new HtmlHead("Smart Home Devices");
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICES));
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::CORE));
-echo $head->toString();
-
-
-?>
-<body>
-<?php
-require_once __DIR__."/../../includes/navbar/Nav.php";
-
-echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
-?>
-<div class="container ">
-
-    <?php
-    foreach ($manager->getUserDeviceManager()->getPhysicalDevices() as $physicalDevice) {
-        echo $physicalDevice->getRowHtml($manager->getSessionManager()->getUserId());
+    /**
+     * NavHamburger constructor.
+     * @param string $toggles_id
+     */
+    public function __construct(string $toggles_id, string $label = null, $class = "")
+    {
+        parent::__construct($class);
+        $this->toggles_id = $toggles_id;
+        $this->label = $label;
     }
-    ?>
-</div>
-</body>
-</html>
+
+
+    /** @return string */
+    public function toString()
+    {
+        $label = $this->label !== null ? "aria-label='$this->label'" : "";
+        return <<<HTML
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#$this->toggles_id"
+                aria-controls="$this->toggles_id" aria-expanded="false" $label>
+            <span class="navbar-toggler-icon"></span>
+        </button>
+HTML;
+
+    }
+}

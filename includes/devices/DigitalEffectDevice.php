@@ -46,7 +46,9 @@ class DigitalEffectDevice extends BaseEffectDevice
             Effect::EFFECT_PIECES => "pieces",
             Effect::EFFECT_SPECTRUM => "spectrum",
             Effect::EFFECT_SIMPLE_RAINBOW => "rainbow",
-            Effect::EFFECT_ROTATING_RAINBOW => "rainbow_rotating"
+            Effect::EFFECT_ROTATING_RAINBOW => "rainbow_rotating",
+            Effect::EFFECT_PARTICLES => "particles",
+            Effect::EFFECT_FILL => "fill"
         ];
     }
 }

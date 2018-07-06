@@ -31,6 +31,10 @@
  */
 
 require_once __DIR__ . "/../database/DbUtils.php";
+require_once __DIR__. "/arguments/Argument.php";
+require_once __DIR__. "/arguments/YesNoArgument.php";
+require_once __DIR__. "/arguments/DirectionArgument.php";
+require_once __DIR__. "/arguments/BlendModeArgument.php";
 require_once __DIR__ . "/Off.php";
 require_once __DIR__ . "/Statiic.php";
 require_once __DIR__ . "/Breathe.php";
@@ -40,6 +44,8 @@ require_once __DIR__ . "/Pieces.php";
 require_once __DIR__ . "/Spectrum.php";
 require_once __DIR__ . "/SimpleRainbow.php";
 require_once __DIR__ . "/RotatingRainbow.php";
+require_once __DIR__ . "/Particles.php";
+require_once __DIR__ . "/Fill.php";
 
 abstract class Effect
 {
@@ -61,7 +67,7 @@ abstract class Effect
     const EFFECT_BLINKING = 3;
     const EFFECT_FADING = 4;
     const EFFECT_SIMPLE_RAINBOW = 5;
-    const EFFECT_FILLING = 6;
+    const EFFECT_FILL = 6;
     const EFFECT_MARQUEE = 7;
     const EFFECT_ROTATING = 8;
     const EFFECT_SWEEP = 9;
@@ -77,8 +83,8 @@ abstract class Effect
     const EFFECT_TWO_HALVES_FADE = 20;
     const EFFECT_PARTICLES = 21;
 
-    const DIRECTION_CW = 0;
-    const DIRECTION_CCW = 1;
+    const DIRECTION_NORMAL = 1;
+    const DIRECTION_REVERSE = 0;
 
     const TIME_OFF = 0;
     const TIME_FADEIN = 1;
@@ -93,11 +99,11 @@ abstract class Effect
         /** @noinspection HtmlUnknownAttribute */
         COLOR_TEMPLATE =
         "<div class=\"color-container row mb-1\">
-            <div class=\"col-auto ml-3 px-0\">
+            <div class=\"col-auto ml-3 pl-0 pr-1\">
                 <button class=\"btn btn-danger color-delete-btn\" type=\"button\" role=\"button\" 
                 title=\"\$title_delete\"><span class=\"oi oi-trash\" \$disabled></span></button>
             </div>
-            <div class=\"col-auto px-1\">
+            <div class=\"col-auto pl-0 pr-1 d-none d-xs-block\">
                 <button class=\"btn color-jump-btn\" type=\"button\" role=\"button\" title=\"\$title_jump\"><span class=\"oi oi-action-redo\"></span></button>
             </div>
             <div class=\"col pl-0\">
@@ -109,11 +115,11 @@ abstract class Effect
             </div>
         </div>";
 
-    const INPUT_TEMPLATE_ARGUMENTS = "<div class=\"col-sm-6 col-md-6 col-lg-4 col-xl-3 form-group px-1 mb-1\"><label class=\"mb-0\">\$label</label>
-                            <input class=\"form-control\" type=\"text\" name=\"\$name\" 
+    const INPUT_TEMPLATE_ARGUMENTS = "<div class=\"col-auto form-group px-1 mb-1\"><label class=\"mb-0\">\$label</label>
+                            <input class=\"form-control input-args\" type=\"text\" name=\"\$name\" 
                                     placeholder=\"\$placeholder\" value=\"\$value\" data-previous-value='\$value'></div>";
-    const INPUT_TEMPLATE_TIMES = "<div class=\"col-sm-6 col-md-6 col-lg-4 col-xl-3 form-group px-1 mb-1\"><label class=\"mb-0\">\$label</label>
-                            <input class=\"form-control input-time\" type=\"text\" name=\"\$name\" placeholder=\"\$placeholder\"
+    const INPUT_TEMPLATE_TIMES = "<div class=\"col-auto form-group px-1 mb-1\"><label class=\"mb-0\">\$label</label>
+                            <input class=\"form-control input-times\" type=\"text\" name=\"\$name\" placeholder=\"\$placeholder\"
                              value=\"\$value\" data-previous-value='\$value'></div>";
 
     const HIDDEN_TEMPLATE = "<input type=\"hidden\" name=\"\$name\" value=\"\$value\">";
@@ -294,55 +300,9 @@ abstract class Effect
 
         if(sizeof($this->args) > 0)
         {
-            foreach($this->args as $name => $argument)
+            foreach($this->args as $name => $value0)
             {
-                switch($name)
-                {
-                    case "direction":
-                        $str_cw = Utils::getString("profile_direction_cw");
-                        $str_ccw = Utils::getString("profile_direction_ccw");
-                        $str = Utils::getString("profile_arguments_" . $name);
-                        $selected0 = $argument ? " selected" : "";
-                        $selected1 = $argument ? "" : " selected";
-                        $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
-                                            <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . Effect::DIRECTION_CW . "\" $selected0>$str_cw</option>
-                                                <option value=\"" . Effect::DIRECTION_CCW . "\" $selected1>$str_ccw</option>
-                                            </select></div>";
-                        break;
-                    case "smooth":
-                    case "fade_smooth":
-                    case "fill_fade_return":
-                    case "two_halves_return":
-                        $str_yes = Utils::getString("yes");
-                        $str_no = Utils::getString("no");
-                        $str = Utils::getString("profile_arguments_" . $name);
-                        $selected0 = $argument ? " selected" : "";
-                        $selected1 = $argument ? "" : " selected";
-                        $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
-                                            <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . 1 . "\" $selected0>$str_yes</option>
-                                                <option value=\"" . 0 . "\" $selected1>$str_no</option>
-                                            </select></div>";
-                        break;
-                    case "two_halves_color_count":
-                        $str = Utils::getString("profile_arguments_" . $name);
-                        $selected0 = $argument === 2 ? " selected" : "";
-                        $selected1 = $argument === 1 ? "" : " selected";
-                        $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
-                                            <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . 1 . "\" $selected0>1</option>
-                                                <option value=\"" . 2 . "\" $selected1>2</option>
-                                            </select></div>";
-                        break;
-                    default:
-                        $template = self::INPUT_TEMPLATE_ARGUMENTS;
-                        $template = str_replace("\$label", Utils::getString("profile_arguments_$name"), $template);
-                        $template = str_replace("\$name", "arg_" . $name, $template);
-                        $template = str_replace("\$placeholder", $argument, $template);
-                        $template = str_replace("\$value", $argument, $template);
-                        $arguments_html .= $template;
-                }
+                $arguments_html .= $this->getArgumentClass($name)->toString();
             }
         }
 
@@ -383,6 +343,12 @@ abstract class Effect
 
         return $html;
     }
+
+    /**
+     * @param $name
+     * @return Argument
+     */
+    public abstract function getArgumentClass($name);
 
     public function toJson()
     {
@@ -436,6 +402,7 @@ abstract class Effect
 
     /**
      * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     * The updated_effect JSON filed then contains those values and replaces them in the user interface
      */
     public abstract function overwriteValues();
 
@@ -830,6 +797,10 @@ abstract class Effect
                 return SimpleRainbow::class;
             case Effect::EFFECT_ROTATING_RAINBOW:
                 return RotatingRainbow::class;
+            case Effect::EFFECT_PARTICLES:
+                return Particles::class;
+            case Effect::EFFECT_FILL:
+                return Fill::class;
             default:
                 throw new UnexpectedValueException("Invalid effect id: $id");
         }

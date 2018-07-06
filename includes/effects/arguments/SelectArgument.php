@@ -26,40 +26,32 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-02-17
- * Time: 14:34
+ * Date: 2018-07-06
+ * Time: 20:38
  */
 
-require_once __DIR__ . "/../../includes/GlobalManager.php";
+require_once __DIR__ . "/Argument.php";
 
-$manager = GlobalManager::all();
+abstract class SelectArgument extends Argument
+{
+    protected abstract function getOptions();
 
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<?php
-require_once __DIR__."/../../includes/head/HtmlHead.php";
-$head = new HtmlHead("Smart Home Devices");
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICES));
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::CORE));
-echo $head->toString();
-
-
-?>
-<body>
-<?php
-require_once __DIR__."/../../includes/navbar/Nav.php";
-
-echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
-?>
-<div class="container ">
-
-    <?php
-    foreach ($manager->getUserDeviceManager()->getPhysicalDevices() as $physicalDevice) {
-        echo $physicalDevice->getRowHtml($manager->getSessionManager()->getUserId());
+    public function toString()
+    {
+        $options_html = "";
+        foreach($this->getOptions() as $value => $name)
+        {
+            $selected = $value == $this->value ? "selected" : "";
+            $str = Utils::getString($name);
+            $options_html .= "<option value=\"$value\" $selected>$str</option>";
+        }
+        $name_str = Utils::getString("profile_arguments_$this->name");
+        return <<<HTML
+            <div class="col-auto px-1"><label class="mb-0">$name_str</label>
+                <select class="form-control" name="arg_$this->name">
+                   $options_html
+                </select>
+            </div>
+HTML;
     }
-    ?>
-</div>
-</body>
-</html>
+}

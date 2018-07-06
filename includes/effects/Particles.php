@@ -26,22 +26,25 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-07-02
- * Time: 16:45
+ * Date: 2018-07-06
+ * Time: 12:33
  */
-
-require_once __DIR__ . "/Effect.php";
-
-class Fade extends Effect
+class Particles extends Effect
 {
-    const TIME_FADE = 3;
+    const TIME_PARTICLE_SPEED = 0;
+    const TIME_PARTICLE_DELAY = 1;
+
+    const ARG_SMOOTH = "smooth";
+    const ARG_DIRECTION = "direction";
+    const ARG_PARTICLE_SIZE = "particles_size";
+    const ARG_BLEND = "particles_blend";
 
     /**
      * @return int
      */
     public function getTimingsForEffect()
     {
-        return (1 << Fade::TIME_FADE) | (1 << Effect::TIME_ON) | (1 << Effect::TIME_DELAY);
+        return (1 << Particles::TIME_PARTICLE_SPEED) | (1 << Particles::TIME_PARTICLE_DELAY) | (1 << Particles::TIME_DELAY);
     }
 
     /**
@@ -49,19 +52,31 @@ class Fade extends Effect
      */
     public function packArgs()
     {
-        return [2 => 0xff, 5 => 1];
+        $args = [];
+        $args[0] = ($this->args[Particles::ARG_DIRECTION] << 0) | ($this->args[Particles::ARG_SMOOTH] << 1) |
+            ($this->args[Particles::ARG_BLEND] << 2);
+        $args[1] = $this->args[Particles::ARG_PARTICLE_SIZE];
+        $args[5] = $this->args[Effect::ARG_COLOR_CYCLES];
+        return $args;
+    }
+
+    public function unpackArgs(array $args)
+    {
+        $this->args[Particles::ARG_DIRECTION] = $args[0] & (1 << 0) ? 1 : 0;
+        $this->args[Particles::ARG_SMOOTH] = $args[0] & (1 << 1) ? 1 : 0;
+        $this->args[Particles::ARG_BLEND] = $args[0] & (1 << 2) ? 1 : 0;
+        $this->args[Particles::ARG_PARTICLE_SIZE] = $args[1];
+        $this->args[Effect::ARG_COLOR_CYCLES] = $args[5];
     }
 
     protected function getTimingStrings()
     {
         $strings = parent::getTimingStrings();
-        $strings[Fade::TIME_FADE] = "fade";
+
+        $strings[Particles::TIME_PARTICLE_SPEED] = "particles_speed";
+        $strings[Particles::TIME_PARTICLE_DELAY] = "particles_delay";
+
         return $strings;
-    }
-
-    public function unpackArgs(array $args)
-    {
-
     }
 
     /**
@@ -69,7 +84,7 @@ class Fade extends Effect
      */
     public function avrEffect()
     {
-        return Effect::AVR_EFFECT_FADE;
+        return Effect::AVR_EFFECT_PARTICLES;
     }
 
     /**
@@ -77,7 +92,7 @@ class Fade extends Effect
      */
     public function getEffectId()
     {
-        return Effect::EFFECT_FADING;
+        return Effect::EFFECT_PARTICLES;
     }
 
     /**
@@ -93,7 +108,7 @@ class Fade extends Effect
      */
     public function getMinColors()
     {
-        return 2;
+        return 1;
     }
 
     /**
@@ -102,22 +117,20 @@ class Fade extends Effect
      */
     public function overwriteValues()
     {
-        $this->timings[Effect::TIME_OFF] = 0;
-        $this->timings[Effect::TIME_FADEIN] = 0;
-        $this->timings[Effect::TIME_ROTATION] = 0;
-        if(sizeof($this->colors) < 2)
-            $this->colors = [0xff0000, 0x0000ff];
+        if($this->args[Particles::ARG_PARTICLE_SIZE] < 1)
+            $this->args[Particles::ARG_PARTICLE_SIZE] = 4;
 
+        if($this->args[Effect::ARG_COLOR_CYCLES] < 1)
+            $this->args[Effect::ARG_COLOR_CYCLES] = 1;
     }
 
     /**
      * @param int $id
-     * @param string $device_id
      * @return Effect
      */
     public static function getDefault(int $id)
     {
-        return new Fade($id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 0, 0]);
+        return new Particles($id, [0xff0000], [2, 2], [7, 4]);
     }
 
     /**
@@ -126,6 +139,16 @@ class Fade extends Effect
      */
     public function getArgumentClass($name)
     {
-        return null;
+
+        switch($name)
+        {
+            case Particles::ARG_DIRECTION:
+                return new DirectionArgument($name, $this->args[$name]);
+            case Particles::ARG_SMOOTH:
+            case Particles::ARG_BLEND:
+                return new YesNoArgument($name, $this->args[$name]);
+            default:
+                return new Argument($name, $this->args[$name]);
+        }
     }
 }

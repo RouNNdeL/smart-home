@@ -32,9 +32,9 @@
 class Spectrum extends Effect
 {
     const TIME_FADE = 3;
-    const ARG_SMOOTH = "smooth";
     const ARG_DIRECTION = "direction";
     const ARG_COLOR_COUNT = "spectrum_color_count";
+    const ARG_BLEND_MODE = "spectrum_blend_mode";
 
     /**
      * @return int
@@ -58,17 +58,18 @@ class Spectrum extends Effect
     public function packArgs()
     {
         $args = [];
-        $args[0] = ($this->args[Spectrum::ARG_DIRECTION] ? 1 : 0) << 0 | ($this->args[Spectrum::ARG_SMOOTH] ? 1 : 0) << 1;
+        $args[0] = $this->args[Spectrum::ARG_DIRECTION] << 0;
         $args[1] = $this->args[Spectrum::ARG_COLOR_COUNT];
+        $args[2] = $this->args[Spectrum::ARG_BLEND_MODE];
         $args[5] = 1;
         return $args;
     }
 
     public function unpackArgs(array $args)
     {
-        $this->args[Spectrum::ARG_DIRECTION] = $args[0] & (1 << 0) ? true : false;
-        $this->args[Spectrum::ARG_SMOOTH] = $args[0] & (1 << 1) ? true : false;
+        $this->args[Spectrum::ARG_DIRECTION] = $args[0] & (1 << 0) ? 1 : 0;
         $this->args[Spectrum::ARG_COLOR_COUNT] = $args[1];
+        $this->args[Spectrum::ARG_BLEND_MODE] = $args[2];
     }
 
     /**
@@ -105,10 +106,24 @@ class Spectrum extends Effect
 
     /**
      * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     * The updated_effect JSON filed then contains those values and replaces them in the user interface
      */
     public function overwriteValues()
     {
+        if(sizeof($this->colors) < 2)
+            $this->colors = [0xff0000, 0x0000ff];
 
+        if($this->timings[Effect::TIME_ON] === 0 && $this->timings[Spectrum::TIME_FADE] === 0)
+            $this->timings[Effect::TIME_ON] = 0x10;
+
+        if($this->args[Spectrum::ARG_COLOR_COUNT] > sizeof($this->colors))
+            $this->args[Spectrum::ARG_COLOR_COUNT] = sizeof($this->colors);
+
+        while(sizeof($this->colors) % $this->args[Spectrum::ARG_COLOR_COUNT] > 0 ||
+            $this->args[Spectrum::ARG_COLOR_COUNT] < 2)
+        {
+            $this->args[Spectrum::ARG_COLOR_COUNT]++;
+        }
     }
 
     /**
@@ -117,6 +132,21 @@ class Spectrum extends Effect
      */
     public static function getDefault(int $id)
     {
-        return new Spectrum($id, [0xff0000, 0x0000ff], [0, 0, 4, 1], [2, 2]);
+        return new Spectrum($id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 5], [3, 2, 0]);
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name)
+    {
+        switch($name)
+        {
+            case Spectrum::ARG_DIRECTION:
+                return new DirectionArgument($name, $this->args[$name]);
+            default:
+                return new Argument($name, $this->args[$name]);
+        }
     }
 }

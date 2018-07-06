@@ -69,6 +69,11 @@ echo $head->toString();
 
 ?>
 <body>
+<?php
+require_once __DIR__."/../../includes/navbar/Nav.php";
+
+echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
+?>
 <div class="container-fluid">
     <div class="row device-settings-content" data-device-id="<?php echo $device->getId()?>">
         <div class="col-sm-12">

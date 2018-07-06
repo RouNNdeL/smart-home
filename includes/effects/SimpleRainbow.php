@@ -102,12 +102,13 @@ class SimpleRainbow extends Effect
 
     /**
      * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
+     * The updated_effect JSON filed then contains those values and replaces them in the user interface
      */
     public function overwriteValues()
     {
         if($this->args[SimpleRainbow::ARG_BRIGHTNESS] < 1)
-            $this->args[SimpleRainbow::ARG_BRIGHTNESS] = 255;
-        $this->colors = [0]; /* Required in order to send color count >0*/
+            $this->args[SimpleRainbow::ARG_BRIGHTNESS] = 0xff;
+        $this->colors = [0]; /* Required in order to send color count greater then 0 */
     }
 
     /**
@@ -117,5 +118,14 @@ class SimpleRainbow extends Effect
     public static function getDefault(int $id)
     {
         return new SimpleRainbow($id, [], [0, 0, 0, 2], [0, 0xff, 1]);
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name)
+    {
+        return new Argument($name, $this->args[$name]);
     }
 }

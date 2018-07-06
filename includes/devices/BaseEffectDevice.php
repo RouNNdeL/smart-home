@@ -219,7 +219,7 @@ HTML;
         }
 
         $name_placeholder = Utils::getString("effect_default_name") . " $effect_id";
-        $html .= "<div class=\"main-container row m-2\">
+        $html .= "<div class=\"row mt-2\">
         <div class=\"col-12 col-sm-6 col-lg-4 col-xl-3 mb-3 mb-lg-0\">
             <div class=\"form-group\">
                 <h4>$profile_name</h4>
