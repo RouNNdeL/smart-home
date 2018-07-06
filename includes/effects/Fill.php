@@ -27,24 +27,45 @@
  * Created by PhpStorm.
  * User: Krzysiek
  * Date: 2018-07-06
- * Time: 12:33
+ * Time: 21:39
  */
-class Particles extends Effect
+
+class Fill extends Effect
 {
-    const TIME_PARTICLE_SPEED = 0;
-    const TIME_PARTICLE_DELAY = 1;
 
     const ARG_SMOOTH = "smooth";
-    const ARG_DIRECTION = "direction";
-    const ARG_PARTICLE_SIZE = "particles_size";
-    const ARG_BLEND = "particles_blend";
+    const ARG_RETURN = "fill_return";
+    const ARG_ROTATE_DIR = "fill_rotation_direction";
+    const ARG_COLOR_COUNT = "fill_color_count";
+    const ARG_PIECE_COUNT = "fill_piece_count";
+    const ARG_DIRECTION_1 = "fill_direction_1";
+    const ARG_DIRECTION_2 = "fill_direction_2";
+
+    /**
+     * @param $name
+     * @return Argument
+     */
+    public function getArgumentClass($name)
+    {
+        switch($name)
+        {
+            case Fill::ARG_ROTATE_DIR:
+                return new DirectionArgument($name, $this->args[$name]);
+            case Fill::ARG_SMOOTH:
+            case Fill::ARG_RETURN:
+                return new YesNoArgument($name, $this->args[$name]);
+            default:
+                return new Argument($name, $this->args[$name]);
+        }
+    }
 
     /**
      * @return int
      */
     public function getTimingsForEffect()
     {
-        return (1 << Particles::TIME_PARTICLE_SPEED) | (1 << Particles::TIME_PARTICLE_DELAY) | (1 << Particles::TIME_DELAY);
+        return (1 << Effect::TIME_OFF) | (1 << Effect::TIME_FADEIN) | (1 << Effect::TIME_ON) |
+        (1 << Effect::TIME_FADEOUT) | (1 << Effect::TIME_DELAY)| (1 << Effect::TIME_ROTATION);
     }
 
     /**
@@ -53,30 +74,28 @@ class Particles extends Effect
     public function packArgs()
     {
         $args = [];
-        $args[0] = ($this->args[Particles::ARG_DIRECTION] << 0) | ($this->args[Particles::ARG_SMOOTH] << 1) |
-            ($this->args[Particles::ARG_BLEND] << 2);
-        $args[1] = $this->args[Particles::ARG_PARTICLE_SIZE];
+
+        $args[0] = ($this->args[Fill::ARG_ROTATE_DIR] << 0) | ($this->args[Fill::ARG_SMOOTH] << 1) |
+            ($this->args[Fill::ARG_RETURN] << 2);
+        $args[1] = $this->args[Fill::ARG_COLOR_COUNT];
+        $args[2] = $this->args[Fill::ARG_PIECE_COUNT];
+        $args[3] = $this->args[Fill::ARG_DIRECTION_1];
+        $args[4] = $this->args[Fill::ARG_DIRECTION_2];
         $args[5] = $this->args[Effect::ARG_COLOR_CYCLES];
+
         return $args;
     }
 
     public function unpackArgs(array $args)
     {
-        $this->args[Particles::ARG_DIRECTION] = $args[0] & (1 << 0) ? 1 : 0;
-        $this->args[Particles::ARG_SMOOTH] = $args[0] & (1 << 1) ? 1 : 0;
-        $this->args[Particles::ARG_BLEND] = $args[0] & (1 << 2) ? 1 : 0;
-        $this->args[Particles::ARG_PARTICLE_SIZE] = $args[1];
+        $this->args[Fill::ARG_ROTATE_DIR] = $args[0] & (1 << 0) ? 1 : 0;
+        $this->args[Fill::ARG_SMOOTH] = $args[0] & (1 << 1) ? 1 : 0;
+        $this->args[Fill::ARG_RETURN] = $args[0] & (1 << 2) ? 1 : 0;
+        $this->args[Fill::ARG_COLOR_COUNT] = $args[1];
+        $this->args[Fill::ARG_PIECE_COUNT] = $args[2];
+        $this->args[Fill::ARG_DIRECTION_1] = $args[3];
+        $this->args[Fill::ARG_DIRECTION_2] = $args[4];
         $this->args[Effect::ARG_COLOR_CYCLES] = $args[5];
-    }
-
-    protected function getTimingStrings()
-    {
-        $strings = parent::getTimingStrings();
-
-        $strings[Particles::TIME_PARTICLE_SPEED] = "particles_speed";
-        $strings[Particles::TIME_PARTICLE_DELAY] = "particles_delay";
-
-        return $strings;
     }
 
     /**
@@ -84,7 +103,7 @@ class Particles extends Effect
      */
     public function avrEffect()
     {
-        return Effect::AVR_EFFECT_PARTICLES;
+        return Effect::AVR_EFFECT_FILL;
     }
 
     /**
@@ -92,7 +111,7 @@ class Particles extends Effect
      */
     public function getEffectId()
     {
-        return Effect::EFFECT_PARTICLES;
+        return Effect::EFFECT_FILL;
     }
 
     /**
@@ -117,11 +136,21 @@ class Particles extends Effect
      */
     public function overwriteValues()
     {
-        if($this->args[Particles::ARG_PARTICLE_SIZE] < 1)
-            $this->args[Particles::ARG_PARTICLE_SIZE] = 4;
-
         if($this->args[Effect::ARG_COLOR_CYCLES] < 1)
             $this->args[Effect::ARG_COLOR_CYCLES] = 1;
+
+        if($this->args[Fill::ARG_COLOR_COUNT] > sizeof($this->colors))
+            $this->args[Fill::ARG_COLOR_COUNT] = sizeof($this->colors);
+
+        while(sizeof($this->colors) % $this->args[Fill::ARG_COLOR_COUNT] > 0 ||
+            $this->args[Fill::ARG_COLOR_COUNT] < 1)
+        {
+            $this->args[Fill::ARG_COLOR_COUNT]++;
+        }
+        while($this->args[Fill::ARG_PIECE_COUNT] % $this->args[Fill::ARG_COLOR_COUNT] > 0)
+        {
+            $this->args[Fill::ARG_PIECE_COUNT]++;
+        }
     }
 
     /**
@@ -130,25 +159,6 @@ class Particles extends Effect
      */
     public static function getDefault(int $id)
     {
-        return new Particles($id, [0xff0000], [2, 2], [7, 4]);
-    }
-
-    /**
-     * @param $name
-     * @return string
-     */
-    public function getArgumentClass($name)
-    {
-
-        switch($name)
-        {
-            case Particles::ARG_DIRECTION:
-                return new DirectionArgument($name, $this->args[$name]);
-            case Particles::ARG_SMOOTH:
-            case Particles::ARG_BLEND:
-                return new YesNoArgument($name, $this->args[$name]);
-            default:
-                return new Argument($name, $this->args[$name]);
-        }
+        return new Fill($id, [0xff0000], [0,2.5,0,2.5], [2, 1, 1]);
     }
 }

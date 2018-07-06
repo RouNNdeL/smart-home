@@ -45,6 +45,7 @@ require_once __DIR__ . "/Spectrum.php";
 require_once __DIR__ . "/SimpleRainbow.php";
 require_once __DIR__ . "/RotatingRainbow.php";
 require_once __DIR__ . "/Particles.php";
+require_once __DIR__ . "/Fill.php";
 
 abstract class Effect
 {
@@ -66,7 +67,7 @@ abstract class Effect
     const EFFECT_BLINKING = 3;
     const EFFECT_FADING = 4;
     const EFFECT_SIMPLE_RAINBOW = 5;
-    const EFFECT_FILLING = 6;
+    const EFFECT_FILL = 6;
     const EFFECT_MARQUEE = 7;
     const EFFECT_ROTATING = 8;
     const EFFECT_SWEEP = 9;
@@ -798,6 +799,8 @@ abstract class Effect
                 return RotatingRainbow::class;
             case Effect::EFFECT_PARTICLES:
                 return Particles::class;
+            case Effect::EFFECT_FILL:
+                return Fill::class;
             default:
                 throw new UnexpectedValueException("Invalid effect id: $id");
         }
