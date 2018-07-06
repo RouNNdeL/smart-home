@@ -135,4 +135,21 @@ class Pieces extends Effect
     {
         return new Pieces($id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 5], [2, 2, 2, 0, 0, 1]);
     }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name)
+    {
+        switch($name)
+        {
+            case Pieces::ARG_DIRECTION:
+                return new DirectionArgument($name, $this->args[$name]);
+            case Pieces::ARG_SMOOTH:
+                return new YesNoArgument($name, $this->args[$name]);
+            default:
+                return new Argument($name, $this->args[$name]);
+        }
+    }
 }

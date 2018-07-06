@@ -119,4 +119,13 @@ class SimpleRainbow extends Effect
     {
         return new SimpleRainbow($id, [], [0, 0, 0, 2], [0, 0xff, 1]);
     }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name)
+    {
+        return new Argument($name, $this->args[$name]);
+    }
 }

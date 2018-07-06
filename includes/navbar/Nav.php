@@ -30,6 +30,7 @@
  * Time: 18:32
  */
 
+require_once __DIR__."/../Utils.php";
 require_once __DIR__."/NavItem.php";
 require_once __DIR__."/NavPageSetListener.php";
 require_once __DIR__."/Navbar.php";
@@ -168,7 +169,7 @@ HTML;
     {
         $nav_toggled_id = "navbar-".number_format( rand()*rand(), 0, '', '' );
         $items = [];
-        $items[] = new NavBrand("Smart Home");
+        $items[] = new NavBrand(Utils::getString("navbar_brand_title"));
         $items[] = new NavHamburger($nav_toggled_id);
         $items[] = Navbar::getDefaultLeft($nav_toggled_id);
         $items[] = Navbar::getDefaultRight();

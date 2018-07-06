@@ -26,28 +26,36 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-05-17
- * Time: 20:18
+ * Date: 2018-07-06
+ * Time: 20:10
  */
 
-require_once __DIR__ . "/BaseEffectDevice.php";
-require_once __DIR__ . "/../effects/Effect.php";
-
-class DigitalEffectDevice extends BaseEffectDevice
+class Argument
 {
+    /** @var string */
+    protected $name;
 
-    public function getAvailableEffects()
+    /** @var string */
+    protected $value;
+
+    /**
+     * Argument constructor.
+     * @param string $name
+     * @param string $value
+     */
+    public function __construct(string $name, string $value)
     {
-        return [Effect::EFFECT_OFF => "off",
-            Effect::EFFECT_STATIC => "static",
-            Effect::EFFECT_BREATHING => "breathe",
-            Effect::EFFECT_BLINKING => "blink",
-            Effect::EFFECT_FADING => "fade",
-            Effect::EFFECT_PIECES => "pieces",
-            Effect::EFFECT_SPECTRUM => "spectrum",
-            Effect::EFFECT_SIMPLE_RAINBOW => "rainbow",
-            Effect::EFFECT_ROTATING_RAINBOW => "rainbow_rotating",
-            Effect::EFFECT_PARTICLES => "particles"
-        ];
+        $this->name = $name;
+        $this->value = $value;
+    }
+
+    public function toString()
+    {
+        $template = Effect::INPUT_TEMPLATE_ARGUMENTS;
+        $template = str_replace("\$label", Utils::getString("profile_arguments_$this->name"), $template);
+        $template = str_replace("\$name", "arg_" . $this->name, $template);
+        $template = str_replace("\$placeholder", $this->value, $template);
+        $template = str_replace("\$value", $this->value, $template);
+        return $template;
     }
 }

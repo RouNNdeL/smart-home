@@ -104,4 +104,13 @@ class Breathe extends Effect
         if($this->args[Effect::ARG_COLOR_CYCLES] < 1)
             $this->args[Effect::ARG_COLOR_CYCLES] = 1;
     }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name)
+    {
+        return new Argument($name, $this->args[$name]);
+    }
 }

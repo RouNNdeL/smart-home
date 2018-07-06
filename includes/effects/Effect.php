@@ -31,6 +31,10 @@
  */
 
 require_once __DIR__ . "/../database/DbUtils.php";
+require_once __DIR__. "/arguments/Argument.php";
+require_once __DIR__. "/arguments/YesNoArgument.php";
+require_once __DIR__. "/arguments/DirectionArgument.php";
+require_once __DIR__. "/arguments/BlendModeArgument.php";
 require_once __DIR__ . "/Off.php";
 require_once __DIR__ . "/Statiic.php";
 require_once __DIR__ . "/Breathe.php";
@@ -40,6 +44,7 @@ require_once __DIR__ . "/Pieces.php";
 require_once __DIR__ . "/Spectrum.php";
 require_once __DIR__ . "/SimpleRainbow.php";
 require_once __DIR__ . "/RotatingRainbow.php";
+require_once __DIR__ . "/Particles.php";
 
 abstract class Effect
 {
@@ -77,8 +82,8 @@ abstract class Effect
     const EFFECT_TWO_HALVES_FADE = 20;
     const EFFECT_PARTICLES = 21;
 
-    const DIRECTION_CW = 1;
-    const DIRECTION_CCW = 0;
+    const DIRECTION_NORMAL = 1;
+    const DIRECTION_REVERSE = 0;
 
     const TIME_OFF = 0;
     const TIME_FADEIN = 1;
@@ -294,55 +299,9 @@ abstract class Effect
 
         if(sizeof($this->args) > 0)
         {
-            foreach($this->args as $name => $argument)
+            foreach($this->args as $name => $value0)
             {
-                switch($name)
-                {
-                    case "direction":
-                        $str_cw = Utils::getString("profile_direction_cw");
-                        $str_ccw = Utils::getString("profile_direction_ccw");
-                        $str = Utils::getString("profile_arguments_" . $name);
-                        $selected0 = $argument ? " selected" : "";
-                        $selected1 = $argument ? "" : " selected";
-                        $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
-                                            <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . Effect::DIRECTION_CW . "\" $selected0>$str_cw</option>
-                                                <option value=\"" . Effect::DIRECTION_CCW . "\" $selected1>$str_ccw</option>
-                                            </select></div>";
-                        break;
-                    case "smooth":
-                    case "fade_smooth":
-                    case "fill_fade_return":
-                    case "two_halves_return":
-                        $str_yes = Utils::getString("yes");
-                        $str_no = Utils::getString("no");
-                        $str = Utils::getString("profile_arguments_" . $name);
-                        $selected0 = $argument ? " selected" : "";
-                        $selected1 = $argument ? "" : " selected";
-                        $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
-                                            <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . 1 . "\" $selected0>$str_yes</option>
-                                                <option value=\"" . 0 . "\" $selected1>$str_no</option>
-                                            </select></div>";
-                        break;
-                    case "two_halves_color_count":
-                        $str = Utils::getString("profile_arguments_" . $name);
-                        $selected0 = $argument === 2 ? " selected" : "";
-                        $selected1 = $argument === 1 ? "" : " selected";
-                        $arguments_html .= "<div class=\"col-auto px-1\"><label class=\"mb-0\">$str</label>
-                                            <select class=\"form-control\" name=\"arg_$name\">
-                                                <option value=\"" . 1 . "\" $selected0>1</option>
-                                                <option value=\"" . 2 . "\" $selected1>2</option>
-                                            </select></div>";
-                        break;
-                    default:
-                        $template = self::INPUT_TEMPLATE_ARGUMENTS;
-                        $template = str_replace("\$label", Utils::getString("profile_arguments_$name"), $template);
-                        $template = str_replace("\$name", "arg_" . $name, $template);
-                        $template = str_replace("\$placeholder", $argument, $template);
-                        $template = str_replace("\$value", $argument, $template);
-                        $arguments_html .= $template;
-                }
+                $arguments_html .= $this->getArgumentClass($name)->toString();
             }
         }
 
@@ -383,6 +342,12 @@ abstract class Effect
 
         return $html;
     }
+
+    /**
+     * @param $name
+     * @return Argument
+     */
+    public abstract function getArgumentClass($name);
 
     public function toJson()
     {
@@ -831,6 +796,8 @@ abstract class Effect
                 return SimpleRainbow::class;
             case Effect::EFFECT_ROTATING_RAINBOW:
                 return RotatingRainbow::class;
+            case Effect::EFFECT_PARTICLES:
+                return Particles::class;
             default:
                 throw new UnexpectedValueException("Invalid effect id: $id");
         }

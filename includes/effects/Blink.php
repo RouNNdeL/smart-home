@@ -109,4 +109,13 @@ class Blink extends Effect
     {
         return new Blink($id, [0xff0000], [1, 0, 1, 0, 0, 0]);
     }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name)
+    {
+        return new Argument($name, $this->args[$name]);
+    }
 }

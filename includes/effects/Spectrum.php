@@ -134,4 +134,19 @@ class Spectrum extends Effect
     {
         return new Spectrum($id, [0xff0000, 0x0000ff], [0, 0, 4, 1], [2, 2, 0]);
     }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name)
+    {
+        switch($name)
+        {
+            case Spectrum::ARG_DIRECTION:
+                return new DirectionArgument($name, $this->args[$name]);
+            default:
+                return new Argument($name, $this->args[$name]);
+        }
+    }
 }

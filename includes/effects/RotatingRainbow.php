@@ -124,4 +124,21 @@ class RotatingRainbow extends Effect
     {
         return new RotatingRainbow($id, [], [0, 0, 0, 0, 5], [0, 0xff, 1]);
     }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name)
+    {
+        switch($name)
+        {
+            case RotatingRainbow::ARG_DIRECTION:
+                return new DirectionArgument($name, $this->args[$name]);
+            case RotatingRainbow::ARG_MODE:
+                return new BlendModeArgument($name, $this->args[$name]);
+            default:
+                return new Argument($name, $this->args[$name]);
+        }
+    }
 }

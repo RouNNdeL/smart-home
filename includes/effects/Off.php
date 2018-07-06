@@ -106,4 +106,13 @@ class Off extends Effect
         $this->timings[Effect::TIME_ROTATION] = 0;
         $this->colors = [0];
     }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name)
+    {
+        return null;
+    }
 }

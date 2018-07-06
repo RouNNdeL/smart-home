@@ -26,28 +26,32 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-05-17
- * Time: 20:18
+ * Date: 2018-07-06
+ * Time: 20:38
  */
 
-require_once __DIR__ . "/BaseEffectDevice.php";
-require_once __DIR__ . "/../effects/Effect.php";
+require_once __DIR__ . "/Argument.php";
 
-class DigitalEffectDevice extends BaseEffectDevice
+abstract class SelectArgument extends Argument
 {
+    protected abstract function getOptions();
 
-    public function getAvailableEffects()
+    public function toString()
     {
-        return [Effect::EFFECT_OFF => "off",
-            Effect::EFFECT_STATIC => "static",
-            Effect::EFFECT_BREATHING => "breathe",
-            Effect::EFFECT_BLINKING => "blink",
-            Effect::EFFECT_FADING => "fade",
-            Effect::EFFECT_PIECES => "pieces",
-            Effect::EFFECT_SPECTRUM => "spectrum",
-            Effect::EFFECT_SIMPLE_RAINBOW => "rainbow",
-            Effect::EFFECT_ROTATING_RAINBOW => "rainbow_rotating",
-            Effect::EFFECT_PARTICLES => "particles"
-        ];
+        $options_html = "";
+        foreach($this->getOptions() as $value => $name)
+        {
+            $selected = $name === $this->value ? "selected" : "";
+            $str = Utils::getString($name);
+            $options_html .= "<option value=\"$value\" $selected>$str</option>";
+        }
+        $name_str = Utils::getString("profile_arguments_$this->name");
+        return <<<HTML
+            <div class="col-auto px-1"><label class="mb-0">$name_str</label>
+                <select class="form-control" name="arg_$this->name">
+                   $options_html
+                </select>
+            </div>
+HTML;
     }
 }

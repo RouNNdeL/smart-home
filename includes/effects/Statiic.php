@@ -109,4 +109,13 @@ class Statiic extends Effect
             $this->colors[0] = 0;
         $this->colors = [$this->colors[0]]; //Remove any unn
     }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name)
+    {
+        return null;
+    }
 }

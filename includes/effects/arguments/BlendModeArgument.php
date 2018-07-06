@@ -26,28 +26,17 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-05-17
- * Time: 20:18
+ * Date: 2018-07-06
+ * Time: 20:46
  */
 
-require_once __DIR__ . "/BaseEffectDevice.php";
-require_once __DIR__ . "/../effects/Effect.php";
+require_once __DIR__ . "/SelectArgument.php";
 
-class DigitalEffectDevice extends BaseEffectDevice
+class BlendModeArgument extends SelectArgument
 {
 
-    public function getAvailableEffects()
+    protected function getOptions()
     {
-        return [Effect::EFFECT_OFF => "off",
-            Effect::EFFECT_STATIC => "static",
-            Effect::EFFECT_BREATHING => "breathe",
-            Effect::EFFECT_BLINKING => "blink",
-            Effect::EFFECT_FADING => "fade",
-            Effect::EFFECT_PIECES => "pieces",
-            Effect::EFFECT_SPECTRUM => "spectrum",
-            Effect::EFFECT_SIMPLE_RAINBOW => "rainbow",
-            Effect::EFFECT_ROTATING_RAINBOW => "rainbow_rotating",
-            Effect::EFFECT_PARTICLES => "particles"
-        ];
+        return [0 => "profile_arguments_blend_mode_dark", 1 => "profile_arguments_blend_mode_bright"];
     }
 }
