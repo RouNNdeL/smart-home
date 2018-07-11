@@ -33,6 +33,7 @@
 require_once __DIR__ . "/EspWifiLedController.php";
 require_once __DIR__ . "/PcLedController.php";
 require_once __DIR__ . "/EspWiFiLamp.php";
+require_once __DIR__ . "/IrRemote.php";
 require_once __DIR__ . "/../database/HomeUser.php";
 require_once __DIR__ . "/../Utils.php";
 
@@ -94,6 +95,7 @@ abstract class PhysicalDevice
      * @param array $action
      * @param string $request_id
      * @return array
+     * @noinspection PhpUnusedParameterInspection
      */
     public function handleAssistantAction(array $action, string $request_id)
     {
@@ -121,7 +123,7 @@ abstract class PhysicalDevice
 
     /**
      * @param string $id
-     * @return null|&VirtualDevice
+     * @return &VirtualDevice|null
      */
     public function getVirtualDeviceById(string $id)
     {

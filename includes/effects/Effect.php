@@ -330,7 +330,7 @@ abstract class Effect
 
         if($timings !== 0)
         {
-            $html .= "<div class=\"timing-container col-12 col-sm-6 col-lg-4 mb-3 mb-sm-0\"><h4>$profile_timing</h4>
+            $html .= "<div class=\"timing-container col-24 col-sm-12 col-lg-8 mb-3 mb-sm-0\"><h4>$profile_timing</h4>
                         <div class=\"row mx-0\">$timing_html</div></div>";
         }
         else
@@ -338,7 +338,7 @@ abstract class Effect
             $html .= "$timing_html";
         }
         if(sizeof($this->args) > 0)
-            $html .= "<div class=\"args-container col-12 col-lg-4 col-xl-5\"><h4>$profile_arguments</h4>
+            $html .= "<div class=\"args-container col-24 col-lg-8 col-xl-10\"><h4>$profile_arguments</h4>
                         <div class=\"row mx-0\">$arguments_html</div></div>";
 
         return $html;
@@ -710,6 +710,7 @@ abstract class Effect
         $class = Effect::getClassForEffectId($effect);
         if(!class_exists($class) || !is_subclass_of($class, Effect::class))
             throw new InvalidArgumentException("$class is not a valid Effect class name");
+        /** @noinspection PhpUndefinedMethodInspection */
         return $class::getDefault($effect_id);
     }
 

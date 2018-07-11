@@ -43,3 +43,10 @@ $device-offline-text-color: #dc3545 !default;
 .device-offline-text {
   color: $device-offline-text-color;
 }
+
+.device-remote {
+  & button {
+    padding: .45em;
+    height: 40px;
+  }
+}

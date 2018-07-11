@@ -29,6 +29,7 @@ import 'ion-rangeslider';
 import 'bootstrap-switch';
 import '../../lib/bootstrap-colorpicker';
 import {serializeToAssociative, showSnackbar} from "./_utils";
+import ir_init from './_device_ir';
 
 const MIN_UPDATE_DELAY = 500;
 const REPORT_STATE_DELAY = 2500;
@@ -41,6 +42,8 @@ $(function() {
     let last_call_duration = 0;
     const update_timeouts = [];
     let update_timeout_global = -1;
+
+    ir_init();
 
     $(".slider").ionRangeSlider({
         min: 0,

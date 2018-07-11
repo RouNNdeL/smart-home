@@ -118,7 +118,7 @@ echo $head->toString();
 <body>
 <div class="container mt-5">
     <div class="row justify-content-md-center">
-        <div class="col-12 col-md-auto"><h3>Login to Smart Home with <?php echo $client->name ?></h3>
+        <div class="col col-md-auto"><h3>Login to Smart Home with <?php echo $client->name ?></h3>
             <?php
             if(isset($user_error))
             {

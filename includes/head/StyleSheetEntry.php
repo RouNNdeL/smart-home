@@ -40,6 +40,7 @@ class StyleSheetEntry extends HeadEntry
     const DEVICE_ADVANCED = "/dist/css/device_advanced";
 
     const VENDOR = "/dist/vendor/css/vendor";
+    const MATERIAL_ICONS = "https://fonts.googleapis.com/icon?family=Material+Icons";
 
     const DEFAULT = [StyleSheetEntry::VENDOR];
 
@@ -62,9 +63,11 @@ class StyleSheetEntry extends HeadEntry
      */
     public function toString(bool $minified)
     {
-        preg_match("/.css$/", $this->url, $output_array);
-        $url = sizeof($output_array) ? $this->url : $this->url . ($minified ? ".min.css" : ".css");
-        $url .= "?v=" . HtmlHead::VERSION;
+        preg_match("/.css$/", $this->url, $extension_match);
+        preg_match("/^https?:\/\//", $this->url, $external_match);
+        $url = sizeof($extension_match) || sizeof($external_match) ? $this->url : $this->url . ($minified ? ".min.css" : ".css");
+        if(!sizeof($external_match))
+            $url .= "?v=" . HtmlHead::VERSION;
         return "<link rel='stylesheet' href='$url'>";
     }
 

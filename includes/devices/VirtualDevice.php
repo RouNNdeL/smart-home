@@ -36,6 +36,7 @@ require_once __DIR__ . "/AnalogEffectDevice.php";
 require_once __DIR__ . "/DigitalEffectDevice.php";
 require_once __DIR__ . "/LampAnalog.php";
 require_once __DIR__ . "/LampSimple.php";
+require_once __DIR__ . "/PioneerVsx920.php";
 
 abstract class VirtualDevice
 {
@@ -46,6 +47,7 @@ abstract class VirtualDevice
     const DEVICE_TYPE_LAMP_ANALOG = "DEVICE_LAMP_ANALOG";
     const DEVICE_TYPE_SWITCH = "DEVICE_SWITCH";
     const DEVICE_TYPE_REMOTE_CONTROLLED = "DEVICE_REMOTE_CONTROLLED";
+    const DEVICE_TYPE_PIONEER_VSX920 = "DEVICE_PIONEER_VSX920";
 
     const DEVICE_TRAIT_BRIGHTNESS = "action.devices.traits.Brightness";
     const DEVICE_TRAIT_COLOR_SPECTRUM = "action.devices.traits.ColorSpectrum";
@@ -55,6 +57,7 @@ abstract class VirtualDevice
 
     const DEVICE_TYPE_ACTIONS_LIGHT = "action.devices.types.LIGHT";
     const DEVICE_TYPE_ACTIONS_OUTLET = "action.devices.types.OUTLET";
+    const DEVICE_TYPE_ACTIONS_SWITCH = "action.devices.types.SWITCH";
 
     const DEVICE_COMMAND_BRIGHTNESS_ABSOLUTE = "action.devices.commands.BrightnessAbsolute";
     const DEVICE_COMMAND_COLOR_ABSOLUTE = "action.devices.commands.ColorAbsolute";
@@ -130,7 +133,7 @@ abstract class VirtualDevice
         $attributes = $this->getAttributes();
         $arr = ["id" => $this->device_id, "type" => $this->getActionsDeviceType(), "name" => ["name" => $this->device_name],
             "traits" => $this->getTraits(), "willReportState" => $this->will_report_state];
-        if(sizeof($attributes) > 0)
+        if($attributes !== null && sizeof($attributes) > 0)
             $arr["attributes"] = $attributes;
         if(sizeof($this->synonyms) > 0)
             $arr["name"]["nicknames"] = $this->synonyms;
@@ -193,6 +196,10 @@ abstract class VirtualDevice
                 return new LampAnalog(
                     $row["id"], $row["display_name"], $synonyms, $row["home_actions"],
                     $row["will_report_state"], $row["brightness"], $row["state"]
+                );
+            case self::DEVICE_TYPE_PIONEER_VSX920:
+                return new PioneerVsx920(
+                    $row["id"], $row["display_name"], $synonyms, $row["home_actions"],  $row["ir_protocol"]
                 );
             default:
                 throw new InvalidArgumentException("Invalid device type " . $row["type"]);
