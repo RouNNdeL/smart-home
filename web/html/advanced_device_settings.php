@@ -77,7 +77,7 @@ echo $head->toString();
 <body>
 <div class="container-fluid">
     <div class="row device-settings-content" data-device-id="<?php echo $device->getDeviceId() ?>">
-        <div class="col-sm-12 mt-3">
+        <div class="col mt-3">
             <div class="card">
                 <div class="card-header">
                     <h2><?php echo $device->getDeviceName()?></h2>

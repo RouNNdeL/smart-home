@@ -65,6 +65,7 @@ require_once __DIR__ . "/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("Smart Home - " . $device->getDisplayName());
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICE_SETTINGS));
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICE_SETTINGS));
+$head->addEntry(new StyleSheetEntry(StyleSheetEntry::MATERIAL_ICONS));
 echo $head->toString();
 
 ?>
@@ -76,7 +77,7 @@ echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
 ?>
 <div class="container-fluid">
     <div class="row device-settings-content" data-device-id="<?php echo $device->getId()?>">
-        <div class="col-sm-12">
+        <div class="col">
             <?php
             $reboot_string = Utils::getString("device_reboot");
             if(sizeof($virtualDevices) > 1)
@@ -87,7 +88,7 @@ echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
                     $html = $virtualDevice->toHtml();
                     $id = $virtualDevice->getDeviceId();
                     $virtual_html .= <<<HTML
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 px-1 py-1">
+                        <div class="col-24 col-sm-12 col-md-8 col-lg-6 px-1 py-1">
                             <div class="card device-parent" data-device-id="$id">
                                 $html
                             </div> 

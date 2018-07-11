@@ -91,6 +91,7 @@ echo $head->toString();
 ?>
 <body>
 <div id="fb-root"></div>
+<!--suppress ES6ConvertVarToLetConst -->
 <script>(function(d, s, id) {
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) return;
@@ -100,7 +101,7 @@ echo $head->toString();
     }(document, 'script', 'facebook-jssdk'));</script>
 <div class="container mt-5">
     <div class="row justify-content-md-center">
-        <div class="col-12 col-md-auto"><h3>Login to Smart Home</h3>
+        <div class="col col-md-auto"><h3>Login to Smart Home</h3>
             <?php
             if(isset($user_error))
             {

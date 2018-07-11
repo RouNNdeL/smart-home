@@ -56,7 +56,7 @@ class Utils
     private function loadStrings()
     {
         $lang = $this->lang;
-        $path = __DIR__."/../_lang/$lang.json";
+        $path = __DIR__ . "/../_lang/$lang.json";
         $file = file_get_contents($path);
         if($file == false)
         {
@@ -104,6 +104,19 @@ class Utils
 
     public static function intToHex(int $n, int $bytes = 1)
     {
-        return str_pad(dechex($n), $bytes*2, '0', STR_PAD_LEFT);
+        return str_pad(dechex($n), $bytes * 2, '0', STR_PAD_LEFT);
+    }
+
+    public static function dec2hex($number)
+    {
+        $hexvalues = array('0','1','2','3','4','5','6','7',
+            '8','9','A','B','C','D','E','F');
+        $hexval = '';
+        while($number != '0')
+        {
+            $hexval = $hexvalues[bcmod($number,'16')].$hexval;
+            $number = bcdiv($number,'16',0);
+        }
+        return $hexval;
     }
 }
