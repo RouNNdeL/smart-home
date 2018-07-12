@@ -36,6 +36,7 @@ class RemoteLayoutGenerator
 {
     const TYPE_BUTTON = "button";
     const TYPE_TEXT = "text";
+    const TYPE_EMPTY_SPACE = "empty";
     const BREAKPOINT_DEFAULT = "_";
 
     /** @var RemoteAction[] */
@@ -168,6 +169,27 @@ class RemoteLayoutGenerator
                 else if($type === RemoteLayoutGenerator::TYPE_TEXT)
                 {
                     $html .= "<span>$item[text]</span>";
+                }
+                else if($type === RemoteLayoutGenerator::TYPE_EMPTY_SPACE)
+                {
+                    switch($item["size"])
+                    {
+                        case 0.25:
+                            $c = "s025";
+                            break;
+                        case 0.5:
+                            $c = "s05";
+                            break;
+                        case 1:
+                            $c = "s1";
+                            break;
+                        case 2:
+                            $c = "s2";
+                            break;
+                        default:
+                            $c = "";
+                    }
+                    $html .= "<div class='button-row $c'></div>";
                 }
                 else
                 {

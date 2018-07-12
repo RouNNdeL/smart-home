@@ -36,7 +36,7 @@ require_once __DIR__ . "/AnalogEffectDevice.php";
 require_once __DIR__ . "/DigitalEffectDevice.php";
 require_once __DIR__ . "/LampAnalog.php";
 require_once __DIR__ . "/LampSimple.php";
-require_once __DIR__ . "/PioneerVsx920.php";
+require_once __DIR__ . "/IrControlledDevice.php";
 
 abstract class VirtualDevice
 {
@@ -47,7 +47,6 @@ abstract class VirtualDevice
     const DEVICE_TYPE_LAMP_ANALOG = "DEVICE_LAMP_ANALOG";
     const DEVICE_TYPE_SWITCH = "DEVICE_SWITCH";
     const DEVICE_TYPE_REMOTE_CONTROLLED = "DEVICE_REMOTE_CONTROLLED";
-    const DEVICE_TYPE_PIONEER_VSX920 = "DEVICE_PIONEER_VSX920";
 
     const DEVICE_TRAIT_BRIGHTNESS = "action.devices.traits.Brightness";
     const DEVICE_TRAIT_COLOR_SPECTRUM = "action.devices.traits.ColorSpectrum";
@@ -197,8 +196,8 @@ abstract class VirtualDevice
                     $row["id"], $row["display_name"], $synonyms, $row["home_actions"],
                     $row["will_report_state"], $row["brightness"], $row["state"]
                 );
-            case self::DEVICE_TYPE_PIONEER_VSX920:
-                return new PioneerVsx920(
+            case self::DEVICE_TYPE_REMOTE_CONTROLLED:
+                return new IrControlledDevice(
                     $row["id"], $row["display_name"], $synonyms, $row["home_actions"],  $row["ir_protocol"]
                 );
             default:

@@ -1,0 +1,10 @@
+[
+  [
+    "tv_power_toggle",
+    {
+      "name": "tv_input_hdmi2",
+      "offset": 14,
+      "column": 6
+    }
+  ]
+]

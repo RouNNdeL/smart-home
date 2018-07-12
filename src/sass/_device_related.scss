@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 $color-input-size: auto !default;
+$remote-button-width: 40px;
 
 .color-input {
   width: $color-input-size;
@@ -47,6 +48,24 @@ $device-offline-text-color: #dc3545 !default;
 .device-remote {
   & button {
     padding: .45em;
-    height: 40px;
+    height: $remote-button-width;
+  }
+  & div.button-row {
+    height: $remote-button-width;
+    &.s025 {
+      height: $remote-button-width/4;
+    }
+    &.s05 {
+      height: $remote-button-width/2;
+    }
+    &.s1 {
+      height: $remote-button-width;
+    }
+    &.s2 {
+      height: $remote-button-width*2;
+    }
+    &.s3 {
+      height: $remote-button-width*3;
+    }
   }
 }
