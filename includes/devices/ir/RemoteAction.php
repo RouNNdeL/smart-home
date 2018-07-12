@@ -78,6 +78,27 @@ class RemoteAction
     }
 
     /**
+     * @param string $device_id
+     * @return RemoteAction[]
+     */
+    public static function forDeviceId(string $device_id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, primary_code, support_code, display_name, icon FROM ir_codes WHERE device_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $device_id);
+        $stmt->bind_result($id, $primary_code, $support_code, $display_name, $icon);
+        $stmt->execute();
+        $arr = [];
+        while($stmt->fetch())
+        {
+            $arr[$id] = new RemoteAction($id, $primary_code, $support_code, $display_name, $icon);
+        }
+        $stmt->close();
+        return $arr;
+    }
+
+    /**
      * @return string
      */
     public function getPrimaryCodeHex()
@@ -91,5 +112,29 @@ class RemoteAction
     public function getSupportCodeHex()
     {
         return $this->support_code;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDisplayName(): string
+    {
+        return $this->display_name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIcon()
+    {
+        return $this->icon;
     }
 }

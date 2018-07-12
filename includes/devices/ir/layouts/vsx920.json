@@ -1,0 +1,62 @@
+[
+  [
+    "av_power_toggle"
+  ],
+  [
+    {
+      "name": "av_arrow_up",
+      "offset": 10
+    }
+  ],
+  [
+    {
+      "name": "av_arrow_left",
+      "offset": 6
+    },
+    "av_ok",
+    "av_arrow_right"
+  ],
+  [
+    {
+      "name": "av_arrow_down",
+      "offset": 10
+    }
+  ],
+  [
+    "av_volume_up",
+    {
+      "name": "av_back",
+      "offset": 6
+    },
+    {
+      "name": "av_channel_up",
+      "offset": 6
+    }
+  ],
+  [
+    {
+      "type": "text",
+      "text": "Vol"
+    },
+    {
+      "name": "av_audio_mute",
+      "offset": 6
+    },
+    {
+      "type": "text",
+      "text": "Ch",
+      "offset": 6
+    }
+  ],
+  [
+    "av_volume_down",
+    {
+      "name": "av_back",
+      "offset": 6
+    },
+    {
+      "name": "av_channel_down",
+      "offset": 6
+    }
+  ]
+]

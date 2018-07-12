@@ -94,9 +94,9 @@ class IrRemote extends PhysicalDevice
 
     public function sendCode(int $protocol, string $code, $support)
     {
-        $data = "id=" . $protocol . "&value=" . str_pad(Utils::dec2hex($code), 8, '0', STR_PAD_LEFT);
+        $data = "p=" . $protocol . "&v=" . str_pad(Utils::dec2hex($code), 8, '0', STR_PAD_LEFT);
         if($support !== null)
-            $data .= "&support=".str_pad(Utils::dec2hex($support), 8, '0', STR_PAD_LEFT);
+            $data .= "&s=".str_pad(Utils::dec2hex($support), 8, '0', STR_PAD_LEFT);
 
         $headers = array(
             "Content-Type: application/x-www-form-urlencoded"

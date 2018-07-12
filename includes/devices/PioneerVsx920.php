@@ -30,7 +30,8 @@
  * Time: 19:10
  */
 
-require_once __DIR__."/IrControlledDevice.php";
+require_once __DIR__ . "/IrControlledDevice.php";
+require_once __DIR__ . "/ir/RemoteLayoutGenerator.php";
 
 class PioneerVsx920 extends IrControlledDevice
 {
@@ -87,6 +88,10 @@ class PioneerVsx920 extends IrControlledDevice
         else
             $name = $this->device_name;
 
+        $layout = json_decode(file_get_contents(__DIR__ . "/ir/layouts/vsx920.json"), true);
+        $remote_grid = (new RemoteLayoutGenerator("av"))->toHtml($layout);
+
+
         return <<<HTML
         <form>
             <div class="card-header">
@@ -95,68 +100,7 @@ class PioneerVsx920 extends IrControlledDevice
                 </div>
             </div>
             <div class="card-body device-remote">
-                <div class="row">
-                    <div class="col-6 p-1 col-lg-4">
-                        <button class="btn full-width" type="button" role="button" data-action-id="av_power_toggle"><i class="material-icons">power_settings_new</i></button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6 offset-9 p-1">
-                        <button class="btn full-width" type="button" role="button" data-action-id="av_arrow_up"><i class="material-icons">arrow_upward</i></button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6 offset-3 p-1">
-                        <button class="btn full-width" type="button" role="button" data-action-id="av_arrow_left"><i class="material-icons">arrow_back</i></button>
-                    </div>
-                    <div class="col-6 p-1">
-                        <button class="btn full-width" type="button" role="button" data-action-id="av_ok">OK</span></button>
-                    </div>
-                    <div class="col-6 p-1">
-                        <button class="btn full-width" type="button" role="button" data-action-id="av_arrow_right"><i class="material-icons">arrow_forward</i></button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6 offset-9 p-1">
-                        <button class="btn full-width" type="button" role="button" data-action-id="av_arrow_down"><i class="material-icons">arrow_downward</i></button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6  col-xl-4 p-1">
-                        <button class="btn full-width" type="button" role="button" data-action-id="av_volume_up"><i class="material-icons">volume_up</i></button>
-                    </div>
-                    <div class="col-6  col-xl-4 offset-3 p-1 offset-xl-6">
-                        <button class="btn full-width" type="button" role="button" data-action-id="av_channel_up"><i class="material-icons">keyboard_return</i></button>
-                    </div>
-                    <div class="col-6  col-xl-4 offset-3 p-1 offset-xl-6">
-                        <button class="btn full-width" type="button" role="button" data-action-id="av_channel_up"><i class="material-icons">add</i></button>
-                    </div>
-                </div> <div class="row">
-                    <div class="col-6 col-xl-4 p-1 text-center">
-                        <span>Vol</span>
-                    </div>
-                    <div class="col-6  col-xl-4 offset-3 p-1 offset-xl-6">
-                        <button class="btn full-width" type="button" role="button" data-action-id="av_audio_mute"><i class="material-icons">volume_off</i></button>
-                    </div>
-                    <div class="col-6  col-xl-4 offset-3 p-1 offset-xl-6 text-center">
-                        <span>Ch</span>
-                    </div>
-                </div> <div class="row">
-                    <div class="col-6 col-xl-4 p-1">
-                        <button class="btn full-width" type="button" role="button" data-action-id="av_volume_down"><i class="material-icons">volume_down</i></button>
-                    </div>
-                    <div class="col-6  col-xl-4 offset-12 p-1 offset-xl-16">
-                        <button class="btn full-width" type="button" role="button" data-action-id="av_channel_down"><i class="material-icons">remove</i></button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-6 col-xl-4 p-1">
-                        <button class="btn full-width" type="button" role="button" data-action-id="av_input_hdmi2">TV</button>
-                    </div>
-                    <div class="col-6 col-xl-4 p-1">
-                        <button class="btn full-width" type="button" role="button" data-action-id="av_input_hdmi3">Chromecast</button>
-                    </div>
-                </div>
+                $remote_grid
             </div>
             <div class="card-footer py-2">
                 <div class="row">
