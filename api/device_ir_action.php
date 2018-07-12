@@ -70,7 +70,7 @@ if($virtual === null || !$virtual instanceof IrControlledDevice)
 }
 require_once __DIR__ . "/../includes/devices/ir/RemoteAction.php";
 
-$action = RemoteAction::byId($json["action_id"]);
+$action = RemoteAction::byId($json["action_id"], $json["device_id"]);
 if($action === null)
 {
     $response = ["status" => "error", "error" => "invalid_action_id"];

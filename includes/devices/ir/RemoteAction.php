@@ -62,12 +62,13 @@ class RemoteAction
         $this->icon = $icon;
     }
 
-    public static function byId(string $id)
+    public static function byId(string $id, string $device_id)
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT primary_code, support_code, display_name, icon FROM ir_codes WHERE id = ?";
+        $sql = "SELECT primary_code, support_code, display_name, icon 
+                FROM ir_codes WHERE id = ? AND device_id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $id);
+        $stmt->bind_param("ss", $id, $device_id);
         $stmt->bind_result($primary_code, $support_code, $display_name, $icon);
         $stmt->execute();
         if($stmt->fetch())
