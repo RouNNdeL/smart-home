@@ -74,5 +74,48 @@
       "name": "decoder_channel_down",
       "offset": 2
     }
+  ],
+  [{"type": "empty", "size": 0.5}],
+  [
+    {
+      "name": "decoder_digit_1",
+      "offset": 6
+    },
+    {
+      "name": "decoder_digit_2"
+    },
+    {
+      "name": "decoder_digit_3"
+    }
+  ],
+  [
+    {
+      "name": "decoder_digit_4",
+      "offset": 6
+    },
+    {
+      "name": "decoder_digit_5"
+    },
+    {
+      "name": "decoder_digit_6"
+    }
+  ],
+  [
+    {
+      "name": "decoder_digit_7",
+      "offset": 6
+    },
+    {
+      "name": "decoder_digit_8"
+    },
+    {
+      "name": "decoder_digit_9"
+    }
+  ],
+  [
+    {
+      "name": "decoder_digit_0",
+      "offset": 10
+    }
   ]
 ]

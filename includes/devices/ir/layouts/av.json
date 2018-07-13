@@ -63,11 +63,7 @@
       "offset": 6
     },
     {
-      "name": "av_input_hdmi3",
-      "columns": {
-        "_": 4,
-        "md": 4
-      }
+      "name": "av_input_hdmi3"
     },
     {
       "name": "av_input_dvd"
