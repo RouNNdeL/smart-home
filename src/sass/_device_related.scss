@@ -50,22 +50,28 @@ $device-offline-text-color: #dc3545 !default;
     padding: .45em;
     height: $remote-button-width;
   }
-  & div.button-row {
+
+  & .button-row {
     height: $remote-button-width;
+
     &.s025 {
-      height: $remote-button-width/4;
+      height: $remote-button-width / 4;
     }
+
     &.s05 {
-      height: $remote-button-width/2;
+      height: $remote-button-width / 2;
     }
+
     &.s1 {
       height: $remote-button-width;
     }
+
     &.s2 {
-      height: $remote-button-width*2;
+      height: $remote-button-width * 2;
     }
+
     &.s3 {
-      height: $remote-button-width*3;
+      height: $remote-button-width * 3;
     }
   }
 }
