@@ -159,6 +159,6 @@ class Fill extends Effect
      */
     public static function getDefault(int $id)
     {
-        return new Fill($id, [0xff0000], [0,2.5,0,2.5], [2, 1, 1]);
+        return new Fill($id, [0xff0000], [0,2.5,0,2.5], [2, 1, 1, 0, 0]);
     }
 }

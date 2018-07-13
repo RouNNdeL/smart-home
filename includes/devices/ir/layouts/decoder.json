@@ -1,0 +1,121 @@
+[
+  [
+    "decoder_power_toggle"
+  ],
+  [
+    {
+      "name": "decoder_arrow_up",
+      "offset": 10
+    }
+  ],
+  [
+    {
+      "name": "decoder_arrow_left",
+      "offset": 6
+    },
+    "decoder_ok",
+    "decoder_arrow_right"
+  ],
+  [
+    {
+      "name": "decoder_arrow_down",
+      "offset": 10
+    }
+  ],
+  [{"type": "empty", "size": 0.25}],
+  [
+    "decoder_volume_up",
+    {
+      "name": "decoder_menu",
+      "column": 6,
+      "offset": 2
+    },
+    {
+      "name": "decoder_info",
+      "column": 6
+    },
+    {
+      "name": "decoder_channel_up",
+      "offset": 2
+    }
+  ],
+  [
+    {
+      "type": "text",
+      "text": "Vol"
+    },
+    {
+      "name": "decoder_exit",
+      "column": 6,
+      "offset": 2
+    },
+    {
+      "name": "decoder_guide",
+      "column": 6
+    },
+    {
+      "type": "text",
+      "text": "Ch",
+      "offset": 2
+    }
+  ],
+  [
+    "decoder_volume_down",
+    {
+      "name": "decoder_favourite",
+      "column": 6,
+      "offset": 2
+    },
+    {
+      "name": "decoder_vod",
+      "column": 6
+    },
+    {
+      "name": "decoder_channel_down",
+      "offset": 2
+    }
+  ],
+  [{"type": "empty", "size": 0.5}],
+  [
+    {
+      "name": "decoder_digit_1",
+      "offset": 6
+    },
+    {
+      "name": "decoder_digit_2"
+    },
+    {
+      "name": "decoder_digit_3"
+    }
+  ],
+  [
+    {
+      "name": "decoder_digit_4",
+      "offset": 6
+    },
+    {
+      "name": "decoder_digit_5"
+    },
+    {
+      "name": "decoder_digit_6"
+    }
+  ],
+  [
+    {
+      "name": "decoder_digit_7",
+      "offset": 6
+    },
+    {
+      "name": "decoder_digit_8"
+    },
+    {
+      "name": "decoder_digit_9"
+    }
+  ],
+  [
+    {
+      "name": "decoder_digit_0",
+      "offset": 10
+    }
+  ]
+]

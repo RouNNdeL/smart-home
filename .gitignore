@@ -4,6 +4,7 @@ vendor/
 node_modules/
 dist/
 .sass-cache/
+lib/jquery-ui
 /home_graph_key.json
 /database.mwb.bak
 *.min.js
