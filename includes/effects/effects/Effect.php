@@ -30,11 +30,11 @@
  * Time: 13:43
  */
 
-require_once __DIR__ . "/../database/DbUtils.php";
-require_once __DIR__. "/arguments/Argument.php";
-require_once __DIR__. "/arguments/YesNoArgument.php";
-require_once __DIR__. "/arguments/DirectionArgument.php";
-require_once __DIR__. "/arguments/BlendModeArgument.php";
+require_once __DIR__ . "/../../database/DbUtils.php";
+require_once __DIR__ . "/../arguments/Argument.php";
+require_once __DIR__ . "/../arguments/YesNoArgument.php";
+require_once __DIR__ . "/../arguments/DirectionArgument.php";
+require_once __DIR__ . "/../arguments/BlendModeArgument.php";
 require_once __DIR__ . "/Off.php";
 require_once __DIR__ . "/Statiic.php";
 require_once __DIR__ . "/Breathe.php";
@@ -632,6 +632,23 @@ abstract class Effect
         return $arr;
     }
 
+    public static function forProfile(string $profile_id)
+    {
+        $conn = DbUtils::getConnection();
+        $colors = Effect::getColorsForEffectIdsByProfileId($profile_id);
+        $sql = "SELECT devices_effects.id, name, effect, time0, time1, time2, time3, time4, time5, 
+                arg0, arg1, arg2, arg3, arg4, arg5
+                FROM device_effect_profiles 
+                  JOIN devices_device_effects dde on device_effect_profiles.device_effect_id = dde.id
+                  JOIN devices_effects on dde.effect_id = devices_effects.id
+                WHERE profile_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $profile_id);
+        $arr = Effect::arrayFromStatement($stmt, $colors, true);
+        $stmt->close();
+        return $arr;
+    }
+
     public static function forDevice(string $device_id)
     {
         $conn = DbUtils::getConnection();
@@ -661,14 +678,29 @@ abstract class Effect
         return $arr;
     }
 
+    private static function getColorsForEffectIdsByProfileId(string $profile_id)
+    {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT devices_effects.id FROM devices_device_effects
+                  JOIN devices_effects ON devices_device_effects.effect_id = devices_effects.id
+                  JOIN device_effect_profiles dep on devices_device_effects.id = dep.device_effect_id
+                WHERE profile_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $profile_id);
+        $arr = Effect::getEffectIdsColorsFromStatement($stmt);
+        $stmt->close();
+        return $arr;
+    }
+
+
     private static function getEffectIdsColorsFromStatement(mysqli_stmt & $stmt)
     {
-        $stmt->bind_result($profile_id);
+        $stmt->bind_result($effect_id);
         $stmt->execute();
         $ids = [];
         while($stmt->fetch())
         {
-            $ids[] = $profile_id;
+            $ids[] = $effect_id;
         }
 
         $arr = [];
@@ -686,7 +718,7 @@ abstract class Effect
      * @param array $colors
      * @return Effect[]
      */
-    private static function arrayFromStatement(mysqli_stmt & $stmt, array $colors)
+    private static function arrayFromStatement(mysqli_stmt & $stmt, array $colors, bool $assoc = false)
     {
         $stmt->bind_result($id, $n, $e, $t0, $t1, $t2, $t3, $t4, $t5, $a0, $a1, $a2, $a3, $a4, $a5);
         $stmt->execute();
@@ -697,10 +729,20 @@ abstract class Effect
             if(!class_exists($class) || !is_subclass_of($class, Effect::class))
                 throw new InvalidArgumentException("$class is not a valid Effect class name");
 
-            $arr[] = new $class($id, $colors[$id],
-                [$t0, $t1, $t2, $t3, $t4, $t5],
-                [$a0, $a1, $a2, $a3, $a4, $a5], $n,
-                Effect::TIMING_MODE_RAW);
+            if($assoc)
+            {
+                $arr[$id] = new $class($id, $colors[$id],
+                    [$t0, $t1, $t2, $t3, $t4, $t5],
+                    [$a0, $a1, $a2, $a3, $a4, $a5], $n,
+                    Effect::TIMING_MODE_RAW);
+            }
+            else
+            {
+                $arr[] = new $class($id, $colors[$id],
+                    [$t0, $t1, $t2, $t3, $t4, $t5],
+                    [$a0, $a1, $a2, $a3, $a4, $a5], $n,
+                    Effect::TIMING_MODE_RAW);
+            }
         }
         return $arr;
     }

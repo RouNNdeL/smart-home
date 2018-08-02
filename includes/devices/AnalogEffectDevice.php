@@ -31,7 +31,7 @@
  */
 
 require_once __DIR__ . "/BaseEffectDevice.php";
-require_once __DIR__ . "/../effects/Effect.php";
+require_once __DIR__ . "/../effects/effects/Effect.php";
 
 class AnalogEffectDevice extends BaseEffectDevice
 {
