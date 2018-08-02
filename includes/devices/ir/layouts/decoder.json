@@ -22,7 +22,12 @@
       "offset": 10
     }
   ],
-  [{"type": "empty", "size": 0.25}],
+  [
+    {
+      "type": "empty",
+      "size": 0.25
+    }
+  ],
   [
     "decoder_volume_up",
     {
@@ -75,7 +80,12 @@
       "offset": 2
     }
   ],
-  [{"type": "empty", "size": 0.5}],
+  [
+    {
+      "type": "empty",
+      "size": 0.5
+    }
+  ],
   [
     {
       "name": "decoder_digit_1",

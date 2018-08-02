@@ -22,7 +22,12 @@
       "offset": 10
     }
   ],
-  [{"type": "empty", "size": 0.25}],
+  [
+    {
+      "type": "empty",
+      "size": 0.25
+    }
+  ],
   [
     "av_volume_up",
     {
@@ -56,7 +61,12 @@
       "offset": 6
     }
   ],
-  [{"type": "empty", "size": 0.5}],
+  [
+    {
+      "type": "empty",
+      "size": 0.5
+    }
+  ],
   [
     {
       "name": "av_input_hdmi2",
