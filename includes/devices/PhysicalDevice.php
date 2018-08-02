@@ -31,7 +31,6 @@
  */
 
 require_once __DIR__ . "/EspWifiLedController.php";
-require_once __DIR__ . "/PcLedController.php";
 require_once __DIR__ . "/EspWiFiLamp.php";
 require_once __DIR__ . "/IrRemote.php";
 require_once __DIR__ . "/../database/HomeUser.php";
