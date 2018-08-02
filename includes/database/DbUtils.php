@@ -47,6 +47,7 @@ class DbUtils
 
         if(self::$connection === null)
         {
+            mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
             return self::$connection = new mysqli("localhost", $db_username, $db_passwd, "smart_home");
         }
         else
