@@ -26,50 +26,16 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-06-20
- * Time: 17:44
+ * Date: 2018-08-02
+ * Time: 12:15
  */
 
+ini_set('xdebug.var_display_max_depth', 5);
+require_once __DIR__ . "/../../includes/effects/profiles/Profile.php";
+require_once __DIR__ . "/../../includes/GlobalManager.php";
 
-class Profile
-{
-    /** @var  */
-    private $id;
+$manager = GlobalManager::all();
 
-    /** @var  */
-    private $name;
-
-    /** @var Effect[] */
-    private $effects;
-
-    /**
-     * Profile constructor.
-     * @param $id
-     * @param $name
-     * @param Effect[] $effects
-     */
-    private function __construct($id, $name, array $effects)
-    {
-        $this->id = $id;
-        $this->name = $name;
-        $this->effects = $effects;
-    }
-
-    public static function fromId(int $profile_id)
-    {
-        $conn = DbUtils::getConnection();
-        $sql = "SELECT name FROM device_profiles WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $profile_id);
-        $stmt->bind_result($name);
-        $stmt->execute();
-        if($stmt->fetch())
-        {
-            $stmt->close();
-            $effects = Effect::forProfile($profile_id);
-            return new Profile($profile_id, $name, $effects);
-        }
-        $stmt->close();
-        return null;
-    }
-}
+$user_id = $manager->getSessionManager()->getUserId();
+var_dump($user_id);
+var_dump(Profile::allForUser($user_id));
