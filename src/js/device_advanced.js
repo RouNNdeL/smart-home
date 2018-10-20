@@ -32,7 +32,7 @@ import '../../lib/bootstrap-colorpicker';
 import {roundTime, timeToString} from "./_device_timing";
 import Mexp from 'math-expression-evaluator';
 
-const URL_EFFECT_HTML = "/api/device_advanced_default_html.php";
+const URL_EFFECT_HTML = "/api/device_effect_default_html.php";
 const DEFAULT_COLORS = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ffffff"];
 const COLORPICKER_OPTIONS = {
     useAlpha: false,
@@ -99,7 +99,7 @@ $(function() {
             }
         }
 
-        $.ajax("/api/device_advanced_save.php", {
+        $.ajax("/api/device_effect_save.php", {
             method: "POST",
             dataType: "json",
             contentType: "json",

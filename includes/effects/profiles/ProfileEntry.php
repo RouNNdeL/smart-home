@@ -35,8 +35,8 @@ require_once __DIR__ . "/../../database/DbUtils.php";
 
 class ProfileEntry
 {
-    /** @var  string */
-    private $device_id;
+    /** @var  VirtualDevice */
+    private $device;
 
     /** @var int */
     private $device_index;
@@ -51,9 +51,9 @@ class ProfileEntry
      * @param int $device_index
      * @param Effect $effect
      */
-    public function __construct(string $device_id, int $device_index, Effect $effect)
+    public function __construct(VirtualDevice $device, int $device_index, Effect $effect)
     {
-        $this->device_id = $device_id;
+        $this->device = $device;
         $this->device_index = $device_index;
         $this->effect = $effect;
     }
@@ -91,8 +91,9 @@ class ProfileEntry
     public static function getForProfileId(int $profile_id)
     {
         $effects = Effect::forProfile($profile_id);
-
         $conn = DbUtils::getConnection();
+        $devices = DeviceDbHelper::queryVirtualDevicesForProfileId($conn, $profile_id);
+
         $sql = "SELECT
                   device_id,
                   device_index,
@@ -110,10 +111,28 @@ class ProfileEntry
         {
             if(in_array($device_id, $device_ids))
                 continue;
-            $arr[] = new ProfileEntry($device_id, $device_index, $effects[$effect_id]);
+            $arr[] = new ProfileEntry($devices[$device_id], $device_index, $effects[$effect_id]);
             $device_ids[] = $device_id;
         }
         $stmt->close();
         return $arr;
     }
+
+    /**
+     * @return Effect
+     */
+    public function getEffect(): Effect
+    {
+        return $this->effect;
+    }
+
+    /**
+     * @return VirtualDevice
+     */
+    public function getDevice(): VirtualDevice
+    {
+        return $this->device;
+    }
+
+
 }

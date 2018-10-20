@@ -178,7 +178,7 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
 HTML;
     }
 
-    public function toAdvancedHtml(int $effect)
+    public function effectHtml(int $effect)
     {
         $device = $this->device_id;
         $profile_colors = Utils::getString("profile_colors");

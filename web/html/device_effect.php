@@ -60,7 +60,7 @@ if($device === null || !$device instanceof BaseEffectDevice)
 $device->setMaxColorCount($physical->getMaxColorCount());
 if(isset($_GET["name"]) && $_GET["name"] === "false")
 {
-    header("Location: /device/" . urlencode($device->getDeviceName()) . "/" . urlencode($device->getDeviceId()));
+    header("Location: /effect/" . urlencode($device->getDeviceName()) . "/" . urlencode($device->getDeviceId()));
 }
 ?>
 
@@ -108,7 +108,7 @@ HTML;
                         {
                             $active = $i ? "" : "show active";
                             $effect_id = "e-".$effect->getId();
-                            $effectHtml = $device->toAdvancedHtml($i);
+                            $effectHtml = $device->effectHtml($i);
                             echo <<<HTML
                         <div class="tab-pane fade $active effect-parent" id="$effect_id" 
                          role="tabpanel" aria-labelledby="$effect_id-tab">

@@ -120,6 +120,49 @@ class DeviceDbHelper
 
     /**
      * @param mysqli $conn
+     * @param int $physical_device_id
+     * @return VirtualDevice[]
+     */
+    public static function queryVirtualDevicesForProfileId(mysqli $conn, int $profile_id)
+    {
+        $sql = "SELECT
+                  v.id,
+                  type,
+                  display_name,
+                  synonyms,
+                  home_actions,
+                  will_report_state,
+                  state,
+                  brightness,
+                  color,
+                  toggles,
+                  ir_protocol,
+                  ir_nec_return
+                FROM device_profiles
+                  JOIN device_effect_profiles on device_profiles.id = device_effect_profiles.profile_id
+                  JOIN devices_device_effects dde on device_effect_profiles.device_effect_id = dde.id
+                  JOIN devices_virtual v on dde.device_id = v.id
+                WHERE profile_id = ?
+                GROUP BY v.id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $profile_id);
+        $stmt->execute();
+        $arr = [];
+
+        if($result = $stmt->get_result())
+        {
+            while($row = $result->fetch_assoc())
+            {
+                $arr[$row["id"]] = VirtualDevice::fromDatabaseRow($row);
+            }
+        }
+
+        $stmt->close();
+        return $arr;
+    }
+
+    /**
+     * @param mysqli $conn
      * @param string $physical_device_id
      * @return HomeUser[]
      */

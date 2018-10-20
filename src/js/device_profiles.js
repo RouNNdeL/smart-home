@@ -1,5 +1,4 @@
-<?php
-/**
+/*
  * MIT License
  *
  * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
@@ -23,19 +22,11 @@
  * SOFTWARE.
  */
 
-/**
- * Created by PhpStorm.
- * User: Krzysiek
- * Date: 2018-08-02
- * Time: 12:15
- */
+import $ from './_jquery';
+import '../../lib/jquery-ui/jquery-ui';
+import 'bootstrap';
+import 'tether';
 
-ini_set('xdebug.var_display_max_depth', 5);
-require_once __DIR__ . "/../../includes/effects/profiles/Profile.php";
-require_once __DIR__ . "/../../includes/GlobalManager.php";
-
-$manager = GlobalManager::all();
-
-$user_id = $manager->getSessionManager()->getUserId();
-var_dump($user_id);
-var_dump(Profile::allForUser($user_id));
+$(function() {
+    
+});

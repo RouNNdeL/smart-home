@@ -38,7 +38,8 @@ class JavaScriptEntry extends HeadEntry
     const GOOGLE_PLATFORM = "https://apis.google.com/js/platform";
     const LOGIN = "/dist/js/login";
     const DEVICE_SETTINGS = "/dist/js/device_settings";
-    const DEVICE_ADVANCED = "/dist/js/device_advanced";
+    const DEVICE_ADVANCED = "/dist/js/device_effect";
+    const DEVICE_PROFILES = "/dist/js/device_profiles";
     const CORE = "/dist/js/core";
 
     const VENDOR = "/dist/vendor/js/vendor";

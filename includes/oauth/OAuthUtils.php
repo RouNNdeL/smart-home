@@ -35,7 +35,7 @@ require_once __DIR__."/../database/HomeUser.php";
 class OAuthUtils
 {
     const SCOPE_HOME_CONTROL = "home_control";
-    const SCOPE_ADVANCED_CONTROL = "advanced_control";
+    const SCOPE_EFFECT_CONTROL = "effect_control";
 
     const SUPPORTED_SCOPES = [OAuthUtils::SCOPE_HOME_CONTROL];
 

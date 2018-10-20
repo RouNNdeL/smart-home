@@ -73,6 +73,10 @@ class Profile
         return null;
     }
 
+    /**
+     * @param $user_id
+     * @return Profile[]
+     */
     public static function allForUser($user_id)
     {
         $entries = ProfileEntry::getForUserId($user_id);
@@ -89,5 +93,53 @@ class Profile
             $arr[] = new Profile($profile_id, $name, $entries[$profile_id]);
         }
         return $arr;
+    }
+
+    public function getProfileHtml()
+    {
+        $html = "<div class=\"list-group\">";
+        foreach($this->entries as $entry)
+        {
+            $device = $entry->getDevice();
+            $effect = $entry->getEffect();
+
+            $effect_url = "/effect/" . $device->getDeviceId() . "#e-" . $effect->getId();
+            $device_name = $device->getDeviceName();
+            $effect_name = $effect->getName();
+            $html .= <<<HTML
+            <a href="$effect_url" class="list-group-item list-group-item-action flex-column align-items-start col-24 col-md-12 col-xl-8">
+                <div class="row">
+                    <div class="col profile-entry">
+                        <h5 class="mb-1">$effect_name</h5>
+                        <p class="mb-1">$device_name</p>
+                    </div>
+                    <div class="col float-right col-auto text-center-vertical pr-0">
+                        <button class="btn btn-secondary">Preview</button>
+                    </div>
+                    <div class="col float-right col-auto text-center-vertical">
+                        <button class="btn btn-danger">Remove</button>
+                    </div>
+                </div>
+            </a>
+HTML;
+        }
+        $html .= "</div>";
+        return $html;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 }

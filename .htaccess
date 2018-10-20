@@ -16,8 +16,9 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)/$ /$1 [L,R=301]
 
 RewriteRule ^$ /login [L]
-RewriteRule ^/?effect/.*?/(.+)$ /advanced_device_settings?device_id=$1 [L]
-RewriteRule ^/?effect/.*?/(.+)$ /advanced_device_settings_advanced?device_id=$1 [L]
+RewriteRule ^/?effect/.*?/(.+)$ /device_effect?device_id=$1 [L]
+RewriteRule ^/?effect/(.+)$ /device_effect?device_id=$1&name=false [L]
+RewriteRule ^/?profiles$ /device_profiles [L]
 RewriteRule ^/?device/.*?/(.+)$ /device_settings?device_id=$1 [L]
 RewriteRule ^/?device/(.+)$ /device_settings?device_id=$1&name=false [L]
 
