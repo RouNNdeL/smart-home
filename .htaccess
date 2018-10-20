@@ -3,6 +3,9 @@ ErrorDocument 500 /web/error/500.php
 
 RewriteEngine on
 
+RewriteCond %{SERVER_NAME} iot-api.zdul.xyz
+RewriteRule ^ /iot_api%{REQUEST_URI} [END]
+
 RewriteCond %{SERVER_NAME} !dev.zdul.xyz
 RewriteCond %{SERVER_NAME} !bets.zdul.xyz
 RewriteCond %{SERVER_NAME} !home.zdul.xyz
