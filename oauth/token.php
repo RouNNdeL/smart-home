@@ -30,6 +30,8 @@
  * Time: 16:31
  */
 
+header("Content-Type: application/json");
+
 if($_SERVER["REQUEST_METHOD"] !== "POST")
 {
     echo "{\"error\": \"invalid_request\"}";
@@ -60,11 +62,37 @@ if($client === null || $client->secret !== $params["client_secret"])
     exit(0);
 }
 
+if(!$client->supportsGrantType($params["grant_type"]))
+{
+    echo "{\"error\": \"unsupported_grant_type\"}";
+    http_response_code(400);
+    exit(0);
+}
+
 if($params["grant_type"] === "authorization_code" && isset($params["code"]))
 {
     require_once __DIR__ . "/../includes/oauth/OAuthUtils.php";
     $tokens = OAuthUtils::exchangeCodeForTokens(DbUtils::getConnection(), $params["code"], $params["client_id"]);
 
+    if($tokens !== null)
+    {
+        $tokens["token_type"] = "bearer";
+        $tokens["expires"] = 30 * 24 * 60 * 60;
+
+        echo json_encode($tokens);
+    }
+    else
+    {
+        echo "{\"error\": \"invalid_grant\"}";
+        http_response_code(400);
+        exit(0);
+    }
+}
+else if($params["grant_type"] === "password" && isset($params["username"]) && isset($params["password"]) && isset($params["scope"]))
+{
+    require_once __DIR__ . "/../includes/oauth/OAuthUtils.php";
+    $tokens = OAuthUtils::exchangePasswordForTokens(DbUtils::getConnection(),
+        $params["client_id"], $params["username"], $params["password"], $params["scope"]);
     if($tokens !== null)
     {
         $tokens["token_type"] = "bearer";

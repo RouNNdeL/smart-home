@@ -29,12 +29,12 @@
  * Date: 2018-02-17
  * Time: 15:17
  */
-
 class ApiClient
 {
     public $id;
     public $name;
     public $secret;
+    private $grant_types;
 
     /**
      * ApiClient constructor.
@@ -42,11 +42,12 @@ class ApiClient
      * @param $name
      * @param $secret
      */
-    private function __construct($id, $name, $secret)
+    private function __construct($id, $name, $secret, array $grant_types)
     {
         $this->id = $id;
         $this->name = $name;
         $this->secret = $secret;
+        $this->grant_types = $grant_types;
     }
 
     /**
@@ -56,15 +57,23 @@ class ApiClient
      */
     public static function queryClientById($conn, string $id)
     {
-        $sql = "SELECT id, name, secret FROM api_clients WHERE id='$id'";
-        $result = $conn->query($sql);
+        $sql = "SELECT id, name, secret, grant_types FROM api_clients WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $id);
+        $stmt->bind_result($id, $name, $secret, $grant_types);
+        $stmt->execute();
 
-        if($result->num_rows > 0)
+        if($stmt->fetch())
         {
-            $row = $result->fetch_assoc();
-            return new ApiClient($row["id"], $row["name"], $row["secret"]);
+            return new ApiClient($id, $name, $secret, explode(" ", $grant_types));
         }
 
+        $stmt->close();
         return null;
+    }
+
+    public function supportsGrantType($grant_type)
+    {
+        return in_array($grant_type, $this->grant_types);
     }
 }

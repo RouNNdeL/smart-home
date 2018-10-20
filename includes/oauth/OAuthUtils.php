@@ -30,6 +30,8 @@
  * Time: 15:57
  */
 
+require_once __DIR__."/../database/HomeUser.php";
+
 class OAuthUtils
 {
     const SCOPE_HOME_CONTROL = "home_control";
@@ -69,6 +71,29 @@ class OAuthUtils
         }
         $stmt->close();
         return null;
+    }
+
+    public static function exchangePasswordForTokens(mysqli $conn, string $client_id, string $username, string $password, string $scopes)
+    {
+        if(!OAuthUtils::checkScopes($scopes))
+            throw new InvalidArgumentException("Invalid scope");
+        $sql = "SELECT password, id FROM home_users WHERE username = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $username);
+        $stmt->bind_result($password_hash, $user_id);
+        $stmt->execute();
+        if(!$stmt->fetch())
+        {
+            $stmt->close();
+            return null;
+        }
+        if(!HomeUser::verifyPassword($password, $password_hash))
+        {
+            $stmt->close();
+            return null;
+        }
+        $stmt->close();
+        return OAuthUtils::generateAndInsertTokens($conn, $client_id, $user_id, $scopes);
     }
 
     /**
