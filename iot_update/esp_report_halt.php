@@ -48,7 +48,7 @@ if($json === false || !isset($json["device_id"]))
     exit(0);
 }
 
-require_once __DIR__."/../../includes/devices/EspWifiLedController.php";
+require_once __DIR__ . "/../includes/devices/EspWifiLedController.php";
 $device_id = $json["device_id"];
 $device = DeviceDbHelper::queryPhysicalDeviceById(DbUtils::getConnection(), $device_id);
 if($device === null)
@@ -59,10 +59,10 @@ if($device === null)
     exit(0);
 }
 
-require_once __DIR__."/../../includes/database/DbUtils.php";
-require_once __DIR__ . "/../../includes/database/DeviceDbHelper.php";
-require_once __DIR__."/../../includes/UserDeviceManager.php";
-require_once __DIR__ . "/../../includes/logging/LocalDeviceLogger.php";
+require_once __DIR__ . "/../includes/database/DbUtils.php";
+require_once __DIR__ . "/../includes/database/DeviceDbHelper.php";
+require_once __DIR__ . "/../includes/UserDeviceManager.php";
+require_once __DIR__ . "/../includes/logging/LocalDeviceLogger.php";
 $attempts = isset(apache_request_headers()["x-Request-Attempts"]) ? apache_request_headers()["x-Request-Attempts"] : null;
 
 //TODO: Set the device status to halted and maybe send a notification to the device owner
