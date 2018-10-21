@@ -30,17 +30,17 @@
  * Time: 18:32
  */
 
-require_once __DIR__."/../Utils.php";
-require_once __DIR__."/NavItem.php";
-require_once __DIR__."/NavPageSetListener.php";
-require_once __DIR__."/Navbar.php";
-require_once __DIR__."/NavHamburger.php";
-require_once __DIR__."/NavLink.php";
-require_once __DIR__."/NavList.php";
-require_once __DIR__."/NavDropdown.php";
-require_once __DIR__."/DropdownItem.php";
-require_once __DIR__."/NavBrand.php";
-require_once __DIR__."/NavDivider.php";
+require_once __DIR__ . "/../Utils.php";
+require_once __DIR__ . "/NavItem.php";
+require_once __DIR__ . "/NavPageSetListener.php";
+require_once __DIR__ . "/Navbar.php";
+require_once __DIR__ . "/NavHamburger.php";
+require_once __DIR__ . "/NavLink.php";
+require_once __DIR__ . "/NavList.php";
+require_once __DIR__ . "/NavDropdown.php";
+require_once __DIR__ . "/DropdownItem.php";
+require_once __DIR__ . "/NavBrand.php";
+require_once __DIR__ . "/NavDivider.php";
 
 class Nav
 {
@@ -60,8 +60,13 @@ class Nav
 
     const PAGE_DEVICES = "/devices";
     const PAGE_EFFECTS = "/effects";
+    const PAGE_PROFILES = "/profiles";
 
-    const DEFAULT_LINKS = [Nav::PAGE_DEVICES => "navbar_devices", Nav::PAGE_EFFECTS => "navbar_effects"];
+    const DEFAULT_LINKS = [
+        Nav::PAGE_DEVICES => "navbar_devices",
+        Nav::PAGE_EFFECTS => "navbar_effects",
+        Nav::PAGE_PROFILES => "navbar_profiles"
+    ];
 
     /** @var NavItem[] */
     private $items;
@@ -167,7 +172,7 @@ HTML;
 
     public static function getDefault($current_page = null)
     {
-        $nav_toggled_id = "navbar-".number_format( rand()*rand(), 0, '', '' );
+        $nav_toggled_id = "navbar-" . number_format(rand() * rand(), 0, '', '');
         $items = [];
         $items[] = new NavBrand(Utils::getString("navbar_brand_title"));
         $items[] = new NavHamburger($nav_toggled_id);

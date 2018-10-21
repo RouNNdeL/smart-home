@@ -50,6 +50,11 @@ echo $head->toString();
 
 ?>
 <body>
+<?php
+require_once __DIR__."/../../includes/navbar/Nav.php";
+
+echo Nav::getDefault(Nav::PAGE_PROFILES)->toString();
+?>
 <div class="container-fluid">
     <div class="row device-settings-content">
         <div class="col mt-3">
