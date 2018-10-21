@@ -75,6 +75,7 @@ class ActionsRequestManager
                     $payload["agentUserId"] = (string)$user_id;
                     $payload["devices"] = $userDeviceManager->getSync();
                     HomeUser::setActionsRegistered(DbUtils::getConnection(), $user_id, true);
+                    $userDeviceManager->sendReportState($request_id);
                     break;
                 case self::ACTION_INTENT_QUERY:
                     $payload["errorCode"] = "notSupported";
