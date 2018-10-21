@@ -3,6 +3,6 @@
     "src/*"
   ],
   "presets": [
-    "env"
+    "@babel/preset-env"
   ]
 }

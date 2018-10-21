@@ -307,7 +307,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-sass');
     grunt.loadNpmTasks('grunt-sass-lint');
-    grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-csscomb');
     grunt.loadNpmTasks('grunt-exorcise');
     grunt.loadNpmTasks('grunt-contrib-copy');
