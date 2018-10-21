@@ -92,11 +92,10 @@ abstract class PhysicalDevice
 
     /**
      * @param array $action
-     * @param string $request_id
      * @return array
      * @noinspection PhpUnusedParameterInspection
      */
-    public function handleAssistantAction(array $action, string $request_id)
+    public function handleAssistantAction(array $action)
     {
         $ids = [];
         foreach($action["commands"] as $command)

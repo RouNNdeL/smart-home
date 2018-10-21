@@ -40,8 +40,6 @@ require_once __DIR__ . "/RgbEffectDevice.php";
 class EspWifiLedController extends RgbEffectDevice
 {
 
-    private $request_id = null;
-
     public function isOnline()
     {
         $port = 80;
@@ -59,10 +57,9 @@ class EspWifiLedController extends RgbEffectDevice
      * @param string $request_id
      * @return array
      */
-    public function handleAssistantAction(array $action, string $request_id)
+    public function handleAssistantAction(array $action)
     {
-        $this->request_id = $request_id;
-        return parent::handleAssistantAction($action, $request_id);
+        return parent::handleAssistantAction($action);
     }
 
     public function reboot()
@@ -92,8 +89,6 @@ class EspWifiLedController extends RgbEffectDevice
                 "Content-Type: application/json",
                 "Content-Length: " . strlen($data_string)
             );
-            if($this->request_id !== null)
-                $headers[] = "x-Request-Id: $this->request_id";
 
             $ch = curl_init("http://" . $this->hostname . "/globals");
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");

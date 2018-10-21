@@ -68,19 +68,20 @@ class ActionsRequestManager
         $request_id = $request["requestId"];
         foreach($request["inputs"] as $input)
         {
+            $userDeviceManager = UserDeviceManager::fromUserId($user_id);
             switch($input["intent"])
             {
                 case self::ACTION_INTENT_SYNC:
                     $payload["agentUserId"] = (string)$user_id;
-                    $payload["devices"] = UserDeviceManager::fromUserId($user_id)->getSync();
+                    $payload["devices"] = $userDeviceManager->getSync();
                     HomeUser::setActionsRegistered(DbUtils::getConnection(), $user_id, true);
                     break;
                 case self::ACTION_INTENT_QUERY:
                     $payload["errorCode"] = "notSupported";
                     break;
                 case self::ACTION_INTENT_EXECUTE:
-                    $payload["commands"] =
-                        UserDeviceManager::fromUserId($user_id)->processExecute($input["payload"], $request_id);
+                    $payload["commands"] = $userDeviceManager->processExecute($input["payload"]);
+                    $userDeviceManager->sendReportState($request_id);
                     break;
                 case self::ACTION_INTENT_DISCONNECT:
                     HomeUser::setActionsRegistered(DbUtils::getConnection(), $user_id, false);

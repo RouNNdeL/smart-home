@@ -112,11 +112,11 @@ class UserDeviceManager
         return $response;
     }
 
-    public function processExecute(array $payload, string $request_id)
+    public function processExecute(array $payload)
     {
         $commands_response = [];
         foreach ($this->physical_devices as $device) {
-            $result = $device->handleAssistantAction($payload, $request_id);
+            $result = $device->handleAssistantAction($payload);
             $status = $result["status"];
             if(sizeof($result["ids"]) > 0)
             {
