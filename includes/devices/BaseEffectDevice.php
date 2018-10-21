@@ -187,7 +187,7 @@ HTML;
         $profile_add_color = Utils::getString("profile_add_color");
         $max_colors = $this->max_color_count;
         $current_effect = $this->effects[$effect];
-        $effect_name = $current_effect->getName();
+        $effect_name = htmlspecialchars($current_effect->getName());
 
         $effect_id = $current_effect->getId();
         $max_colors = $current_effect->getMaxColors() === Effect::COLOR_COUNT_UNLIMITED ?
@@ -223,7 +223,7 @@ HTML;
         <div class=\"col-24 col-sm-12 col-lg-8 col-xl-6 mb-3 mb-lg-0\">
             <div class=\"form-group\">
                 <h4>$profile_name</h4>
-                <input class='form-control effect-name-input' name='profile_name' value='$effect_name' placeholder='$name_placeholder'>
+                <input class='form-control effect-name-input' name='effect_name' value=\"$effect_name\" placeholder='$name_placeholder'>
             </div>
             <div class=\"form-group\">
                 <h4>$profile_effect</h4>

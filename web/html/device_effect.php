@@ -96,7 +96,7 @@ echo Nav::getDefault(Nav::PAGE_EFFECTS)->toString();
                         foreach($effects as $i => $effect)
                         {
                             $active = $i ? "" : "active";
-                            $name = $effect->getName();
+                            $name = htmlspecialchars($effect->getName());
                             $effect_id = "e-".$effect->getId();
                             echo <<<HTML
                         <li class="nav-item">

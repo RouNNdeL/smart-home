@@ -44,7 +44,7 @@ $manager = GlobalManager::all();
 
 $json = json_decode(file_get_contents("php://input"), true);
 if($json === false || !isset($json["effect"]) || !isset($json["effect_id"]) || !isset($json["times"])
-    || !isset($json["args"]) || !isset($json["colors"]))
+    || !isset($json["args"]) || !isset($json["colors"]) || !isset($json["effect_name"]))
 {
     $response = ["status" => "error", "error" => "invalid_json"];
     http_response_code(400);

@@ -765,7 +765,7 @@ abstract class Effect
         $times = $json["times"];
         $args = $json["args"];
         $colors = $json["colors"];
-        $name = $json["profile_name"];
+        $name = $json["effect_name"];
         $id = $json["effect_id"];
 
         $class = Effect::getClassForEffectId($json["effect"]);
