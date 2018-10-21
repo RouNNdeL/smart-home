@@ -105,7 +105,7 @@ class Profile
 
             $effect_url = "/effect/" . $device->getDeviceId() . "#e-" . $effect->getId();
             $device_name = $device->getDeviceName();
-            $effect_name = $effect->getName();
+            $effect_name = htmlspecialchars($effect->getName());
             $html .= <<<HTML
             <a href="$effect_url" class="list-group-item list-group-item-action flex-column align-items-start col-24 col-md-12 col-xl-8">
                 <div class="row">
