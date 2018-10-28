@@ -328,4 +328,6 @@ abstract class RgbEffectDevice extends PhysicalDevice
     }
 
     public abstract function saveEffectForDevice(string $device_id, int $index);
+
+    public abstract function previewEffect(string $device_id, int $index);
 }

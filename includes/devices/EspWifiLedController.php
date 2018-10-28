@@ -214,4 +214,39 @@ class EspWifiLedController extends RgbEffectDevice
         }
         return false;
     }
+
+    public function previewEffect(string $device_id, int $index)
+    {
+        $device = $this->getVirtualDeviceById($device_id);
+        $class_name = get_class($this);
+        if(!$device instanceof BaseEffectDevice)
+            throw new UnexpectedValueException("Children of $class_name should be of type RgbEffectDevice");
+
+        $device_index = $this->getVirtualDeviceIndexById($device_id);
+        $hex = str_repeat("??", sizeof($this->virtual_devices) + $device_index) . "05" .
+            str_repeat("??", sizeof($this->virtual_devices) * 4 - 1) .
+            Utils::intToHex($index) . "*";
+
+        if($this->isOnline())
+        {
+            $headers = array(
+                "Content-Type: application/json",
+                "Content-Length: " . strlen($hex)
+            );
+
+            $ch = curl_init("http://" . $this->hostname . "/globals");
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $hex);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_exec($ch);
+            curl_close($ch);
+
+            return true;
+        }
+        return false;
+    }
+
+
 }

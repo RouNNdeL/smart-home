@@ -72,6 +72,8 @@ if($device === null || !$device instanceof BaseEffectDevice)
 
 $effect = Effect::fromJson($json);
 $index = $device->updateEffect($effect);
+//TODO: Move to a separate API call
+$physical->previewEffect($json["device_id"], $index);
 $success = $physical->saveEffectForDevice($json["device_id"], $index);
 $response = ["status" => $success ? "success" : "error",
     "message" => $success ? "Saved successfully!" : "An error occurred!",
