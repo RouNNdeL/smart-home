@@ -47,7 +47,7 @@ LocalDeviceLogger::log($device_id, LocalDeviceLogger::TYPE_UPDATE_CHECK, $attemp
 $md5 = apache_request_headers()["x-ESP8266-sketch-md5"];
 $newest_file = null;
 $newest_version = -1;
-$dir = __DIR__ . "/../iot_binaries/device_";
+$dir = __DIR__ . "/../iot_binaries/device_".$device_id;
 foreach(scandir($dir) as $item)
 {
     preg_match("/bin_(\d+)\.bin/", $item, $matches);
