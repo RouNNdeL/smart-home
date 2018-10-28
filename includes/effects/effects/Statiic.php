@@ -104,10 +104,13 @@ class Statiic extends Effect
     public function overwriteValues()
     {
         $this->timings[Effect::TIME_ON] = 1;
+        $this->timings[Effect::TIME_OFF] = 0;
+        $this->timings[Effect::TIME_FADEIN] = 0;
+        $this->timings[Effect::TIME_FADEOUT] = 0;
         $this->timings[Effect::TIME_ROTATION] = 0;
         if(!isset($this->colors[0]))
-            $this->colors[0] = 0;
-        $this->colors = [$this->colors[0]]; //Remove any unn
+            $this->colors[0] = 0xff0000;
+        $this->colors = [$this->colors[0]]; //Remove any unnecessary colors
     }
 
     /**

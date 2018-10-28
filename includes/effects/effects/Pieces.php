@@ -102,7 +102,7 @@ class Pieces extends Effect
      */
     public function getMinColors()
     {
-        return 1;
+        return 2;
     }
 
     /**
@@ -111,6 +111,8 @@ class Pieces extends Effect
      */
     public function overwriteValues()
     {
+        if(sizeof($this->colors) < 2)
+            $this->colors = [0xff0000, 0x0000ff];
         if($this->timings[Effect::TIME_ON] === 0 && $this->timings[Pieces::TIME_FADE] === 0)
             $this->timings[Effect::TIME_ON] = 0x10;
         if($this->args[Pieces::ARG_COLOR_COUNT] > sizeof($this->colors))

@@ -99,7 +99,7 @@ class Blink extends Effect
         if($this->args[Effect::ARG_COLOR_CYCLES] < 1)
             $this->args[Effect::ARG_COLOR_CYCLES] = 1;
         if($this->timings[Effect::TIME_ON] <= 0)
-            $this->timings[Effect::TIME_ON] = 1;
+            $this->timings[Effect::TIME_ON] = 0x10;
     }
 
     /**
