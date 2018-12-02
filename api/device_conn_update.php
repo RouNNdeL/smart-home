@@ -40,8 +40,8 @@ if($_SERVER["REQUEST_METHOD"] !== "POST") {
 }
 
 $json = json_decode(file_get_contents("php://input"), true);
-if($json === false || !isset($json["device_id"]) || !isset($json["device_ip"]) || !isset($json["device_port"])
-    || !is_int($json["device_port"]) || !is_string($json["device_id"]) || !is_string($json["device_ip"])) {
+if($json === false || !isset($json["device_id"]) || !isset($json["device_port"])
+    || !is_int($json["device_port"]) || !is_string($json["device_id"])) {
     $response = ["status" => "error", "error" => "invalid_json"];
     http_response_code(400);
     echo json_encode($response);
@@ -51,7 +51,7 @@ if($json === false || !isset($json["device_id"]) || !isset($json["device_ip"]) |
 require_once __DIR__ . "/../includes/database/DbUtils.php";
 require_once __DIR__ . "/../includes/database/DeviceDbHelper.php";
 $success = DeviceDbHelper::updateDeviceConnectionInfo(DbUtils::getConnection(),
-    $json["device_id"], $json["device_ip"], $json["device_port"]);
+    $json["device_id"], $_SERVER["REMOTE_ADDR"], $json["device_port"]);
 
 if($success) {
     $response = ["status" => "success"];
