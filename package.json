@@ -2,23 +2,23 @@
   "name": "SmartHome",
   "version": "1.0.0",
   "dependencies": {
-    "@babel/core": "^7.1.2",
-    "@babel/preset-env": "^7.1.0",
-    "bootstrap": "^4.1.3",
+    "bootstrap": "^4.1.1",
     "bootstrap-switch": "^3.3.4",
     "ion-rangeslider": "^2.2.0",
-    "jquery": "^3.3.1",
+    "jquery": "latest",
     "jquery-ui": "^1.12.1",
     "math-expression-evaluator": "^1.2.17",
-    "mathjs": "^5.2.1",
+    "mathjs": "^5.0.0",
     "open-iconic": "^1.1.1",
-    "popper.js": "^1.14.4",
+    "popper.js": "^1.14.3",
     "tether": "1.4.4"
   },
   "devDependencies": {
+    "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
-    "babelify": "10.0.0",
+    "babelify": "latest",
     "grunt": "^1.0.3",
+    "grunt-babel": "^7.0.0",
     "grunt-browserify": "^5.3.0",
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-copy": "^1.0.0",
@@ -28,10 +28,10 @@
     "grunt-csscomb": "^3.1.1",
     "grunt-exorcise": "^2.1.1",
     "grunt-jsonlint": "^1.1.0",
-    "grunt-sass": "^3.0.2",
+    "grunt-sass": "^3.0.0",
     "grunt-sass-lint": "^0.2.4",
-    "jshint": "^2.9.6",
-    "node-sass": "^4.9.4"
+    "jshint": "^2.9.5",
+    "node-sass": "^4.10.0"
   },
   "scripts": {
     "build": "grunt vendor && grunt"

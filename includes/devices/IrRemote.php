@@ -33,19 +33,16 @@
 require_once __DIR__ . "/PhysicalDevice.php";
 require_once __DIR__ . "/ir/RemoteAction.php";
 
-class IrRemote extends PhysicalDevice
-{
-    public function __construct(string $id, int $owner_id, string $display_name, string $hostname, $virtual_devices)
-    {
-        parent::__construct($id, $owner_id, $display_name, $hostname, $virtual_devices);
+class IrRemote extends PhysicalDevice {
+    public function __construct(string $id, int $owner_id, string $display_name, string $hostname, int $port, $virtual_devices) {
+        parent::__construct($id, $owner_id, $display_name, $hostname, $port, $virtual_devices);
     }
 
 
     /**
      * @return bool
      */
-    public function isOnline()
-    {
+    public function isOnline() {
         $port = 80;
         $waitTimeoutInSeconds = .2;
         $fp = fsockopen($this->hostname, $port, $errCode, $errStr, $waitTimeoutInSeconds);
@@ -60,8 +57,7 @@ class IrRemote extends PhysicalDevice
      * @param bool $quick
      * @return bool - whether the device was online when calling save
      */
-    public function save(bool $quick)
-    {
+    public function save(bool $quick) {
         return true;
     }
 
@@ -72,17 +68,14 @@ class IrRemote extends PhysicalDevice
      * @param string $hostname
      * @return PhysicalDevice
      */
-    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname)
-    {
+    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port) {
 
         $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
-        return new IrRemote($device_id, $owner_id, $display_name, $hostname, $virtual);
+        return new IrRemote($device_id, $owner_id, $display_name, $hostname, $port, $virtual);
     }
 
-    public function reboot()
-    {
-        if($this->isOnline())
-        {
+    public function reboot() {
+        if($this->isOnline()) {
             $ch = curl_init("http://" . $this->hostname . "/restart");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_exec($ch);
@@ -92,11 +85,10 @@ class IrRemote extends PhysicalDevice
         return false;
     }
 
-    public function sendCode(int $protocol, string $code, $support)
-    {
+    public function sendCode(int $protocol, string $code, $support) {
         $data = "p=" . $protocol . "&v=" . str_pad(Utils::dec2hex($code), 8, '0', STR_PAD_LEFT);
         if($support !== null)
-            $data .= "&s=".str_pad(Utils::dec2hex($support), 8, '0', STR_PAD_LEFT);
+            $data .= "&s=" . str_pad(Utils::dec2hex($support), 8, '0', STR_PAD_LEFT);
 
         $headers = array(
             "Content-Type: application/x-www-form-urlencoded"

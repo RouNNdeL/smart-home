@@ -37,14 +37,11 @@ require_once __DIR__ . "/RgbEffectDevice.php";
 /**
  * To be used with an ESP8266 WiFi Led Controller: https://github.com/RouNNdeL/esp8266-leds
  */
-class EspWifiLedController extends RgbEffectDevice
-{
+class EspWifiLedController extends RgbEffectDevice {
 
-    public function isOnline()
-    {
-        $port = 80;
+    public function isOnline() {
         $waitTimeoutInSeconds = .2;
-        $fp = fsockopen($this->hostname, $port, $errCode, $errStr, $waitTimeoutInSeconds);
+        $fp = fsockopen($this->hostname, $this->port, $errCode, $errStr, $waitTimeoutInSeconds);
         $online = $fp !== false;
         DeviceDbHelper::setOnline(DbUtils::getConnection(), $this->getId(), $online);
         if($online)
@@ -52,20 +49,8 @@ class EspWifiLedController extends RgbEffectDevice
         return $online;
     }
 
-    /**
-     * @param array $action
-     * @param string $request_id
-     * @return array
-     */
-    public function handleAssistantAction(array $action)
-    {
-        return parent::handleAssistantAction($action);
-    }
-
-    public function reboot()
-    {
-        if($this->isOnline())
-        {
+    public function reboot() {
+        if($this->isOnline()) {
             $ch = curl_init("http://" . $this->hostname . "/restart");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_exec($ch);
@@ -79,18 +64,19 @@ class EspWifiLedController extends RgbEffectDevice
      * @param bool $quick
      * @return bool - whether the device was online when calling save
      */
-    public function save(bool $quick)
-    {
+    public function save(bool $quick) {
         $online = $quick || $this->isOnline();
-        if($online)
-        {
+        if($online) {
             $data_string = ($quick ? "q" : "") . $this->getSmallGlobalsHex() . "*";
             $headers = array(
                 "Content-Type: application/json",
                 "Content-Length: " . strlen($data_string)
             );
 
-            $ch = curl_init("http://" . $this->hostname . "/globals");
+            $url = <<<URL
+http://$this->hostname:$this->port/globals
+URL;
+            $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
             curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -100,20 +86,36 @@ class EspWifiLedController extends RgbEffectDevice
             curl_close($ch);
         }
 
-        foreach($this->virtual_devices as $virtual_device)
-        {
+        foreach($this->virtual_devices as $virtual_device) {
             $virtual_device->toDatabase();
         }
         return $online;
     }
 
-    private function getSmallGlobalsHex()
-    {
+    public function handleReportedState(array $state) {
+        $this->current_profile = $state["current_profile"];
+        $this->auto_increment = $state["auto_increment"];
+        // $this->avr_order = $state["profiles"];
+        for($i = 0; $i < sizeof($this->virtual_devices); $i++) {
+            $virtual_device = $this->virtual_devices[$i];
+            if(!($virtual_device instanceof BaseEffectDevice))
+                throw new UnexpectedValueException("Children of EspWifiLedController should be of type RgbEffectDevice");
+            $virtual_device->setBrightness(ceil($state["brightness"][$i] * 100 / 255));
+            $virtual_device->setOn($state["flags"][$i] & (1 << 0));
+            $virtual_device->setEffectsEnabled($state["flags"][$i] & (1 << 2));
+            $virtual_device->setColor($state["color"][$i]);
+        }
+
+        foreach($this->virtual_devices as $virtual_device) {
+            $virtual_device->toDatabase();
+        }
+    }
+
+    private function getSmallGlobalsHex() {
         $str_b = "";
         $str_f = "";
         $str_c = "";
-        for($i = 0; $i < sizeof($this->virtual_devices); $i++)
-        {
+        for($i = 0; $i < sizeof($this->virtual_devices); $i++) {
             $device = $this->virtual_devices[$i];
             $class_name = get_class($this);
             if(!$device instanceof BaseEffectDevice)
@@ -129,36 +131,30 @@ class EspWifiLedController extends RgbEffectDevice
         return $str_b . $str_f . $str_c;
     }
 
-    private function getGlobalsHex()
-    {
+    private function getGlobalsHex() {
         $str = $this->getSmallGlobalsHex();
         $str .= dechex($this->getActiveProfileIndex());
         $str .= dechex($this->getProfileCount());
         $str .= dechex($this->getAutoIncrement());
 
-        foreach($this->avr_order as $item)
-        {
+        foreach($this->avr_order as $item) {
             $str .= dechex($item);
         }
 
         return $str;
     }
 
-    private function getEffectHex(Effect $effect)
-    {
+    private function getEffectHex(Effect $effect) {
         $str = Utils::intToHex($effect->avrEffect());
         $str .= Utils::intToHex(sizeof($effect->getColors()));
 
-        foreach($effect->getTimes(Effect::TIMING_MODE_RAW) as $arg)
-        {
+        foreach($effect->getTimes(Effect::TIMING_MODE_RAW) as $arg) {
             $str .= Utils::intToHex($arg);
         }
-        foreach($effect->getSanitizedArgs() as $arg)
-        {
+        foreach($effect->getSanitizedArgs() as $arg) {
             $str .= Utils::intToHex($arg);
         }
-        foreach($effect->getSanitizedColors($this->max_color_count) as $color)
-        {
+        foreach($effect->getSanitizedColors($this->max_color_count) as $color) {
             $r = $color >> 16 & 0xff;
             $g = $color >> 8 & 0xff;
             $b = $color >> 0 & 0xff;
@@ -178,14 +174,12 @@ class EspWifiLedController extends RgbEffectDevice
      * @param string $hostname
      * @return PhysicalDevice
      */
-    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname)
-    {
+    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port) {
         $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
-        return new EspWifiLedController($device_id, $owner_id, $display_name, $hostname, 0, true, 0, [], $virtual);
+        return new EspWifiLedController($device_id, $owner_id, $display_name, $hostname, $port, 0, true, 0, [], $virtual);
     }
 
-    public function saveEffectForDevice(string $device_id, int $index)
-    {
+    public function saveEffectForDevice(string $device_id, int $index) {
         $device = $this->getVirtualDeviceById($device_id);
         $class_name = get_class($this);
         if(!$device instanceof BaseEffectDevice)
@@ -194,14 +188,16 @@ class EspWifiLedController extends RgbEffectDevice
         $hex .= Utils::intToHex($this->getVirtualDeviceIndexById($device_id));
         $hex .= $this->getEffectHex($device->getEffects()[$index]);
 
-        if($this->isOnline())
-        {
+        if($this->isOnline()) {
             $headers = array(
                 "Content-Type: application/json",
                 "Content-Length: " . strlen($hex)
             );
 
-            $ch = curl_init("http://" . $this->hostname . "/profile");
+            $url = <<<URL
+http://$this->hostname:$this->port/profile
+URL;
+            $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
             curl_setopt($ch, CURLOPT_POSTFIELDS, $hex);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -214,39 +210,4 @@ class EspWifiLedController extends RgbEffectDevice
         }
         return false;
     }
-
-    public function previewEffect(string $device_id, int $index)
-    {
-        $device = $this->getVirtualDeviceById($device_id);
-        $class_name = get_class($this);
-        if(!$device instanceof BaseEffectDevice)
-            throw new UnexpectedValueException("Children of $class_name should be of type RgbEffectDevice");
-
-        $device_index = $this->getVirtualDeviceIndexById($device_id);
-        $hex = str_repeat("??", sizeof($this->virtual_devices) + $device_index) . "05" .
-            str_repeat("??", sizeof($this->virtual_devices) * 4 - 1) .
-            Utils::intToHex($index) . "*";
-
-        if($this->isOnline())
-        {
-            $headers = array(
-                "Content-Type: application/json",
-                "Content-Length: " . strlen($hex)
-            );
-
-            $ch = curl_init("http://" . $this->hostname . "/globals");
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $hex);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLINFO_HEADER_OUT, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_exec($ch);
-            curl_close($ch);
-
-            return true;
-        }
-        return false;
-    }
-
-
 }
