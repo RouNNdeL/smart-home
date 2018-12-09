@@ -38,21 +38,6 @@ class IrRemote extends PhysicalDevice {
         parent::__construct($id, $owner_id, $display_name, $hostname, $port, $virtual_devices);
     }
 
-
-    /**
-     * @return bool
-     */
-    public function isOnline() {
-        $port = 80;
-        $waitTimeoutInSeconds = .2;
-        $fp = fsockopen($this->hostname, $port, $errCode, $errStr, $waitTimeoutInSeconds);
-        $online = $fp !== false;
-        DeviceDbHelper::setOnline(DbUtils::getConnection(), $this->getId(), $online);
-        if($online)
-            fclose($fp);
-        return $online;
-    }
-
     /**
      * @param bool $quick
      * @return bool - whether the device was online when calling save
