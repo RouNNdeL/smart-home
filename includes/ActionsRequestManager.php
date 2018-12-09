@@ -36,8 +36,7 @@ require_once __DIR__ . "/database/HomeUser.php";
 require_once __DIR__ . "/../includes/database/DbUtils.php";
 require_once __DIR__ . "/../includes/oauth/OAuthUtils.php";
 
-class ActionsRequestManager
-{
+class ActionsRequestManager {
     const ACTION_INTENT_SYNC = "action.devices.SYNC";
     const ACTION_INTENT_QUERY = "action.devices.QUERY";
     const ACTION_INTENT_EXECUTE = "action.devices.EXECUTE";
@@ -48,29 +47,24 @@ class ActionsRequestManager
      * @param string $token
      * @return array
      */
-    public static function processRequest(array $request, string $token)
-    {
+    public static function processRequest(array $request, string $token) {
         $user_id = OAuthUtils::getUserIdForToken(DbUtils::getConnection(), $token);
-        if($user_id == null)
-        {
+        if($user_id == null) {
             http_response_code(400);
             return ["error" => "invalid_grant"];
         }
 
         $scopes = OAuthUtils::getScopesForToken(DbUtils::getConnection(), $token);
-        if(strpos($scopes, OAuthUtils::SCOPE_HOME_CONTROL) === false)
-        {
+        if(strpos($scopes, OAuthUtils::SCOPE_HOME_CONTROL) === false) {
             http_response_code(400);
             return ["error" => "invalid_scope"];
         }
 
         $payload = [];
         $request_id = $request["requestId"];
-        foreach($request["inputs"] as $input)
-        {
+        foreach($request["inputs"] as $input) {
             $userDeviceManager = UserDeviceManager::fromUserId($user_id);
-            switch($input["intent"])
-            {
+            switch($input["intent"]) {
                 case self::ACTION_INTENT_SYNC:
                     $payload["agentUserId"] = (string)$user_id;
                     $payload["devices"] = $userDeviceManager->getSync();
@@ -78,7 +72,7 @@ class ActionsRequestManager
                     $userDeviceManager->sendReportState($request_id);
                     break;
                 case self::ACTION_INTENT_QUERY:
-                    $payload["devices"] = $userDeviceManager->processQuery($payload);
+                    $payload["devices"] = $userDeviceManager->processQuery($input["payload"]);
                     break;
                 case self::ACTION_INTENT_EXECUTE:
                     $payload["commands"] = $userDeviceManager->processExecute($input["payload"]);
@@ -98,8 +92,7 @@ class ActionsRequestManager
 
     private static function insertRequest(int $user_id, string $request_id, string $type,
                                           string $request_payload, string $response_payload
-    )
-    {
+    ) {
         $sql = "INSERT INTO actions_requests 
                   (user_id, request_id, type, request_payload, response_payload) 
                 VALUES ($user_id, ?, ?, ?, ?)";
