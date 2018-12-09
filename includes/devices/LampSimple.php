@@ -29,8 +29,7 @@
  * Date: 2018-06-07
  * Time: 18:14
  */
-class LampSimple extends VirtualDevice
-{
+class LampSimple extends VirtualDevice {
     /** @var bool */
     protected $on;
 
@@ -43,8 +42,7 @@ class LampSimple extends VirtualDevice
      * @param bool $will_report_state
      * @param bool $on
      */
-    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions, bool $will_report_state, bool $on = true)
-    {
+    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions, bool $will_report_state, bool $on = true) {
         parent::__construct($device_id, $device_name, $synonyms, VirtualDevice::DEVICE_TYPE_LAMP, $home_actions, $will_report_state);
         $this->on = $on;
     }
@@ -53,10 +51,8 @@ class LampSimple extends VirtualDevice
     /**
      * @param array $command
      */
-    public function handleAssistantAction($command)
-    {
-        switch($command["command"])
-        {
+    public function handleAssistantAction($command) {
+        switch($command["command"]) {
             case VirtualDevice::DEVICE_COMMAND_ON_OFF:
                 $this->on = $command["params"]["on"];
                 break;
@@ -66,8 +62,7 @@ class LampSimple extends VirtualDevice
     /**
      * @param array $json
      */
-    public function handleSaveJson($json)
-    {
+    public function handleSaveJson($json) {
         if(isset($json["state"]))
             $this->on = $json["state"];
     }
@@ -76,21 +71,20 @@ class LampSimple extends VirtualDevice
      * @param bool $online
      * @return array
      */
-    public function getStateJson(bool $online = false)
-    {
+    public function getStateJson(bool $online = false) {
         return [
             "on" => $this->on,
             "online" => $online,
         ];
     }
 
-    public function toDatabase()
-    {
+    public function toDatabase() {
+        $state = $this->on ? 1 : 0;
         $conn = DbUtils::getConnection();
         $sql = "UPDATE devices_virtual SET 
-                  state = $this->on WHERE id = ?";
+                  state = ? WHERE id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $this->device_id);
+        $stmt->bind_param("is", $state, $this->device_id);
         $stmt->execute();
         $stmt->close();
     }
@@ -100,40 +94,34 @@ class LampSimple extends VirtualDevice
      * @param string $footer_html
      * @return string
      */
-    public function toHtml($header_name = null, $footer_html = "")
-    {
+    public function toHtml($header_name = null, $footer_html = "") {
         // TODO: Implement toHTML() method.
         return "";
     }
 
-    public function getTraits()
-    {
+    public function getTraits() {
         return [self::DEVICE_TRAIT_ON_OFF];
     }
 
-    public function getActionsDeviceType()
-    {
+    public function getActionsDeviceType() {
         return self::DEVICE_TYPE_ACTIONS_LIGHT;
     }
 
-    public function getAttributes()
-    {
+    public function getAttributes() {
         return [];
     }
 
     /**
      * @return bool
      */
-    public function isOn(): bool
-    {
+    public function isOn(): bool {
         return $this->on;
     }
 
     /**
      * @param bool $on
      */
-    public function setOn(bool $on)
-    {
+    public function setOn(bool $on) {
         $this->on = $on;
     }
 

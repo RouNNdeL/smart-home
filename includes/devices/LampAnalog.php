@@ -29,8 +29,7 @@
  * Date: 2018-06-07
  * Time: 18:12
  */
-class LampAnalog extends VirtualDevice
-{
+class LampAnalog extends VirtualDevice {
     /** @var int */
     protected $brightness;
 
@@ -47,8 +46,7 @@ class LampAnalog extends VirtualDevice
      * @param int $brightness
      * @param bool $on
      */
-    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions, bool $will_report_state, int $brightness = 100, bool $on = true)
-    {
+    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions, bool $will_report_state, int $brightness = 100, bool $on = true) {
         parent::__construct($device_id, $device_name, $synonyms, VirtualDevice::DEVICE_TYPE_LAMP_ANALOG, $home_actions, $will_report_state);
         $this->brightness = $brightness;
         $this->on = $on;
@@ -58,10 +56,8 @@ class LampAnalog extends VirtualDevice
     /**
      * @param array $command
      */
-    public function handleAssistantAction($command)
-    {
-        switch($command["command"])
-        {
+    public function handleAssistantAction($command) {
+        switch($command["command"]) {
             case VirtualDevice::DEVICE_COMMAND_BRIGHTNESS_ABSOLUTE:
                 $this->brightness = $command["params"]["brightness"];
                 $this->on = $this->brightness !== 0 ? true : false;
@@ -78,8 +74,7 @@ class LampAnalog extends VirtualDevice
     /**
      * @param array $json
      */
-    public function handleSaveJson($json)
-    {
+    public function handleSaveJson($json) {
         if(isset($json["state"]))
             $this->on = $json["state"];
         if(isset($json["brightness"]))
@@ -90,8 +85,7 @@ class LampAnalog extends VirtualDevice
      * @param bool $online
      * @return array
      */
-    public function getStateJson(bool $online = false)
-    {
+    public function getStateJson(bool $online = false) {
         return [
             "on" => $this->on,
             "online" => $online,
@@ -99,14 +93,14 @@ class LampAnalog extends VirtualDevice
         ];
     }
 
-    public function toDatabase()
-    {
+    public function toDatabase() {
+        $state = $this->on ? 1 : 0;
         $conn = DbUtils::getConnection();
         $sql = "UPDATE devices_virtual SET 
-                  brightness = $this->brightness, 
-                  state = $this->on WHERE id = ?";
+                  brightness = ?, 
+                  state = ? WHERE id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $this->device_id);
+        $stmt->bind_param("iis", $this->brightness, $state, $this->device_id);
         $stmt->execute();
         $stmt->close();
     }
@@ -116,56 +110,48 @@ class LampAnalog extends VirtualDevice
      * @param string $footer_html
      * @return string
      */
-    public function toHtml($header_name = null, $footer_html = "")
-    {
+    public function toHtml($header_name = null, $footer_html = "") {
         // TODO: Implement toHTML() method.
         return "";
     }
 
-    public function getTraits()
-    {
+    public function getTraits() {
         return [self::DEVICE_TRAIT_ON_OFF, self::DEVICE_TRAIT_BRIGHTNESS];
     }
 
-    public function getActionsDeviceType()
-    {
+    public function getActionsDeviceType() {
         return self::DEVICE_TYPE_ACTIONS_LIGHT;
     }
 
-    public function getAttributes()
-    {
+    public function getAttributes() {
         return [];
     }
 
     /**
      * @return bool
      */
-    public function isOn(): bool
-    {
+    public function isOn(): bool {
         return $this->on;
     }
 
     /**
      * @return int
      */
-    public function getBrightness(): int
-    {
+    public function getBrightness(): int {
         return $this->brightness;
     }
 
     /**
      * @param int $brightness
      */
-    public function setBrightness(int $brightness)
-    {
+    public function setBrightness(int $brightness) {
         $this->brightness = $brightness;
     }
 
     /**
      * @param bool $on
      */
-    public function setOn(bool $on)
-    {
+    public function setOn(bool $on) {
         $this->on = $on;
     }
 }
