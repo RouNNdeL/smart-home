@@ -52,6 +52,7 @@ require_once __DIR__ . "/../includes/database/DbUtils.php";
 require_once __DIR__ . "/../includes/database/DeviceDbHelper.php";
 $success = DeviceDbHelper::updateDeviceConnectionInfo(DbUtils::getConnection(),
     $json["device_id"], $_SERVER["REMOTE_ADDR"], $json["device_port"]);
+DeviceDbHelper::queryPhysicalDeviceById(DbUtils::getConnection(), $json["device_id"])->isOnline();
 
 if($success) {
     $response = ["status" => "success"];
