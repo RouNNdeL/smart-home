@@ -54,6 +54,8 @@ abstract class PhysicalDevice {
 
     protected $port;
 
+    protected $online = null;
+
     /**
      * PhysicalDevice constructor.
      * @param string $id
@@ -73,7 +75,17 @@ abstract class PhysicalDevice {
     /**
      * @return bool
      */
-    public abstract function isOnline();
+    public function isOnline() {
+        if($this->online !== null)
+            return $this->online;
+        $waitTimeoutInSeconds = .2;
+        $fp = fsockopen($this->hostname, $this->port, $errCode, $errStr, $waitTimeoutInSeconds);
+        $this->online = $fp !== false;
+        DeviceDbHelper::setOnline(DbUtils::getConnection(), $this->getId(), $this->online);
+        if($this->online)
+            fclose($fp);
+        return $this->online;
+    }
 
     /**
      * @param bool $quick
@@ -225,7 +237,7 @@ HTML;
     }
 
     public function getNameWithState() {
-        $class = $this->isOnline() ?  "invisible" : "";
+        $class = $this->isOnline() ? "invisible" : "";
         return trim("$this->display_name <span class=\"device-offline-text $class\">(" . Utils::getString("device_status_offline") . ")</span>");
     }
 }

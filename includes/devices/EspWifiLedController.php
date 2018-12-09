@@ -39,16 +39,6 @@ require_once __DIR__ . "/RgbEffectDevice.php";
  */
 class EspWifiLedController extends RgbEffectDevice {
 
-    public function isOnline() {
-        $waitTimeoutInSeconds = .2;
-        $fp = fsockopen($this->hostname, $this->port, $errCode, $errStr, $waitTimeoutInSeconds);
-        $online = $fp !== false;
-        DeviceDbHelper::setOnline(DbUtils::getConnection(), $this->getId(), $online);
-        if($online)
-            fclose($fp);
-        return $online;
-    }
-
     public function reboot() {
         if($this->isOnline()) {
             $ch = curl_init("http://" . $this->hostname . "/restart");
@@ -212,8 +202,7 @@ URL;
         return false;
     }
 
-    public function previewEffect(string $device_id, int $index)
-    {
+    public function previewEffect(string $device_id, int $index) {
         $device = $this->getVirtualDeviceById($device_id);
         $class_name = get_class($this);
         if(!$device instanceof BaseEffectDevice)
@@ -224,8 +213,7 @@ URL;
             str_repeat("??", sizeof($this->virtual_devices) * 4 - 1) .
             Utils::intToHex($index) . "*";
 
-        if($this->isOnline())
-        {
+        if($this->isOnline()) {
             $headers = array(
                 "Content-Type: application/json",
                 "Content-Length: " . strlen($hex)

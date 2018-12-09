@@ -35,37 +35,18 @@ require_once __DIR__ . "/../database/DbUtils.php";
 require_once __DIR__ . "/../database/DeviceDbHelper.php";
 require_once __DIR__ . "/../UserDeviceManager.php";
 
-class EspWiFiLamp extends PhysicalDevice
-{
-
-    /**
-     * @return bool
-     */
-    public function isOnline()
-    {
-        $port = 80;
-        $waitTimeoutInSeconds = .2;
-        $fp = fsockopen($this->hostname, $port, $errCode, $errStr, $waitTimeoutInSeconds);
-        $online = $fp !== false;
-        DeviceDbHelper::setOnline(DbUtils::getConnection(), $this->getId(), $online);
-        if($online)
-            fclose($fp);
-        return $online;
-    }
-
+class EspWiFiLamp extends PhysicalDevice {
     /**
      * @param bool $quick
      * @return bool - whether the device was online when calling save
      */
-    public function save(bool $quick)
-    {
+    public function save(bool $quick) {
         $device = $this->virtual_devices[0];
         if(!$device instanceof LampAnalog)
             throw new UnexpectedValueException("Children of EspWiFiLamp should be of type LampAnalog");
 
         $online = $this->isOnline();
-        if($online)
-        {
+        if($online) {
             $b = $device->getBrightness() * 255 / 100;
             $s = $device->isOn() ? 1 : 0;
             $ch = curl_init("http://" . $this->hostname . "?b=" . $b . "&s=" . $s);
@@ -87,14 +68,12 @@ class EspWiFiLamp extends PhysicalDevice
      * @param string $hostname
      * @return PhysicalDevice
      */
-    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port)
-    {
+    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port) {
         $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
         return new EspWiFiLamp($device_id, $owner_id, $display_name, $hostname, $port, $virtual);
     }
 
-    public function reboot()
-    {
+    public function reboot() {
         // TODO: Implement reboot() method.
     }
 }

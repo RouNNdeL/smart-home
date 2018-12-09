@@ -35,21 +35,7 @@ require_once __DIR__ . "/../database/DeviceDbHelper.php";
 require_once __DIR__ . "/RgbEffectDevice.php";
 
 class PcLedController extends RgbEffectDevice {
-
     const DEVICE_INDEXES = ["pc_case" => 0, "pc_gpu" => 1, "pc_fan1" => 2, "pc_fan2" => 3, "pc_strip" => 5];
-
-    /**
-     * @return bool
-     */
-    public function isOnline() {
-        $waitTimeoutInSeconds = .2;
-        $fp = fsockopen($this->hostname, $this->port, $errCode, $errStr, $waitTimeoutInSeconds);
-        $online = $fp !== false;
-        DeviceDbHelper::setOnline(DbUtils::getConnection(), $this->getId(), $online);
-        if($online)
-            fclose($fp);
-        return $online;
-    }
 
     /**
      * @param bool $quick
