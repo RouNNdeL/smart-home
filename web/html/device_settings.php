@@ -80,17 +80,17 @@ echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
         <div class="col">
             <?php
             $reboot_string = Utils::getString("device_reboot");
+            $parent_id = $device->getId();
             if(sizeof($virtualDevices) > 1)
             {
                 $virtual_html = "";
-                $parent_id = $device->getId();
                 foreach($virtualDevices as $i => $virtualDevice)
                 {
                     $html = $virtualDevice->toHtml();
                     $id = $virtualDevice->getDeviceId();
                     $virtual_html .= <<<HTML
                         <div class="col-24 col-sm-12 col-md-8 col-lg-6 px-1 py-1">
-                            <div class="card device-parent" data-device-id="$id"  data-parent-id="$parent_id">
+                            <div class="card device-parent" data-device-id="$id" data-parent-id="$parent_id">
                                 $html
                             </div> 
                         </div>
@@ -129,7 +129,7 @@ HTML;
                 $virtual_html = $virtualDevices[0]->toHtml($device->getNameWithState(), $footer);
                 $id = $virtualDevices[0]->getDeviceId();
                 echo <<<HTML
-                    <div class="card device-parent" data-device-id="$id">
+                    <div class="card device-parent" data-device-id="$id" data-parent-id="$parent_id">
                             $virtual_html
                     </div> 
 HTML;
