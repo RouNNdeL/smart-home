@@ -30,6 +30,7 @@
  * Time: 16:33
  */
 header("Content-Type: application/json");
+
 if($_SERVER['REQUEST_METHOD'] !== 'GET')
 {
     echo "{\"status\":\"error\",\"message\":\"Invalid request\"}";

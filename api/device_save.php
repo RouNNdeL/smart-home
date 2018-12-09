@@ -30,8 +30,9 @@
  * Time: 09:49
  */
 
-if($_SERVER["REQUEST_METHOD"] !== "POST")
-{
+header("Content-Type: application/json");
+
+if($_SERVER["REQUEST_METHOD"] !== "POST") {
     $response = ["status" => "error", "error" => "invalid_request"];
     http_response_code(400);
     echo json_encode($response);
@@ -43,8 +44,7 @@ require_once __DIR__ . "/../includes/GlobalManager.php";
 $manager = GlobalManager::all();
 
 $json = json_decode(file_get_contents("php://input"), true);
-if($json === false || !isset($json["devices"])|| !isset($json["report_state"]))
-{
+if($json === false || !isset($json["devices"]) || !isset($json["report_state"])) {
     $response = ["status" => "error", "error" => "invalid_json"];
     http_response_code(400);
     echo json_encode($response);
@@ -52,19 +52,19 @@ if($json === false || !isset($json["devices"])|| !isset($json["report_state"]))
 }
 
 $response = [];
-foreach($json["devices"] as $id => $device)
-{
-    $physical_device = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($id);
-    if($physical_device === null)
-    {
+foreach($json["devices"] as $id => $physical) {
+    $physical_device = $manager->getUserDeviceManager()->getPhysicalDeviceById($id);
+    if($physical_device === null) {
         $response = ["status" => "error", "error" => "invalid_device_id"];
         http_response_code(400);
         echo json_encode($response);
         exit();
     }
 
-    $virtualDevice = $physical_device->getVirtualDeviceById($id);
-    $virtualDevice->handleSaveJson($json["devices"][$id]);
+    foreach($physical as $virtual_id => $virtual) {
+        $virtualDevice = $physical_device->getVirtualDeviceById($virtual_id);
+        $virtualDevice->handleSaveJson($virtual);
+    }
 
     if($physical_device->save(true))
         $response[$id] = "success";
@@ -74,9 +74,8 @@ foreach($json["devices"] as $id => $device)
 }
 echo json_encode($response);
 
-if($json["report_state"])
-{
+if($json["report_state"]) {
     $user_id = $manager->getSessionManager()->getUserId();
-    $script = __DIR__."/../scripts/report_state.php";
-    exec ("php $script $user_id >/dev/null &");
+    $script = __DIR__ . "/../scripts/report_state.php";
+    exec("php $script $user_id >/dev/null &");
 }

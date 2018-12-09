@@ -36,7 +36,6 @@ const REPORT_STATE_DELAY = 2500;
 const UPDATE_URL = "/api/device_save.php";
 
 $(function() {
-    const device_id = $(".device-settings-content").data("device-id");
     let last_update = Date.now();
     let last_call = 0;
     let last_call_duration = 0;
@@ -84,12 +83,12 @@ $(function() {
             reportState(false);
     });
 
-    $("#device-reboot-btn").click(function() {
+    $(".device-reboot-btn").click(function() {
         $.ajax("/api/device_reboot.php", {
             method: "POST",
             dataType: "json",
             contentType: "json",
-            data: JSON.stringify({device_id: device_id})
+            data: JSON.stringify({device_id: $(this).data("device-id")})
         }).done(resp => {
             showSnackbar(resp.message);
         }).fail(resp => {
@@ -104,13 +103,21 @@ $(function() {
      */
     function updateById(id) {
         const parent = $(`.device-parent[data-device-id="${id}"]`);
+        const parent_id = parent.data("parent-id");
         const form = serializeToAssociative(parent.find("form").serializeArray());
+
         parent.find("input[type=checkbox]").each(function() {
             form[$(this).attr("name")] = $(this)[0].checked;
         });
+
         const all = {report_state: false, devices: {}};
-        all.devices[id] = form;
+
+        if(all.devices[parent_id] === undefined)
+            all.devices[parent_id] = {};
+
+        all.devices[parent_id][id] = form;
         last_call = Date.now();
+
         $.ajax(UPDATE_URL, {
             method: "POST",
             dataType: "json",
@@ -123,15 +130,23 @@ $(function() {
 
     function reportState(async = true) {
         const all = {report_state: true, devices: {}};
+
         $(".device-parent").each(function() {
             const id = $(this).data("device-id");
+            const parent_id = $(this).data("parent-id");
             const form = serializeToAssociative($(this).find("form").serializeArray());
+
             $(this).find("input[type=checkbox]").each(function() {
                 form[$(this).attr("name")] = $(this)[0].checked;
             });
-            all.devices[id] = form;
+
+            if(all.devices[parent_id] === undefined)
+                all.devices[parent_id] = {};
+            all.devices[parent_id][id] = form;
         });
+
         last_call = Date.now();
+
         $.ajax(UPDATE_URL, {
             method: "POST",
             dataType: "json",
@@ -155,7 +170,6 @@ $(function() {
         let update_delay = Math.max(MIN_UPDATE_DELAY, 2 * last_call_duration);
         const id = $(e.target).parents(".device-parent").data("device-id");
         if(Date.now() > last_update + update_delay) {
-
             updateById(id);
             last_update = Date.now();
         }

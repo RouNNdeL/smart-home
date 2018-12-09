@@ -76,20 +76,21 @@ require_once __DIR__."/../../includes/navbar/Nav.php";
 echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
 ?>
 <div class="container-fluid">
-    <div class="row device-settings-content" data-device-id="<?php echo $device->getId()?>">
+    <div class="row device-settings-content">
         <div class="col">
             <?php
             $reboot_string = Utils::getString("device_reboot");
             if(sizeof($virtualDevices) > 1)
             {
                 $virtual_html = "";
+                $parent_id = $device->getId();
                 foreach($virtualDevices as $i => $virtualDevice)
                 {
                     $html = $virtualDevice->toHtml();
                     $id = $virtualDevice->getDeviceId();
                     $virtual_html .= <<<HTML
                         <div class="col-24 col-sm-12 col-md-8 col-lg-6 px-1 py-1">
-                            <div class="card device-parent" data-device-id="$id">
+                            <div class="card device-parent" data-device-id="$id"  data-parent-id="$parent_id">
                                 $html
                             </div> 
                         </div>
@@ -109,8 +110,8 @@ HTML;
                             </div>
                         </div>
                         <div class="card-footer">
-                        <button id="device-reboot-btn" role="button" type="button"
-                            class="btn btn-danger">$reboot_string</button>
+                        <button role="button" type="button"
+                            class="btn btn-danger device-reboot-btn" data-device-id="$parent_id">$reboot_string</button>
                         </div>
                     </div>
 HTML;
@@ -120,8 +121,8 @@ HTML;
             {
                 $footer = <<<HTML
                     <div class="col col-auto float-right"> 
-                        <button id="device-reboot-btn" class="btn btn-sm btn-danger" 
-                        role="button" type="button">$reboot_string</button>
+                        <button class="btn btn-sm btn-danger device-reboot-btn" 
+                        role="button" type="button" data-device-id="$parent_id">$reboot_string</button>
                     </div>
 HTML;
 
