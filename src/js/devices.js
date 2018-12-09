@@ -1,5 +1,4 @@
-<?php
-/**
+/*
  * MIT License
  *
  * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
@@ -23,43 +22,25 @@
  * SOFTWARE.
  */
 
-/**
- * Created by PhpStorm.
- * User: Krzysiek
- * Date: 2018-02-17
- * Time: 14:34
- */
+import $ from './_jquery';
+import 'bootstrap';
+import 'tether';
 
-require_once __DIR__ . "/../../includes/GlobalManager.php";
+$(function() {
+    if(typeof(EventSource) !== "undefined") {
+        const source = new EventSource("/api/mod_stream.php?type=16");
+        source.onmessage = function(event) {
+            const mods = JSON.parse(event.data);
 
-$manager = GlobalManager::all();
+            for(let i = 0; i < mods.length; i++) {
+                const id = mods[i].physical_id;
 
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<?php
-require_once __DIR__."/../../includes/head/HtmlHead.php";
-$head = new HtmlHead("Smart Home Devices");
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICES));
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICES));
-echo $head->toString();
-
-
-?>
-<body>
-<?php
-require_once __DIR__."/../../includes/navbar/Nav.php";
-
-echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
-?>
-<div class="container ">
-
-    <?php
-    foreach ($manager->getUserDeviceManager()->getPhysicalDevices() as $physicalDevice) {
-        echo $physicalDevice->getRowHtml($manager->getSessionManager()->getUserId());
+                $.ajax(`/api/device_get_info.php?device_id=${id}`).done(function(response) { // jshint ignore:line
+                    const info = response.data;
+                    $(`.device-list-item[data-device-id='${info.id}']`)
+                        .find(".device-offline-text").toggleClass("invisible", info.online);
+                });
+            }
+        };
     }
-    ?>
-</div>
-</body>
-</html>
+});

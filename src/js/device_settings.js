@@ -36,6 +36,7 @@ const REPORT_STATE_DELAY = 2500;
 const UPDATE_URL = "/api/device_save.php";
 
 $(function() {
+    const parent_id = $(".device-settings-content").data("device-id");
     let last_update = Date.now();
     let last_call = 0;
     let last_call_duration = 0;
@@ -179,5 +180,15 @@ $(function() {
         }
         clearTimeout(update_timeout_global);
         update_timeout_global = setTimeout(reportState, REPORT_STATE_DELAY);
+    }
+
+    if(typeof(EventSource) !== "undefined") {
+        const source = new EventSource(`/api/mod_stream.php?type=16&physical_id=${parent_id}`);
+        source.onmessage = function() {
+            $.ajax(`/api/device_get_info.php?device_id=${parent_id}`).done(function(response) { // jshint ignore:line
+                const info = response.data;
+                $(".device-offline-text").toggleClass("invisible", info.online);
+            });
+        };
     }
 });

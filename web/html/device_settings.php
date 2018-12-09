@@ -56,6 +56,7 @@ if(isset($_GET["name"]) && $_GET["name"] === "false")
     header("Location: /device/" . urlencode($device->getDisplayName()) . "/" . urlencode($device->getId()));
 }
 $virtualDevices = $device->getVirtualDevices();
+$parent_id = $device->getId();
 ?>
 
 <!DOCTYPE html>
@@ -76,11 +77,10 @@ require_once __DIR__."/../../includes/navbar/Nav.php";
 echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
 ?>
 <div class="container-fluid">
-    <div class="row device-settings-content">
+    <div class="row device-settings-content" data-device-id="<?php echo $parent_id?>">
         <div class="col">
             <?php
             $reboot_string = Utils::getString("device_reboot");
-            $parent_id = $device->getId();
             if(sizeof($virtualDevices) > 1)
             {
                 $virtual_html = "";

@@ -78,7 +78,7 @@ while(1) {
     if(sizeof($new_mods) > 0) {
         $last_event = DeviceDbHelper::getLastModDate(DbUtils::getConnection(),
             $user_id, $physical_id, $virtual_id, $type);
-        echo json_encode($new_mods) . "\n\n";
+        echo "data: ".json_encode($new_mods) . "\n\n";
         flush();
         ob_end_flush();
     }

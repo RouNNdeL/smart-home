@@ -40,6 +40,7 @@ class JavaScriptEntry extends HeadEntry
     const DEVICE_SETTINGS = "/dist/js/device_settings";
     const DEVICE_ADVANCED = "/dist/js/device_effect";
     const DEVICE_PROFILES = "/dist/js/device_profiles";
+    const DEVICES = "/dist/js/devices";
     const CORE = "/dist/js/core";
 
     const VENDOR = "/dist/vendor/js/vendor";

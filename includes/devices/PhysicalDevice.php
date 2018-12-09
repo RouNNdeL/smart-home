@@ -188,7 +188,7 @@ abstract class PhysicalDevice {
         $name = $this->getNameWithState();
 
         return <<<HTML
-<a href="/device/$display_name/$id" class="list-group-item list-group-item-action">
+<a href="/device/$display_name/$id" class="list-group-item list-group-item-action device-list-item" data-device-id="$id">
         <div class="row">
             <div class="col">
                 <h5 class="card-title">$name</h5>
@@ -225,7 +225,7 @@ HTML;
     }
 
     public function getNameWithState() {
-        $offline = $this->isOnline() ? "" : "<span class=\"device-offline-text\">(" . Utils::getString("device_status_offline") . ")</span>";
-        return trim("$this->display_name $offline");
+        $class = $this->isOnline() ?  "invisible" : "";
+        return trim("$this->display_name <span class=\"device-offline-text $class\">(" . Utils::getString("device_status_offline") . ")</span>");
     }
 }

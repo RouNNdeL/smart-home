@@ -26,40 +26,40 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-02-17
- * Time: 14:34
+ * Date: 2018-12-09
+ * Time: 17:10
  */
 
-require_once __DIR__ . "/../../includes/GlobalManager.php";
+header("Content-Type: application/json");
+
+if($_SERVER["REQUEST_METHOD"] !== "GET") {
+    $response = ["status" => "error", "error" => "invalid_request"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
+
+require_once __DIR__."/../includes/GlobalManager.php";
 
 $manager = GlobalManager::all();
 
-?>
+if(!isset($_GET["device_id"])) {
+    $response = ["status" => "error", "error" => "invalid_request"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
 
-<!DOCTYPE html>
-<html lang="en">
-<?php
-require_once __DIR__."/../../includes/head/HtmlHead.php";
-$head = new HtmlHead("Smart Home Devices");
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICES));
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICES));
-echo $head->toString();
+$device_id = $_GET["device_id"];
+$device = $manager->getUserDeviceManager()->getPhysicalDeviceById($device_id);
 
+if($device === null) {
+    $response = ["status" => "error", "error" => "invalid_device_id"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
 
-?>
-<body>
-<?php
-require_once __DIR__."/../../includes/navbar/Nav.php";
-
-echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
-?>
-<div class="container ">
-
-    <?php
-    foreach ($manager->getUserDeviceManager()->getPhysicalDevices() as $physicalDevice) {
-        echo $physicalDevice->getRowHtml($manager->getSessionManager()->getUserId());
-    }
-    ?>
-</div>
-</body>
-</html>
+$payload = ["online" => $device->isOnline(), "display_name" => $device->getDisplayName(), "id" => $device_id];
+$response = ["status" => "success", "data" => $payload];
+echo json_encode($response);

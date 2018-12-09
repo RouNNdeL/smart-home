@@ -55,8 +55,7 @@ class EspWifiLedController extends RgbEffectDevice {
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_exec($ch);
             curl_close($ch);
-            $online = false;
-            DeviceDbHelper::setOnline(DbUtils::getConnection(), $this->getId(), $online);
+            DeviceDbHelper::setOnline(DbUtils::getConnection(), $this->getId(), false);
             return true;
         }
         return false;
