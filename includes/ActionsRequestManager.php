@@ -78,7 +78,7 @@ class ActionsRequestManager
                     $userDeviceManager->sendReportState($request_id);
                     break;
                 case self::ACTION_INTENT_QUERY:
-                    $payload["errorCode"] = "notSupported";
+                    $payload["devices"] = $userDeviceManager->processQuery($payload);
                     break;
                 case self::ACTION_INTENT_EXECUTE:
                     $payload["commands"] = $userDeviceManager->processExecute($input["payload"]);
