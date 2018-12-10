@@ -51,13 +51,8 @@ class EspWifiLedController extends RgbEffectDevice {
         return false;
     }
 
-    /**
-     * @param bool $quick
-     * @return bool - whether the device was online when calling save
-     */
-    public function save(bool $quick) {
-        $online = $quick || $this->isOnline();
-        if($online) {
+    public function sendData(bool $quick) {
+        if($quick || $this->isOnline()) {
             $data_string = ($quick ? "q" : "") . $this->getSmallGlobalsHex() . "*";
             $headers = array(
                 "Content-Type: application/json",
@@ -77,10 +72,7 @@ URL;
             curl_close($ch);
         }
 
-        foreach($this->virtual_devices as $virtual_device) {
-            $virtual_device->toDatabase();
-        }
-        return $online;
+        return $this->isOnline();
     }
 
     public function handleReportedState(array $state) {

@@ -117,7 +117,9 @@ class SimpleRgbDevice extends VirtualDevice {
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iiis", $this->color, $this->brightness, $state, $this->device_id);
         $stmt->execute();
+        $changes = $stmt->affected_rows > 0 ? true : false;
         $stmt->close();
+        return $changes;
     }
 
     /**

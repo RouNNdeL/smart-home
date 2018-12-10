@@ -66,10 +66,15 @@ foreach($json["devices"] as $id => $physical) {
         $virtualDevice->handleSaveJson($virtual);
     }
 
-    if($physical_device->save(true))
-        $response[$id] = "success";
-    else
-        $response[$id] = "offline";
+    if($physical_device->save()) {
+        if($physical_device->sendData(true))
+            $response[$id] = "success";
+        else
+            $response[$id] = "offline";
+    }
+    else {
+        $response[$id] = "not_changed";
+    }
 
 }
 echo json_encode($response);

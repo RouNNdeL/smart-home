@@ -102,7 +102,9 @@ class LampAnalog extends VirtualDevice {
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iis", $this->brightness, $state, $this->device_id);
         $stmt->execute();
+        $changes = $stmt->affected_rows > 0 ? true : false;
         $stmt->close();
+        return $changes;
     }
 
     /**

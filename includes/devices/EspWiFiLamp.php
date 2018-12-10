@@ -36,11 +36,8 @@ require_once __DIR__ . "/../database/DeviceDbHelper.php";
 require_once __DIR__ . "/../UserDeviceManager.php";
 
 class EspWiFiLamp extends PhysicalDevice {
-    /**
-     * @param bool $quick
-     * @return bool - whether the device was online when calling save
-     */
-    public function save(bool $quick) {
+
+    public function sendData(bool $quick) {
         $device = $this->virtual_devices[0];
         if(!$device instanceof LampAnalog)
             throw new UnexpectedValueException("Children of EspWiFiLamp should be of type LampAnalog");
@@ -57,7 +54,6 @@ class EspWiFiLamp extends PhysicalDevice {
             curl_close($ch);
         }
 
-        $device->toDatabase();
         return $online;
     }
 

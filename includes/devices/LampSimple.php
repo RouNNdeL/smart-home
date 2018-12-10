@@ -86,7 +86,9 @@ class LampSimple extends VirtualDevice {
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("is", $state, $this->device_id);
         $stmt->execute();
+        $changes = $stmt->affected_rows > 0 ? true : false;
         $stmt->close();
+        return $changes;
     }
 
     /**

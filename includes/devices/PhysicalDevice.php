@@ -89,9 +89,17 @@ abstract class PhysicalDevice {
 
     /**
      * @param bool $quick
-     * @return bool - whether the device was online when calling save
+     * @return bool - whether any changes were made to the Database
      */
-    public abstract function save(bool $quick);
+    public function save() {
+        $changed = false;
+        foreach($this->virtual_devices as $virtual_device) {
+            $changed = $changed || $virtual_device->toDatabase();
+        }
+        return $changed;
+    }
+
+    public abstract function sendData(bool $quick);
 
     /**
      * @param string $device_id
@@ -126,7 +134,9 @@ abstract class PhysicalDevice {
             }
         }
 
-        $this->save(false);
+        if($this->save()) {
+            $this->sendData(false);
+        }
 
         return ["status" => ($this->isOnline() ? "SUCCESS" : "OFFLINE"), "ids" => $ids];
     }
@@ -135,7 +145,9 @@ abstract class PhysicalDevice {
      * @param string $id
      * @return &VirtualDevice|null
      */
-    public function getVirtualDeviceById(string $id) {
+    public
+    function getVirtualDeviceById(string $id
+    ) {
         foreach($this->virtual_devices as &$virtual_device) {
             if($virtual_device->getDeviceId() === $id)
                 return $virtual_device;
@@ -147,7 +159,9 @@ abstract class PhysicalDevice {
      * @param string $id
      * @return int
      */
-    public function getVirtualDeviceIndexById(string $id) {
+    public
+    function getVirtualDeviceIndexById(string $id
+    ) {
         foreach($this->virtual_devices as $i => $virtual_device) {
             if($virtual_device->getDeviceId() === $id)
                 return $i;
@@ -158,11 +172,13 @@ abstract class PhysicalDevice {
     /**
      * @return VirtualDevice[]
      */
-    public function getVirtualDevices(): array {
+    public
+    function getVirtualDevices(): array {
         return $this->virtual_devices;
     }
 
-    public function getDeviceNavbarHtml() {
+    public
+    function getDeviceNavbarHtml() {
         $html = "";
 
         foreach($this->virtual_devices as $i => $virtual_device) {
@@ -177,7 +193,9 @@ abstract class PhysicalDevice {
         return $html;
     }
 
-    public function getRowHtml(int $user_id) {
+    public
+    function getRowHtml(int $user_id
+    ) {
         $id = urlencode($this->id);
         $display_name = urlencode($this->display_name);
 
@@ -215,7 +233,9 @@ HTML;
 
     }
 
-    public static function fromDatabaseRow(array $row) {
+    public
+    static function fromDatabaseRow(array $row
+    ) {
         if(!class_exists($row["device_driver"]) || !is_subclass_of($row["device_driver"], PhysicalDevice::class)) {
             throw new InvalidArgumentException("$row[device_driver] is not a valid PhysicalDevice class name");
         }
@@ -225,18 +245,21 @@ HTML;
     /**
      * @return string
      */
-    public function getId(): string {
+    public
+    function getId(): string {
         return $this->id;
     }
 
     /**
      * @return string
      */
-    public function getDisplayName(): string {
+    public
+    function getDisplayName(): string {
         return $this->display_name;
     }
 
-    public function getNameWithState() {
+    public
+    function getNameWithState() {
         $class = $this->isOnline() ? "invisible" : "";
         return trim("$this->display_name <span class=\"device-offline-text $class\">(" . Utils::getString("device_status_offline") . ")</span>");
     }

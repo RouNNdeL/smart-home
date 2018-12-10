@@ -289,14 +289,15 @@ HTML;
                 WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iiiis", $this->color, $this->brightness, $state, $toggles, $this->device_id);
-        $result = $stmt->execute();
+        $stmt->execute();
+        $changes = $stmt->affected_rows > 0 ? true : false;
         $stmt->close();
 
         foreach($this->effects as $effect)
         {
-            $result = $result && $effect->toDatabase();
+            $effect->toDatabase();
         }
-        return $result;
+        return $changes;
     }
 
     /**

@@ -38,12 +38,8 @@ class IrRemote extends PhysicalDevice {
         parent::__construct($id, $owner_id, $display_name, $hostname, $port, $virtual_devices);
     }
 
-    /**
-     * @param bool $quick
-     * @return bool - whether the device was online when calling save
-     */
-    public function save(bool $quick) {
-        return true;
+    public function sendData(bool $quick) {
+        return $this->isOnline();
     }
 
     /**

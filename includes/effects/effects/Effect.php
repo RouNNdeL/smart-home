@@ -590,10 +590,11 @@ abstract class Effect
             $this->timings[3], $this->timings[4], $this->timings[5], $args[0], $args[1], $args[2],
             $args[3], $args[4], $args[5]
         );
-        $result = $stmt->execute();
+        $stmt->execute();
+        $changes = $stmt->affected_rows > 0 ? true : false;
         $stmt->close();
         $this->saveColors();
-        return $result;
+        return $changes;
     }
 
     private function saveColors()

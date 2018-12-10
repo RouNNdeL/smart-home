@@ -37,11 +37,7 @@ require_once __DIR__ . "/RgbEffectDevice.php";
 class PcLedController extends RgbEffectDevice {
     const DEVICE_INDEXES = ["pc_case" => 0, "pc_gpu" => 1, "pc_fan1" => 2, "pc_fan2" => 3, "pc_strip" => 5];
 
-    /**
-     * @param bool $quick
-     * @return bool - whether the device was online when calling save
-     */
-    public function save(bool $quick) {
+    public function sendData(bool $quick) {
         if($this->isOnline()) {
             $size = 6;
             $brightness = array_fill(0, $size, 0);
@@ -78,13 +74,9 @@ class PcLedController extends RgbEffectDevice {
             $fp = fsockopen($this->hostname, $this->port, $errno, $errstr, 0.2);
             fwrite($fp, json_encode($json));
             fclose($fp);
+        }
 
-            $online = true;
-        }
-        foreach($this->virtual_devices as $virtual_device) {
-            $virtual_device->toDatabase();
-        }
-        return $online;
+        return $this->isOnline();
     }
 
     /**

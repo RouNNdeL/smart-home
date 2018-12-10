@@ -155,6 +155,9 @@ abstract class VirtualDevice
         return $this->device_id;
     }
 
+    /**
+     * @return bool - whether any changes were made to the database
+     */
     public abstract function toDatabase();
 
     public static function fromDatabaseRow(array $row)
