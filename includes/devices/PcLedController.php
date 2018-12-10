@@ -42,7 +42,6 @@ class PcLedController extends RgbEffectDevice {
      * @return bool - whether the device was online when calling save
      */
     public function save(bool $quick) {
-        $online = false;
         if($this->isOnline()) {
             $size = 6;
             $brightness = array_fill(0, $size, 0);
@@ -74,7 +73,7 @@ class PcLedController extends RgbEffectDevice {
             $data["profiles"] = $profiles;
             $data["profile_flags"] = 0;
 
-            $json = array("type" => "globals_update", "data" => $data);
+            $json = array("type" => $quick ? "quick_globals" :"globals_update", "data" => $data);
 
             $fp = fsockopen($this->hostname, $this->port, $errno, $errstr, 0.2);
             fwrite($fp, json_encode($json));
