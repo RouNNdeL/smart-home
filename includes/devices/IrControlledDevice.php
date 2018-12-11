@@ -68,6 +68,7 @@ class IrControlledDevice extends VirtualDevice {
      */
     public function getStateJson(bool $online = false) {
         return [
+            "on" => $this->on,
             "online" => $online,
         ];
     }
