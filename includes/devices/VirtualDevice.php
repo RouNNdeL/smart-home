@@ -38,8 +38,7 @@ require_once __DIR__ . "/LampAnalog.php";
 require_once __DIR__ . "/LampSimple.php";
 require_once __DIR__ . "/IrControlledDevice.php";
 
-abstract class VirtualDevice
-{
+abstract class VirtualDevice {
     const DEVICE_TYPE_RGB = "DEVICE_RGB";
     const DEVICE_TYPE_EFFECTS_RGB_ANALOG = "DEVICE_EFFECTS_RGB_ANALOG";
     const DEVICE_TYPE_EFFECTS_RGB_DIGITAL = "DEVICE_EFFECTS_RGB_DIGITAL";
@@ -86,8 +85,7 @@ abstract class VirtualDevice
      */
     public function __construct(string $device_id, string $device_name, array $synonyms, string $device_type,
                                 bool $home_actions, bool $will_report_state
-    )
-    {
+    ) {
         $this->device_id = $device_id;
         $this->device_name = $device_name;
         $this->synonyms = $synonyms;
@@ -125,8 +123,7 @@ abstract class VirtualDevice
      */
     public abstract function toHtml($header_name = null, $footer_html = "");
 
-    public function getSyncJson()
-    {
+    public function getSyncJson() {
         if(!$this->home_actions)
             return null;
         $attributes = $this->getAttributes();
@@ -142,16 +139,14 @@ abstract class VirtualDevice
     /**
      * @return string
      */
-    public function getDeviceName()
-    {
+    public function getDeviceName() {
         return $this->device_name;
     }
 
     /**
      * @return string
      */
-    public function getDeviceId()
-    {
+    public function getDeviceId() {
         return $this->device_id;
     }
 
@@ -160,20 +155,17 @@ abstract class VirtualDevice
      */
     public abstract function toDatabase();
 
-    public static function fromDatabaseRow(array $row)
-    {
+    public static function fromDatabaseRow(array $row) {
         /* For some reason Google uses the first value of the synonyms as the main device name */
         $synonyms = [$row["display_name"]];
-        if($row["synonyms"] !== null && strlen(trim($row["synonyms"])) !== 0)
-        {
+        if($row["synonyms"] !== null && strlen(trim($row["synonyms"])) !== 0) {
             $synonyms = array_merge($synonyms, explode(",", $row["synonyms"]));
             foreach($synonyms as &$synonym) $synonym = trim($synonym);
         }
 
         if(!$row["home_actions"])
             $row["will_report_state"] = 0;
-        switch($row["type"])
-        {
+        switch($row["type"]) {
             case self::DEVICE_TYPE_RGB:
                 return new SimpleRgbDevice(
                     $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["will_report_state"],
@@ -201,8 +193,7 @@ abstract class VirtualDevice
                 );
             case self::DEVICE_TYPE_REMOTE_CONTROLLED:
                 return new IrControlledDevice(
-                    $row["id"], $row["display_name"], $synonyms, $row["home_actions"],  $row["ir_protocol"]
-                );
+                    $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["ir_protocol"], $row["state"]);
             default:
                 throw new InvalidArgumentException("Invalid device type " . $row["type"]);
         }

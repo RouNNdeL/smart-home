@@ -43,9 +43,10 @@ class IrControlledDevice extends VirtualDevice {
     /** @var bool */
     protected $on;
 
-    public function __construct(string $device_id, string $device_name, $synonyms, string $device_type, int $protocol) {
+    public function __construct(string $device_id, string $device_name, $synonyms, string $device_type, int $protocol, bool $on) {
         parent::__construct($device_id, $device_name, $synonyms, $device_type, true, false);
         $this->protocol = $protocol;
+        $this->on = $on;
     }
 
 
