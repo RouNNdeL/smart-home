@@ -583,10 +583,11 @@ abstract class Effect
                 ON DUPLICATE KEY UPDATE effect = ?, name = ?, time0 = ?, time1 = ?, time2 = ?, time3 = ?, time4 = ?, time5 = ?, 
                 arg0 = ?, arg1 = ?, arg2 = ?, arg3 = ?, arg4 = ?, arg5 = ?";
         $stmt = $conn->prepare($sql);
+        $effectId = $this->getEffectId();
         $stmt->bind_param("iisiiiiiiiiiiiiisiiiiiiiiiiii", $this->id,
-            $this->getEffectId(), $this->name, $this->timings[0], $this->timings[1], $this->timings[2], $this->timings[3],
+            $effectId, $this->name, $this->timings[0], $this->timings[1], $this->timings[2], $this->timings[3],
             $this->timings[4], $this->timings[5], $args[0], $args[1], $args[2], $args[3],
-            $args[4], $args[5], $this->getEffectId(), $this->name, $this->timings[0], $this->timings[1], $this->timings[2],
+            $args[4], $args[5], $effectId, $this->name, $this->timings[0], $this->timings[1], $this->timings[2],
             $this->timings[3], $this->timings[4], $this->timings[5], $args[0], $args[1], $args[2],
             $args[3], $args[4], $args[5]
         );
