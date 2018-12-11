@@ -5,7 +5,7 @@ List of available devices:
 - PC LED Controller ([MCU C code](https://github.com/RouNNdeL/led-controller-avr), [Windows Service](https://github.com/RouNNdeL/led-controller-node))
 - WiFi LED Controller ([ESP8266 Arduino code](https://github.com/RouNNdeL/esp8266-leds))
 - WiFi Dimmable Lamp ([ESP8266 Arduino code](https://github.com/RouNNdeL/esp8266-lamp)) [WIP]
-- WiFi IR Remote ([ESP8266 Arduino code](https://github.com/RouNNdeL/esp8266-remote)) [WIP]
+- WiFi IR Remote ([ESP8266 Arduino code](https://github.com/RouNNdeL/esp8266-remote))
 
 # Schematics
 All devices are custom designed with all files being open source. Schematic and board files are located in each repository's *_schematics* directory, or in case of the PC LED Controller [here](https://github.com/RouNNdeL/led-controller-pcb).
