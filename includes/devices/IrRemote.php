@@ -67,9 +67,9 @@ class IrRemote extends PhysicalDevice {
         foreach($action["commands"] as $command) {
             foreach($command["devices"] as $d) {
                 $device = $this->getVirtualDeviceById($d["id"]);
-                if(!($device instanceof IrControlledDevice))
-                    throw new UnexpectedValueException("Children of IrRemote should be of type IrControlledDevice");
                 if($device !== null) {
+                    if(!($device instanceof IrControlledDevice))
+                        throw new UnexpectedValueException("Children of IrRemote should be of type IrControlledDevice");
                     foreach($command["execution"] as $item) {
                         if($item["command"] === VirtualDevice::DEVICE_COMMAND_ON_OFF) {
                             $ir_action = $device->getRemoteActionForPower($item["params"]["on"]);
