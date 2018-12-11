@@ -72,8 +72,8 @@ class IrRemote extends PhysicalDevice {
                 if($device !== null) {
                     foreach($command["execution"] as $item) {
                         if($item["command"] === VirtualDevice::DEVICE_COMMAND_ON_OFF) {
-                            $action = $device->getRemoteActionForPower($item["params"]["on"]);
-                            $this->sendCode($device->getProtocol(), $action->getPrimaryCodeHex(), $action->getSupportCodeHex());
+                            $ir_action = $device->getRemoteActionForPower($item["params"]["on"]);
+                            $this->sendCode($device->getProtocol(), $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
                         }
                     }
                 }
