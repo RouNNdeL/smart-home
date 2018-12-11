@@ -40,6 +40,9 @@ class IrControlledDevice extends VirtualDevice {
 
     private $protocol;
 
+    /** @var bool */
+    protected $on;
+
     public function __construct(string $device_id, string $device_name, $synonyms, string $device_type, int $protocol) {
         parent::__construct($device_id, $device_name, $synonyms, $device_type, true, false);
         $this->protocol = $protocol;
@@ -141,6 +144,15 @@ HTML;
     }
 
     public function toDatabase() {
-
+        $state = $this->on ? 1 : 0;
+        $conn = DbUtils::getConnection();
+        $sql = "UPDATE devices_virtual SET 
+                  state = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("is", $state, $this->device_id);
+        $stmt->execute();
+        $changes = $stmt->affected_rows > 0 ? true : false;
+        $stmt->close();
+        return $changes;
     }
 }
