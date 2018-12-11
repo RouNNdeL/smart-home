@@ -40,9 +40,6 @@ class IrControlledDevice extends VirtualDevice {
 
     private $protocol;
 
-    /** @var IrRemote */
-    private $physical_parent;
-
     public function __construct(string $device_id, string $device_name, $synonyms, string $device_type, int $protocol) {
         parent::__construct($device_id, $device_name, $synonyms, $device_type, true, false);
         $this->protocol = $protocol;
@@ -113,24 +110,27 @@ HTML;
     public function handleAssistantAction($command) {
         switch($command["command"]) {
             case VirtualDevice::DEVICE_COMMAND_ON_OFF:
-                switch($this->device_id) {
-                    case IrControlledDevice::ID_TV:
-                        if($command["params"]["on"]) $action = RemoteAction::byId("tv_power_on", "tv");
-                        else $action = RemoteAction::byId("tv_power_off", "tv");
-                        break;
-                    case IrControlledDevice::ID_DECODER:
-                        $action = RemoteAction::byId("decoder_power_toggle", "decoder");
-                        break;
-                    case IrControlledDevice::ID_AV:
-                        if($command["params"]["on"]) $action = RemoteAction::byId("av_power_on", "av");
-                        else $action = RemoteAction::byId("av_power_off", "av");
-                        break;
-                }
-                $this->physical_parent->
-                sendCode($this->protocol, $action->getPrimaryCodeHex(), $action->getSupportCodeHex());
+                $this->on = $command["params"]["on"];
                 break;
         }
+    }
 
+    public function getRemoteActionForPower(bool $on) {
+        switch($this->device_id) {
+            case IrControlledDevice::ID_TV:
+                if($on) return RemoteAction::byId("tv_power_on", $this->device_id);
+                else return RemoteAction::byId("tv_power_off", $this->device_id);
+                break;
+            case IrControlledDevice::ID_DECODER:
+                return RemoteAction::byId("decoder_power_toggle", $this->device_id);
+                break;
+            case IrControlledDevice::ID_AV:
+                if($on) return RemoteAction::byId("av_power_on", $this->device_id);
+                else return RemoteAction::byId("av_power_off", $this->device_id);
+                break;
+            default:
+                return null;
+        }
     }
 
     /**
@@ -142,21 +142,5 @@ HTML;
 
     public function toDatabase() {
 
-    }
-
-    /**
-     * @return mixed
-     */
-    public function &getPhysicalParent() {
-        return $this->physical_parent;
-    }
-
-    /**
-     * @param mixed $physical_parent
-     */
-    public function setPhysicalParent(&$physical_parent) {
-        if(!($physical_parent instanceof IrRemote))
-            throw new InvalidArgumentException("Parent of IrControlledDevice should be IrRemote");
-        $this->physical_parent = &$physical_parent;
     }
 }

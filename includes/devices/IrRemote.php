@@ -34,14 +34,6 @@ require_once __DIR__ . "/PhysicalDevice.php";
 require_once __DIR__ . "/ir/RemoteAction.php";
 
 class IrRemote extends PhysicalDevice {
-    public function __construct(string $id, int $owner_id, string $display_name, string $hostname, int $port, $virtual_devices) {
-        parent::__construct($id, $owner_id, $display_name, $hostname, $port, $virtual_devices);
-        foreach($this->virtual_devices as $virtual_device) {
-            if(!($virtual_device instanceof IrControlledDevice))
-                throw new UnexpectedValueException("Children of IrRemote should be of type IrControlledDevice");
-            $virtual_device->setPhysicalParent($this);
-        }
-    }
 
     public function sendData(bool $quick) {
         return $this->isOnline();
@@ -69,6 +61,25 @@ class IrRemote extends PhysicalDevice {
             return true;
         }
         return false;
+    }
+
+    public function handleAssistantAction(array $action) {
+        foreach($action["commands"] as $command) {
+            foreach($command["devices"] as $d) {
+                $device = $this->getVirtualDeviceById($d["id"]);
+                if(!($device instanceof IrControlledDevice))
+                    throw new UnexpectedValueException("Children of IrRemote should be of type IrControlledDevice");
+                if($device !== null) {
+                    foreach($command["execution"] as $item) {
+                        if($item["command"] === VirtualDevice::DEVICE_COMMAND_ON_OFF) {
+                            $action = $device->getRemoteActionForPower($item["params"]["on"]);
+                            $this->sendCode($device->getProtocol(), $action->getPrimaryCodeHex(), $action->getSupportCodeHex());
+                        }
+                    }
+                }
+            }
+        }
+        return parent::handleAssistantAction($action);
     }
 
     public function sendCode(int $protocol, string $code, $support) {
