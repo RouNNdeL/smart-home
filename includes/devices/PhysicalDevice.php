@@ -79,7 +79,7 @@ abstract class PhysicalDevice {
         if($this->online !== null)
             return $this->online;
         $waitTimeoutInSeconds = .2;
-        $fp = fsockopen($this->hostname, $this->port, $errCode, $errStr, $waitTimeoutInSeconds);
+        $fp = @fsockopen($this->hostname, $this->port, $errCode, $errStr, $waitTimeoutInSeconds);
         $this->online = $fp !== false;
         DeviceDbHelper::setOnline(DbUtils::getConnection(), $this->getId(), $this->online);
         if($this->online)
