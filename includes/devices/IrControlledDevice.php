@@ -30,34 +30,34 @@
  * Time: 18:18
  */
 
-require_once __DIR__."/VirtualDevice.php";
-require_once __DIR__."/ir/RemoteLayoutGenerator.php";
+require_once __DIR__ . "/VirtualDevice.php";
+require_once __DIR__ . "/ir/RemoteLayoutGenerator.php";
 
-class IrControlledDevice extends VirtualDevice
-{
+class IrControlledDevice extends VirtualDevice {
+    const ID_TV = "tv";
+    const ID_DECODER = "decoder";
+    const ID_AV = "av";
+
     private $protocol;
 
-    public function __construct(string $device_id, string $device_name, $synonyms, string $device_type,
-                                int $protocol
-    )
-    {
-        parent::__construct($device_id, $device_name, $synonyms, $device_type, false, false);
+    /** @var IrRemote */
+    private $physical_parent;
+
+    public function __construct(string $device_id, string $device_name, $synonyms, string $device_type, int $protocol) {
+        parent::__construct($device_id, $device_name, $synonyms, $device_type, true, false);
         $this->protocol = $protocol;
     }
 
 
-    public function getTraits()
-    {
+    public function getTraits() {
         return [VirtualDevice::DEVICE_TRAIT_ON_OFF];
     }
 
-    public function getActionsDeviceType()
-    {
+    public function getActionsDeviceType() {
         return VirtualDevice::DEVICE_TYPE_ACTIONS_SWITCH;
     }
 
-    public function getAttributes()
-    {
+    public function getAttributes() {
         return null;
     }
 
@@ -65,8 +65,7 @@ class IrControlledDevice extends VirtualDevice
      * @param bool $online
      * @return array
      */
-    public function getStateJson(bool $online = false)
-    {
+    public function getStateJson(bool $online = false) {
         return [
             "online" => $online,
         ];
@@ -77,8 +76,7 @@ class IrControlledDevice extends VirtualDevice
      * @param string $footer_html
      * @return string
      */
-    public function toHtml($header_name = null, $footer_html = "")
-    {
+    public function toHtml($header_name = null, $footer_html = "") {
         if($header_name !== null)
             $name = $header_name;
         else
@@ -98,11 +96,6 @@ class IrControlledDevice extends VirtualDevice
             <div class="card-body device-remote">
                 $remote_grid
             </div>
-            <div class="card-footer py-2">
-                <div class="row">
-                    $footer_html
-                </div>
-            </div>
     </form>
 HTML;
     }
@@ -110,29 +103,60 @@ HTML;
     /**
      * @return int
      */
-    public function getProtocol(): int
-    {
+    public function getProtocol(): int {
         return $this->protocol;
     }
 
     /**
      * @param array $command
      */
-    public function handleAssistantAction($command)
-    {
+    public function handleAssistantAction($command) {
+        switch($command["command"]) {
+            case VirtualDevice::DEVICE_COMMAND_ON_OFF:
+                switch($this->device_id) {
+                    case IrControlledDevice::ID_TV:
+                        if($command["params"]["on"]) $action = RemoteAction::byId("tv_power_on", "tv");
+                        else $action = RemoteAction::byId("tv_power_off", "tv");
+                        break;
+                    case IrControlledDevice::ID_DECODER:
+                        $action = RemoteAction::byId("decoder_power_toggle", "decoder");
+                        break;
+                    case IrControlledDevice::ID_AV:
+                        if($command["params"]["on"]) $action = RemoteAction::byId("av_power_on", "av");
+                        else $action = RemoteAction::byId("av_power_off", "av");
+                        break;
+                }
+                $this->physical_parent->
+                sendCode($this->protocol, $action->getPrimaryCodeHex(), $action->getSupportCodeHex());
+                break;
+        }
 
     }
 
     /**
      * @param array $json
      */
-    public function handleSaveJson($json)
-    {
+    public function handleSaveJson($json) {
 
     }
 
-    public function toDatabase()
-    {
+    public function toDatabase() {
 
+    }
+
+    /**
+     * @return mixed
+     */
+    public function &getPhysicalParent() {
+        return $this->physical_parent;
+    }
+
+    /**
+     * @param mixed $physical_parent
+     */
+    public function setPhysicalParent(&$physical_parent) {
+        if(!($physical_parent instanceof IrRemote))
+            throw new InvalidArgumentException("Parent of IrControlledDevice should be IrRemote");
+        $this->physical_parent = &$physical_parent;
     }
 }
