@@ -46,7 +46,7 @@ class EspWiFiLamp extends PhysicalDevice {
         if($online) {
             $b = $device->getBrightness() * 255 / 100;
             $s = $device->isOn() ? 1 : 0;
-            $ch = curl_init("http://" . $this->hostname . "?b=" . $b . "&s=" . $s);
+            $ch = curl_init("http://" . $this->hostname . "?b=" . $b . "&s=" . $s . "&f=1");
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLINFO_HEADER_OUT, true);
