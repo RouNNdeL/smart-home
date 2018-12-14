@@ -34,25 +34,22 @@ require_once __DIR__ . "/../../includes/GlobalManager.php";
 
 $manager = GlobalManager::withSessionManager(true);
 
-if(!isset($_GET["device_id"]))
-{
+if(!isset($_GET["device_id"])) {
     require __DIR__ . "/../error/404.php";
     http_response_code(404);
     exit(0);
 }
 
-$manager->loadUserDeviceManager();
+$manager->loadUserDeviceManager([ShareManager::SCOPE_SIMPLE_CONTROL]);
 
 $device = $manager->getUserDeviceManager()->getPhysicalDeviceById($_GET["device_id"]);
-if($device === null)
-{
+if($device === null) {
     require __DIR__ . "/../error/404.php";
     http_response_code(404);
     exit(0);
 }
 
-if(isset($_GET["name"]) && $_GET["name"] === "false")
-{
+if(isset($_GET["name"]) && $_GET["name"] === "false") {
     header("Location: /device/" . urlencode($device->getDisplayName()) . "/" . urlencode($device->getId()));
 }
 $virtualDevices = $device->getVirtualDevices();
@@ -72,20 +69,33 @@ echo $head->toString();
 ?>
 <body>
 <?php
-require_once __DIR__."/../../includes/navbar/Nav.php";
+require_once __DIR__ . "/../../includes/navbar/Nav.php";
 
 echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
 ?>
 <div class="container-fluid">
-    <div class="row device-settings-content" data-device-id="<?php echo $parent_id?>">
+    <div class="row device-settings-content" data-device-id="<?php echo $parent_id ?>">
         <div class="col">
             <?php
             $reboot_string = Utils::getString("device_reboot");
-            if(sizeof($virtualDevices) > 1)
-            {
+            $reboot_disabled = $device->getOwnerId() !== $manager->getSessionManager()->getUserId() &&
+                !$device->hasScope(ShareManager::SCOPE_REBOOT);
+            $reboot_disabled_help_string = Utils::getString("device_reboot_forbidden");
+            $reboot_disabled_tooltip = $reboot_disabled ?
+                "data-toggle=\"tooltip\" data-placement=\"top\" title=\"$reboot_disabled_help_string\"" : "";
+            $reboot_disabled_attr = $reboot_disabled ? "disabled" : "";
+
+            $reboot_btn = <<<HTML
+                        <div tabindex="0" $reboot_disabled_tooltip class="d-inline-block">
+                            <button $reboot_disabled_attr  class="btn btn-sm btn-danger device-reboot-btn" 
+                            role="button" type="button" data-device-id="$parent_id">$reboot_string</button>
+                        </div>
+HTML;
+
+
+            if(sizeof($virtualDevices) > 1) {
                 $virtual_html = "";
-                foreach($virtualDevices as $i => $virtualDevice)
-                {
+                foreach($virtualDevices as $i => $virtualDevice) {
                     $html = $virtualDevice->toHtml();
                     $id = $virtualDevice->getDeviceId();
                     $virtual_html .= <<<HTML
@@ -110,19 +120,15 @@ HTML;
                             </div>
                         </div>
                         <div class="card-footer">
-                        <button role="button" type="button"
-                            class="btn btn-danger device-reboot-btn" data-device-id="$parent_id">$reboot_string</button>
+                            $reboot_btn
                         </div>
                     </div>
 HTML;
 
-            }
-            else
-            {
+            } else {
                 $footer = <<<HTML
                     <div class="col col-auto float-right"> 
-                        <button class="btn btn-sm btn-danger device-reboot-btn" 
-                        role="button" type="button" data-device-id="$parent_id">$reboot_string</button>
+                        $reboot_btn
                     </div>
 HTML;
 

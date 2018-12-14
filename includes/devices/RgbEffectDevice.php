@@ -78,9 +78,9 @@ abstract class RgbEffectDevice extends PhysicalDevice
      * @param array $virtual_devices
      */
     protected function __construct(string $id, int $owner_id, string $display_name, string $hostname, int $port, int $current_profile, bool $enabled, int $auto_increment,
-                                   array $profiles, array $virtual_devices)
+                                   array $profiles, array $virtual_devices, array $scopes)
     {
-        parent::__construct($id, $owner_id, $display_name, $hostname, $port, $virtual_devices);
+        parent::__construct($id, $owner_id, $display_name, $hostname, $port, $virtual_devices, $scopes);
 
         $this->current_profile = $current_profile;
         $this->auto_increment = $auto_increment;

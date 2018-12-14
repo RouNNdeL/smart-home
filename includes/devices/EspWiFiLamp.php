@@ -64,9 +64,9 @@ class EspWiFiLamp extends PhysicalDevice {
      * @param string $hostname
      * @return PhysicalDevice
      */
-    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port) {
+    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port, array $scopes) {
         $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
-        return new EspWiFiLamp($device_id, $owner_id, $display_name, $hostname, $port, $virtual);
+        return new EspWiFiLamp($device_id, $owner_id, $display_name, $hostname, $port, $virtual, $scopes);
     }
 
     public function reboot() {

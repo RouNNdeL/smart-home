@@ -87,10 +87,10 @@ class PcLedController extends RgbEffectDevice {
      * @return PhysicalDevice
      */
     public static function load(string $device_id, int $owner_id, string $display_name,
-                                string $hostname, int $port
+                                string $hostname, int $port, array $scopes
     ) {
         $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
-        return new PcLedController($device_id, $owner_id, $display_name, $hostname, $port, 0, true, 0, [], $virtual);
+        return new PcLedController($device_id, $owner_id, $display_name, $hostname, $port, 0, true, 0, [], $virtual, $scopes);
     }
 
     public function reboot() {

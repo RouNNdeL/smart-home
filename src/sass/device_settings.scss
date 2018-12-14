@@ -29,3 +29,9 @@ $color-input-size: 184px;
 @import '../../node_modules/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch';
 @import '../../node_modules/ion-rangeslider/css/ion.rangeSlider';
 @import '../../node_modules/ion-rangeslider/css/ion.rangeSlider.skinFlat';
+
+.device-reboot-btn {
+  &:disabled {
+    pointer-events: none;
+  }
+}

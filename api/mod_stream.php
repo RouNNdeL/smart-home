@@ -34,7 +34,7 @@ require_once __DIR__ . "/../includes/GlobalManager.php";
 require_once __DIR__ . "/../includes/database/DbUtils.php";
 require_once __DIR__ . "/../includes/database/DeviceDbHelper.php";
 
-$manager = GlobalManager::all();
+$manager = GlobalManager::all([ShareManager::SCOPE_ANY]);
 
 header("Cache-Control: no-cache");
 header("Content-Type: text/event-stream\n\n");
@@ -53,31 +53,31 @@ if(isset($_GET["virtual_id"]) && $manager->getUserDeviceManager()->getVirtualDev
     exit();
 }
 
-if(isset($_GET["type"]) && !is_numeric($_GET["type"])) {
+if(!isset($_GET["type"])) {
     http_response_code(400);
-    echo "Invalid type\n\n";
+    echo "Types required\n\n";
     exit();
 }
 
 $user_id = $manager->getSessionManager()->getUserId();
 $physical_id = isset($_GET["physical_id"]) ? $_GET["physical_id"] : null;
 $virtual_id = isset($_GET["virtual_id"]) ? $_GET["virtual_id"] : null;
-$type = isset($_GET["type"]) ? $_GET["type"] : null;
+$types = isset($_GET["type"]) ? explode(",", $_GET["type"]) : [];
 
 echo "retry: 500\n\n";
 flush();
 ob_end_flush();
 
-$last_event = DeviceDbHelper::getLastModDate(DbUtils::getConnection(),
-    $user_id, $physical_id, $virtual_id, $type);
+$last_event = DeviceModManager::getLastModDate(DbUtils::getConnection(),
+    $user_id, $physical_id, $virtual_id, $types);
 
 while(1) {
-    $new_mods = DeviceDbHelper::queryNewMods(DbUtils::getConnection(),
-        $last_event, $user_id, $physical_id, $virtual_id, $type);
+    $new_mods = DeviceModManager::queryNewMods(DbUtils::getConnection(),
+        $last_event, $user_id, $physical_id, $virtual_id, $types);
 
     if(sizeof($new_mods) > 0) {
-        $last_event = DeviceDbHelper::getLastModDate(DbUtils::getConnection(),
-            $user_id, $physical_id, $virtual_id, $type);
+        $last_event = DeviceModManager::getLastModDate(DbUtils::getConnection(),
+            $user_id, $physical_id, $virtual_id, $types);
         echo "data: ".json_encode($new_mods) . "\n\n";
         flush();
         ob_end_flush();

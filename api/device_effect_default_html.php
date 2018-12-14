@@ -39,7 +39,7 @@ if($_SERVER["REQUEST_METHOD"] !== "GET")
 
 require_once __DIR__ . "/../includes/GlobalManager.php";
 
-$manager = GlobalManager::all();
+$manager = GlobalManager::all([ShareManager::SCOPE_EDIT_PROFILES]);
 
 $json = $_GET;
 if($json === false || !isset($json["device_id"]) || !isset($json["effect"]))
@@ -69,7 +69,7 @@ if($device === null || !$device instanceof BaseEffectDevice)
 }
 
 $device->setMaxColorCount($physical->getMaxColorCount());
-$index = $device->updateEffect(Effect::getDefaultForEffectId($json["effect_id"], $json["effect"], $json["device_id"]));
+$index = $device->updateEffect(Effect::getDefaultForEffectId($json["effect_id"], $json["effect"]));
 
 $response = ["status" => "success", "html" => $device->effectHtml($index)];
 echo json_encode($response);

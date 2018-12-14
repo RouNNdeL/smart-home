@@ -35,6 +35,7 @@ require_once __DIR__ . "/database/HomeGraphTokenManager.php";
 require_once __DIR__ . "/database/DbUtils.php";
 require_once __DIR__ . "/database/HomeUser.php";
 require_once __DIR__ . "/database/DeviceDbHelper.php";
+require_once __DIR__ . "/database/ShareManager.php";
 require_once __DIR__ . "/../secure_config.php";
 
 class UserDeviceManager {
@@ -43,6 +44,9 @@ class UserDeviceManager {
 
     /** @var int */
     private $user_id;
+
+    /** @var string */
+    private $share_scope;
 
     /**
      * UserDeviceManager constructor.
@@ -156,12 +160,21 @@ class UserDeviceManager {
     public static function requestSyncForAll() {
         $responses = [];
         foreach(HomeUser::queryAllRegistered(DbUtils::getConnection()) as $user) {
-            $responses[$user->id] = UserDeviceManager::fromUserId($user->id)->requestSync();
+            $responses[$user->id] = UserDeviceManager::forUserId($user->id)->requestSync();
         }
         return $responses;
     }
 
-    public static function fromUserId(int $id) {
+    public static function forUserIdAndScope(int $user_id, array $scope){
+        $owned = DeviceDbHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $user_id);
+        $shared = ShareManager::getDevicesForScope($user_id, $scope);
+        return new UserDeviceManager(
+            $user_id,
+            array_merge($owned, $shared)
+        );
+    }
+
+    public static function forUserId(int $id) {
         return new UserDeviceManager(
             $id,
             DeviceDbHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $id)

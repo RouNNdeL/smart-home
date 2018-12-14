@@ -41,7 +41,7 @@ if($_SERVER["REQUEST_METHOD"] !== "POST") {
 
 require_once __DIR__ . "/../includes/GlobalManager.php";
 
-$manager = GlobalManager::all();
+$manager = GlobalManager::all([ShareManager::SCOPE_SIMPLE_CONTROL]);
 
 $json = json_decode(file_get_contents("php://input"), true);
 if($json === false || !isset($json["devices"]) || !isset($json["report_state"])) {
@@ -71,8 +71,7 @@ foreach($json["devices"] as $id => $physical) {
             $response[$id] = "success";
         else
             $response[$id] = "offline";
-    }
-    else {
+    } else {
         $response[$id] = "not_changed";
     }
 

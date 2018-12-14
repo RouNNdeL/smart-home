@@ -36,7 +36,7 @@ header("Content-Type: application/json");
 
 if(isset($_GET["user_id"]))
 {
-    echo json_encode(UserDeviceManager::fromUserId($_GET["user_id"])->requestSync());
+    echo json_encode(UserDeviceManager::forUserId($_GET["user_id"])->requestSync());
 }
 else
 {

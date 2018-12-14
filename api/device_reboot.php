@@ -30,8 +30,7 @@
  * Time: 12:58
  */
 
-if($_SERVER["REQUEST_METHOD"] !== "POST")
-{
+if($_SERVER["REQUEST_METHOD"] !== "POST") {
     $response = ["status" => "error", "error" => "invalid_request"];
     http_response_code(400);
     echo json_encode($response);
@@ -40,21 +39,19 @@ if($_SERVER["REQUEST_METHOD"] !== "POST")
 
 require_once __DIR__ . "/../includes/GlobalManager.php";
 
-$manager = GlobalManager::all();
+$manager = GlobalManager::all([ShareManager::SCOPE_REBOOT]);
 
 $json = json_decode(file_get_contents("php://input"), true);
-if($json === false || !isset($json["device_id"]))
-{
-    $response = ["status" => "error", "error" => "invalid_json"];
+if($json === false || !isset($json["device_id"])) {
+    $response = ["status" => "error", "error" => "invalid_json", "message" => Utils::getString("error_msg_unexpected")];
     http_response_code(400);
     echo json_encode($response);
     exit();
 }
 
 $physical = $manager->getUserDeviceManager()->getPhysicalDeviceById($json["device_id"]);
-if($physical === null)
-{
-    $response = ["status" => "error", "error" => "invalid_device_id"];
+if($physical === null) {
+    $response = ["status" => "error", "error" => "invalid_device_id", "message" => Utils::getString("error_msg_device_id")];
     http_response_code(400);
     echo json_encode($response);
     exit();
@@ -62,6 +59,6 @@ if($physical === null)
 
 $success = $physical->reboot();
 
-$response = ["status" => $success ? "success" : "error",
-    "message" => $success ? "The device will reboot shortly" : "An error occured!"];
+$response = ["status" => $success ? "success" : "error", "message" => $success ?
+    Utils::getString("device_reboot_success") : Utils::getString("device_reboot_error")];
 echo json_encode($response);

@@ -56,6 +56,9 @@ abstract class PhysicalDevice {
 
     protected $online = null;
 
+    /** @var array */
+    private $scopes;
+
     /**
      * PhysicalDevice constructor.
      * @param string $id
@@ -63,13 +66,14 @@ abstract class PhysicalDevice {
      * @param string $display_name
      * @param VirtualDevice[] $virtual_devices
      */
-    protected function __construct(string $id, int $owner_id, string $display_name, string $hostname, int $port, array $virtual_devices) {
+    protected function __construct(string $id, int $owner_id, string $display_name, string $hostname, int $port, array $virtual_devices, array $scopes) {
         $this->id = $id;
         $this->owner_id = $owner_id;
         $this->display_name = $display_name;
         $this->hostname = $hostname;
         $this->port = $port;
         $this->virtual_devices = $virtual_devices;
+        $this->scopes = $scopes;
     }
 
     /**
@@ -109,7 +113,7 @@ abstract class PhysicalDevice {
      * @return PhysicalDevice
      */
     public static abstract function load(string $device_id, int $owner_id, string $display_name,
-                                         string $hostname, int $port
+                                         string $hostname, int $port, array $scopes
     );
 
     public abstract function reboot();
@@ -145,8 +149,7 @@ abstract class PhysicalDevice {
      * @param string $id
      * @return &VirtualDevice|null
      */
-    public
-    function getVirtualDeviceById(string $id
+    public function getVirtualDeviceById(string $id
     ) {
         foreach($this->virtual_devices as &$virtual_device) {
             if($virtual_device->getDeviceId() === $id)
@@ -159,8 +162,7 @@ abstract class PhysicalDevice {
      * @param string $id
      * @return int
      */
-    public
-    function getVirtualDeviceIndexById(string $id
+    public function getVirtualDeviceIndexById(string $id
     ) {
         foreach($this->virtual_devices as $i => $virtual_device) {
             if($virtual_device->getDeviceId() === $id)
@@ -172,13 +174,11 @@ abstract class PhysicalDevice {
     /**
      * @return VirtualDevice[]
      */
-    public
-    function getVirtualDevices(): array {
+    public function getVirtualDevices(): array {
         return $this->virtual_devices;
     }
 
-    public
-    function getDeviceNavbarHtml() {
+    public function getDeviceNavbarHtml() {
         $html = "";
 
         foreach($this->virtual_devices as $i => $virtual_device) {
@@ -193,8 +193,7 @@ abstract class PhysicalDevice {
         return $html;
     }
 
-    public
-    function getRowHtml(int $user_id
+    public function getRowHtml(int $user_id
     ) {
         $id = urlencode($this->id);
         $display_name = urlencode($this->display_name);
@@ -206,8 +205,7 @@ abstract class PhysicalDevice {
                 $devices .= $device->getDeviceName();
             }
             $devices .= "<br>";
-        }
-        else {
+        } else {
             $devices = "";
         }
 
@@ -233,34 +231,44 @@ HTML;
 
     }
 
-    public
-    static function fromDatabaseRow(array $row
+    public static function fromDatabaseRow(array $row
     ) {
         if(!class_exists($row["device_driver"]) || !is_subclass_of($row["device_driver"], PhysicalDevice::class)) {
             throw new InvalidArgumentException("$row[device_driver] is not a valid PhysicalDevice class name");
         }
-        return $row["device_driver"]::load($row["id"], $row["owner_id"], $row["display_name"], $row["hostname"], $row["port"]);
+
+        $scopes = isset($row["scope"]) ? explode(" ", $row["scope"]) : [];
+        return $row["device_driver"]::load($row["id"], $row["owner_id"],
+            $row["display_name"], $row["hostname"], $row["port"], $scopes);
     }
 
     /**
      * @return string
      */
-    public
-    function getId(): string {
+    public function getId(): string {
         return $this->id;
     }
 
     /**
      * @return string
      */
-    public
-    function getDisplayName(): string {
+    public function getDisplayName(): string {
         return $this->display_name;
     }
 
-    public
-    function getNameWithState() {
+    public function getNameWithState() {
         $class = $this->isOnline() ? "invisible" : "";
         return trim("$this->display_name <span class=\"device-offline-text $class\">(" . Utils::getString("device_status_offline") . ")</span>");
+    }
+
+    public function hasScope(string $scope) {
+        return in_array($scope, $this->scopes);
+    }
+
+    /**
+     * @return int
+     */
+    public function getOwnerId(): int {
+        return $this->owner_id;
     }
 }

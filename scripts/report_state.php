@@ -34,7 +34,7 @@ if(php_sapi_name() != 'cli') exit;
 
 if(isset($argv[1])) {
     require_once __DIR__ . "/../includes/UserDeviceManager.php";
-    $manager = UserDeviceManager::fromUserId($argv[1]);
+    $manager = UserDeviceManager::forUserId($argv[1]);
     if($manager === null) {
         throw new InvalidArgumentException("Invalid user id: $argv[1]");
     }

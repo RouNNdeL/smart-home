@@ -45,6 +45,10 @@ $(function() {
 
     ir_init();
 
+    $(function() {
+        $("[data-toggle='tooltip']").tooltip();
+    });
+
     $(".slider").ionRangeSlider({
         min: 0,
         max: 100,

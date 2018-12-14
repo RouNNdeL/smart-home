@@ -63,7 +63,7 @@ class ActionsRequestManager {
         $payload = [];
         $request_id = $request["requestId"];
         foreach($request["inputs"] as $input) {
-            $userDeviceManager = UserDeviceManager::fromUserId($user_id);
+            $userDeviceManager = UserDeviceManager::forUserId($user_id);
             switch($input["intent"]) {
                 case self::ACTION_INTENT_SYNC:
                     $payload["agentUserId"] = (string)$user_id;

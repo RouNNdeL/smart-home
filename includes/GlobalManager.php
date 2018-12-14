@@ -35,8 +35,7 @@ require_once __DIR__ . "/database/SessionManager.php";
 require_once __DIR__ . "/UserDeviceManager.php";
 require_once __DIR__ . "/logging/RequestLogger.php";
 
-class GlobalManager
-{
+class GlobalManager {
     const LOG = true;
 
     /** @var SessionManager */
@@ -54,13 +53,11 @@ class GlobalManager
     /**
      * GlobalManager constructor.
      */
-    private function __construct()
-    {
+    private function __construct() {
 
     }
 
-    public static function minimal()
-    {
+    public static function minimal() {
         $manager = new GlobalManager();
 
         $manager->loadIpTrustManager();
@@ -68,8 +65,7 @@ class GlobalManager
         return $manager;
     }
 
-    public static function withSessionManager($login_required = false, $log = GlobalManager::LOG)
-    {
+    public static function withSessionManager($login_required = false, $log = GlobalManager::LOG) {
         $manager = new GlobalManager();
 
         $manager->loadIpTrustManager();
@@ -78,74 +74,67 @@ class GlobalManager
         return $manager;
     }
 
-    public static function all($log = GlobalManager::LOG)
-    {
+    public static function all($scopes = null, $log = GlobalManager::LOG) {
         $manager = new GlobalManager();
 
         $manager->loadIpTrustManager();
         $manager->loadSessionManager(true, $log);
-        $manager->loadUserDeviceManager();
+        $manager->loadUserDeviceManager($scopes);
 
         return $manager;
     }
 
-    public function loadIpTrustManager()
-    {
+    public function loadIpTrustManager() {
         $this->ipTrustManager = IpTrustManager::getInstance();
-        if($this->ipTrustManager === null || !$this->ipTrustManager->isAllowed())
-        {
+        if($this->ipTrustManager === null || !$this->ipTrustManager->isAllowed()) {
             http_response_code(403);
             exit(0);
         }
     }
 
-    public function loadSessionManager($login_required = false, $log = GlobalManager::LOG)
-    {
+    public function loadSessionManager($login_required = false, $log = GlobalManager::LOG) {
         $this->sessionManager = SessionManager::getInstance();
         if($log)
             $this->requestLogger = RequestLogger::getInstance();
-        if($login_required && !$this->sessionManager->isLoggedIn())
-        {
-            require __DIR__."/../web/error/404.php";
+        if($login_required && !$this->sessionManager->isLoggedIn()) {
+            require __DIR__ . "/../web/error/404.php";
             http_response_code(404);
             exit(0);
         }
     }
 
-    public function loadUserDeviceManager()
-    {
-        $this->userDeviceManager = UserDeviceManager::fromUserId($this->sessionManager->getUserId());
+    public function loadUserDeviceManager($scopes = null) {
+        if($scopes === null)
+            $this->userDeviceManager = UserDeviceManager::forUserId($this->sessionManager->getUserId());
+        else
+            $this->userDeviceManager = UserDeviceManager::forUserIdAndScope($this->sessionManager->getUserId(), $scopes);
     }
 
     /**
      * @return SessionManager
      */
-    public function getSessionManager()
-    {
+    public function getSessionManager() {
         return $this->sessionManager;
     }
 
     /**
      * @return UserDeviceManager
      */
-    public function getUserDeviceManager()
-    {
+    public function getUserDeviceManager() {
         return $this->userDeviceManager;
     }
 
     /**
      * @return RequestLogger
      */
-    public function getRequestLogger()
-    {
+    public function getRequestLogger() {
         return $this->requestLogger;
     }
 
     /**
      * @return IpTrustManager
      */
-    public function getIpTrustManager()
-    {
+    public function getIpTrustManager() {
         return $this->ipTrustManager;
     }
 }

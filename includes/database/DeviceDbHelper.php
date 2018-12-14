@@ -35,11 +35,6 @@ require_once __DIR__ . "/../database/HomeUser.php";
 
 class DeviceDbHelper {
 
-    const DEVICE_MOD_UNKNOWN = -1;
-    const DEVICE_MOD_ONLINE_STATE = 0x10;
-    const DEVICE_MOD_SIMPLE_SETTINGS = 0x11;
-    const DEVICE_MOD_EFFECT = 0x12;
-
     /**
      * @param mysqli $conn
      * @param string $physical_device_id
@@ -184,8 +179,8 @@ class DeviceDbHelper {
         $changed = $stmt->affected_rows;
         $stmt->close();
         if($changed) {
-            DeviceDbHelper::insertDeviceModification($conn, $physical_device_id, null,
-                DeviceDbHelper::DEVICE_MOD_ONLINE_STATE);
+            DeviceModManager::insertDeviceModification($conn, $physical_device_id, null,
+                DeviceModManager::DEVICE_MOD_ONLINE_STATE);
         }
     }
 
@@ -241,105 +236,5 @@ class DeviceDbHelper {
         $success = $stmt->execute();
         $stmt->close();
         return $success;
-    }
-
-    public static function insertDeviceModification(mysqli $conn, string $physical_id, $virtual_id, int $type) {
-        $sql = "INSERT INTO device_modifications (physical_id, virtual_id, type) VALUES (?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssi", $physical_id, $virtual_id, $type);
-        $success = $stmt->execute();
-        $stmt->close();
-        return $success;
-    }
-
-    private static function getStatementForParams(mysqli $conn, string $sql, int $user_id, $physical_id, $virtual_id, $type) {
-        $where = "";
-        $types = "";
-        $count = 0;
-        $func_params = [0];
-
-        if($physical_id !== null) {
-            $where .= "physical_id = ?";
-            $types .= "s";
-            $count++;
-            $func_params[] = &$physical_id;
-        }
-        else {
-            $where .= "owner_id = ?";
-            $types .= "i";
-            $count++;
-            $func_params[] = &$user_id;
-        }
-
-        if($virtual_id !== null) {
-            if($count > 0)
-                $where .= " AND ";
-            $where .= "virtual_id = ?";
-            $types .= "s";
-            $count++;
-            $func_params[] = &$virtual_id;
-        }
-
-        if($type !== null) {
-            if($count > 0)
-                $where .= " AND ";
-            $where .= "type = ?";
-            $types .= "i";
-            $count++;
-            $func_params[] = &$type;
-        }
-
-        $func_params[0] = &$types;
-        $query = str_replace("%WHERE%", "($where)", $sql);
-        $stmt = $conn->prepare($query);
-        call_user_func_array([$stmt, "bind_param"], $func_params);
-        return $stmt;
-    }
-
-    public static function getLastModDate(mysqli $conn, int $user_id, $physical_id, $virtual_id, $type) {
-        if($physical_id === null)
-            $sql = "SELECT date FROM device_modifications JOIN devices_physical dp ON
-                    device_modifications.physical_id = dp.id WHERE %WHERE% ORDER BY date DESC LIMIT 1";
-        else
-            $sql = "SELECT date FROM device_modifications WHERE %WHERE% ORDER BY date DESC LIMIT 1";
-        $stmt = DeviceDbHelper::getStatementForParams($conn, $sql, $user_id, $physical_id, $virtual_id, $type);
-        $stmt->bind_result($date);
-        $stmt->execute();
-        if($stmt->fetch()) {
-            $stmt->close();
-            return $date;
-        }
-
-        $stmt->close();
-        return null;
-    }
-
-    /**
-     * @param mysqli $conn
-     * @param string $last_date - Use caution, variable is not sanitized (it should be pulled from the getLastModDate method anyways)
-     * @param int $user_id
-     * @param $physical_id
-     * @param $virtual_id
-     * @param $type
-     * @return null
-     */
-    public static function queryNewMods(mysqli $conn, string $last_date, int $user_id, $physical_id, $virtual_id, $type) {
-        if($physical_id === null)
-            $sql = "SELECT date, physical_id, virtual_id, type FROM device_modifications JOIN devices_physical dp ON
-                    device_modifications.physical_id = dp.id WHERE date > '$last_date' AND %WHERE% ORDER BY date";
-        else
-            $sql = "SELECT date, physical_id, virtual_id, type FROM device_modifications WHERE date > '$last_date' 
-                                                                      AND %WHERE% ORDER BY date DESC";
-        $stmt = DeviceDbHelper::getStatementForParams($conn, $sql, $user_id, $physical_id, $virtual_id, $type);
-        $stmt->bind_result($_date, $_physical_id, $_virtual_id, $_type);
-        $stmt->execute();
-
-        $array = [];
-        while($stmt->fetch()) {
-            $array[] = ["date" => $_date, "physical_id" => "$_physical_id", "virtual_id" => $_virtual_id, "type" => "$_type"];
-        }
-
-        $stmt->close();
-        return $array;
     }
 }

@@ -41,7 +41,7 @@ if($_SERVER["REQUEST_METHOD"] !== "GET") {
 
 require_once __DIR__."/../includes/GlobalManager.php";
 
-$manager = GlobalManager::all();
+$manager = GlobalManager::all([ShareManager::SCOPE_SIMPLE_CONTROL]);
 
 if(!isset($_GET["device_id"])) {
     $response = ["status" => "error", "error" => "invalid_request"];
