@@ -88,13 +88,13 @@ abstract class PhysicalDevice {
     }
 
     /**
-     * @param bool $quick
      * @return bool - whether any changes were made to the Database
      */
     public function save() {
         $changed = false;
         foreach($this->virtual_devices as $virtual_device) {
-            $changed = $changed || $virtual_device->toDatabase();
+            $d_changed = $virtual_device->toDatabase();
+            $changed = $changed || $d_changed;
         }
         return $changed;
     }
