@@ -53,7 +53,7 @@ require_once __DIR__."/../../includes/navbar/Nav.php";
 
 echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
 ?>
-<div class="container ">
+<div class="container mt-3">
 
     <?php
     foreach ($manager->getUserDeviceManager()->getPhysicalDevices() as $physicalDevice) {
