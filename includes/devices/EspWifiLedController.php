@@ -104,7 +104,7 @@ URL;
             if(!$device instanceof BaseEffectDevice)
                 throw new UnexpectedValueException("Children of $class_name should be of type RgbEffectDevice");
 
-            $flags = (($device->isOn() ? 1 : 0) << 0) | (($device->areEffectsEnabled() ? 1 : 0) << 2);
+            $flags = (($device->isOn() ? 1 : 0) << 0) | (($device->areEffectsEnabled() ? 1 : 0) << 2)  | (1 << 1);
 
             $str_b .= Utils::intToHex($device->getBrightness() / 100 * 255);
             $str_f .= Utils::intToHex($flags);
