@@ -139,7 +139,7 @@ class Fill extends Effect
         if($this->args[Effect::ARG_COLOR_CYCLES] < 1)
             $this->args[Effect::ARG_COLOR_CYCLES] = 1;
 
-        if($this->args[Fill::ARG_COLOR_COUNT] > sizeof($this->colors))
+        if($this->args[Fill::ARG_COLOR_COUNT] > sizeof($this->colors) || $this->args[Fill::ARG_COLOR_COUNT] <= 0)
             $this->args[Fill::ARG_COLOR_COUNT] = sizeof($this->colors);
 
         while(sizeof($this->colors) % $this->args[Fill::ARG_COLOR_COUNT] > 0 ||
