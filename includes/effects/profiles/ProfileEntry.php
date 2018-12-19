@@ -58,29 +58,35 @@ class ProfileEntry
         $this->effect = $effect;
     }
 
-    public static function getForUserId($user_id)
+    public static function getForDeviceId(string $physical_id)
     {
         $conn = DbUtils::getConnection();
+
+        $devices = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice($conn, $physical_id);
+        $effects = Effect::forDevice($physical_id);
+
         $sql = "SELECT
-                  id
-                FROM device_profiles
-                WHERE user_id = ?";
+                  device_id,
+                  device_index,
+                  effect_id
+                FROM devices_effect_join
+                  JOIN devices_effect_profiles_effect_join dde on devices_effect_join.id = dde.effect_join_id
+                  JOIN devices_effect_profiles dep on dde.profile_id = dep.id
+                WHERE physical_id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $user_id);
-        $stmt->bind_result($profile_id);
+        $stmt->bind_param("s", $physical_id);
+        $stmt->bind_result($device_id, $device_index, $effect_id);
         $stmt->execute();
-        $ids = [];
+        $arr = [];
+        $device_ids = [];
         while($stmt->fetch())
         {
-            $ids[] = $profile_id;
+            if(in_array($device_id, $device_ids))
+                continue;
+            $arr[] = new ProfileEntry($devices[$device_id], $device_index, $effects[$effect_id]);
+            $device_ids[] = $device_id;
         }
         $stmt->close();
-
-        $arr = [];
-        foreach($ids as $id)
-        {
-            $arr[$id] = ProfileEntry::getForProfileId($id);
-        }
         return $arr;
     }
 
@@ -98,8 +104,8 @@ class ProfileEntry
                   device_id,
                   device_index,
                   effect_id
-                FROM device_effect_profiles
-                  JOIN devices_device_effects dde on device_effect_profiles.device_effect_id = dde.id
+                FROM devices_effect_join
+                  JOIN devices_effect_profiles_effect_join dde on devices_effect_join.id = dde.effect_join_id
                 WHERE profile_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $profile_id);

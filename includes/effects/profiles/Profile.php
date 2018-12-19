@@ -59,7 +59,7 @@ class Profile
     public static function fromId(int $profile_id)
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT name FROM device_profiles WHERE id = ?";
+        $sql = "SELECT name FROM devices_effect_scenes WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $profile_id);
         $stmt->bind_result($name);
@@ -77,12 +77,12 @@ class Profile
      * @param $user_id
      * @return Profile[]
      */
-    public static function allForUser($user_id)
+    public static function allForDeviceId(string $device_id)
     {
-        $entries = ProfileEntry::getForUserId($user_id);
+        $entries = ProfileEntry::getForDeviceId($device_id);
 
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, name FROM device_profiles WHERE user_id = ?";
+        $sql = "SELECT id, name FROM devices_effect_profiles WHERE physical_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
         $stmt->bind_result($profile_id, $name);

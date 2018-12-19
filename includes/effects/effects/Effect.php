@@ -634,16 +634,16 @@ abstract class Effect
         return $arr;
     }
 
-    public static function forProfile(string $profile_id)
+    public static function forProfile(int $profile_id)
     {
         $conn = DbUtils::getConnection();
         $colors = Effect::getColorsForEffectIdsByProfileId($profile_id);
         $sql = "SELECT devices_effects.id, name, effect, time0, time1, time2, time3, time4, time5, 
                 arg0, arg1, arg2, arg3, arg4, arg5
-                FROM device_effect_profiles 
-                  JOIN devices_device_effects dde on device_effect_profiles.device_effect_id = dde.id
+                FROM devices_effect_profiles_effect_join 
+                  JOIN devices_effect_join dde on devices_effect_profiles_effect_join.effect_join_id = dde.id
                   JOIN devices_effects on dde.effect_id = devices_effects.id
-                WHERE profile_id = ?";
+                WHERE devices_effect_profiles_effect_join.profile_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $profile_id);
         $arr = Effect::arrayFromStatement($stmt, $colors, true);
@@ -657,8 +657,8 @@ abstract class Effect
         $colors = Effect::getColorsForEffectIdsByDeviceId($device_id);
         $sql = "SELECT devices_effects.id, name, effect, time0, time1, time2, time3, time4, time5, 
                 arg0, arg1, arg2, arg3, arg4, arg5
-                FROM devices_device_effects 
-                  JOIN devices_effects ON devices_device_effects.effect_id = devices_effects.id 
+                FROM devices_effect_join 
+                  JOIN devices_effects ON devices_effect_join.effect_id = devices_effects.id 
                 WHERE device_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $device_id);
@@ -670,8 +670,8 @@ abstract class Effect
     private static function getColorsForEffectIdsByDeviceId(string $device_id)
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT devices_effects.id FROM devices_device_effects 
-                  JOIN devices_effects ON devices_device_effects.effect_id = devices_effects.id 
+        $sql = "SELECT devices_effects.id FROM devices_effect_join 
+                  JOIN devices_effects ON devices_effect_join.effect_id = devices_effects.id 
                 WHERE device_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $device_id);
@@ -680,13 +680,13 @@ abstract class Effect
         return $arr;
     }
 
-    private static function getColorsForEffectIdsByProfileId(string $profile_id)
+    private static function getColorsForEffectIdsByProfileId(int $profile_id)
     {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT devices_effects.id FROM devices_device_effects
-                  JOIN devices_effects ON devices_device_effects.effect_id = devices_effects.id
-                  JOIN device_effect_profiles dep on devices_device_effects.id = dep.device_effect_id
-                WHERE profile_id = ?";
+        $sql = "SELECT devices_effects.id FROM devices_effect_join
+                  JOIN devices_effects ON devices_effect_join.effect_id = devices_effects.id
+                  JOIN devices_effect_profiles_effect_join dep on devices_effect_join.id = dep.effect_join_id
+                WHERE dep.profile_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $profile_id);
         $arr = Effect::getEffectIdsColorsFromStatement($stmt);

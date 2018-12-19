@@ -127,9 +127,9 @@ class DeviceDbHelper {
                   toggles,
                   ir_protocol,
                   ir_nec_return
-                FROM device_profiles
-                  JOIN device_effect_profiles on device_profiles.id = device_effect_profiles.profile_id
-                  JOIN devices_device_effects dde on device_effect_profiles.device_effect_id = dde.id
+                FROM devices_effect_scenes
+                  JOIN device_effect_profiles on devices_effect_scenes.id = device_effect_profiles.profile_id
+                  JOIN devices_effect_join dde on device_effect_profiles.device_effect_id = dde.id
                   JOIN devices_virtual v on dde.device_id = v.id
                 WHERE profile_id = ?
                 GROUP BY v.id";
