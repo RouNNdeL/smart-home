@@ -46,10 +46,21 @@ class EspWiFiLamp extends PhysicalDevice {
         if($online) {
             $b = $device->getBrightness() * 255 / 100;
             $s = $device->isOn() ? 1 : 0;
-            $ch = curl_init("http://" . $this->hostname . "?b=" . $b . "&s=" . $s . "&f=1");
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+            $hex = Utils::intToHex($s) . Utils::intToHex($b);
+            $headers = array(
+                "Content-Type: application/json",
+                "Content-Length: " . strlen($hex)
+            );
+
+            $url = <<<URL
+http://$this->hostname:$this->port/data
+URL;
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $hex);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             curl_exec($ch);
             curl_close($ch);
         }
