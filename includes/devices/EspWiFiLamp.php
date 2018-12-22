@@ -46,23 +46,11 @@ class EspWiFiLamp extends PhysicalDevice {
         if($online) {
             $b = $device->getBrightness() * 255 / 100;
             $s = $device->isOn() ? 1 : 0;
-            $hex = Utils::intToHex($s) . Utils::intToHex($b);
-            $headers = array(
-                "Content-Type: application/json",
-                "Content-Length: " . strlen($hex)
-            );
-
-            $url = <<<URL
-http://$this->hostname:$this->port/data
-URL;
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $hex);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLINFO_HEADER_OUT, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_exec($ch);
-            curl_close($ch);
+            $fp = @fsockopen($this->hostname, $this->port, $errCode, $errStr, .2);
+            if($fp !== false) {
+                fwrite($fp, chr(0xB0) . chr($s) . chr($b));
+                fread($fp, 1);
+            }
         }
 
         return $online;
@@ -81,6 +69,15 @@ URL;
     }
 
     public function reboot() {
-        // TODO: Implement reboot() method.
+        $online = $this->isOnline();
+        if($online) {
+            $fp = @fsockopen($this->hostname, $this->port, $errCode, $errStr, .2);
+            if($fp !== false) {
+                fwrite($fp, chr(0xE0));
+                fread($fp, 1);
+            }
+        }
+
+        return $online;
     }
 }
