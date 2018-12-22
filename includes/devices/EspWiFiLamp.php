@@ -46,14 +46,24 @@ class EspWiFiLamp extends PhysicalDevice {
         if($online) {
             $b = $device->getBrightness() * 255 / 100;
             $s = $device->isOn() ? 1 : 0;
-            $fp = @fsockopen($this->hostname, $this->port, $errCode, $errStr, .2);
-            if($fp !== false) {
-                fwrite($fp, chr(0xB0) . chr($s) . chr($b));
-                fread($fp, 1);
+
+            $i = 0;
+            while($i < 10) {
+                $fp = @fsockopen($this->hostname, $this->port, $errCode, $errStr, .2);
+                if($fp !== false) {
+                    fwrite($fp, chr(0xB0) . chr($s) . chr($b));
+                    $response = ord(fread($fp, 1));
+                    if($response === 0x10) {
+                        return true;
+                    }
+                }
+                $i++;
             }
+
+            return false;
         }
 
-        return $online;
+        return false;
     }
 
     /**
@@ -71,10 +81,17 @@ class EspWiFiLamp extends PhysicalDevice {
     public function reboot() {
         $online = $this->isOnline();
         if($online) {
-            $fp = @fsockopen($this->hostname, $this->port, $errCode, $errStr, .2);
-            if($fp !== false) {
-                fwrite($fp, chr(0xE0));
-                fread($fp, 1);
+            $i = 0;
+            while($i < 10) {
+                $fp = @fsockopen($this->hostname, $this->port, $errCode, $errStr, .1);
+                if($fp !== false) {
+                    fwrite($fp, chr(0xE0));
+                    $response = ord(fread($fp, 1));
+                    if($response === 0x10) {
+                        return true;
+                    }
+                }
+                $i++;
             }
         }
 
