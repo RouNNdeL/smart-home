@@ -274,7 +274,7 @@ HTML;
 
     public function handleDeviceReportedState(string $state) {
         /* Devices that report the state can override this to handle it */
-        $script = __DIR__ . "/../scripts/report_state.php";
+        $script = __DIR__ . "/../../scripts/report_state.php";
         exec("php $script $this->owner_id >/dev/null &");
     }
 }
