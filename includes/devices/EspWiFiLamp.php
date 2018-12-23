@@ -45,6 +45,9 @@ class EspWiFiLamp extends PhysicalDevice {
         $online = $this->isOnline();
         if($online) {
             $b = $device->getBrightness() * 255 / 100;
+            if($b > 50) {
+                $b = -46.83537 + 2.810772 * $b - 0.02027813 * $b ** 2 + 0.00005449933 * $b ** 3;
+            }
             $s = $device->isOn() ? 1 : 0;
 
             $i = 0;
