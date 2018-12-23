@@ -58,7 +58,7 @@ $(function() {
 
     $(".checkbox-switch").bootstrapSwitch().on('switchChange.bootstrapSwitch', update);
     $(".color-picker-init").on('changeColor', function(e) {
-        $(this).find("input").val(e.value);
+        //$(this).find("input").val(e.value);
         update(e);
     }).colorpicker({
         useAlpha: false,
@@ -164,6 +164,12 @@ $(function() {
         });
     }
 
+    $(".device-global-switch").bootstrapSwitch().on('switchChange.bootstrapSwitch', function(e) {
+        const state = $(e.target)[0].checked;
+        $("input[data-input-class='base-effect-state']").bootstrapSwitch("state", state, false);
+        reportState();
+    });
+
     /**
      *
      * @param {Event} e
@@ -172,8 +178,11 @@ $(function() {
         if(e === undefined || e.target === undefined) {
             throw new Error("This function requires an event with a valid target");
         }
+
+        const target = $(e.target);
+
         let update_delay = Math.max(MIN_UPDATE_DELAY, 2 * last_call_duration);
-        const id = $(e.target).parents(".device-parent").data("device-id");
+        const id = target.parents(".device-parent").data("device-id");
         if(Date.now() > last_update + update_delay) {
             updateById(id);
             last_update = Date.now();
@@ -182,6 +191,7 @@ $(function() {
             clearTimeout(update_timeouts[id]);
             update_timeouts[id] = setTimeout(update.bind(this, e), last_update + MIN_UPDATE_DELAY - Date.now());
         }
+
         clearTimeout(update_timeout_global);
         update_timeout_global = setTimeout(reportState, REPORT_STATE_DELAY);
     }

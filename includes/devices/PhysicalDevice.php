@@ -45,7 +45,7 @@ abstract class PhysicalDevice {
     private $id;
 
     /** @var string */
-    private $display_name;
+    protected $display_name;
 
     /** @var int */
     private $owner_id;
@@ -276,5 +276,9 @@ HTML;
         /* Devices that report the state can override this to handle it */
         $script = __DIR__ . "/../../scripts/report_state.php";
         exec("php $script $this->owner_id >/dev/null &");
+    }
+
+    public function getHtmlHeader(){
+        return "<h4>$this->display_name</h4>";
     }
 }

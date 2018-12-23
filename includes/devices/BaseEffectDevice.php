@@ -131,7 +131,7 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
                 <div class="row">
                     <div class="col text-center-vertical"><h6 class="mb-0">$name</h6></div>
                     <div class="col-auto float-right pl-0">
-                        <input class="checkbox-switch change-listen" type="checkbox" name="state" $checked
+                        <input data-input-class="base-effect-state" class="checkbox-switch change-listen" type="checkbox" name="state" $checked
                             data-size="small" data-label-width="10" id="state-$this->device_id">
                     </div>
                 </div>
@@ -141,7 +141,7 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
                     <div class="$center_col">
                         <p class="mb-2">Brightness</p>
                         <div class="slider-container"> 
-                            <input
+                            <input data-input-class="base-effect-brightness"
                                 class="slider change-listen"
                                 type="text"
                                 name="brightness"
@@ -151,14 +151,14 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
                         <div class="input-group mt-3">
                             <label for="effects-$this->device_id">Effects enabled
                             <div class="ml-3 d-inline">
-                                <input class="checkbox-switch change-listen" type="checkbox" name="effects_enabled" $checked_effects
+                                <input data-input-class="base-effect-effects" class="checkbox-switch change-listen" type="checkbox" name="effects_enabled" $checked_effects
                                 data-size="mini" data-label-width="10" id="effects-$this->device_id">
                             </label>
                             </div>
                         </div>
                         <div class="color-container row">
                             <div class="col">
-                                <div class="color-picker-init" >
+                                <div data-input-class="base-effect-color" class="color-picker-init" >
                                     <input id="color-$this->device_id" name="color" type="text change-listen" class="form-control color-input" value="$color"/>
                                 </div>
                             </div>

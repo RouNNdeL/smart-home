@@ -104,7 +104,7 @@ URL;
             if(!$device instanceof BaseEffectDevice)
                 throw new UnexpectedValueException("Children of $class_name should be of type RgbEffectDevice");
 
-            $flags = (($device->isOn() ? 1 : 0) << 0) | (($device->areEffectsEnabled() ? 1 : 0) << 2)  | (1 << 1);
+            $flags = (($device->isOn() ? 1 : 0) << 0) | (($device->areEffectsEnabled() ? 1 : 0) << 2) | (1 << 1);
 
             $str_b .= Utils::intToHex($device->getBrightness() / 100 * 255);
             $str_f .= Utils::intToHex($flags);
@@ -198,7 +198,7 @@ URL;
         $device = $this->getVirtualDeviceById($device_id);
         $class_name = get_class($this);
         if(!$device instanceof BaseEffectDevice)
-            throw new UnexpectedValueException("Children of $class_name should be of type RgbEffectDevice");
+            throw new UnexpectedValueException("Children of $class_name should be of type BaseEffectDevice");
 
         $device_index = $this->getVirtualDeviceIndexById($device_id);
         $hex = str_repeat("??", sizeof($this->virtual_devices) + $device_index) . "05" .
@@ -226,5 +226,31 @@ URL;
             return true;
         }
         return false;
+    }
+
+    public function getHtmlHeader() {
+        $on = false;
+        foreach($this->virtual_devices as $device) {
+            if(!$device instanceof BaseEffectDevice)
+                throw new UnexpectedValueException("Children of EspWiFiLedController should be of type RgbEffectDevice");
+            $on = $on || $device->isOn();
+        }
+
+        $checked = $on ? "checked" : "";
+
+        return <<<HTML
+    <div class="row">
+        <div class="col text-center-vertical">
+            <h4>$this->display_name</h4>
+        </div>
+        <div class="col-auto float-right pl-0 align-self-center">
+            <div class="form-check">
+                <input class="device-global-switch" type="checkbox" name="state" $checked
+                            data-size="small" data-label-width="10" id="device-global-switch">
+            </div>
+        </div>
+    </div>
+HTML;
+
     }
 }
