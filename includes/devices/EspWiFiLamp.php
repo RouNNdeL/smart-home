@@ -113,5 +113,6 @@ class EspWiFiLamp extends PhysicalDevice {
             }
         }
         $this->save();
+        parent::handleDeviceReportedState($state);
     }
 }
