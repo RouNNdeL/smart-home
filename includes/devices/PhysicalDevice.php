@@ -271,4 +271,8 @@ HTML;
     public function getOwnerId(): int {
         return $this->owner_id;
     }
+
+    public function handleDeviceReportedState(string $state) {
+        /* Devices that report the state can override this to handle it */
+    }
 }
