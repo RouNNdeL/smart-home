@@ -118,11 +118,7 @@ class LampAnalog extends VirtualDevice {
             $name = $header_name;
         else
             $name = $this->device_name;
-        $id = urlencode($this->device_id);
-        $display_name = urlencode($this->device_name);
         $checked = $this->on ? "checked" : "";
-        $checked_effects = $this->effects_enabled ? "checked" : "";
-        $color = "#" . str_pad(dechex($this->color), 6, '0', STR_PAD_LEFT);
 
         $center_row = strlen($footer_html) === 0 ? "justify-content-center" : "";
         $center_col = strlen($footer_html) === 0 ? "col-auto" : "col";
