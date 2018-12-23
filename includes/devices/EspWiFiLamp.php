@@ -45,9 +45,7 @@ class EspWiFiLamp extends PhysicalDevice {
         $online = $this->isOnline();
         if($online) {
             $b = $device->getBrightness() * 255 / 100;
-            if($b > 50) {
-                $b = -46.83537 + 2.810772 * $b - 0.02027813 * $b ** 2 + 0.00005449933 * $b ** 3;
-            }
+            $b = EspWiFiLamp::convertBrightness($b);
             $s = $device->isOn() ? 1 : 0;
 
             $i = 0;
@@ -109,10 +107,38 @@ class EspWiFiLamp extends PhysicalDevice {
             $on = $state > 0 ? true : false;
             $device->setOn($on);
             if($on) {
-                $device->setBrightness($state * 100 / 255);
+                $device->setBrightness(EspWiFiLamp::convertBrightnessInverse($state) * 100 / 255);
             }
         }
         $this->save();
         parent::handleDeviceReportedState($state);
+    }
+
+    private static function convertBrightnessInverse(int $b) {
+        if($b <= 51) return $b;
+        if($b >= 255) return 255;
+
+        $a0 = -0.213024904820333;
+        $a1 = 2.05792544729635;
+        $a2 = -0.0683415506580082;
+        $a3 = 0.00138207019923988;
+        $a4 = -1.09501339174387e-05;
+        $a5 = 3.77005216597614e-08;
+        $a6 = -4.76144268843609e-11;
+
+        return $a0 + $a1 * $b + $a2 * $b ^ 2 + $a3 * $b ^ 3 + $a4 * $b ^ 4 + $a5 * $b ^ 5 + $a6 * $b ^ 6;
+    }
+
+    private static function convertBrightness(int $b) {
+        if($b <= 51) return $b;
+        if($b >= 255) return 255;
+
+        $a0 = -0.2701097;
+        $a1 = 1.056361;
+        $a2 = 0.0004974895;
+        $a3 = -0.00004297229;
+        $a4 = 0.0000001575381;
+
+        return $a0 + $a1 * $b + $a2 * $b ^ 2 + $a3 * $b ^ 3 + $a4 * $b ^ 4;
     }
 }
