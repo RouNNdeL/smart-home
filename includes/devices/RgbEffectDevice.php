@@ -330,4 +330,30 @@ abstract class RgbEffectDevice extends PhysicalDevice
     public abstract function saveEffectForDevice(string $device_id, int $index);
 
     public abstract function previewEffect(string $device_id, int $index);
+
+    public function getHtmlHeader() {
+        $on = false;
+        foreach($this->virtual_devices as $device) {
+            if(!$device instanceof BaseEffectDevice)
+                throw new UnexpectedValueException("Children of EspWiFiLedController should be of type RgbEffectDevice");
+            $on = $on || $device->isOn();
+        }
+
+        $checked = $on ? "checked" : "";
+
+        return <<<HTML
+    <div class="row">
+        <div class="col text-center-vertical">
+            <h4>$this->display_name</h4>
+        </div>
+        <div class="col-auto float-right pl-0 align-self-center">
+            <div class="form-check">
+                <input class="device-global-switch" type="checkbox" name="state" $checked
+                            data-size="small" data-label-width="10" id="device-global-switch">
+            </div>
+        </div>
+    </div>
+HTML;
+
+    }
 }
