@@ -107,7 +107,7 @@ class EspWiFiLamp extends PhysicalDevice {
             throw new UnexpectedValueException("Children of EspWiFiLamp should be of type LampAnalog");
         $device->setOn(true);
         if(is_numeric($state))
-            $device->setBrightness($state);
+            $device->setBrightness($state * 100 / 255);
         $this->save();
     }
 }
