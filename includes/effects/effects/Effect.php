@@ -47,8 +47,7 @@ require_once __DIR__ . "/RotatingRainbow.php";
 require_once __DIR__ . "/Particles.php";
 require_once __DIR__ . "/Fill.php";
 
-abstract class Effect
-{
+abstract class Effect {
     const AVR_EFFECT_BREATHE = 0x00;
     const AVR_EFFECT_FADE = 0x01;
     const AVR_EFFECT_FILLING_FADE = 0x02;
@@ -161,8 +160,7 @@ abstract class Effect
                                 array $args = array(), string $name = null,
                                 int $timing_mode = Effect::TIMING_MODE_SECONDS,
                                 int $arg_mode = Effect::ARG_MODE_ARRAY
-    )
-    {
+    ) {
         if($name === null)
             $this->name = Utils::getString("effect_default_name") . " $id";
         else
@@ -170,17 +168,14 @@ abstract class Effect
         $this->id = $id;
         $this->colors = $colors;
 
-        if($timing_mode !== Effect::TIMING_MODE_JSON)
-        {
-            for($i = 0; $i < 6; $i++)
-            {
+        if($timing_mode !== Effect::TIMING_MODE_JSON) {
+            for($i = 0; $i < 6; $i++) {
                 if(!isset($timing[$i]))
                     $timing[$i] = 0;
             }
         }
 
-        switch($timing_mode)
-        {
+        switch($timing_mode) {
             case Effect::TIMING_MODE_JSON:
                 $this->setTimings($this->timingJsonToArray($timing));
                 break;
@@ -194,45 +189,36 @@ abstract class Effect
                 throw new InvalidArgumentException("Invalid timing_mode: $timing_mode");
         }
 
-        if($arg_mode === Effect::ARG_MODE_ARRAY)
-        {
+        if($arg_mode === Effect::ARG_MODE_ARRAY) {
             $this->unpackArgs($args);
-        }
-        else
-        {
+        } else {
             $this->args = $args;
         }
 
         $this->overwriteValues();
     }
 
-    public function getColors()
-    {
+    public function getColors() {
         return $this->colors;
     }
 
-    public function setTimings(array $timing)
-    {
+    public function setTimings(array $timing) {
         $t = [];
-        foreach($timing as $i => $value)
-        {
+        foreach($timing as $i => $value) {
             $t[$i] = Effect::convertToTiming($timing[$i]);
         }
         $this->setTimingsRaw($t);
     }
 
-    public function setTimingsRaw(array $timing)
-    {
+    public function setTimingsRaw(array $timing) {
         if($timing[0] > 255 || $timing[0] < 0 || $timing[1] > 255 || $timing[1] < 0 ||
             $timing[2] > 255 || $timing[2] < 0 || $timing[3] > 255 || $timing[3] < 0 ||
-            $timing[4] > 255 || $timing[4] < 0 || $timing[5] > 255 || $timing[5] < 0)
-        {
+            $timing[4] > 255 || $timing[4] < 0 || $timing[5] > 255 || $timing[5] < 0) {
             throw new InvalidArgumentException("Timings have to be in range 0-255");
         }
 
         $zeros = true;
-        foreach($timing as $item)
-        {
+        foreach($timing as $item) {
             if($item > 0)
                 $zeros = false;
         }
@@ -247,8 +233,7 @@ abstract class Effect
         $this->timings[5] = $timing[5];
     }
 
-    public static function getColorTemplateLocalized()
-    {
+    public static function getColorTemplateLocalized() {
         $template = self::COLOR_TEMPLATE;
         $template = str_replace("\$title_delete", Utils::getString("profile_btn_hint_delete"), $template);
         $template = str_replace("\$title_jump", Utils::getString("profile_btn_hint_jump"), $template);
@@ -260,16 +245,14 @@ abstract class Effect
      * @param int $color_limit
      * @return string
      */
-    public function colorsHtml(int $color_limit)
-    {
+    public function colorsHtml(int $color_limit) {
         $colors_html = "";
         if($this->getMinColors() === 0)
             return null;
 
         $max = $this->getMaxColors() === Effect::COLOR_COUNT_UNLIMITED ? min(sizeof($this->colors), $color_limit) :
             min(min(sizeof($this->colors), $color_limit), $this->getMaxColors());
-        for($i = 0; $i < max($this->getMinColors(), $max); $i++)
-        {
+        for($i = 0; $i < max($this->getMinColors(), $max); $i++) {
             $c = isset($this->colors[$i]) ? $this->colors[$i] : 0xff0000;
             $c_str = Utils::intToHex($c, 3);
             $template = self::COLOR_TEMPLATE;
@@ -286,8 +269,7 @@ abstract class Effect
         return $colors_html;
     }
 
-    public function timingArgHtml()
-    {
+    public function timingArgHtml() {
         $html = "";
 
         $timings = $this->getTimingsForEffect();
@@ -298,19 +280,15 @@ abstract class Effect
         $arguments_html = "";
         $timing_html = "";
 
-        if(sizeof($this->args) > 0)
-        {
-            foreach($this->args as $name => $value0)
-            {
+        if(sizeof($this->args) > 0) {
+            foreach($this->args as $name => $value0) {
                 $arguments_html .= $this->getArgumentClass($name)->toString();
             }
         }
 
-        for($i = 0; $i < 6; $i++)
-        {
+        for($i = 0; $i < 6; $i++) {
             $t = self::getSeconds($this->timings[$i]);
-            if(($timings & (1 << $i)) > 0)
-            {
+            if(($timings & (1 << $i)) > 0) {
                 $template = self::INPUT_TEMPLATE_TIMES;
                 $t_str = $timing_strings[$i];
                 $template = str_replace("\$label", Utils::getString("profile_timing_$t_str"), $template);
@@ -318,9 +296,7 @@ abstract class Effect
                 $template = str_replace("\$placeholder", $t, $template);
                 $template = str_replace("\$value", $t, $template);
                 $timing_html .= $template;
-            }
-            else
-            {
+            } else {
                 $template = self::HIDDEN_TEMPLATE;
                 $template = str_replace("\$name", "time_" . $timing_strings[$i], $template);
                 $template = str_replace("\$value", $t, $template);
@@ -328,13 +304,10 @@ abstract class Effect
             }
         }
 
-        if($timings !== 0)
-        {
+        if($timings !== 0) {
             $html .= "<div class=\"timing-container col-24 col-sm-12 col-lg-8 mb-3 mb-sm-0\"><h4>$profile_timing</h4>
                         <div class=\"row mx-0\">$timing_html</div></div>";
-        }
-        else
-        {
+        } else {
             $html .= "$timing_html";
         }
         if(sizeof($this->args) > 0)
@@ -350,8 +323,7 @@ abstract class Effect
      */
     public abstract function getArgumentClass($name);
 
-    public function toJson()
-    {
+    public function toJson() {
         $data = array();
 
         $data["times"] = $this->getTimes(Effect::TIMING_MODE_JSON);
@@ -363,8 +335,7 @@ abstract class Effect
         return $data;
     }
 
-    protected function getTimingStrings()
-    {
+    protected function getTimingStrings() {
         return ["off", "fadein", "on", "fadeout", "rotation", "offset"];
     }
 
@@ -412,127 +383,100 @@ abstract class Effect
      */
     public static abstract function getDefault(int $id);
 
-    public static function getSeconds(int $x)
-    {
-        if($x < 0 || $x > 255)
-        {
+    public static function getSeconds(int $x) {
+        if($x < 0 || $x > 255) {
             throw new InvalidArgumentException("x has to be an integer in range 0-255");
         }
 
-        if($x <= 80)
-        {
+        if($x <= 80) {
             return $x / 16;
         }
-        if($x <= 120)
-        {
+        if($x <= 120) {
             return $x / 8 - 5;
         }
-        if($x <= 160)
-        {
+        if($x <= 160) {
             return $x / 2 - 50;
         }
-        if($x <= 190)
-        {
+        if($x <= 190) {
             return $x - 130;
         }
-        if($x <= 235)
-        {
+        if($x <= 235) {
             return 2 * $x - 320;
         }
-        if($x <= 245)
-        {
+        if($x <= 245) {
             return 15 * $x - 3375;
         }
         return 60 * $x - 14400;
     }
 
-    public static function convertToTiming($float)
-    {
+    public static function convertToTiming($float) {
         if($float < 0)
             return 0;
-        foreach(self::getTimings() as $i => $timing)
-        {
+        foreach(self::getTimings() as $i => $timing) {
             if($float < $timing) return $i - 1;
         }
         return 255;
     }
 
-    public static function getTimings()
-    {
+    public static function getTimings() {
         $a = array();
-        for($i = 0; $i < 256; $i++)
-        {
+        for($i = 0; $i < 256; $i++) {
             $a[$i] = self::getSeconds($i);
         }
         return $a;
     }
 
-    public static function getIncrementTiming(int $x)
-    {
-        if($x < 0 || $x > 255)
-        {
+    public static function getIncrementTiming(int $x) {
+        if($x < 0 || $x > 255) {
             throw new InvalidArgumentException("x has to be an integer in range 0-255");
         }
 
-        if($x <= 60)
-        {
+        if($x <= 60) {
             return $x / 2;
         }
-        if($x <= 90)
-        {
+        if($x <= 90) {
             return $x - 30;
         }
-        if($x <= 126)
-        {
+        if($x <= 126) {
             return 5 * $x / 2 - 165;
         }
-        if($x <= 156)
-        {
+        if($x <= 156) {
             return 5 * $x - 480;
         }
-        if($x <= 196)
-        {
+        if($x <= 196) {
             return 15 * $x - 2040;
         }
-        if($x <= 211)
-        {
+        if($x <= 211) {
             return 60 * $x - 10860;
         }
-        if($x <= 253)
-        {
+        if($x <= 253) {
             return 300 * $x - 61500;
         }
         if($x == 254) return 18000;
         return 21600;
     }
 
-    public static function convertIncrementToTiming($float)
-    {
+    public static function convertIncrementToTiming($float) {
         if($float < 0)
             return 0;
-        foreach(self::getIncrementTimings() as $i => $timing)
-        {
+        foreach(self::getIncrementTimings() as $i => $timing) {
             if($float < $timing) return $i - 1;
         }
         return 255;
     }
 
-    public static function getIncrementTimings()
-    {
+    public static function getIncrementTimings() {
         $a = array();
-        for($i = 0; $i < 256; $i++)
-        {
+        for($i = 0; $i < 256; $i++) {
             $a[$i] = self::getIncrementTiming($i);
         }
         return $a;
     }
 
-    public function timingJsonToArray($json)
-    {
+    public function timingJsonToArray($json) {
         $arr = [];
         $strings = $this->getTimingStrings();
-        foreach($json as $key => $value)
-        {
+        foreach($json as $key => $value) {
             $array_search = array_search($key, $strings);
             if($array_search !== false)
                 $arr[$array_search] = $value;
@@ -540,41 +484,34 @@ abstract class Effect
         return $arr;
     }
 
-    public function timingArrayToJson()
-    {
+    public function timingArrayToJson() {
         $arr = [];
         $strings = $this->getTimingStrings();
-        foreach($this->timings as $i => $value)
-        {
+        foreach($this->timings as $i => $value) {
             $arr[$strings[$i]] = Effect::getSeconds($value);
         }
         return $arr;
     }
 
-    public function getSanitizedColors(int $color_count)
-    {
+    public function getSanitizedColors(int $color_count) {
         $arr = $this->getColors();
         $args = [];
-        for($i = 0; $i < $color_count; $i++)
-        {
+        for($i = 0; $i < $color_count; $i++) {
             $args[$i] = isset($arr[$i]) ? $arr[$i] : 0;
         }
         return $args;
     }
 
-    public function getSanitizedArgs()
-    {
+    public function getSanitizedArgs() {
         $arr = $this->packArgs();
         $args = [];
-        for($i = 0; $i < 6; $i++)
-        {
+        for($i = 0; $i < 6; $i++) {
             $args[$i] = isset($arr[$i]) ? $arr[$i] : 0;
         }
         return $args;
     }
 
-    public function toDatabase()
-    {
+    public function toDatabase() {
         $args = $this->getSanitizedArgs();
         $conn = DbUtils::getConnection();
         $sql = "INSERT INTO devices_effects 
@@ -598,8 +535,7 @@ abstract class Effect
         return $changes;
     }
 
-    private function saveColors()
-    {
+    private function saveColors() {
         $conn = DbUtils::getConnection();
         $sql = "DELETE FROM devices_colors WHERE effect_id = ?";
         $stmt = $conn->prepare($sql);
@@ -609,16 +545,19 @@ abstract class Effect
 
         $sql = "INSERT INTO devices_colors (effect_id, color, `order`) VALUES (?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        foreach($this->colors as $i => $color)
-        {
+        foreach($this->colors as $i => $color) {
             $stmt->bind_param("iii", $this->id, $color, $i);
-            $stmt->execute();
+            try {
+                $stmt->execute();
+            }
+            catch(mysqli_sql_exception $e) {
+
+            }
         }
         $stmt->close();
     }
 
-    public static function getColorsForEffect(int $effect_id)
-    {
+    public static function getColorsForEffect(int $effect_id) {
         $conn = DbUtils::getConnection();
         $sql = "SELECT color, `order` FROM devices_colors WHERE effect_id = ? ORDER BY `order` ASC";
         $stmt = $conn->prepare($sql);
@@ -626,16 +565,14 @@ abstract class Effect
         $stmt->bind_result($color, $order);
         $stmt->execute();
         $arr = [];
-        while($stmt->fetch())
-        {
+        while($stmt->fetch()) {
             $arr[] = $color;
         }
         $stmt->close();
         return $arr;
     }
 
-    public static function forProfile(int $profile_id)
-    {
+    public static function forProfile(int $profile_id) {
         $conn = DbUtils::getConnection();
         $colors = Effect::getColorsForEffectIdsByProfileId($profile_id);
         $sql = "SELECT devices_effects.id, name, effect, time0, time1, time2, time3, time4, time5, 
@@ -651,8 +588,7 @@ abstract class Effect
         return $arr;
     }
 
-    public static function forDevice(string $device_id)
-    {
+    public static function forDevice(string $device_id) {
         $conn = DbUtils::getConnection();
         $colors = Effect::getColorsForEffectIdsByDeviceId($device_id);
         $sql = "SELECT devices_effects.id, name, effect, time0, time1, time2, time3, time4, time5, 
@@ -667,8 +603,7 @@ abstract class Effect
         return $arr;
     }
 
-    private static function getColorsForEffectIdsByDeviceId(string $device_id)
-    {
+    private static function getColorsForEffectIdsByDeviceId(string $device_id) {
         $conn = DbUtils::getConnection();
         $sql = "SELECT devices_effects.id FROM devices_effect_join 
                   JOIN devices_effects ON devices_effect_join.effect_id = devices_effects.id 
@@ -680,8 +615,7 @@ abstract class Effect
         return $arr;
     }
 
-    private static function getColorsForEffectIdsByProfileId(int $profile_id)
-    {
+    private static function getColorsForEffectIdsByProfileId(int $profile_id) {
         $conn = DbUtils::getConnection();
         $sql = "SELECT devices_effects.id FROM devices_effect_join
                   JOIN devices_effects ON devices_effect_join.effect_id = devices_effects.id
@@ -695,19 +629,16 @@ abstract class Effect
     }
 
 
-    private static function getEffectIdsColorsFromStatement(mysqli_stmt & $stmt)
-    {
+    private static function getEffectIdsColorsFromStatement(mysqli_stmt & $stmt) {
         $stmt->bind_result($effect_id);
         $stmt->execute();
         $ids = [];
-        while($stmt->fetch())
-        {
+        while($stmt->fetch()) {
             $ids[] = $effect_id;
         }
 
         $arr = [];
-        foreach($ids as $id)
-        {
+        foreach($ids as $id) {
             $arr[$id] = Effect::getColorsForEffect($id);
         }
         return $arr;
@@ -720,26 +651,21 @@ abstract class Effect
      * @param array $colors
      * @return Effect[]
      */
-    private static function arrayFromStatement(mysqli_stmt & $stmt, array $colors, bool $assoc = false)
-    {
+    private static function arrayFromStatement(mysqli_stmt & $stmt, array $colors, bool $assoc = false) {
         $stmt->bind_result($id, $n, $e, $t0, $t1, $t2, $t3, $t4, $t5, $a0, $a1, $a2, $a3, $a4, $a5);
         $stmt->execute();
         $arr = [];
-        while($stmt->fetch())
-        {
+        while($stmt->fetch()) {
             $class = Effect::getClassForEffectId($e);
             if(!class_exists($class) || !is_subclass_of($class, Effect::class))
                 throw new InvalidArgumentException("$class is not a valid Effect class name");
 
-            if($assoc)
-            {
+            if($assoc) {
                 $arr[$id] = new $class($id, $colors[$id],
                     [$t0, $t1, $t2, $t3, $t4, $t5],
                     [$a0, $a1, $a2, $a3, $a4, $a5], $n,
                     Effect::TIMING_MODE_RAW);
-            }
-            else
-            {
+            } else {
                 $arr[] = new $class($id, $colors[$id],
                     [$t0, $t1, $t2, $t3, $t4, $t5],
                     [$a0, $a1, $a2, $a3, $a4, $a5], $n,
@@ -749,8 +675,7 @@ abstract class Effect
         return $arr;
     }
 
-    public static function getDefaultForEffectId(int $effect_id, int $effect)
-    {
+    public static function getDefaultForEffectId(int $effect_id, int $effect) {
         $class = Effect::getClassForEffectId($effect);
         if(!class_exists($class) || !is_subclass_of($class, Effect::class))
             throw new InvalidArgumentException("$class is not a valid Effect class name");
@@ -762,8 +687,7 @@ abstract class Effect
      * @param array $json
      * @return Effect
      */
-    public static function fromJson(array $json)
-    {
+    public static function fromJson(array $json) {
         $times = $json["times"];
         $args = $json["args"];
         $colors = $json["colors"];
@@ -780,30 +704,25 @@ abstract class Effect
     /**
      * @return string
      */
-    public function getName(): string
-    {
+    public function getName(): string {
         return $this->name;
     }
 
     /**
      * @return int
      */
-    public function getId(): int
-    {
+    public function getId(): int {
         return $this->id;
     }
 
     /**
      * @return int[]
      */
-    public function getTimes(int $mode = Effect::TIMING_MODE_SECONDS): array
-    {
-        switch($mode)
-        {
+    public function getTimes(int $mode = Effect::TIMING_MODE_SECONDS): array {
+        switch($mode) {
             case Effect::TIMING_MODE_SECONDS:
                 $arr = [];
-                for($i = 0; $i < 6; $i++)
-                {
+                for($i = 0; $i < 6; $i++) {
                     $arr[$i] = Effect::getSeconds($this->timings[$i]);
                 }
                 return $arr;
@@ -820,10 +739,8 @@ abstract class Effect
      * @param int $id
      * @return string
      */
-    private static function getClassForEffectId(int $id)
-    {
-        switch($id)
-        {
+    private static function getClassForEffectId(int $id) {
+        switch($id) {
             case Effect::EFFECT_OFF:
                 return Off::class;
             case Effect::EFFECT_STATIC:
