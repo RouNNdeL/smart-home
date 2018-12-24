@@ -577,10 +577,10 @@ abstract class Effect {
         $colors = Effect::getColorsForEffectIdsByProfileId($profile_id);
         $sql = "SELECT devices_effects.id, name, effect, time0, time1, time2, time3, time4, time5, 
                 arg0, arg1, arg2, arg3, arg4, arg5
-                FROM devices_effect_profiles_effect_join 
-                  JOIN devices_effect_join dde on devices_effect_profiles_effect_join.effect_join_id = dde.id
+                FROM devices_effect_scenes_effect_join 
+                  JOIN devices_effect_join dde on devices_effect_scenes_effect_join.effect_join_id = dde.id
                   JOIN devices_effects on dde.effect_id = devices_effects.id
-                WHERE devices_effect_profiles_effect_join.profile_id = ?";
+                WHERE devices_effect_scenes_effect_join.scene_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $profile_id);
         $arr = Effect::arrayFromStatement($stmt, $colors, true);
@@ -619,8 +619,8 @@ abstract class Effect {
         $conn = DbUtils::getConnection();
         $sql = "SELECT devices_effects.id FROM devices_effect_join
                   JOIN devices_effects ON devices_effect_join.effect_id = devices_effects.id
-                  JOIN devices_effect_profiles_effect_join dep on devices_effect_join.id = dep.effect_join_id
-                WHERE dep.profile_id = ?";
+                  JOIN devices_effect_scenes_effect_join dep on devices_effect_join.id = dep.effect_join_id
+                WHERE dep.scene_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $profile_id);
         $arr = Effect::getEffectIdsColorsFromStatement($stmt);

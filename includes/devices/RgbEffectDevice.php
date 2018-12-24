@@ -63,7 +63,7 @@ abstract class RgbEffectDevice extends PhysicalDevice
     /** @var int */
     protected $max_color_count;
 
-    /** @var Profile[] */
+    /** @var Scene[] */
     protected $profiles;
 
     /**
@@ -110,7 +110,7 @@ abstract class RgbEffectDevice extends PhysicalDevice
         return sizeof($this->profiles);
     }
 
-    public function addProfile(Profile $profile)
+    public function addProfile(Scene $profile)
     {
         if (sizeof($this->profiles) >= $this->max_profile_count)
             return false;
@@ -199,7 +199,7 @@ abstract class RgbEffectDevice extends PhysicalDevice
     }
 
     /**
-     * @return Profile[]
+     * @return Scene[]
      */
     public function getProfiles()
     {
@@ -212,7 +212,7 @@ abstract class RgbEffectDevice extends PhysicalDevice
     }
 
     /**
-     * @return Profile[]
+     * @return Scene[]
      */
     public function getActiveProfilesInOrder()
     {
@@ -224,7 +224,7 @@ abstract class RgbEffectDevice extends PhysicalDevice
     }
 
     /**
-     * @return Profile[]
+     * @return Scene[]
      */
     public function getInactiveProfilesInOrder()
     {

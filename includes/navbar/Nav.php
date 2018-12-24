@@ -60,12 +60,12 @@ class Nav
 
     const PAGE_DEVICES = "/devices";
     const PAGE_EFFECTS = "/effects";
-    const PAGE_PROFILES = "/profiles";
+    const PAGE_SCENES = "/scenes";
 
     const DEFAULT_LINKS = [
         Nav::PAGE_DEVICES => "navbar_devices",
         Nav::PAGE_EFFECTS => "navbar_effects",
-        Nav::PAGE_PROFILES => "navbar_profiles"
+        Nav::PAGE_SCENES => "navbar_scenes"
     ];
 
     /** @var NavItem[] */

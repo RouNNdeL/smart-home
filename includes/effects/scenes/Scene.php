@@ -26,34 +26,114 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-12-17
- * Time: 15:19
+ * Date: 2018-06-20
+ * Time: 17:44
  */
 
-require_once __DIR__."/SceneEntry.php";
+require_once __DIR__ . "/SceneEntry.php";
 
 class Scene {
-
-    /** @var int */
+    /** @var */
     private $id;
 
-    /** @var string */
+    /** @var */
     private $name;
 
-    /** @var  SceneEntry[] */
+    /** @var SceneEntry[] */
     private $entries;
 
     /**
      * Scene constructor.
-     * @param int $id
-     * @param string $name
+     * @param $id
+     * @param $name
      * @param SceneEntry[] $entries
      */
-    public function __construct(int $id, string $name, array $entries) {
+    private function __construct($id, $name, array $entries) {
         $this->id = $id;
         $this->name = $name;
         $this->entries = $entries;
     }
 
+    public static function fromId(int $profile_id) {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT name FROM devices_effect_scenes WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $profile_id);
+        $stmt->bind_result($name);
+        $stmt->execute();
+        if($stmt->fetch()) {
+            $stmt->close();
+            return new Scene($profile_id, $name, SceneEntry::getForSceneId($profile_id));
+        }
+        $stmt->close();
+        return null;
+    }
 
+    /**
+     * @param $user_id
+     * @return Scene[]
+     */
+    public static function allForUserId(int $user_id) {
+        $entries = SceneEntry::getForUserId($user_id);
+
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, name FROM devices_effect_scenes WHERE user_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $user_id);
+        $stmt->bind_result($scene_id, $name);
+        $stmt->execute();
+        $arr = [];
+        while($stmt->fetch()) {
+            $entries_for_scene = isset($entries[$scene_id]) ? $entries[$scene_id] : [];
+            $arr[] = new Scene($scene_id, $name, $entries_for_scene);
+        }
+        return $arr;
+    }
+
+    public function getSceneHtml(UserDeviceManager $manager) {
+        $html = "<div class=\"list-group\">";
+        foreach($this->entries as $entry) {
+            $device_id = $entry->getDeviceId();
+            $device = $manager->getVirtualDeviceById($device_id);
+            if(!$device instanceof BaseEffectDevice)
+                throw new UnexpectedValueException("SceneEntry for profile id: $this->id contains pointer to invalid device: $device_id");
+            $effect = $device->getEffectById($entry->getEffectId());
+
+            $effect_url = "/effect/" . $device->getDeviceId() . "#e-" . $effect->getId();
+            $device_name = $device->getDeviceName();
+            $effect_name = htmlspecialchars($effect->getName());
+            $html .= <<<HTML
+            <a href="$effect_url" class="list-group-item list-group-item-action flex-column align-items-start col-24 col-md-12 col-xl-8">
+                <div class="row">
+                    <div class="col profile-entry">
+                        <h5 class="mb-1">$effect_name</h5>
+                        <p class="mb-1">$device_name</p>
+                    </div>
+                    <div class="col float-right col-auto text-center-vertical pr-0">
+                        <button class="btn btn-secondary">Preview</button>
+                    </div>
+                    <div class="col float-right col-auto text-center-vertical">
+                        <button class="btn btn-danger">Remove</button>
+                    </div>
+                </div>
+            </a>
+HTML;
+        }
+        $html .= "</div>";
+        return $html;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId() {
+        return $this->id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getName() {
+        return $this->name;
+    }
 }

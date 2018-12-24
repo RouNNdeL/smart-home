@@ -41,7 +41,7 @@ if(!isset($_GET["device_id"]))
     exit(0);
 }
 
-$manager->loadUserDeviceManager();
+$manager->loadUserDeviceManager([ShareManager::SCOPE_SIMPLE_CONTROL]);
 
 $physical = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($_GET["device_id"]);
 if($physical === null || !$physical instanceof RgbEffectDevice)
@@ -50,6 +50,7 @@ if($physical === null || !$physical instanceof RgbEffectDevice)
     http_response_code(404);
     exit(0);
 }
+
 $device = $physical->getVirtualDeviceById($_GET["device_id"]);
 if($device === null || !$device instanceof BaseEffectDevice)
 {
@@ -57,6 +58,7 @@ if($device === null || !$device instanceof BaseEffectDevice)
     http_response_code(404);
     exit(0);
 }
+
 $device->setMaxColorCount($physical->getMaxColorCount());
 if(isset($_GET["name"]) && $_GET["name"] === "false")
 {

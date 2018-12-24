@@ -30,12 +30,10 @@
  * Time: 12:15
  */
 
-require_once __DIR__ . "/../../includes/effects/profiles/Profile.php";
+require_once __DIR__ . "/../../includes/effects/scenes/Scene.php";
 require_once __DIR__ . "/../../includes/GlobalManager.php";
 
 $manager = GlobalManager::all([ShareManager::SCOPE_VIEW_PROFILES]);
-
-$profiles = Profile::allForUser($manager->getSessionManager()->getUserId());
 
 ?>
 
@@ -53,14 +51,16 @@ echo $head->toString();
 <?php
 require_once __DIR__."/../../includes/navbar/Nav.php";
 
-echo Nav::getDefault(Nav::PAGE_PROFILES)->toString();
+$profiles = Scene::allForUserId($manager->getSessionManager()->getUserId());
+
+echo Nav::getDefault(Nav::PAGE_SCENES)->toString();
 ?>
 <div class="container-fluid">
     <div class="row device-settings-content">
         <div class="col mt-3">
             <div class="card">
                 <div class="card-header">
-                    <h2>Profiles</h2>
+                    <h2>Scenes</h2>
                 </div>
                 <div class="card-body">
                     <?php
@@ -82,13 +82,13 @@ HTML;
                         ?>
                     </ul>
                     <div class="tab-content">
-                        <h4 class="my-2">Device profile list</h4>
+                        <h4 class="my-2">Device effects</h4>
                         <?php
                         foreach($profiles as $i => $profile)
                         {
                             $active = $i ? "" : "show active";
                             $profile_id = "p-".$profile->getId();
-                            $html = $profile->getProfileHtml();
+                            $html = $profile->getSceneHtml($manager->getUserDeviceManager());
                             echo <<<HTML
                         <div class="tab-pane fade $active effect-parent" id="$profile_id" 
                          role="tabpanel" aria-labelledby="$profile_id-tab">

@@ -78,7 +78,7 @@ URL;
     public function handleReportedState(array $state) {
         $this->current_profile = $state["current_profile"];
         $this->auto_increment = $state["auto_increment"];
-        // $this->avr_order = $state["profiles"];
+        // $this->avr_order = $state["scenes"];
         for($i = 0; $i < sizeof($this->virtual_devices); $i++) {
             $virtual_device = $this->virtual_devices[$i];
             if(!($virtual_device instanceof BaseEffectDevice))

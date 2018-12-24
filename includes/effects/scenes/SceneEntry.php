@@ -26,10 +26,104 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-12-17
- * Time: 15:20
+ * Date: 2018-08-02
+ * Time: 11:49
  */
 
+require_once __DIR__ . "/../effects/Effect.php";
+require_once __DIR__ . "/../../database/DbUtils.php";
+
 class SceneEntry {
+    /** @var  VirtualDevice */
+    private $device_id;
+
+    /** @var int */
+    private $device_index;
+
+    /** @var Effect */
+    private $effect_id;
+
+    /**
+     * SceneEntry constructor.
+     * @param int $id
+     * @param int $device_id
+     * @param int $device_index
+     * @param Effect $effect
+     */
+    public function __construct(string $device_id, int $device_index, int $effect_id) {
+        $this->device_id = $device_id;
+        $this->device_index = $device_index;
+        $this->effect_id = $effect_id;
+    }
+
+    public static function getForUserId(int $user_id) {
+        $conn = DbUtils::getConnection();
+
+        $sql = "SELECT
+                  scene_id,
+                  device_id,
+                  device_index,
+                  effect_id
+                FROM devices_effect_join
+                  JOIN devices_effect_scenes_effect_join dde on devices_effect_join.id = dde.effect_join_id
+                  JOIN devices_effect_scenes dep on dde.scene_id = dep.id
+                WHERE user_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $user_id);
+        $stmt->bind_result($scene_id, $device_id, $device_index, $effect_id);
+        $stmt->execute();
+        $arr = [];
+        while($stmt->fetch()) {
+            if(!isset($arr[$scene_id])) /* Might not be required */
+                $arr[$scene_id] = [];
+            $arr[$scene_id][] = new SceneEntry($device_id, $device_index, $effect_id);
+        }
+        $stmt->close();
+        return $arr;
+    }
+
+    /**
+     * @param int $profile_id
+     * @return SceneEntry[]
+     */
+    public static function getForSceneId(int $profile_id) {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT
+                  device_id,
+                  device_index,
+                  effect_id
+                FROM devices_effect_join
+                  JOIN devices_effect_scenes_effect_join dde on devices_effect_join.id = dde.effect_join_id
+                WHERE scene_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $profile_id);
+        $stmt->bind_result($device_id, $device_index, $effect_id);
+        $stmt->execute();
+        $arr = [];
+        $device_ids = [];
+        while($stmt->fetch()) {
+            if(in_array($device_id, $device_ids))
+                continue;
+            $arr[] = new SceneEntry($device_id, $device_index, $effect_id);
+            $device_ids[] = $device_id;
+        }
+        $stmt->close();
+        return $arr;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEffectId(): int {
+        return $this->effect_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceId(): string {
+        return $this->device_id;
+    }
+
 
 }
