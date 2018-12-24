@@ -42,6 +42,7 @@ $(function() {
     let last_call_duration = 0;
     const update_timeouts = [];
     let update_timeout_global = -1;
+    let update_lock = false;
 
     ir_init();
 
@@ -152,6 +153,7 @@ $(function() {
 
         last_call = Date.now();
 
+        update_lock = true;
         $.ajax(UPDATE_URL, {
             method: "POST",
             dataType: "json",
@@ -159,6 +161,7 @@ $(function() {
             data: JSON.stringify(all),
             async: async
         }).done(() => {
+            update_lock = false;
             last_call_duration = Date.now() - last_call;
             update_timeout_global = -1;
         });
@@ -166,6 +169,7 @@ $(function() {
 
     $(".device-global-switch").bootstrapSwitch().on('switchChange.bootstrapSwitch', function(e) {
         const state = $(e.target)[0].checked;
+        update_lock = true;
         $("input[data-input-class='base-effect-state']").bootstrapSwitch("state", state, false);
         reportState();
     });
@@ -175,6 +179,10 @@ $(function() {
      * @param {Event} e
      */
     function update(e) {
+        if(update_lock){
+            return;
+        }
+
         if(e === undefined || e.target === undefined) {
             throw new Error("This function requires an event with a valid target");
         }
