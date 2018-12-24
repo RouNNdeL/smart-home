@@ -67,12 +67,12 @@
   [
     "decoder_volume_down",
     {
-      "name": "decoder_favourite",
+      "name": "decoder_color_yellow",
       "column": 6,
       "offset": 2
     },
     {
-      "name": "decoder_vod",
+      "name": "decoder_favourite",
       "column": 6
     },
     {
@@ -91,36 +91,24 @@
       "name": "decoder_digit_1",
       "offset": 6
     },
-    {
-      "name": "decoder_digit_2"
-    },
-    {
-      "name": "decoder_digit_3"
-    }
+    "decoder_digit_2",
+    "decoder_digit_3"
   ],
   [
     {
       "name": "decoder_digit_4",
       "offset": 6
     },
-    {
-      "name": "decoder_digit_5"
-    },
-    {
-      "name": "decoder_digit_6"
-    }
+    "decoder_digit_5",
+    "decoder_digit_6"
   ],
   [
     {
       "name": "decoder_digit_7",
       "offset": 6
     },
-    {
-      "name": "decoder_digit_8"
-    },
-    {
-      "name": "decoder_digit_9"
-    }
+    "decoder_digit_8",
+    "decoder_digit_9"
   ],
   [
     {

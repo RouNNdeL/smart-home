@@ -72,11 +72,18 @@
       "name": "av_input_hdmi2",
       "offset": 6
     },
+    "av_input_hdmi3",
+    "av_input_dvd"
+  ],
+  [
     {
-      "name": "av_input_hdmi3"
+      "name": "av_audio_stereo",
+      "column": 6,
+      "offset": 6
     },
     {
-      "name": "av_input_dvd"
+      "name": "av_audio_standard",
+      "column": 6
     }
   ]
 ]
