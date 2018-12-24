@@ -29,9 +29,7 @@
  * Date: 2018-07-06
  * Time: 21:39
  */
-
-class Fill extends Effect
-{
+class Fill extends Effect {
 
     const ARG_SMOOTH = "smooth";
     const ARG_RETURN = "fill_return";
@@ -45,10 +43,8 @@ class Fill extends Effect
      * @param $name
      * @return Argument
      */
-    public function getArgumentClass($name)
-    {
-        switch($name)
-        {
+    public function getArgumentClass($name) {
+        switch($name) {
             case Fill::ARG_ROTATE_DIR:
                 return new DirectionArgument($name, $this->args[$name]);
             case Fill::ARG_SMOOTH:
@@ -62,17 +58,15 @@ class Fill extends Effect
     /**
      * @return int
      */
-    public function getTimingsForEffect()
-    {
+    public function getTimingsForEffect() {
         return (1 << Effect::TIME_OFF) | (1 << Effect::TIME_FADEIN) | (1 << Effect::TIME_ON) |
-        (1 << Effect::TIME_FADEOUT) | (1 << Effect::TIME_DELAY)| (1 << Effect::TIME_ROTATION);
+            (1 << Effect::TIME_FADEOUT) | (1 << Effect::TIME_DELAY) | (1 << Effect::TIME_ROTATION);
     }
 
     /**
      * @return array
      */
-    public function packArgs()
-    {
+    public function packArgs() {
         $args = [];
 
         $args[0] = ($this->args[Fill::ARG_ROTATE_DIR] << 0) | ($this->args[Fill::ARG_SMOOTH] << 1) |
@@ -86,8 +80,7 @@ class Fill extends Effect
         return $args;
     }
 
-    public function unpackArgs(array $args)
-    {
+    public function unpackArgs(array $args) {
         $this->args[Fill::ARG_ROTATE_DIR] = $args[0] & (1 << 0) ? 1 : 0;
         $this->args[Fill::ARG_SMOOTH] = $args[0] & (1 << 1) ? 1 : 0;
         $this->args[Fill::ARG_RETURN] = $args[0] & (1 << 2) ? 1 : 0;
@@ -101,32 +94,28 @@ class Fill extends Effect
     /**
      * @return int
      */
-    public function avrEffect()
-    {
+    public function avrEffect() {
         return Effect::AVR_EFFECT_FILL;
     }
 
     /**
      * @return int
      */
-    public function getEffectId()
-    {
+    public function getEffectId() {
         return Effect::EFFECT_FILL;
     }
 
     /**
      * @return int
      */
-    public function getMaxColors()
-    {
+    public function getMaxColors() {
         return Effect::COLOR_COUNT_UNLIMITED;
     }
 
     /**
      * @return int
      */
-    public function getMinColors()
-    {
+    public function getMinColors() {
         return 1;
     }
 
@@ -134,21 +123,21 @@ class Fill extends Effect
      * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
      * The updated_effect JSON filed then contains those values and replaces them in the user interface
      */
-    public function overwriteValues()
-    {
+    public function overwriteValues() {
         if($this->args[Effect::ARG_COLOR_CYCLES] < 1)
             $this->args[Effect::ARG_COLOR_CYCLES] = 1;
+
+        if(sizeof($this->colors) <= 0)
+            $this->colors = [0xff0000];
 
         if($this->args[Fill::ARG_COLOR_COUNT] > sizeof($this->colors) || $this->args[Fill::ARG_COLOR_COUNT] <= 0)
             $this->args[Fill::ARG_COLOR_COUNT] = sizeof($this->colors);
 
         while(sizeof($this->colors) % $this->args[Fill::ARG_COLOR_COUNT] > 0 ||
-            $this->args[Fill::ARG_COLOR_COUNT] < 1)
-        {
+            $this->args[Fill::ARG_COLOR_COUNT] < 1) {
             $this->args[Fill::ARG_COLOR_COUNT]++;
         }
-        while($this->args[Fill::ARG_PIECE_COUNT] % $this->args[Fill::ARG_COLOR_COUNT] > 0)
-        {
+        while($this->args[Fill::ARG_PIECE_COUNT] % $this->args[Fill::ARG_COLOR_COUNT] > 0) {
             $this->args[Fill::ARG_PIECE_COUNT]++;
         }
     }
@@ -157,8 +146,7 @@ class Fill extends Effect
      * @param int $id
      * @return Effect
      */
-    public static function getDefault(int $id)
-    {
-        return new Fill($id, [0xff0000], [0,2.5,0,2.5], [2, 1, 1, 0, 0]);
+    public static function getDefault(int $id) {
+        return new Fill($id, [0xff0000], [0, 2.5, 0, 2.5], [2, 1, 1, 0, 0]);
     }
 }
