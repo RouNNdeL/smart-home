@@ -95,7 +95,7 @@ abstract class BaseEffectDevice extends SimpleRgbDevice {
                 $utils->_getString("actions_toggle_effect2")]
             ];
         }
-        $attributes["availableToggles"] = [
+        $attributes[self::DEVICE_ATTRIBUTE_AVAILABLE_TOGGLES] = [
             ["name" => self::ACTIONS_TOGGLE_EFFECT, "name_values" => $name_values]
         ];
         return $attributes;
