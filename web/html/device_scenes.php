@@ -33,7 +33,7 @@
 require_once __DIR__ . "/../../includes/effects/scenes/Scene.php";
 require_once __DIR__ . "/../../includes/GlobalManager.php";
 
-$manager = GlobalManager::all([ShareManager::SCOPE_VIEW_PROFILES]);
+$manager = GlobalManager::all([ShareManager::SCOPE_VIEW_EFFECTS]);
 
 ?>
 

@@ -40,7 +40,7 @@ if($_SERVER["REQUEST_METHOD"] !== "POST")
 
 require_once __DIR__ . "/../includes/GlobalManager.php";
 
-$manager = GlobalManager::all([ShareManager::SCOPE_EDIT_PROFILES]);
+$manager = GlobalManager::all([ShareManager::SCOPE_EDIT_EFFECTS]);
 
 $json = json_decode(file_get_contents("php://input"), true);
 if($json === false || !isset($json["effect"]) || !isset($json["effect_id"]) || !isset($json["times"])

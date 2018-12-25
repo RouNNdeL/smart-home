@@ -39,7 +39,7 @@ if($_SERVER["REQUEST_METHOD"] !== "GET")
 
 require_once __DIR__ . "/../includes/GlobalManager.php";
 
-$manager = GlobalManager::all([ShareManager::SCOPE_EDIT_PROFILES]);
+$manager = GlobalManager::all([ShareManager::SCOPE_EDIT_EFFECTS]);
 
 $json = $_GET;
 if($json === false || !isset($json["device_id"]) || !isset($json["effect"]))

@@ -39,9 +39,11 @@ class ShareManager {
     const SCOPE_SIMPLE_CONTROL = "simple_control";
     const SCOPE_REBOOT = "reboot";
 
-    const SCOPE_VIEW_PROFILES = "view_profiles";
-    const SCOPE_EDIT_PROFILES = ShareManager::SCOPE_VIEW_PROFILES . " edit_profiles";
-    const SCOPE_FULL_PROFILES = ShareManager::SCOPE_EDIT_PROFILES . " full_profiles";
+    const SCOPE_VIEW_EFFECTS = "view_effects";
+    const SCOPE_EDIT_EFFECTS = ShareManager::SCOPE_VIEW_EFFECTS . " edit_effects";
+    const SCOPE_FULL_PROFILES = ShareManager::SCOPE_EDIT_EFFECTS . " delete_effects";
+
+    const SCOPE_VIEW_SCENES = "view_scenes";
 
     public static function getDevicesForScope(int $audience_id, array $scopes) {
         $conn = DbUtils::getConnection();
@@ -76,7 +78,7 @@ class ShareManager {
             case DeviceModManager::DEVICE_MOD_SIMPLE_SETTINGS:
                 return ShareManager::SCOPE_SIMPLE_CONTROL;
             case DeviceModManager::DEVICE_MOD_EFFECT:
-                return ShareManager::SCOPE_VIEW_PROFILES;
+                return ShareManager::SCOPE_VIEW_EFFECTS;
             default:
                 return ShareManager::SCOPE_NONE;
         }
