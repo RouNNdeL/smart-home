@@ -71,7 +71,7 @@ abstract class VirtualDevice {
     const DEVICE_TYPE_ACTIONS_SWITCH = "action.devices.types.SWITCH";
 
     const DEVICE_ATTRIBUTE_COLOR_MODEL = "colorModel";
-    const DEVICE_ATTRIBUTE_COLOR_MODEL_RGB = "rgb ";
+    const DEVICE_ATTRIBUTE_COLOR_MODEL_RGB = "rgb";
     const DEVICE_ATTRIBUTE_COLOR_MODEL_HSV = "hsv";
 
     const DEVICE_COMMAND_BRIGHTNESS_ABSOLUTE = "action.devices.commands.BrightnessAbsolute";
