@@ -32,8 +32,7 @@
 
 require_once __DIR__ . "/../Utils.php";
 
-abstract class BaseEffectDevice extends SimpleRgbDevice
-{
+abstract class BaseEffectDevice extends SimpleRgbDevice {
     const ACTIONS_TOGGLE_EFFECT = "ACTIONS_TOGGLE_EFFECT";
 
     const TOGGLE_EFFECT_BIT = 0;
@@ -64,46 +63,42 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
     public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions,
                                 bool $will_report_state, int $color = 0xffffff, int $brightness = 100,
                                 bool $on = true, int $toggles = 0
-    )
-    {
+    ) {
         parent::__construct($device_id, $device_name, $synonyms, $home_actions, $will_report_state, $color, $brightness, $on);
         $this->effects_enabled = $toggles & (1 << BaseEffectDevice::TOGGLE_EFFECT_BIT);
         $this->loadEffects();
     }
 
-    public function handleSaveJson($json)
-    {
+    public function handleSaveJson($json) {
         parent::handleSaveJson($json);
         $this->effects_enabled = $json["effects_enabled"];
     }
 
-    public function handleAssistantAction($command)
-    {
+    public function handleAssistantAction($command) {
         parent::handleAssistantAction($command);
         $this->effects_enabled = false;
     }
 
-    public function getTraits()
-    {
+    public function getTraits() {
         $array = parent::getTraits();
         array_push($array, self::DEVICE_TRAIT_TOGGLES);
         return $array;
     }
 
-    public function getAttributes()
-    {
+    public function getAttributes() {
+        $attributes = parent::getAttributes();
         $name_values = [];
-        foreach(Utils::AVAILABLE_LANGUAGES as $i => $lang)
-        {
+        foreach(Utils::AVAILABLE_LANGUAGES as $i => $lang) {
             $utils = new Utils($lang);
             $name_values[$i] = ["lang" => $lang, "name_synonym" => [
                 $utils->_getString("actions_toggle_effect1"),
                 $utils->_getString("actions_toggle_effect2")]
             ];
         }
-        return ["availableToggles" => [
+        $attributes["availableToggles"] = [
             ["name" => self::ACTIONS_TOGGLE_EFFECT, "name_values" => $name_values]
-        ]];
+        ];
+        return $attributes;
     }
 
     /**
@@ -111,8 +106,7 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
      * @param string $footer_html
      * @return string
      */
-    public function toHtml($header_name = null, $footer_html = "")
-    {
+    public function toHtml($header_name = null, $footer_html = "") {
         if($header_name !== null)
             $name = $header_name;
         else
@@ -178,8 +172,7 @@ abstract class BaseEffectDevice extends SimpleRgbDevice
 HTML;
     }
 
-    public function effectHtml(int $effect)
-    {
+    public function effectHtml(int $effect) {
         $device = $this->device_id;
         $profile_colors = Utils::getString("profile_colors");
         $profile_effect = Utils::getString("profile_effect");
@@ -212,8 +205,7 @@ HTML;
         $effects_html = "";
         $html = "<form data-effect-id=\"$effect_id\" data-max-colors=\"$max_colors\" data-min-colors=\"$min_colors\">";
 
-        foreach($this->getAvailableEffects() as $id => $effect)
-        {
+        foreach($this->getAvailableEffects() as $id => $effect) {
             $string = Utils::getString("profile_effect_" . $effect);
             $effects_html .= "<option value=\"$id\" " . ($id == $current_effect->getEffectId() ? " selected" : "") . ">$string</option>";
         }
@@ -239,12 +231,9 @@ HTML;
         return $html;
     }
 
-    public function updateEffect(Effect $effect)
-    {
-        foreach($this->effects as $i => $e)
-        {
-            if($e->getId() === $effect->getId())
-            {
+    public function updateEffect(Effect $effect) {
+        foreach($this->effects as $i => $e) {
+            if($e->getId() === $effect->getId()) {
                 $this->effects[$i] = $effect;
                 $effect->toDatabase();
                 return $i;
@@ -253,31 +242,26 @@ HTML;
         return -1;
     }
 
-    public function getEffectById(int $effect_id)
-    {
-        foreach($this->effects as $effect)
-        {
+    public function getEffectById(int $effect_id) {
+        foreach($this->effects as $effect) {
             if($effect->getId() === $effect_id)
                 return $effect;
         }
         return null;
     }
 
-    public function addEffect($effect)
-    {
+    public function addEffect($effect) {
         $this->effects[] = $effect;
         $this->toDatabase();
     }
 
     public abstract function getAvailableEffects();
 
-    private function loadEffects()
-    {
+    private function loadEffects() {
         $this->effects = Effect::forDevice($this->device_id);
     }
 
-    public function toDatabase()
-    {
+    public function toDatabase() {
         $conn = DbUtils::getConnection();
         $state = $this->on ? 1 : 0;
         $toggles = (($this->effects_enabled ? 1 : 0) << BaseEffectDevice::TOGGLE_EFFECT_BIT);
@@ -293,8 +277,7 @@ HTML;
         $changes = $stmt->affected_rows > 0 ? true : false;
         $stmt->close();
 
-        foreach($this->effects as $effect)
-        {
+        foreach($this->effects as $effect) {
             $effect->toDatabase();
         }
         return $changes;
@@ -303,37 +286,32 @@ HTML;
     /**
      * @return bool
      */
-    public function areEffectsEnabled(): bool
-    {
+    public function areEffectsEnabled(): bool {
         return $this->effects_enabled;
     }
 
     /**
      * @param bool $effects_enabled
      */
-    public function setEffectsEnabled(bool $effects_enabled)
-    {
+    public function setEffectsEnabled(bool $effects_enabled) {
         $this->effects_enabled = $effects_enabled;
     }
 
     /**
      * @param int $max_color_count
      */
-    public function setMaxColorCount(int $max_color_count)
-    {
+    public function setMaxColorCount(int $max_color_count) {
         $this->max_color_count = $max_color_count;
     }
 
     /**
      * @return Effect[]
      */
-    public function getEffects(): array
-    {
+    public function getEffects(): array {
         return $this->effects;
     }
 
-    public function setEffect(int $index, Effect $effect)
-    {
+    public function setEffect(int $index, Effect $effect) {
         $this->effects[$index] = $effect;
     }
 }
