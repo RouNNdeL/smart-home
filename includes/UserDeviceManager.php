@@ -125,11 +125,7 @@ class UserDeviceManager {
             }
         }
 
-        $commands_response_array = [];
-        foreach($commands_response as $key => $value) {
-            $commands_response_array[] = ["ids" => $value, "status" => $key];
-        }
-        return $commands_response_array;
+        return $commands_response;
     }
 
     public function processQuery(array $payload) {

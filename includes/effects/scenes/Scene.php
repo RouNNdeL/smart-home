@@ -33,7 +33,9 @@
 require_once __DIR__ . "/SceneEntry.php";
 
 class Scene {
-    /** @var */
+    const ID_PREFIX = "scene_";
+
+    /** @var int */
     private $id;
 
     /** @var */
@@ -48,22 +50,22 @@ class Scene {
      * @param $name
      * @param SceneEntry[] $entries
      */
-    private function __construct($id, $name, array $entries) {
+    private function __construct(int $id, string $name, array $entries) {
         $this->id = $id;
         $this->name = $name;
         $this->entries = $entries;
     }
 
-    public static function fromId(int $profile_id) {
+    public static function fromId(int $scene_id) {
         $conn = DbUtils::getConnection();
         $sql = "SELECT name FROM devices_effect_scenes WHERE id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $profile_id);
+        $stmt->bind_param("i", $scene_id);
         $stmt->bind_result($name);
         $stmt->execute();
         if($stmt->fetch()) {
             $stmt->close();
-            return new Scene($profile_id, $name, SceneEntry::getForSceneId($profile_id));
+            return new Scene($scene_id, $name, SceneEntry::getForSceneId($scene_id));
         }
         $stmt->close();
         return null;
@@ -128,17 +130,33 @@ HTML;
         return $html;
     }
 
+    /** @return string */
+    public function getPrefixedId() {
+        return Scene::ID_PREFIX . $this->id;
+    }
+
     /**
-     * @return mixed
+     * @return int
      */
     public function getId() {
         return $this->id;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName() {
         return $this->name;
+    }
+
+    public function getSyncJson() {
+        return [
+            "id" => $this->getPrefixedId(),
+            "name" => ["name" => $this->name],
+            "type" => VirtualDevice::DEVICE_TYPE_ACTIONS_SCENE,
+            "traits" => [VirtualDevice::DEVICE_TRAIT_SCENE],
+            "willReportState" => false,
+            "attributes" => [VirtualDevice::DEVICE_ATTRIBUTE_SCENE_REVERSIBLE => false]
+        ];
     }
 }

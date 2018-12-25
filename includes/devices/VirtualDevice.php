@@ -65,10 +65,12 @@ abstract class VirtualDevice {
     const DEVICE_TRAIT_COLOR_TEMPERATURE = "action.devices.traits.ColorTemperature";
     const DEVICE_TRAIT_ON_OFF = "action.devices.traits.OnOff";
     const DEVICE_TRAIT_TOGGLES = "action.devices.traits.Toggles";
+    const DEVICE_TRAIT_SCENE = "action.devices.traits.Scene";
 
     const DEVICE_TYPE_ACTIONS_LIGHT = "action.devices.types.LIGHT";
     const DEVICE_TYPE_ACTIONS_OUTLET = "action.devices.types.OUTLET";
     const DEVICE_TYPE_ACTIONS_SWITCH = "action.devices.types.SWITCH";
+    const DEVICE_TYPE_ACTIONS_SCENE = "action.devices.types.SCENE";
 
     const DEVICE_ATTRIBUTE_COLOR_MODEL = "colorModel";
     const DEVICE_ATTRIBUTE_COLOR_MODEL_RGB = "rgb";
@@ -76,9 +78,12 @@ abstract class VirtualDevice {
 
     const DEVICE_ATTRIBUTE_AVAILABLE_TOGGLES = "availableToggles";
 
+    const DEVICE_ATTRIBUTE_SCENE_REVERSIBLE = "sceneReversible";
+
     const DEVICE_COMMAND_BRIGHTNESS_ABSOLUTE = "action.devices.commands.BrightnessAbsolute";
     const DEVICE_COMMAND_COLOR_ABSOLUTE = "action.devices.commands.ColorAbsolute";
     const DEVICE_COMMAND_ON_OFF = "action.devices.commands.OnOff";
+    const DEVICE_COMMAND_ACTIVATE_SCENE = "action.devices.commands.ActivateScene";
 
     /** @var string */
     protected $device_type;
@@ -146,7 +151,9 @@ abstract class VirtualDevice {
         if(!$this->home_actions)
             return null;
         $attributes = $this->getAttributes();
-        $arr = ["id" => $this->device_id, "type" => $this->getActionsDeviceType(), "name" => ["name" => $this->device_name],
+        $arr = ["id" => $this->device_id,
+            "type" => $this->getActionsDeviceType(),
+            "name" => ["name" => $this->device_name],
             "traits" => $this->getTraits(), "willReportState" => $this->will_report_state];
         if($attributes !== null && sizeof($attributes) > 0)
             $arr["attributes"] = $attributes;
