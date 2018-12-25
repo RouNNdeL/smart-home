@@ -107,6 +107,12 @@ echo Nav::getDefault(Nav::PAGE_EFFECTS)->toString();
                         </li>
 HTML;
                         }
+                        echo <<<HTML
+                        <li class="nav-item px-1">
+                            <button class="btn btn-outline-primary effect-add-btn">New effect</button>
+                        </li>
+HTML;
+
                         ?>
                     </ul>
                     <div class="tab-content">

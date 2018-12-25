@@ -57,7 +57,7 @@ echo Nav::getDefault(Nav::PAGE_SCENES)->toString();
 ?>
 <div class="container-fluid">
     <div class="row device-settings-content">
-        <div class="col mt-3">
+        <div class="col">
             <div class="card">
                 <div class="card-header">
                     <h2>Scenes</h2>
@@ -81,7 +81,7 @@ HTML;
                         }
                         echo <<<HTML
                         <li class="nav-item px-1">
-                            <button class="btn btn-outline-primary scene-add-btn" tabindex="0">New scene</button>
+                            <button class="btn btn-outline-primary scene-add-btn">New scene</button>
                         </li>
 HTML;
 

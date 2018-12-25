@@ -34,3 +34,10 @@ input {
     max-width: $args-input-width;
   }
 }
+
+button {
+  &.effect-add-btn {
+    position: relative;
+    top: 1px;
+  }
+}
