@@ -48,7 +48,20 @@ abstract class VirtualDevice {
     const DEVICE_TYPE_REMOTE_CONTROLLED = "DEVICE_REMOTE_CONTROLLED";
 
     const DEVICE_TRAIT_BRIGHTNESS = "action.devices.traits.Brightness";
+    const DEVICE_TRAIT_COLOR_SETTING = "action.devices.traits.ColorSetting";
+
+    /**
+     * @var string
+     * @deprecated use as DEVICE_TRAIT_COLOR_SETTING
+     * as per Google Docs https://developers.google.com/actions/smarthome/traits/colorspectrum
+     */
     const DEVICE_TRAIT_COLOR_SPECTRUM = "action.devices.traits.ColorSpectrum";
+
+    /**
+     * @var string
+     * @deprecated use as DEVICE_TRAIT_COLOR_SETTING
+     * as per Google Docs https://developers.google.com/actions/smarthome/traits/colortemperature
+     */
     const DEVICE_TRAIT_COLOR_TEMPERATURE = "action.devices.traits.ColorTemperature";
     const DEVICE_TRAIT_ON_OFF = "action.devices.traits.OnOff";
     const DEVICE_TRAIT_TOGGLES = "action.devices.traits.Toggles";
@@ -56,6 +69,10 @@ abstract class VirtualDevice {
     const DEVICE_TYPE_ACTIONS_LIGHT = "action.devices.types.LIGHT";
     const DEVICE_TYPE_ACTIONS_OUTLET = "action.devices.types.OUTLET";
     const DEVICE_TYPE_ACTIONS_SWITCH = "action.devices.types.SWITCH";
+
+    const DEVICE_ATTRIBUTE_COLOR_MODEL = "colorModel";
+    const DEVICE_ATTRIBUTE_COLOR_MODEL_RGB = "rgb ";
+    const DEVICE_ATTRIBUTE_COLOR_MODEL_HSV = "hsv";
 
     const DEVICE_COMMAND_BRIGHTNESS_ABSOLUTE = "action.devices.commands.BrightnessAbsolute";
     const DEVICE_COMMAND_COLOR_ABSOLUTE = "action.devices.commands.ColorAbsolute";

@@ -103,7 +103,7 @@ class SimpleRgbDevice extends VirtualDevice {
             "on" => $this->on,
             "online" => $online,
             "brightness" => $this->brightness,
-            "color" => ["spectrumRGB" => $this->color]
+            "color" => ["spectrumRgb" => $this->color]
         ];
     }
 
@@ -176,7 +176,7 @@ HTML;
     }
 
     public function getTraits() {
-        return [self::DEVICE_TRAIT_ON_OFF, self::DEVICE_TRAIT_COLOR_SPECTRUM, self::DEVICE_TRAIT_BRIGHTNESS];
+        return [self::DEVICE_TRAIT_ON_OFF, self::DEVICE_TRAIT_COLOR_SETTING, self::DEVICE_TRAIT_BRIGHTNESS];
     }
 
     public function getActionsDeviceType() {
@@ -184,7 +184,7 @@ HTML;
     }
 
     public function getAttributes() {
-        return [];
+        return [self::DEVICE_ATTRIBUTE_COLOR_MODEL => self::DEVICE_ATTRIBUTE_COLOR_MODEL_RGB];
     }
 
     /**
