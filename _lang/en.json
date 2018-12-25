@@ -136,5 +136,7 @@
   "navbar_effects": "Effects",
   "navbar_scenes": "Scenes",
   "navbar_logout": "Logout",
-  "navbar_brand_title": "Smart Home"
+  "navbar_brand_title": "Smart Home",
+  "scene_btn_hint_delete_entry": "Remove entry",
+  "scene_btn_hint_show_effect": "Show effect"
 }

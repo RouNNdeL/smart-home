@@ -97,11 +97,15 @@ class Scene {
             $device = $manager->getVirtualDeviceById($device_id);
             if(!$device instanceof BaseEffectDevice)
                 throw new UnexpectedValueException("SceneEntry for profile id: $this->id contains pointer to invalid device: $device_id");
-            $effect = $device->getEffectById($entry->getEffectId());
+            $effect_id = $entry->getEffectId();
+            $effect = $device->getEffectById($effect_id);
 
-            $effect_url = "/effect/" . $device->getDeviceId() . "#e-" . $effect->getId();
+            $effect_url = "/effect/$device_id#e-$effect_id";
             $device_name = $device->getDeviceName();
             $effect_name = htmlspecialchars($effect->getName());
+            $title_delete = Utils::getString("scene_btn_hint_delete_entry");
+            $title_jump = Utils::getString("scene_btn_hint_show_effect");
+
             $html .= <<<HTML
             <a href="$effect_url" class="list-group-item list-group-item-action flex-column align-items-start col-24 col-md-12 col-xl-8">
                 <div class="row">
@@ -109,11 +113,12 @@ class Scene {
                         <h5 class="mb-1">$effect_name</h5>
                         <p class="mb-1">$device_name</p>
                     </div>
-                    <div class="col float-right col-auto text-center-vertical pr-0">
-                        <button class="btn btn-secondary">Preview</button>
+                    <div class="col float-right col-auto text-center-vertical pr-1">
+                        <button class="btn effect-show-button btn-secondary" type="button" role="button" title="$title_jump"><span class="oi oi-action-redo"></span></button>
                     </div>
-                    <div class="col float-right col-auto text-center-vertical">
-                        <button class="btn btn-danger">Remove</button>
+                    <div class="col float-right col-auto text-center-vertical pl-1">
+                        <button class="btn btn-danger scene-entry-delete-btn" type="button" role="button" 
+                title="$title_delete"><span class="oi oi-trash"></span></button>
                     </div>
                 </div>
             </a>

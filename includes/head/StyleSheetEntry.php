@@ -38,7 +38,7 @@ class StyleSheetEntry extends HeadEntry
     const DEVICES = "/dist/css/devices";
     const DEVICE_SETTINGS = "/dist/css/device_settings";
     const DEVICE_ADVANCED = "/dist/css/device_effect";
-    const DEVICE_PROFILES = "/dist/css/device_profiles";
+    const DEVICE_SCENES = "/dist/css/device_scenes";
 
     const VENDOR = "/dist/vendor/css/vendor";
     const MATERIAL_ICONS = "https://fonts.googleapis.com/icon?family=Material+Icons";

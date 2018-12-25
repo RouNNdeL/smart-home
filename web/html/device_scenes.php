@@ -42,8 +42,8 @@ $manager = GlobalManager::all([ShareManager::SCOPE_VIEW_PROFILES]);
 <?php
 require_once __DIR__ . "/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("Smart Home - Profiles");
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICE_PROFILES));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICE_PROFILES));
+$head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICE_SCENES));
+$head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICE_SCENES));
 echo $head->toString();
 
 ?>
@@ -51,7 +51,7 @@ echo $head->toString();
 <?php
 require_once __DIR__."/../../includes/navbar/Nav.php";
 
-$profiles = Scene::allForUserId($manager->getSessionManager()->getUserId());
+$scenes = Scene::allForUserId($manager->getSessionManager()->getUserId());
 
 echo Nav::getDefault(Nav::PAGE_SCENES)->toString();
 ?>
@@ -67,31 +67,36 @@ echo Nav::getDefault(Nav::PAGE_SCENES)->toString();
                     ?>
                     <ul class="nav nav-pills" role="tablist">
                         <?php
-                        foreach($profiles as $i => $profile)
+                        foreach($scenes as $i => $scene)
                         {
                             $active = $i ? "" : "active";
-                            $name = $profile->getName();
-                            $profile_id = "p-".$profile->getId();
+                            $name = $scene->getName();
+                            $scene_id = "p-".$scene->getId();
                             echo <<<HTML
                         <li class="nav-item">
-                            <a class="nav-link $active" id="$profile_id-tab" data-toggle="tab" href="#$profile_id" 
-                            role="tab" aria-controls="$profile_id" aria-selected="false">$name</a>
+                            <a class="nav-link $active" id="$scene_id-tab" data-toggle="tab" href="#$scene_id" 
+                            role="tab" aria-controls="$scene_id" aria-selected="false">$name</a>
                         </li>
 HTML;
                         }
+                        echo <<<HTML
+                        <li class="nav-item px-1">
+                            <button class="btn btn-outline-primary scene-add-btn" tabindex="0">New scene</button>
+                        </li>
+HTML;
+
                         ?>
                     </ul>
-                    <div class="tab-content">
-                        <h4 class="my-2">Device effects</h4>
+                    <div class="tab-content pt-3">
                         <?php
-                        foreach($profiles as $i => $profile)
+                        foreach($scenes as $i => $scene)
                         {
                             $active = $i ? "" : "show active";
-                            $profile_id = "p-".$profile->getId();
-                            $html = $profile->getSceneHtml($manager->getUserDeviceManager());
+                            $scene_id = "p-".$scene->getId();
+                            $html = $scene->getSceneHtml($manager->getUserDeviceManager());
                             echo <<<HTML
-                        <div class="tab-pane fade $active effect-parent" id="$profile_id" 
-                         role="tabpanel" aria-labelledby="$profile_id-tab">
+                        <div class="tab-pane fade $active effect-parent" id="$scene_id" 
+                         role="tabpanel" aria-labelledby="$scene_id-tab">
                             $html
                         </div>
 HTML;
