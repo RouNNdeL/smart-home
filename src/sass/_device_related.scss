@@ -21,7 +21,12 @@
 // SOFTWARE.
 
 $color-input-size: auto !default;
-$remote-button-width: 40px;
+$remote-button-height: 40px;
+
+%remote-button {
+  padding: .45em;
+  height: $remote-button-height;
+}
 
 .color-input {
   width: $color-input-size;
@@ -45,33 +50,36 @@ $device-offline-text-color: #dc3545 !default;
   color: $device-offline-text-color;
 }
 
+.ir-multi-action-btn {
+  @extend %remote-button;
+}
+
 .device-remote {
   & button {
-    padding: .45em;
-    height: $remote-button-width;
+    @extend %remote-button;
   }
 
   & .button-row {
-    height: $remote-button-width;
+    height: $remote-button-height;
 
     &.s025 {
-      height: $remote-button-width / 4;
+      height: $remote-button-height / 4;
     }
 
     &.s05 {
-      height: $remote-button-width / 2;
+      height: $remote-button-height / 2;
     }
 
     &.s1 {
-      height: $remote-button-width;
+      height: $remote-button-height;
     }
 
     &.s2 {
-      height: $remote-button-width * 2;
+      height: $remote-button-height * 2;
     }
 
     &.s3 {
-      height: $remote-button-width * 3;
+      height: $remote-button-height * 3;
     }
   }
 }

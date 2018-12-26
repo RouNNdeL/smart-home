@@ -22,20 +22,52 @@
  * SOFTWARE.
  */
 import $ from 'jquery';
+import {showSnackbar, sleep} from "./_utils";
 
 const IR_ACTION_URL = "/api/device_ir_action.php";
 
 export default function init() {
+    let action_in_progress = false;
+
     $(".device-remote").each(function() {
         const device_id = $(this).parents(".device-parent").eq(0).data("device-id");
         $(this).find("button").click(function() {
             const action_id = $(this).data("action-id");
-            $.ajax(IR_ACTION_URL, {
-                method: "POST",
-                dataType: "json",
-                contentType: "json",
-                data: JSON.stringify({action_id: action_id, device_id: device_id})
-            });
+            postAction(action_id, device_id);
         });
     });
+
+    $(".ir-multi-action-btn").click(async function() { // jshint ignore:line
+        const actions = $(this).data("action-id").split(" ");
+        const devices = $(this).data("device-id").split(" ");
+        const delay = parseInt($(this).data("action-delay")) || 50;
+
+        if(actions.length !== devices.length) {
+            console.error("Multi action button incorrectly formatted", this);
+            return;
+        }
+
+        if(action_in_progress) {
+            showSnackbar("Action in progress, please wait till it finishes");
+            return;
+        }
+
+        action_in_progress = true;
+        for(let i = 0; i < actions.length; i++) {
+            if(actions[i] !== "_" && devices[i] !== "_")
+                postAction(actions[i], devices[i]);
+            else
+                await sleep(delay); // jshint ignore:line
+        }
+        action_in_progress = false;
+    }); // jshint ignore:line
+
+    function postAction(action_id, device_id) {
+        $.ajax(IR_ACTION_URL, {
+            method: "POST",
+            dataType: "json",
+            contentType: "json",
+            data: JSON.stringify({action_id: action_id, device_id: device_id})
+        });
+    }
 }

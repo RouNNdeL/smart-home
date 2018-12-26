@@ -24,6 +24,10 @@
 
 import $ from "jquery";
 
+export function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export function showSnackbar(text, duration = 2500, cls = "snackbar") {
     const snackbar = $(`.${cls}`);
     snackbar.text(text);

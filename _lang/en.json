@@ -130,6 +130,7 @@
   "device_reboot_success": "The device will reboot shortly",
   "device_reboot_error": "Unable to connect to the device!",
   "device_reboot_forbidden": "You are not allowed to reboot this device",
+  "device_ir_toggle_all": "Toggle all",
   "effect_name": "Effect name",
   "effect_default_name": "Effect",
   "navbar_devices": "Devices",
