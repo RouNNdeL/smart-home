@@ -79,8 +79,9 @@
     {
       "name": "av_audio_stereo",
       "column": 6,
-      "offset": 6
+      "offset": 4
     },
+    "av_audio_alc",
     {
       "name": "av_audio_standard",
       "column": 6

@@ -18,9 +18,11 @@
   ],
   [
     {
-      "name": "decoder_arrow_down",
-      "offset": 10
-    }
+      "name": "decoder_audio_mute",
+      "offset": 6
+    },
+    "decoder_arrow_down",
+    "decoder_back"
   ],
   [
     {
@@ -83,7 +85,26 @@
   [
     {
       "type": "empty",
-      "size": 0.5
+      "size": 0.25
+    }
+  ],
+  [
+    {
+      "name": "decoder_playback_back",
+      "offset": 2
+    },
+    "decoder_playback_pause",
+    {
+      "name":"decoder_record_start",
+      "btn_class": "text-danger"
+    },
+    "decoder_playback_resume",
+    "decoder_playback_forward"
+  ],
+  [
+    {
+      "type": "empty",
+      "size": 0.25
     }
   ],
   [
@@ -112,8 +133,10 @@
   ],
   [
     {
-      "name": "decoder_digit_0",
-      "offset": 10
-    }
+      "name": "decoder_digit_asterisk",
+      "offset": 6
+    },
+    "decoder_digit_0",
+    "decoder_digit_hash"
   ]
 ]
