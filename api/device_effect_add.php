@@ -26,50 +26,49 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-06-30
- * Time: 18:43
+ * Date: 2018-12-27
+ * Time: 17:24
  */
 
-if($_SERVER["REQUEST_METHOD"] !== "GET")
-{
+header("Content-Type: application/json");
+
+if($_SERVER["REQUEST_METHOD"] !== "POST") {
     $response = ["status" => "error", "error" => "invalid_request"];
     http_response_code(400);
     echo json_encode($response);
+    exit();
 }
 
 require_once __DIR__ . "/../includes/GlobalManager.php";
 
 $manager = GlobalManager::all([ShareManager::SCOPE_EDIT_EFFECTS]);
 
-$json = $_GET;
-if($json === false || !isset($json["device_id"]) || !isset($json["effect"]))
-{
+$json = json_decode(file_get_contents("php://input"), true);
+if($json === false || !isset($json["device_id"])) {
     $response = ["status" => "error", "error" => "invalid_json"];
     http_response_code(400);
     echo json_encode($response);
     exit();
 }
 
-$physical = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($_GET["device_id"]);
-if($physical === null || !$physical instanceof RgbEffectDevice)
-{
+$physical = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($json["device_id"]);
+if($physical === null || !$physical instanceof RgbEffectDevice) {
     $response = ["status" => "error", "error" => "invalid_device_id"];
     http_response_code(400);
     echo json_encode($response);
     exit();
 }
 
-$device = $physical->getVirtualDeviceById($_GET["device_id"]);
-if($device === null || !$device instanceof BaseEffectDevice)
-{
+$device = $physical->getVirtualDeviceById($json["device_id"]);
+if($device === null || !$device instanceof BaseEffectDevice) {
     $response = ["status" => "error", "error" => "invalid_device_id"];
     http_response_code(400);
     echo json_encode($response);
     exit();
 }
 
-$device->setMaxColorCount($physical->getMaxColorCount());
-$index = $device->updateEffect(Effect::getDefaultForEffectId($json["effect_id"], $json["effect"]));
+$index = $device->addEffect(Effect::getDefaultForNewEffect($device->getDefaultEffect()));
+$device->toDatabase();
 
-$response = ["status" => "success", "html" => $device->effectHtml($index)];
+$response = ["status" => "success", "effect_id" => $device->getEffectIdByIndex($index)];
 echo json_encode($response);

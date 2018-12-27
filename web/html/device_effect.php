@@ -59,7 +59,6 @@ if($device === null || !$device instanceof BaseEffectDevice)
     exit(0);
 }
 
-$device->setMaxColorCount($physical->getMaxColorCount());
 if(isset($_GET["name"]) && $_GET["name"] === "false")
 {
     header("Location: /effect/" . urlencode($device->getDeviceName()) . "/" . urlencode($device->getDeviceId()));
@@ -115,13 +114,20 @@ HTML;
 
                         ?>
                     </ul>
+                    <div class="effect-pill-template d-none">
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#$effect_id"
+                               role="tab" aria-controls="$effect_id" aria-selected="false">$name</a>
+                        </li>
+                    </div>
                     <div class="tab-content">
                         <?php
                         foreach($effects as $i => $effect)
                         {
                             $active = $i ? "" : "show active";
-                            $effect_id = "e-".$effect->getId();
-                            $effectHtml = $device->effectHtml($i);
+                            $e_id = $effect->getId();
+                            $effect_id = "e-".$e_id;
+                            $effectHtml = $device->effectHtml($e_id);
                             echo <<<HTML
                         <div class="tab-pane fade $active effect-parent" id="$effect_id" 
                          role="tabpanel" aria-labelledby="$effect_id-tab">

@@ -46,7 +46,13 @@ abstract class BaseEffectDevice extends SimpleRgbDevice {
     /** @var int */
     private $max_color_count;
 
-    public $current_profile;
+    /** @var int */
+    private $max_effect_count;
+
+    /** @var int */
+    private $max_active_effect_count;
+
+    private $effect_indexes = [];
 
     /**
      * RgbEffectDevice constructor.
@@ -62,11 +68,16 @@ abstract class BaseEffectDevice extends SimpleRgbDevice {
      */
     public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions,
                                 bool $will_report_state, int $color = 0xffffff, int $brightness = 100,
-                                bool $on = true, int $toggles = 0
+                                bool $on = true, int $toggles = 0,
+                                $max_color_count = null, $max_effect_count = null, $max_active_effect_count = null
     ) {
         parent::__construct($device_id, $device_name, $synonyms, $home_actions, $will_report_state, $color, $brightness, $on);
         $this->effects_enabled = $toggles & (1 << BaseEffectDevice::TOGGLE_EFFECT_BIT);
+        $this->max_color_count = $max_color_count;
+        $this->max_effect_count = $max_effect_count;
+        $this->max_active_effect_count = $max_active_effect_count;
         $this->loadEffects();
+        $this->loadEffectIndexes();
     }
 
     public function handleSaveJson($json) {
@@ -172,17 +183,16 @@ abstract class BaseEffectDevice extends SimpleRgbDevice {
 HTML;
     }
 
-    public function effectHtml(int $effect) {
+    public function effectHtml(int $effect_id) {
         $device = $this->device_id;
         $profile_colors = Utils::getString("profile_colors");
         $profile_effect = Utils::getString("profile_effect");
         $profile_name = Utils::getString("effect_name");
         $profile_add_color = Utils::getString("profile_add_color");
         $max_colors = $this->max_color_count;
-        $current_effect = $this->effects[$effect];
+        $current_effect = $this->getEffectById($effect_id);
         $effect_name = htmlspecialchars($current_effect->getName());
 
-        $effect_id = $current_effect->getId();
         $max_colors = $current_effect->getMaxColors() === Effect::COLOR_COUNT_UNLIMITED ?
             $max_colors : min($max_colors, $current_effect->getMaxColors());
         $min_colors = $current_effect->getMinColors();
@@ -205,8 +215,8 @@ HTML;
         $effects_html = "";
         $html = "<form data-effect-id=\"$effect_id\" data-max-colors=\"$max_colors\" data-min-colors=\"$min_colors\">";
 
-        foreach($this->getAvailableEffects() as $id => $effect) {
-            $string = Utils::getString("profile_effect_" . $effect);
+        foreach($this->getAvailableEffects() as $id => $effect_id) {
+            $string = Utils::getString("profile_effect_" . $effect_id);
             $effects_html .= "<option value=\"$id\" " . ($id == $current_effect->getEffectId() ? " selected" : "") . ">$string</option>";
         }
 
@@ -226,7 +236,7 @@ HTML;
             $colors_html
         </div>";
         $html .= $current_effect->timingArgHtml();
-        $html .= "</form></div>";
+        $html .= "</div></form>";
 
         return $html;
     }
@@ -236,10 +246,54 @@ HTML;
             if($e->getId() === $effect->getId()) {
                 $this->effects[$i] = $effect;
                 $effect->toDatabase();
-                return $i;
+                return $this->updateEffectIndexes($effect->getId());
             }
         }
-        return -1;
+        return $this->addEffect($effect);
+    }
+
+    /**
+     * Attempts to find room for new effect_id, if indexes exceed max effect count
+     * removes the least recently modified effect and inserts the new one in it's place
+     *
+     * @param int $effect_id
+     */
+    private function updateEffectIndexes(int $effect_id) {
+        /* Effect already indexed */
+        if(($key = array_search($effect_id, $this->effect_indexes)) !== false) {
+            return $key;
+        }
+
+        if(sizeof($this->effect_indexes) < $this->max_active_effect_count) {
+            $this->effect_indexes[] = $effect_id;
+            return sizeof($this->effect_indexes) - 1;
+        }
+
+        $oldest = $this->getOldestEffectId();
+        if(($key = array_search($oldest, $this->effect_indexes)) !== false) {
+            $this->effect_indexes[$key] = $effect_id;
+            return $key;
+        }
+
+        throw new UnexpectedValueException("$oldest key is not present in effect_indexes");
+    }
+
+    private function getOldestEffectId() {
+        $old = time();
+        $id = -1;
+        foreach($this->effect_indexes as $effect_id) {
+            $effect = $this->getEffectById($effect_id);
+            $d = $effect->getLastModificationDate();
+            if($d < $old) {
+                $old = $d;
+                $id = $effect_id;
+            }
+        }
+        return $id;
+    }
+
+    public function getEffectIdByIndex(int $index) {
+        return $this->effects[$index]->getId();
     }
 
     public function getEffectById(int $effect_id) {
@@ -250,15 +304,53 @@ HTML;
         return null;
     }
 
-    public function addEffect($effect) {
+    public function addEffect(Effect $effect) {
         $this->effects[] = $effect;
-        $this->toDatabase();
+        $effect->toDatabase();
+        $this->updateEffectIndexes($effect->getId());
+        return sizeof($this->effects) - 1;
     }
 
     public abstract function getAvailableEffects();
 
+    public abstract function getDefaultEffect();
+
     private function loadEffects() {
         $this->effects = Effect::forDevice($this->device_id);
+    }
+
+    private function loadEffectIndexes() {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT effect_id, device_index FROM devices_effect_join WHERE device_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $this->device_id);
+        $stmt->bind_result($effect_id, $index);
+        $stmt->execute();
+        while($stmt->fetch()) {
+            if($index !== null && $index < $this->max_active_effect_count)
+                $this->effect_indexes[$index] = $effect_id;
+        }
+        $stmt->close();
+    }
+
+    public function saveEffectIndexes() {
+        $conn = DbUtils::getConnection();
+        $sql = "UPDATE devices_effect_join SET device_index = NULL WHERE device_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $this->device_id);
+        $stmt->execute();
+        $stmt->close();
+
+        $sql = /** @lang MySQL */
+            "INSERT devices_effect_join SET effect_id = ?, device_index = ?, device_id = ? 
+             ON DUPLICATE KEY UPDATE device_index = ?";
+        $stmt = $conn->prepare($sql);
+
+        $stmt->bind_param("iisi", $effect_id, $index, $this->device_id, $index);
+        foreach($this->effect_indexes as $index => $effect_id) {
+            $stmt->execute();
+        }
+        $stmt->close();
     }
 
     public function toDatabase() {
@@ -280,6 +372,8 @@ HTML;
         foreach($this->effects as $effect) {
             $effect->toDatabase();
         }
+
+        $this->saveEffectIndexes();
         return $changes;
     }
 
@@ -295,13 +389,6 @@ HTML;
      */
     public function setEffectsEnabled(bool $effects_enabled) {
         $this->effects_enabled = $effects_enabled;
-    }
-
-    /**
-     * @param int $max_color_count
-     */
-    public function setMaxColorCount(int $max_color_count) {
-        $this->max_color_count = $max_color_count;
     }
 
     /**

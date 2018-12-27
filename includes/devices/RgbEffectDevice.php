@@ -55,10 +55,10 @@ abstract class RgbEffectDevice extends PhysicalDevice
     protected $avr_order;
     
     /** @var int */
-    protected $active_profile_count;
+    protected $max_active_effect_count;
     
     /** @var int */
-    protected $max_profile_count;
+    protected $max_effect_count;
 
     /** @var int */
     protected $max_color_count;
@@ -85,20 +85,20 @@ abstract class RgbEffectDevice extends PhysicalDevice
         $this->current_profile = $current_profile;
         $this->auto_increment = $auto_increment;
         $this->profiles = $profiles;
-        $this->max_profile_count = DeviceDbHelper::getMaxProfileCount(DbUtils::getConnection(), $id);
-        $this->active_profile_count = DeviceDbHelper::getActiveProfileCount(DbUtils::getConnection(), $id);
+        $this->max_effect_count = DeviceDbHelper::getMaxProfileCount(DbUtils::getConnection(), $id);
+        $this->max_active_effect_count = DeviceDbHelper::getActiveProfileCount(DbUtils::getConnection(), $id);
         $this->max_color_count = DeviceDbHelper::getMaxColorCount(DbUtils::getConnection(), $id);
-        if($this->max_profile_count === null || $this->active_profile_count === null)
+        if($this->max_effect_count === null || $this->max_active_effect_count === null)
         {
             throw new UnexpectedValueException("Missing max_profile_count or active_profile_count for $id, 
             please add the appropriate record in the database");
         }
-        if (sizeof($profiles) <= $this->max_profile_count) {
+        if (sizeof($profiles) <= $this->max_effect_count) {
             $this->active_indexes = range(0, sizeof($profiles) - 1);
             $this->inactive_indexes = array();
         } else {
-            $this->active_indexes = range(0,$this->max_profile_count - 1);
-            $this->inactive_indexes = range($this->max_profile_count, sizeof($profiles) - $this->active_profile_count - 1);
+            $this->active_indexes = range(0,$this->max_effect_count - 1);
+            $this->inactive_indexes = range($this->max_effect_count, sizeof($profiles) - $this->max_active_effect_count - 1);
         }
         $this->avr_indexes = $this->active_indexes;
         $this->avr_order = $this->getAvrOrder();
@@ -112,12 +112,12 @@ abstract class RgbEffectDevice extends PhysicalDevice
 
     public function addProfile(Scene $profile)
     {
-        if (sizeof($this->profiles) >= $this->max_profile_count)
+        if (sizeof($this->profiles) >= $this->max_effect_count)
             return false;
         array_push($this->profiles, $profile);
-        if (sizeof($this->active_indexes) < $this->active_profile_count) {
+        if (sizeof($this->active_indexes) < $this->max_active_effect_count) {
             array_push($this->active_indexes, $this->getMaxIndex());
-            for ($i = 0; $i < $this->active_profile_count; $i++) {
+            for ($i = 0; $i < $this->max_active_effect_count; $i++) {
                 if (!isset($this->avr_indexes[$i])) {
                     $this->avr_indexes[$i] = $this->getMaxIndex();
                     break;
@@ -148,7 +148,7 @@ abstract class RgbEffectDevice extends PhysicalDevice
         }
         foreach ($active as $item) {
             if (array_search($item, $this->active_indexes) === false) {
-                for ($i = 0; $i < $this->active_profile_count; $i++) {
+                for ($i = 0; $i < $this->max_active_effect_count; $i++) {
                     if (!isset($this->avr_indexes[$i])) {
                         $this->avr_indexes[$i] = $item;
                         $avr_i = $i;
@@ -355,5 +355,19 @@ abstract class RgbEffectDevice extends PhysicalDevice
     </div>
 HTML;
 
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxEffectCount(): int {
+        return $this->max_effect_count;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxActiveEffectCount(): int {
+        return $this->max_active_effect_count;
     }
 }

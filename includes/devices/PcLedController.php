@@ -44,7 +44,7 @@ class PcLedController extends RgbEffectDevice {
             $color = array_fill(0, $size, 0);
             $flags = array_fill(0, $size, 0);
             $current_device_profile = array_fill(0, $size, 0);
-            $profiles = array_fill(0, $size * $this->active_profile_count, 0);
+            $profiles = array_fill(0, $size * $this->max_active_effect_count, 0);
 
             foreach(PcLedController::DEVICE_INDEXES as $id => $index) {
                 $device = $this->getVirtualDeviceById($id);

@@ -132,7 +132,7 @@
   "device_reboot_forbidden": "You are not allowed to reboot this device",
   "device_ir_toggle_all": "Toggle all",
   "effect_name": "Effect name",
-  "effect_default_name": "Effect",
+  "effect_default_name": "New Effect",
   "navbar_devices": "Devices",
   "navbar_effects": "Effects",
   "navbar_scenes": "Scenes",

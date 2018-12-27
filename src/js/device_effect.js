@@ -32,7 +32,11 @@ import '../../lib/bootstrap-colorpicker';
 import {roundTime, timeToString} from "./_device_timing";
 import Mexp from 'math-expression-evaluator';
 
-const URL_EFFECT_HTML = "/api/device_effect_default_html.php";
+const URL_EFFECT_HTML = "/api/device_effect_html.php";
+const URL_EFFECT_SAVE = "/api/device_effect_save.php";
+const URL_EFFECT_ADD = "/api/device_effect_add.php";
+const URL_EFFECT_REMOVE = "/api/device_effect_remove.php";
+
 const DEFAULT_COLORS = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ffffff"];
 const COLORPICKER_OPTIONS = {
     useAlpha: false,
@@ -58,8 +62,13 @@ $(function() {
     const device_id = $(".device-settings-content").data("device-id");
     let last_default_color = 0;
 
-    if(window.location.hash)
-        $(`#${window.location.hash.substring(1)}-tab`).click();
+    if(window.location.hash) {
+        try {
+            $(`#${window.location.hash.substring(1)}-tab`).click();
+        } catch(e) {
+            console.error(`Invalid hash: ${window.location.hash}`);
+        }
+    }
 
     $(".swatch-container").sortable({
         handle: ".color-swatch-handle"
@@ -70,7 +79,19 @@ $(function() {
     });
 
     $(".nav-link ").click(function() {
-        window.location.hash = $(this).attr("href");
+        window.history.replaceState(null, null, `${$(this).attr("href")}`);
+    });
+
+    $(".effect-add-btn").click(function() {
+        $.ajax(URL_EFFECT_ADD, {
+            method: "POST",
+            dataType: "json",
+            contentType: "json",
+            data: JSON.stringify({device_id: device_id})
+        }).done(function(response) {
+            window.history.replaceState(null, null, `#e-${response.effect_id}`);
+            window.location.reload();
+        });
     });
 
     $("#effect-save-btn").click(function() {
@@ -99,7 +120,7 @@ $(function() {
             }
         }
 
-        $.ajax("/api/device_effect_save.php", {
+        $.ajax(URL_EFFECT_SAVE, {
             method: "POST",
             dataType: "json",
             contentType: "json",
@@ -116,15 +137,13 @@ $(function() {
     function updateFields(json) {
         const form = $(`form[data-effect-id=${json.effect_id}]`);
 
-        for(let k in json.times)
-        {
+        for(let k in json.times) {
             if(!json.times.hasOwnProperty(k))
                 continue;
             form.find(`input[name=time_${k}]`).val(json.times[k]);
         }
 
-        for(let k in json.args)
-        {
+        for(let k in json.args) {
             if(!json.args.hasOwnProperty(k))
                 continue;
             form.find(`input[name=arg_${k}]`).val(json.args[k]);

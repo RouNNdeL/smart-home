@@ -90,9 +90,11 @@ class DeviceDbHelper {
      * @return VirtualDevice[]
      */
     public static function queryVirtualDevicesForPhysicalDevice(mysqli $conn, string $physical_device_id) {
-        $sql = "SELECT id, type, display_name, synonyms, home_actions, will_report_state, state, 
-                       brightness, color, toggles, ir_protocol, ir_nec_return
-                FROM devices_virtual WHERE parent_id = ?";
+        $sql = "SELECT devices_virtual.id, type, display_name, synonyms, home_actions, will_report_state, state,
+  brightness, color, toggles, ir_protocol, ir_nec_return, max_profile_count, color_count, active_profile_count
+        FROM devices_virtual
+          LEFT JOIN devices_effect_properties ON devices_effect_properties.id = parent_id
+        WHERE parent_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $physical_device_id);
         $stmt->execute();
@@ -164,8 +166,7 @@ class DeviceDbHelper {
         if($stmt->fetch()) {
             $stmt->close();
             $arr[] = HomeUser::queryUserById($conn, $owner_id);
-        }
-        else $stmt->close();
+        } else $stmt->close();
 
         return $arr;
     }
@@ -193,8 +194,7 @@ class DeviceDbHelper {
         if($stmt->fetch()) {
             $stmt->close();
             return $value;
-        }
-        else $stmt->close();
+        } else $stmt->close();
 
         return null;
     }
@@ -208,8 +208,7 @@ class DeviceDbHelper {
         if($stmt->fetch()) {
             $stmt->close();
             return $value;
-        }
-        else $stmt->close();
+        } else $stmt->close();
 
         return null;
     }
@@ -223,8 +222,7 @@ class DeviceDbHelper {
         if($stmt->fetch()) {
             $stmt->close();
             return $value;
-        }
-        else $stmt->close();
+        } else $stmt->close();
 
         return null;
     }

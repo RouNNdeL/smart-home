@@ -115,7 +115,7 @@ class Pieces extends Effect
             $this->colors = [0xff0000, 0x0000ff];
         if($this->timings[Effect::TIME_ON] === 0 && $this->timings[Pieces::TIME_FADE] === 0)
             $this->timings[Effect::TIME_ON] = 0x10;
-        if($this->args[Pieces::ARG_COLOR_COUNT] > sizeof($this->colors))
+        if($this->args[Pieces::ARG_COLOR_COUNT] > sizeof($this->colors) || $this->args[Pieces::ARG_COLOR_COUNT] <= 0)
             $this->args[Pieces::ARG_COLOR_COUNT] = sizeof($this->colors);
         while(sizeof($this->colors) % $this->args[Pieces::ARG_COLOR_COUNT] > 0 ||
             $this->args[Pieces::ARG_COLOR_COUNT] < 2)

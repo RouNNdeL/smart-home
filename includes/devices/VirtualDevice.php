@@ -200,12 +200,14 @@ abstract class VirtualDevice {
             case self::DEVICE_TYPE_EFFECTS_RGB_ANALOG:
                 return new AnalogEffectDevice(
                     $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["will_report_state"],
-                    $row["color"], $row["brightness"], $row["state"], $row["toggles"]
+                    $row["color"], $row["brightness"], $row["state"], $row["toggles"],
+                    $row["color_count"], $row["max_profile_count"], $row["active_profile_count"]
                 );
             case self::DEVICE_TYPE_EFFECTS_RGB_DIGITAL:
                 return new DigitalEffectDevice(
                     $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["will_report_state"],
-                    $row["color"], $row["brightness"], $row["state"], $row["toggles"]
+                    $row["color"], $row["brightness"], $row["state"], $row["toggles"],
+                    $row["color_count"], $row["max_profile_count"], $row["active_profile_count"]
                 );
             case self::DEVICE_TYPE_LAMP:
                 return new LampSimple(

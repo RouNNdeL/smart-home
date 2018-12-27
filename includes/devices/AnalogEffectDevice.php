@@ -33,11 +33,9 @@
 require_once __DIR__ . "/BaseEffectDevice.php";
 require_once __DIR__ . "/../effects/effects/Effect.php";
 
-class AnalogEffectDevice extends BaseEffectDevice
-{
+class AnalogEffectDevice extends BaseEffectDevice {
 
-    public function getAvailableEffects()
-    {
+    public function getAvailableEffects() {
         return [Effect::EFFECT_OFF => "off",
             Effect::EFFECT_STATIC => "static",
             Effect::EFFECT_BREATHING => "breathe",
@@ -45,5 +43,9 @@ class AnalogEffectDevice extends BaseEffectDevice
             Effect::EFFECT_FADING => "fade",
             Effect::EFFECT_SIMPLE_RAINBOW => "rainbow"
         ];
+    }
+
+    public function getDefaultEffect() {
+        return Effect::EFFECT_STATIC;
     }
 }

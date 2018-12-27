@@ -26,14 +26,13 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-07-01
- * Time: 18:19
+ * Date: 2018-06-30
+ * Time: 18:43
  */
 
 header("Content-Type: application/json");
 
-if($_SERVER["REQUEST_METHOD"] !== "POST")
-{
+if($_SERVER["REQUEST_METHOD"] !== "GET") {
     $response = ["status" => "error", "error" => "invalid_request"];
     http_response_code(400);
     echo json_encode($response);
@@ -44,10 +43,8 @@ require_once __DIR__ . "/../includes/GlobalManager.php";
 
 $manager = GlobalManager::all([ShareManager::SCOPE_EDIT_EFFECTS]);
 
-$json = json_decode(file_get_contents("php://input"), true);
-if($json === false || !isset($json["effect"]) || !isset($json["effect_id"]) || !isset($json["times"])
-    || !isset($json["args"]) || !isset($json["colors"]) || !isset($json["effect_name"]))
-{
+$json = $_GET;
+if($json === false || !isset($json["device_id"]) || !isset($json["effect_id"]) || !isset($json["effect"])) {
     $response = ["status" => "error", "error" => "invalid_json"];
     http_response_code(400);
     echo json_encode($response);
@@ -55,8 +52,7 @@ if($json === false || !isset($json["effect"]) || !isset($json["effect_id"]) || !
 }
 
 $physical = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($json["device_id"]);
-if($physical === null || !$physical instanceof RgbEffectDevice)
-{
+if($physical === null || !$physical instanceof RgbEffectDevice) {
     $response = ["status" => "error", "error" => "invalid_device_id"];
     http_response_code(400);
     echo json_encode($response);
@@ -64,20 +60,16 @@ if($physical === null || !$physical instanceof RgbEffectDevice)
 }
 
 $device = $physical->getVirtualDeviceById($json["device_id"]);
-if($device === null || !$device instanceof BaseEffectDevice)
-{
+if($device === null || !$device instanceof BaseEffectDevice) {
     $response = ["status" => "error", "error" => "invalid_device_id"];
     http_response_code(400);
     echo json_encode($response);
     exit();
 }
 
-$effect = Effect::fromJson($json);
+$effect = Effect::getDefaultForEffectId($json["effect_id"], $json["effect"]);
 $index = $device->updateEffect($effect);
-//TODO: Move to a separate API call
-$success = $physical->saveEffectForDevice($json["device_id"], $index);
-$physical->previewEffect($json["device_id"], $index);
-$response = ["status" => $success ? "success" : "error",
-    "message" => $success ? "Saved successfully!" : "An error occurred!",
-    "updated_effect" => $effect->toJson()];
+$device->saveEffectIndexes();
+
+$response = ["status" => "success", "html" => $device->effectHtml($json["effect_id"])];
 echo json_encode($response);
