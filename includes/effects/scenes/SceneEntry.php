@@ -37,9 +37,6 @@ class SceneEntry {
     /** @var  VirtualDevice */
     private $device_id;
 
-    /** @var int */
-    private $device_index;
-
     /** @var Effect */
     private $effect_id;
 
@@ -50,9 +47,8 @@ class SceneEntry {
      * @param int $device_index
      * @param Effect $effect
      */
-    public function __construct(string $device_id, int $device_index, int $effect_id) {
+    public function __construct(string $device_id, int $effect_id) {
         $this->device_id = $device_id;
-        $this->device_index = $device_index;
         $this->effect_id = $effect_id;
     }
 
@@ -62,49 +58,45 @@ class SceneEntry {
         $sql = "SELECT
                   scene_id,
                   device_id,
-                  device_index,
                   effect_id
-                FROM devices_effect_join
-                  JOIN devices_effect_scenes_effect_join dde on devices_effect_join.id = dde.effect_join_id
+                FROM devices_effect_scenes_effect_join dde 
                   JOIN devices_effect_scenes dep on dde.scene_id = dep.id
                 WHERE user_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $user_id);
-        $stmt->bind_result($scene_id, $device_id, $device_index, $effect_id);
+        $stmt->bind_result($scene_id, $device_id, $effect_id);
         $stmt->execute();
         $arr = [];
         while($stmt->fetch()) {
             if(!isset($arr[$scene_id])) /* Might not be required */
                 $arr[$scene_id] = [];
-            $arr[$scene_id][] = new SceneEntry($device_id, $device_index, $effect_id);
+            $arr[$scene_id][] = new SceneEntry($device_id, $effect_id);
         }
         $stmt->close();
         return $arr;
     }
 
     /**
-     * @param int $profile_id
+     * @param int $scene_id
      * @return SceneEntry[]
      */
-    public static function getForSceneId(int $profile_id) {
+    public static function getForSceneId(int $scene_id) {
         $conn = DbUtils::getConnection();
         $sql = "SELECT
                   device_id,
-                  device_index,
                   effect_id
-                FROM devices_effect_join
-                  JOIN devices_effect_scenes_effect_join dde on devices_effect_join.id = dde.effect_join_id
+                FROM devices_effect_scenes_effect_join dde
                 WHERE scene_id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $profile_id);
-        $stmt->bind_result($device_id, $device_index, $effect_id);
+        $stmt->bind_param("i", $scene_id);
+        $stmt->bind_result($device_id, $effect_id);
         $stmt->execute();
         $arr = [];
         $device_ids = [];
         while($stmt->fetch()) {
             if(in_array($device_id, $device_ids))
                 continue;
-            $arr[] = new SceneEntry($device_id, $device_index, $effect_id);
+            $arr[] = new SceneEntry($device_id, $effect_id);
             $device_ids[] = $device_id;
         }
         $stmt->close();
