@@ -133,6 +133,7 @@
   "device_ir_toggle_all": "Toggle all",
   "effect_name": "Effect name",
   "effect_default_name": "New Effect",
+  "effect_add_btn": "Add effect",
   "navbar_devices": "Devices",
   "navbar_effects": "Effects",
   "navbar_scenes": "Scenes",

@@ -72,6 +72,7 @@ require_once __DIR__ . "/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("Smart Home - " . $device->getDeviceName());
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICE_ADVANCED));
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICE_ADVANCED));
+$head->addEntry(new StyleSheetEntry(StyleSheetEntry::MATERIAL_ICONS));
 echo $head->toString();
 
 ?>
@@ -106,20 +107,15 @@ echo Nav::getDefault(Nav::PAGE_EFFECTS)->toString();
                         </li>
 HTML;
                         }
+                        $add_effect_string = Utils::getString("effect_add_btn");
                         echo <<<HTML
                         <li class="nav-item px-1">
-                            <button class="btn btn-outline-primary effect-add-btn">New effect</button>
+                            <button class="btn btn-outline-primary effect-add-btn" title="$add_effect_string"><i class="material-icons">add</i></button>
                         </li>
 HTML;
 
                         ?>
                     </ul>
-                    <div class="effect-pill-template d-none">
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#$effect_id"
-                               role="tab" aria-controls="$effect_id" aria-selected="false">$name</a>
-                        </li>
-                    </div>
                     <div class="tab-content">
                         <?php
                         foreach($effects as $i => $effect)
