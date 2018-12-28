@@ -4,7 +4,7 @@ This is my private Smart Home web server setup. Devices can be controlled with t
 List of available devices:
 - PC LED Controller ([MCU C code](https://github.com/RouNNdeL/led-controller-avr), [Windows Service](https://github.com/RouNNdeL/led-controller-node))
 - WiFi LED Controller ([ESP8266 Arduino code](https://github.com/RouNNdeL/esp8266-leds))
-- WiFi Dimmable Lamp ([ESP8266 Arduino code](https://github.com/RouNNdeL/esp8266-lamp)) [WIP]
+- WiFi Dimmable Lamp ([ESP8266 Arduino code](https://github.com/RouNNdeL/esp8266-lamp))
 - WiFi IR Remote ([ESP8266 Arduino code](https://github.com/RouNNdeL/esp8266-remote))
 
 # Schematics
