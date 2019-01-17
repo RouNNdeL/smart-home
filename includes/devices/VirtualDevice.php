@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -84,6 +84,7 @@ abstract class VirtualDevice {
     const DEVICE_COMMAND_COLOR_ABSOLUTE = "action.devices.commands.ColorAbsolute";
     const DEVICE_COMMAND_ON_OFF = "action.devices.commands.OnOff";
     const DEVICE_COMMAND_ACTIVATE_SCENE = "action.devices.commands.ActivateScene";
+    const DEVICE_COMMAND_SET_TOGGLES = "action.devices.commands.SetToggles";
 
     /** @var string */
     protected $device_type;

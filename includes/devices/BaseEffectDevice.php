@@ -86,9 +86,20 @@ abstract class BaseEffectDevice extends SimpleRgbDevice {
     }
 
     public function handleAssistantAction($command) {
+        if($command["command"] == VirtualDevice::DEVICE_COMMAND_SET_TOGGLES) {
+            if(isset($command["params"]) && isset($command["params"]["updateToggleSettings"])) {
+                $this->effects_enabled =
+                    $command["params"]["updateToggleSettings"][BaseEffectDevice::ACTIONS_TOGGLE_EFFECT];
+            }
+        }
         parent::handleAssistantAction($command);
-        $this->effects_enabled = false;
     }
+
+    public function getStateJson(bool $online = false) {
+        $json = parent::getStateJson($online);
+        $json["currentToggleSettings"][BaseEffectDevice::ACTIONS_TOGGLE_EFFECT] = $this->effects_enabled;
+    }
+
 
     public function getTraits() {
         $array = parent::getTraits();
