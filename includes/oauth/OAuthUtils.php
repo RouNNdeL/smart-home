@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -131,7 +131,7 @@ class OAuthUtils
     {
         $access_token = base64_encode(openssl_random_pseudo_bytes(128));
         $sql = "INSERT INTO oauth_tokens (token, client_id, user_id, scopes, type, expires) VALUES 
-                    ('$access_token', ?, $user_id, ?, 'access_token', (NOW() + INTERVAL 30 DAY ))";
+                    ('$access_token', ?, $user_id, ?, 'access_token', (NOW() + INTERVAL 90 DAY ))";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $client_id, $scopes);
         $stmt->execute();
