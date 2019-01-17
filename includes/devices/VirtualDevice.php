@@ -66,11 +66,16 @@ abstract class VirtualDevice {
     const DEVICE_TRAIT_ON_OFF = "action.devices.traits.OnOff";
     const DEVICE_TRAIT_TOGGLES = "action.devices.traits.Toggles";
     const DEVICE_TRAIT_SCENE = "action.devices.traits.Scene";
+    const DEVICE_TRAIT_VOLUME = "action.devices.traits.Volume";
+    const DEVICE_TRAIT_CHANNEL = "action.devices.traits.Channel";
+    const DEVICE_TRAIT_RECORD = "action.devices.traits.Record";
+    const DEVICE_TRAIT_MEDIA_STATE = "action.devices.traits.MediaState";
 
     const DEVICE_TYPE_ACTIONS_LIGHT = "action.devices.types.LIGHT";
     const DEVICE_TYPE_ACTIONS_OUTLET = "action.devices.types.OUTLET";
     const DEVICE_TYPE_ACTIONS_SWITCH = "action.devices.types.SWITCH";
     const DEVICE_TYPE_ACTIONS_SCENE = "action.devices.types.SCENE";
+    const DEVICE_TYPE_ACTIONS_REMOTE_CONTROL = "action.devices.types.REMOTECONTROL";
 
     const DEVICE_ATTRIBUTE_COLOR_MODEL = "colorModel";
     const DEVICE_ATTRIBUTE_COLOR_MODEL_RGB = "rgb";
@@ -85,6 +90,17 @@ abstract class VirtualDevice {
     const DEVICE_COMMAND_ON_OFF = "action.devices.commands.OnOff";
     const DEVICE_COMMAND_ACTIVATE_SCENE = "action.devices.commands.ActivateScene";
     const DEVICE_COMMAND_SET_TOGGLES = "action.devices.commands.SetToggles";
+    const DEVICE_COMMAND_SET_VOLUME = "action.devices.commands.setVolume";
+    const DEVICE_COMMAND_VOLUME_RELATIVE = "action.devices.commands.volumeRelative";
+    const DEVICE_COMMAND_SELECT_CHANNEL = "action.devices.commands.selectChannel";
+    const DEVICE_COMMAND_RELATIVE_CHANNEL = "action.devices.commands.relativeChannel";
+    const DEVICE_COMMAND_START_RECORDING = "action.devices.commands.startRecording";
+    const DEVICE_COMMAND_STOP_RECORDING = "action.devices.commands.stopRecording";
+    const DEVICE_COMMAND_MEDIA_PAUSE = "action.devices.commands.mediaPause";
+    const DEVICE_COMMAND_MEDIA_RESUME = "action.devices.commands.mediaResume";
+    const DEVICE_COMMAND_MEDIA_STOP = "action.devices.commands.mediaStop";
+    const DEVICE_COMMAND_MEDIA_SEEK_RELATIVE = "action.devices.commands.mediaSeekRelative";
+    const DEVICE_COMMAND_MEDIA_SEEK_TO_POSITION = "action.devices.commands.mediaSeekToPosition";
 
     /** @var string */
     protected $device_type;

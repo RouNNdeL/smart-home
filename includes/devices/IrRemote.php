@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,9 @@ require_once __DIR__ . "/PhysicalDevice.php";
 require_once __DIR__ . "/ir/RemoteAction.php";
 
 class IrRemote extends PhysicalDevice {
+
+    const MAX_VOLUME_INCREASE = 20;
+    const MAX_CHANNEL_CHANGE = 5;
 
     public function sendData(bool $quick) {
         return $this->isOnline();
@@ -71,9 +74,64 @@ class IrRemote extends PhysicalDevice {
                     if(!($device instanceof IrControlledDevice))
                         throw new UnexpectedValueException("Children of IrRemote should be of type IrControlledDevice");
                     foreach($command["execution"] as $item) {
-                        if($item["command"] === VirtualDevice::DEVICE_COMMAND_ON_OFF) {
-                            $ir_action = $device->getRemoteActionForPower($item["params"]["on"]);
-                            $this->sendCode($device->getProtocol(), $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                        switch($item["command"]) {
+                            case VirtualDevice::DEVICE_COMMAND_ON_OFF:
+                                $ir_action = $device->getRemoteActionForPower($item["params"]["on"]);
+                                $this->sendCode($device->getProtocol(), $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                break;
+                            case VirtualDevice::DEVICE_COMMAND_VOLUME_RELATIVE:
+                                $steps = $item["params"]["volumeRelativeLevel"];
+                                $ir_action = RemoteAction::byId($steps > 0 ? "av_volume_up" : "av_volume_down", "av");
+                                for($i = 0; $i < min(abs($steps), IrRemote::MAX_VOLUME_INCREASE); $i++) {
+                                    $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                    usleep(250000);
+                                }
+                                break;
+                            case VirtualDevice::DEVICE_COMMAND_SET_VOLUME:
+                                if($item["params"]["volumeLevel"] === 0) {
+                                    $ir_action = RemoteAction::byId("av_audio_mute", "av");
+                                    $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                }
+                                break;
+                            case VirtualDevice::DEVICE_COMMAND_RELATIVE_CHANNEL:
+                                $steps = $item["params"]["relativeChannelChange"];
+                                $ir_action = RemoteAction::byId($steps > 0 ? "decoder_channel_up" : "decoder_channel_down", "decoder");
+                                for($i = 0; $i < min(abs($steps), IrRemote::MAX_CHANNEL_CHANGE); $i++) {
+                                    $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                    usleep(100000);
+                                }
+                                break;
+                            case VirtualDevice::DEVICE_COMMAND_SELECT_CHANNEL:
+                                $number = $item["params"]["channelNumber"];
+                                $digits = str_split(strval($number));
+                                foreach($digits as $digit) {
+                                    $code = "decoder_digit_" . $digit;
+                                    $ir_action = RemoteAction::byId($code, "decoder");
+                                    $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                    usleep(300000);
+                                }
+                                break;
+                            case VirtualDevice::DEVICE_COMMAND_START_RECORDING:
+                                $ir_action = RemoteAction::byId("decoder_record_start", "decoder");
+                                $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                break;
+                            case VirtualDevice::DEVICE_COMMAND_MEDIA_RESUME:
+                                $ir_action = RemoteAction::byId("decoder_playback_resume", "decoder");
+                                $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                break;
+                            case VirtualDevice::DEVICE_COMMAND_MEDIA_PAUSE:
+                                $ir_action = RemoteAction::byId("decoder_playback_pause", "decoder");
+                                $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                break;
+                            case VirtualDevice::DEVICE_COMMAND_MEDIA_STOP:
+                                $ir_action = RemoteAction::byId("decoder_playback_stop", "decoder");
+                                $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                break;
+                            case VirtualDevice::DEVICE_COMMAND_MEDIA_SEEK_RELATIVE:
+                                $ms = $item["params"]["relativePositionMs"];
+                                $ir_action = RemoteAction::byId($ms > 0 ? "decoder_playback_forward" : "decoder_playback_back", "decoder");
+                                $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                break;
                         }
                     }
                 }

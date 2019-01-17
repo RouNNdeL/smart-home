@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -51,11 +51,15 @@ class IrControlledDevice extends VirtualDevice {
 
 
     public function getTraits() {
-        return [VirtualDevice::DEVICE_TRAIT_ON_OFF];
+        return [VirtualDevice::DEVICE_TRAIT_ON_OFF,
+            VirtualDevice::DEVICE_TRAIT_VOLUME,
+            VirtualDevice::DEVICE_TRAIT_CHANNEL,
+            VirtualDevice::DEVICE_TRAIT_MEDIA_STATE,
+            VirtualDevice::DEVICE_TRAIT_RECORD];
     }
 
     public function getActionsDeviceType() {
-        return VirtualDevice::DEVICE_TYPE_ACTIONS_SWITCH;
+        return VirtualDevice::DEVICE_TYPE_ACTIONS_REMOTE_CONTROL;
     }
 
     public function getAttributes() {
