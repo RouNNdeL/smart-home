@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@
 require_once __DIR__ . "/../Utils.php";
 
 abstract class BaseEffectDevice extends SimpleRgbDevice {
-    const ACTIONS_TOGGLE_EFFECT = "ACTIONS_TOGGLE_EFFECT";
+    const ACTIONS_TOGGLE_EFFECT = "effect";
 
     const TOGGLE_EFFECT_BIT = 0;
 
@@ -99,13 +99,8 @@ abstract class BaseEffectDevice extends SimpleRgbDevice {
     public function getAttributes() {
         $attributes = parent::getAttributes();
         $name_values = [];
-        foreach(Utils::AVAILABLE_LANGUAGES as $i => $lang) {
-            $utils = new Utils($lang);
-            $name_values[$i] = ["lang" => $lang, "name_synonym" => [
-                $utils->_getString("actions_toggle_effect1"),
-                $utils->_getString("actions_toggle_effect2")]
-            ];
-        }
+        $name_values[] = ["lang" => "en", "name_synonym" =>
+            ["effect", "effects", "light effect", "light effects", "led effects"]];
         $attributes[self::DEVICE_ATTRIBUTE_AVAILABLE_TOGGLES] = [
             ["name" => self::ACTIONS_TOGGLE_EFFECT, "name_values" => $name_values]
         ];
