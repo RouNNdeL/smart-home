@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -97,8 +97,7 @@ class GlobalManager {
         if($log)
             $this->requestLogger = RequestLogger::getInstance();
         if($login_required && !$this->sessionManager->isLoggedIn()) {
-            require __DIR__ . "/../web/error/404.php";
-            http_response_code(404);
+            header("Location: /");
             exit(0);
         }
     }
