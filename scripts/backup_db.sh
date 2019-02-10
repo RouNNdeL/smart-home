@@ -5,5 +5,5 @@ if [ "$#" -ne 3 ]; then
     exit
 fi
 
-mysqldump -u $1 -p$2 smart_home > $3/$(date +%Y-%m-%d).sql
-ls $3 -t | tail -n +6 | xargs rm --
+mysqldump -u $1 -p$2 smart_home > $3/smart_home_$(date +%Y-%m-%d_%H:%M:%S).sql
+ls $3 -t | tail -n +15 | xargs rm --
