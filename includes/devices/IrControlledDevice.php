@@ -55,6 +55,7 @@ class IrControlledDevice extends VirtualDevice {
             VirtualDevice::DEVICE_TRAIT_VOLUME,
             VirtualDevice::DEVICE_TRAIT_CHANNEL,
             VirtualDevice::DEVICE_TRAIT_MEDIA_STATE,
+            VirtualDevice::DEVICE_TRAIT_INPUT_SELECTOR,
             VirtualDevice::DEVICE_TRAIT_RECORD];
     }
 
@@ -63,7 +64,7 @@ class IrControlledDevice extends VirtualDevice {
     }
 
     public function getAttributes() {
-        return null;
+        return [];
     }
 
     /**

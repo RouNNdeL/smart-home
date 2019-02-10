@@ -70,12 +70,15 @@ abstract class VirtualDevice {
     const DEVICE_TRAIT_CHANNEL = "action.devices.traits.Channel";
     const DEVICE_TRAIT_RECORD = "action.devices.traits.Record";
     const DEVICE_TRAIT_MEDIA_STATE = "action.devices.traits.MediaState";
+    const DEVICE_TRAIT_INPUT_SELECTOR = "action.devices.traits.InputSelector";
+    const DEVICE_TRAIT_MEDIA_INITIATION = "action.devices.traits.MediaInitiation";
 
     const DEVICE_TYPE_ACTIONS_LIGHT = "action.devices.types.LIGHT";
     const DEVICE_TYPE_ACTIONS_OUTLET = "action.devices.types.OUTLET";
     const DEVICE_TYPE_ACTIONS_SWITCH = "action.devices.types.SWITCH";
     const DEVICE_TYPE_ACTIONS_SCENE = "action.devices.types.SCENE";
     const DEVICE_TYPE_ACTIONS_REMOTE_CONTROL = "action.devices.types.REMOTECONTROL";
+    const DEVICE_TYPE_ACTIONS_TV = "action.devices.types.TV";
 
     const DEVICE_ATTRIBUTE_COLOR_MODEL = "colorModel";
     const DEVICE_ATTRIBUTE_COLOR_MODEL_RGB = "rgb";
