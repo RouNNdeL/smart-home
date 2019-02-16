@@ -78,6 +78,11 @@ class IrRemote extends PhysicalDevice {
                             case VirtualDevice::DEVICE_COMMAND_ON_OFF:
                                 $ir_action = $device->getRemoteActionForPower($item["params"]["on"]);
                                 $this->sendCode($device->getProtocol(), $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                if($device->getDeviceId() === "tv" && $item["params"]["on"]) {
+                                    sleep(5);
+                                    $ir_action = RemoteAction::byId("tv_input_hdmi2", "tv");
+                                    $this->sendCode($device->getProtocol(), $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                }
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_VOLUME_RELATIVE:
                                 $steps = $item["params"]["volumeRelativeLevel"];
