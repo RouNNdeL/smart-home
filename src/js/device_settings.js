@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-import $ from 'jquery';
+import $ from './_jquery';
 import 'tether';
 import 'bootstrap';
 import 'ion-rangeslider';
@@ -54,7 +54,8 @@ $(function() {
         min: 0,
         max: 100,
         grid: true,
-        postfix: "%"
+        postfix: "%",
+        skin: "flat"
     });
 
     $(".checkbox-switch").bootstrapSwitch().on('switchChange.bootstrapSwitch', update);
