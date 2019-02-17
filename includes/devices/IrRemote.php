@@ -67,13 +67,17 @@ class IrRemote extends PhysicalDevice {
     }
 
     public function handleAssistantAction(array $action) {
+        $ids = [];
+        $status = ($this->isOnline() ? "SUCCESS" : "OFFLINE");
         foreach($action["commands"] as $command) {
             foreach($command["devices"] as $d) {
                 $device = $this->getVirtualDeviceById($d["id"]);
                 if($device !== null) {
                     if(!($device instanceof IrControlledDevice))
                         throw new UnexpectedValueException("Children of IrRemote should be of type IrControlledDevice");
+                    $ids[] = $device->getDeviceId();
                     foreach($command["execution"] as $item) {
+                        $device->handleAssistantAction($item);
                         switch($item["command"]) {
                             case VirtualDevice::DEVICE_COMMAND_ON_OFF:
                                 $ir_action = $device->getRemoteActionForPower($item["params"]["on"]);
@@ -91,6 +95,8 @@ class IrRemote extends PhysicalDevice {
                                 if($item["params"]["volumeLevel"] === 0) {
                                     $ir_action = RemoteAction::byId("av_audio_mute", "av");
                                     $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                } else {
+                                    $status = "ERROR:notSupported";
                                 }
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_RELATIVE_CHANNEL:
@@ -139,12 +145,20 @@ class IrRemote extends PhysicalDevice {
                                 $ir_action = RemoteAction::byId($ms > 0 ? "decoder_playback_forward" : "decoder_playback_back", "decoder");
                                 $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
                                 break;
+                            default:
+                                $status = "ERROR:notSupported";
                         }
                     }
                 }
             }
         }
-        return parent::handleAssistantAction($action);
+
+        if($this->save()) {
+            $this->sendData(false);
+        }
+
+        $arr = ["status" => $status, "ids" => $ids];
+        return $arr;
     }
 
     public function sendCode(int $protocol, string $code, $support) {

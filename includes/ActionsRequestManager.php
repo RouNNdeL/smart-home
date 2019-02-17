@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -85,7 +85,12 @@ class ActionsRequestManager {
                     $scene_response = $sceneManager->processExecute($input["payload"]);
                     $commands_response_array = [];
                     foreach(array_merge($device_response, $scene_response) as $key => $value) {
-                        $commands_response_array[] = ["ids" => $value, "status" => $key];
+                        $arr = explode(":", $key);
+                        if(sizeof($arr) >= 2) {
+                            $commands_response_array[] = ["ids" => $value, "status" => $arr[0], "errorCode" => $arr[1]];
+                        } else {
+                            $commands_response_array[] = ["ids" => $value, "status" => $arr[0]];
+                        }
                     }
                     $payload["commands"] = $commands_response_array;
                     $userDeviceManager->sendReportState($request_id);
