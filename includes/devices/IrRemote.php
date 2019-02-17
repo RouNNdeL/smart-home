@@ -78,11 +78,6 @@ class IrRemote extends PhysicalDevice {
                             case VirtualDevice::DEVICE_COMMAND_ON_OFF:
                                 $ir_action = $device->getRemoteActionForPower($item["params"]["on"]);
                                 $this->sendCode($device->getProtocol(), $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
-                                if($device->getDeviceId() === "tv" && $item["params"]["on"]) {
-                                    sleep(5);
-                                    $ir_action = RemoteAction::byId("tv_input_hdmi2", "tv");
-                                    $this->sendCode($device->getProtocol(), $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
-                                }
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_VOLUME_RELATIVE:
                                 $steps = $item["params"]["volumeRelativeLevel"];
@@ -184,9 +179,9 @@ class IrRemote extends PhysicalDevice {
         </div>
         <div class="col-auto float-right pl-1 pr-1 align-self-center">
             <button class="btn btn-success full-width ir-multi-action-btn" 
-            data-action-delay="500"
-            data-action-id="tv_power_on _ av_power_on _ decoder_power_toggle _ _ _ _ _ _ _ _ av_input_hdmi2 _ _ _ tv_input_hdmi2"
-            data-device-id="tv _ av _ decoder _ _ _ _ _ _ _ _ av _ _ _ tv"
+            data-action-delay="250"
+            data-action-id="tv_power_on _ av_power_on _ decoder_power_toggle"
+            data-device-id="tv _ av _ decoder"
             type="button" role="button" title="$button_title_on">
                 <i class="material-icons">power_settings_new</i>
             </button>
