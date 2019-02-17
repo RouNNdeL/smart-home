@@ -115,6 +115,13 @@ class IrRemote extends PhysicalDevice {
                                 $ir_action = RemoteAction::byId("decoder_record_start", "decoder");
                                 $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
                                 break;
+                            case VirtualDevice::DEVICE_COMMAND_STOP_RECORDING:
+                                $ir_action = RemoteAction::byId("decoder_playback_stop", "decoder");
+                                $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                sleep(1);
+                                $ir_action = RemoteAction::byId("decoder_ok", "decoder");
+                                $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                break;
                             case VirtualDevice::DEVICE_COMMAND_MEDIA_RESUME:
                                 $ir_action = RemoteAction::byId("decoder_playback_resume", "decoder");
                                 $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
