@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -72,7 +72,7 @@ class RemoteLayoutGenerator {
                 $margin = "";
                 $title = "";
                 $class = "";
-                $btn_class = "";
+                $btn_class = "btn-light";
                 if(!is_array($item)) {
                     if(!isset($this->actions[$item]))
                         throw new InvalidArgumentException("Non existent action id: $item");
@@ -105,7 +105,7 @@ class RemoteLayoutGenerator {
                     if(isset($item["class"]))
                         $class .= " " . $item["class"] . " ";
                     if(isset($item["btn_class"]))
-                        $btn_class .= " " . $item["btn_class"] . " ";
+                        $btn_class = $item["btn_class"];
 
                     if($type == RemoteLayoutGenerator::TYPE_BUTTON) {
                         if(!isset($item["name"]))

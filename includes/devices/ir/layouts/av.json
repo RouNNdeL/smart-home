@@ -1,25 +1,37 @@
 [
   [
-    "av_power_toggle"
+    {
+      "name": "av_power_toggle",
+      "btn_class": "btn-info"
+    }
   ],
   [
     {
       "name": "av_arrow_up",
-      "offset": 10
+      "offset": 10,
+      "btn_class": "btn-secondary"
     }
   ],
   [
     {
       "name": "av_arrow_left",
-      "offset": 6
+      "offset": 6,
+      "btn_class": "btn-secondary"
     },
-    "av_ok",
-    "av_arrow_right"
+    {
+      "name": "av_ok",
+      "btn_class": "btn-dark"
+    },
+    {
+      "name": "av_arrow_right",
+      "btn_class": "btn-secondary"
+    }
   ],
   [
     {
       "name": "av_arrow_down",
-      "offset": 10
+      "offset": 10,
+      "btn_class": "btn-secondary"
     }
   ],
   [
@@ -42,7 +54,8 @@
     },
     {
       "name": "av_audio_mute",
-      "offset": 6
+      "offset": 6,
+      "btn_class": "btn-warning"
     },
     {
       "type": "text",

@@ -1,27 +1,41 @@
 [
   [
-    "tv_power_toggle"
+    {
+      "name": "tv_power_toggle",
+      "btn_class": "btn-info"
+    }
   ],
   [
     {
       "name": "tv_arrow_up",
-      "offset": 10
+      "offset": 10,
+      "btn_class": "btn-secondary"
     }
   ],
   [
     {
       "name": "tv_arrow_left",
-      "offset": 6
+      "offset": 6,
+      "btn_class": "btn-secondary"
     },
-    "tv_ok",
-    "tv_arrow_right"
+    {
+      "name": "tv_ok",
+      "btn_class": "btn-dark"
+    },
+    {
+      "name": "tv_arrow_right",
+      "btn_class": "btn-secondary"
+    }
   ],
   [
     {
       "name": "tv_exit",
       "offset": 6
     },
-    "tv_arrow_down",
+    {
+      "name": "tv_arrow_down",
+      "btn_class": "btn-secondary"
+    },
     "tv_back"
   ],
   [
