@@ -31,7 +31,6 @@ RewriteRule ^ - [L]
 RewriteRule ^bootstrap/(.*) /vendor/twbs/bootstrap/$1 [L]
 RewriteRule ^jquery/(.*) /vendor/components/jquery/$1 [L]
 RewriteRule ^jqueryui/(.*) /vendor/components/jqueryui/$1 [L]
-RewriteRule ^colorpicker/(.*) /lib/bootstrap-colorpicker/$1 [L] #using 7763122916206 commit from Github
 RewriteRule ^slider/(.*) /node_modules/ion-rangeslider/$1 [L]
 RewriteRule ^switch/(.*) /node_modules/bootstrap-switch/$1 [L]
 RewriteRule ^tether/(.*) /node_modules/tether/$1 [L]

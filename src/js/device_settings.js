@@ -27,13 +27,33 @@ import 'tether';
 import 'bootstrap';
 import 'ion-rangeslider';
 import 'bootstrap-switch';
-import '../../lib/bootstrap-colorpicker';
+import 'bootstrap-colorpicker';
 import {serializeToAssociative, showSnackbar} from "./_utils";
 import ir_init from './_device_ir';
 
 const MIN_UPDATE_DELAY = 500;
 const REPORT_STATE_DELAY = 2500;
 const UPDATE_URL = "/api/device_save.php";
+
+const COLORPICKER_OPTIONS = {
+    useAlpha: false,
+    inline: true,
+    container: true,
+    customClass: "colorpicker-big",
+    format: "hex",
+    sliders: {
+        saturation: {
+            maxLeft: 150,
+            maxTop: 150
+        },
+        hue: {
+            maxTop: 150
+        },
+        alpha: {
+            maxTop: 150
+        }
+    }
+};
 
 $(function() {
     const parent_id = $(".device-settings-content").data("device-id");
@@ -43,6 +63,7 @@ $(function() {
     const update_timeouts = [];
     let update_timeout_global = -1;
     let update_lock = false;
+    let input_cloning = false;
 
     ir_init();
 
@@ -59,28 +80,12 @@ $(function() {
     });
 
     $(".checkbox-switch").bootstrapSwitch().on('switchChange.bootstrapSwitch', update);
-    $(".color-picker-init").on('changeColor', function(e) {
-        //$(this).find("input").val(e.value);
+    $(".color-picker-init").on("change", function(e) {
         update(e);
-    }).colorpicker({
-        useAlpha: false,
-        inline: true,
-        container: true,
-        customClass: "colorpicker-big",
-        format: "hex",
-        sliders: {
-            saturation: {
-                maxLeft: 150,
-                maxTop: 150
-            },
-            hue: {
-                maxTop: 150
-            },
-            alpha: {
-                maxTop: 150
-            }
+        if(input_cloning) {
+            $(".color-picker-init").not($(this)).colorpicker("setValue", e.value);
         }
-    });
+    }).colorpicker(COLORPICKER_OPTIONS);
 
     $(".change-listen").change(update);
 
@@ -180,7 +185,7 @@ $(function() {
      * @param {Event} e
      */
     function update(e) {
-        if(update_lock){
+        if(update_lock) {
             return;
         }
 
