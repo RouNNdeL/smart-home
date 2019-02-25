@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ require_once __DIR__."/FaviconEntry.php";
 
 class HtmlHead
 {
-    const VERSION = "1.5";
+    const VERSION = "1.6";
 
     /** @var string */
     private $title;
