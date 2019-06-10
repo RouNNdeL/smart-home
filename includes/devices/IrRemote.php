@@ -105,7 +105,7 @@ class IrRemote extends PhysicalDevice {
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_RELATIVE_CHANNEL:
                                 $steps = $item["params"]["relativeChannelChange"];
-                                $ir_action = RemoteAction::byId($steps > 0 ? "horizon_channel_up" : "horizon_channel_down", "decoder");
+                                $ir_action = RemoteAction::byId($steps > 0 ? "horizon_channel_up" : "horizon_channel_down", "horizon");
                                 for($i = 0; $i < min(abs($steps), IrRemote::MAX_CHANNEL_CHANGE); $i++) {
                                     $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                     usleep(100000);
@@ -116,37 +116,37 @@ class IrRemote extends PhysicalDevice {
                                 $digits = str_split(strval($number));
                                 foreach($digits as $digit) {
                                     $code = "horizon_digit_" . $digit;
-                                    $ir_action = RemoteAction::byId($code, "decoder");
+                                    $ir_action = RemoteAction::byId($code, "horizon");
                                     $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                     usleep(300000);
                                 }
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_START_RECORDING:
-                                $ir_action = RemoteAction::byId("horizon_record_start", "decoder");
+                                $ir_action = RemoteAction::byId("horizon_record_start", "horizon");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_STOP_RECORDING:
-                                $ir_action = RemoteAction::byId("horizon_playback_stop", "decoder");
+                                $ir_action = RemoteAction::byId("horizon_playback_stop", "horizon");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 sleep(1);
-                                $ir_action = RemoteAction::byId("horizon_ok", "decoder");
+                                $ir_action = RemoteAction::byId("horizon_ok", "horizon");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_MEDIA_RESUME:
-                                $ir_action = RemoteAction::byId("horizon_playback_resume", "decoder");
+                                $ir_action = RemoteAction::byId("horizon_playback_resume", "horizon");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_MEDIA_PAUSE:
-                                $ir_action = RemoteAction::byId("horizon_playback_pause", "decoder");
+                                $ir_action = RemoteAction::byId("horizon_playback_pause", "horizon");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_MEDIA_STOP:
-                                $ir_action = RemoteAction::byId("horizon_playback_stop", "decoder");
+                                $ir_action = RemoteAction::byId("horizon_playback_stop", "horizon");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_MEDIA_SEEK_RELATIVE:
                                 $ms = $item["params"]["relativePositionMs"];
-                                $ir_action = RemoteAction::byId($ms > 0 ? "horizon_playback_forward" : "horizon_playback_back", "decoder");
+                                $ir_action = RemoteAction::byId($ms > 0 ? "horizon_playback_forward" : "horizon_playback_back", "horizon");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             default:
@@ -228,7 +228,7 @@ class IrRemote extends PhysicalDevice {
             <button class="btn btn-danger full-width ir-multi-action-btn" 
              data-action-delay="250"
             data-action-id="av_power_off _ tv_power_off _ horizon_power_toggle"
-            data-device-id="av _ tv _ decoder"
+            data-device-id="av _ tv _ horizon"
             type="button" role="button" title="$button_title_off">
                 <i class="material-icons">power_settings_new</i>
             </button>
@@ -237,7 +237,7 @@ class IrRemote extends PhysicalDevice {
             <button class="btn btn-success full-width ir-multi-action-btn" 
             data-action-delay="250"
             data-action-id="tv_power_on _ av_power_on _ horizon_power_toggle"
-            data-device-id="tv _ av _ decoder"
+            data-device-id="tv _ av _ horizon"
             type="button" role="button" title="$button_title_on">
                 <i class="material-icons">power_settings_new</i>
             </button>
