@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@ import '../../lib/jquery-ui/jquery-ui';
 import {serializeToAssociative, showSnackbar} from "./_utils";
 import 'bootstrap';
 import 'tether';
-import '../../lib/bootstrap-colorpicker';
+import 'bootstrap-colorpicker';
 import {roundTime, timeToString} from "./_device_timing";
 import Mexp from 'math-expression-evaluator';
 

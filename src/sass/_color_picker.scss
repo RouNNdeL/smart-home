@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+// Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-@import '../../lib/bootstrap-colorpicker/src/sass/colorpicker';
+@import '../../node_modules/bootstrap-colorpicker/src/sass/colorpicker';
 $color-picker-big: false !default;
 @if $color-picker-big == true {
   $color-picker-size: 150px;
