@@ -29,15 +29,10 @@
   ],
   [
     {
-      "name": "horizon_audio_mute",
-      "offset": 6,
-      "btn_class": "btn-warning"
-    },
-    {
       "name": "horizon_arrow_down",
-      "btn_class": "btn-secondary"
-    },
-    "horizon_back"
+      "btn_class": "btn-secondary",
+      "offset": 10
+    }
   ],
   [
     {
@@ -46,11 +41,10 @@
     }
   ],
   [
-    "horizon_volume_up",
     {
       "name": "horizon_menu",
       "column": 6,
-      "offset": 2
+      "offset": 6
     },
     {
       "name": "horizon_info",
@@ -63,13 +57,9 @@
   ],
   [
     {
-      "type": "text",
-      "text": "Vol"
-    },
-    {
       "name": "horizon_exit",
       "column": 6,
-      "offset": 2
+      "offset": 6
     },
     {
       "name": "horizon_guide",
@@ -82,14 +72,14 @@
     }
   ],
   [
-    "horizon_volume_down",
     {
-      "name": "horizon_color_yellow",
+      "name": "horizon_vod",
       "column": 6,
-      "offset": 2
+      "offset": 6
     },
+
     {
-      "name": "horizon_favourite",
+      "name": "horizon_back",
       "column": 6
     },
     {
@@ -154,10 +144,8 @@
   ],
   [
     {
-      "name": "horizon_digit_asterisk",
-      "offset": 6
-    },
-    "horizon_digit_0",
-    "horizon_digit_hash"
+      "name": "horizon_digit_0",
+      "offset": 10
+    }
   ]
 ]

@@ -122,7 +122,7 @@ class IrRemote extends PhysicalDevice {
                                     $code = "horizon_digit_" . $digit;
                                     $ir_action = RemoteAction::byId($code, "horizon");
                                     $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
-                                    usleep(300000);
+                                    usleep(200000);
                                 }
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_START_RECORDING:
