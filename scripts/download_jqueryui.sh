@@ -5,5 +5,6 @@ cd "$parent_path"
 
 mkdir -p ../lib
 cd ../lib
-wget https://jqueryui.com/resources/download/jquery-ui-1.12.1.zip
-unzip jquery-ui-1.12.1.zip -d jquery-ui
+wget https://jqueryui.com/resources/download/jquery-ui-1.12.1.zip -O jquery-ui.zip
+unzip jquery-ui.zip
+mv jquery-ui-1.12.1 jquery-ui
