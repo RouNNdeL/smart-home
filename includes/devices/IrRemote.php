@@ -38,6 +38,10 @@ class IrRemote extends PhysicalDevice {
     const MAX_VOLUME_INCREASE = 20;
     const MAX_CHANNEL_CHANGE = 5;
 
+    const PROTOCOL_NEC = 0xA1;
+    const PROTOCOL_PANASONIC = 0xA2;
+    const PROTOCOL_RAW = 0xA3;
+
     public function sendData(bool $quick) {
         return $this->isOnline();
     }
@@ -81,29 +85,29 @@ class IrRemote extends PhysicalDevice {
                         switch($item["command"]) {
                             case VirtualDevice::DEVICE_COMMAND_ON_OFF:
                                 $ir_action = $device->getRemoteActionForPower($item["params"]["on"]);
-                                $this->sendCode($device->getProtocol(), $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                $this->sendCode($device->getProtocol(), $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_VOLUME_RELATIVE:
                                 $steps = $item["params"]["volumeRelativeLevel"];
                                 $ir_action = RemoteAction::byId($steps > 0 ? "av_volume_up" : "av_volume_down", "av");
                                 for($i = 0; $i < min(abs($steps), IrRemote::MAX_VOLUME_INCREASE); $i++) {
-                                    $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                    $this->sendCode(IrRemote::PROTOCOL_NEC, $ir_action);
                                     usleep(250000);
                                 }
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_SET_VOLUME:
                                 if($item["params"]["volumeLevel"] === 0) {
                                     $ir_action = RemoteAction::byId("av_audio_mute", "av");
-                                    $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                    $this->sendCode(IrRemote::PROTOCOL_NEC, $ir_action);
                                 } else {
                                     $status = "ERROR:notSupported";
                                 }
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_RELATIVE_CHANNEL:
                                 $steps = $item["params"]["relativeChannelChange"];
-                                $ir_action = RemoteAction::byId($steps > 0 ? "decoder_channel_up" : "decoder_channel_down", "decoder");
+                                $ir_action = RemoteAction::byId($steps > 0 ? "horizon_channel_up" : "horizon_channel_down", "decoder");
                                 for($i = 0; $i < min(abs($steps), IrRemote::MAX_CHANNEL_CHANGE); $i++) {
-                                    $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                    $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                     usleep(100000);
                                 }
                                 break;
@@ -111,39 +115,39 @@ class IrRemote extends PhysicalDevice {
                                 $number = $item["params"]["channelNumber"];
                                 $digits = str_split(strval($number));
                                 foreach($digits as $digit) {
-                                    $code = "decoder_digit_" . $digit;
+                                    $code = "horizon_digit_" . $digit;
                                     $ir_action = RemoteAction::byId($code, "decoder");
-                                    $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                    $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                     usleep(300000);
                                 }
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_START_RECORDING:
-                                $ir_action = RemoteAction::byId("decoder_record_start", "decoder");
-                                $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                $ir_action = RemoteAction::byId("horizon_record_start", "decoder");
+                                $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_STOP_RECORDING:
-                                $ir_action = RemoteAction::byId("decoder_playback_stop", "decoder");
-                                $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                $ir_action = RemoteAction::byId("horizon_playback_stop", "decoder");
+                                $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 sleep(1);
-                                $ir_action = RemoteAction::byId("decoder_ok", "decoder");
-                                $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                $ir_action = RemoteAction::byId("horizon_ok", "decoder");
+                                $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_MEDIA_RESUME:
-                                $ir_action = RemoteAction::byId("decoder_playback_resume", "decoder");
-                                $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                $ir_action = RemoteAction::byId("horizon_playback_resume", "decoder");
+                                $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_MEDIA_PAUSE:
-                                $ir_action = RemoteAction::byId("decoder_playback_pause", "decoder");
-                                $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                $ir_action = RemoteAction::byId("horizon_playback_pause", "decoder");
+                                $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_MEDIA_STOP:
-                                $ir_action = RemoteAction::byId("decoder_playback_stop", "decoder");
-                                $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                $ir_action = RemoteAction::byId("horizon_playback_stop", "decoder");
+                                $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_MEDIA_SEEK_RELATIVE:
                                 $ms = $item["params"]["relativePositionMs"];
-                                $ir_action = RemoteAction::byId($ms > 0 ? "decoder_playback_forward" : "decoder_playback_back", "decoder");
-                                $this->sendCode(0xA1, $ir_action->getPrimaryCodeHex(), $ir_action->getSupportCodeHex());
+                                $ir_action = RemoteAction::byId($ms > 0 ? "horizon_playback_forward" : "horizon_playback_back", "decoder");
+                                $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             default:
                                 $status = "ERROR:notSupported";
@@ -161,10 +165,41 @@ class IrRemote extends PhysicalDevice {
         return $arr;
     }
 
-    public function sendCode(int $protocol, string $code, $support) {
+    /**
+     * @param int $protocol
+     * @param RemoteAction $remote_action
+     */
+    public function sendCode(int $protocol, $remote_action) {
+        if($protocol === IrRemote::PROTOCOL_RAW) {
+            if($remote_action->getRawCode() === null)
+                throw new UnexpectedValueException("IR code " . $remote_action->getId() . " has to include raw_code for this protocol");
+            $this->sendCodeRaw($remote_action->getRawCode());
+            return;
+        }
+
+        $code = $remote_action->getPrimaryCodeHex();
+        $support = $remote_action->getSupportCodeHex();
         $data = "p=" . $protocol . "&v=" . str_pad(Utils::dec2hex($code), 8, '0', STR_PAD_LEFT);
-        if($support !== null)
+        if($support !== null) {
             $data .= "&s=" . str_pad(Utils::dec2hex($support), 8, '0', STR_PAD_LEFT);
+        }
+
+        $headers = array(
+            "Content-Type: application/x-www-form-urlencoded"
+        );
+
+        $ch = curl_init("http://" . $this->hostname . "/send_code");
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_exec($ch);
+        curl_close($ch);
+    }
+
+    public function sendCodeRaw(string $code) {
+        $data = "p=".IrRemote::PROTOCOL_RAW."&r=" . $code;
 
         $headers = array(
             "Content-Type: application/x-www-form-urlencoded"
@@ -192,7 +227,7 @@ class IrRemote extends PhysicalDevice {
         <div class="col-auto float-right pr-0 pl-2 align-self-center">
             <button class="btn btn-danger full-width ir-multi-action-btn" 
              data-action-delay="250"
-            data-action-id="av_power_off _ tv_power_off _ decoder_power_toggle"
+            data-action-id="av_power_off _ tv_power_off _ horizon_power_toggle"
             data-device-id="av _ tv _ decoder"
             type="button" role="button" title="$button_title_off">
                 <i class="material-icons">power_settings_new</i>
@@ -201,7 +236,7 @@ class IrRemote extends PhysicalDevice {
         <div class="col-auto float-right pl-1 pr-1 align-self-center">
             <button class="btn btn-success full-width ir-multi-action-btn" 
             data-action-delay="250"
-            data-action-id="tv_power_on _ av_power_on _ decoder_power_toggle"
+            data-action-id="tv_power_on _ av_power_on _ horizon_power_toggle"
             data-device-id="tv _ av _ decoder"
             type="button" role="button" title="$button_title_on">
                 <i class="material-icons">power_settings_new</i>

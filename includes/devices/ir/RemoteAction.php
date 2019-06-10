@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,13 +32,14 @@
 
 require_once __DIR__ . "/../../database/DbUtils.php";
 
-class RemoteAction
-{
+class RemoteAction {
     private $id;
 
     private $primary_code;
 
     private $support_code;
+
+    private $raw_code;
 
     private $display_name;
 
@@ -53,27 +54,25 @@ class RemoteAction
      * @param $display_name
      * @param $icon
      */
-    private function __construct(string $id, string $primary_code, $support_code, string $display_name, $icon)
-    {
+    private function __construct(string $id, $primary_code, $support_code, $raw_code, string $display_name, $icon) {
         $this->id = $id;
         $this->primary_code = $primary_code;
         $this->support_code = $support_code;
+        $this->raw_code = $raw_code;
         $this->display_name = $display_name;
         $this->icon = $icon;
     }
 
-    public static function byId(string $id, string $device_id)
-    {
+    public static function byId(string $id, string $device_id) {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT primary_code, support_code, display_name, icon 
+        $sql = "SELECT primary_code, support_code, raw_code, display_name, icon 
                 FROM ir_codes WHERE id = ? AND device_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $id, $device_id);
-        $stmt->bind_result($primary_code, $support_code, $display_name, $icon);
+        $stmt->bind_result($primary_code, $support_code, $raw_code, $display_name, $icon);
         $stmt->execute();
-        if($stmt->fetch())
-        {
-            return new RemoteAction($id, $primary_code, $support_code, $display_name, $icon);
+        if($stmt->fetch()) {
+            return new RemoteAction($id, $primary_code, $support_code, $raw_code, $display_name, $icon);
         }
         return null;
     }
@@ -82,18 +81,16 @@ class RemoteAction
      * @param string $device_id
      * @return RemoteAction[]
      */
-    public static function forDeviceId(string $device_id)
-    {
+    public static function forDeviceId(string $device_id) {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, primary_code, support_code, display_name, icon FROM ir_codes WHERE device_id = ?";
+        $sql = "SELECT id, primary_code, support_code, raw_code, display_name, icon FROM ir_codes WHERE device_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $device_id);
-        $stmt->bind_result($id, $primary_code, $support_code, $display_name, $icon);
+        $stmt->bind_result($id, $primary_code, $support_code, $raw_code, $display_name, $icon);
         $stmt->execute();
         $arr = [];
-        while($stmt->fetch())
-        {
-            $arr[$id] = new RemoteAction($id, $primary_code, $support_code, $display_name, $icon);
+        while($stmt->fetch()) {
+            $arr[$id] = new RemoteAction($id, $primary_code, $support_code, $raw_code, $display_name, $icon);
         }
         $stmt->close();
         return $arr;
@@ -102,40 +99,42 @@ class RemoteAction
     /**
      * @return string
      */
-    public function getPrimaryCodeHex()
-    {
+    public function getPrimaryCodeHex() {
         return $this->primary_code;
     }
 
     /**
      * @return string
      */
-    public function getSupportCodeHex()
-    {
+    public function getSupportCodeHex() {
         return $this->support_code;
     }
 
     /**
      * @return string
      */
-    public function getId(): string
-    {
+    public function getId(): string {
         return $this->id;
     }
 
     /**
      * @return string
      */
-    public function getDisplayName(): string
-    {
+    public function getDisplayName(): string {
         return $this->display_name;
     }
 
     /**
      * @return mixed
      */
-    public function getIcon()
-    {
+    public function getIcon() {
         return $this->icon;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRawCode() {
+        return $this->raw_code;
     }
 }

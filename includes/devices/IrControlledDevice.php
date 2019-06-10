@@ -35,7 +35,7 @@ require_once __DIR__ . "/ir/RemoteLayoutGenerator.php";
 
 class IrControlledDevice extends VirtualDevice {
     const ID_TV = "tv";
-    const ID_DECODER = "decoder";
+    const ID_HORIZON = "horizon";
     const ID_AV = "av";
 
     private $protocol;
@@ -131,8 +131,9 @@ HTML;
                 if($on) return RemoteAction::byId("tv_power_on", $this->device_id);
                 else return RemoteAction::byId("tv_power_off", $this->device_id);
                 break;
-            case IrControlledDevice::ID_DECODER:
-                return RemoteAction::byId("decoder_power_toggle", $this->device_id);
+            case IrControlledDevice::ID_HORIZON:
+                if($on) return RemoteAction::byId("horizon_power_on", $this->device_id);
+                else return RemoteAction::byId("horizon_power_off", $this->device_id);
                 break;
             case IrControlledDevice::ID_AV:
                 if($on) return RemoteAction::byId("av_power_on", $this->device_id);

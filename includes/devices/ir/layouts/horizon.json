@@ -1,43 +1,43 @@
 [
   [
     {
-      "name": "decoder_power_toggle",
+      "name": "horizon_power_toggle",
       "btn_class": "btn-info"
     }
   ],
   [
     {
-      "name": "decoder_arrow_up",
+      "name": "horizon_arrow_up",
       "offset": 10,
       "btn_class": "btn-secondary"
     }
   ],
   [
     {
-      "name": "decoder_arrow_left",
+      "name": "horizon_arrow_left",
       "offset": 6,
       "btn_class": "btn-secondary"
     },
     {
-      "name": "decoder_ok",
+      "name": "horizon_ok",
       "btn_class": "btn-dark"
     },
     {
-      "name": "decoder_arrow_right",
+      "name": "horizon_arrow_right",
       "btn_class": "btn-secondary"
     }
   ],
   [
     {
-      "name": "decoder_audio_mute",
+      "name": "horizon_audio_mute",
       "offset": 6,
       "btn_class": "btn-warning"
     },
     {
-      "name": "decoder_arrow_down",
+      "name": "horizon_arrow_down",
       "btn_class": "btn-secondary"
     },
-    "decoder_back"
+    "horizon_back"
   ],
   [
     {
@@ -46,18 +46,18 @@
     }
   ],
   [
-    "decoder_volume_up",
+    "horizon_volume_up",
     {
-      "name": "decoder_menu",
+      "name": "horizon_menu",
       "column": 6,
       "offset": 2
     },
     {
-      "name": "decoder_info",
+      "name": "horizon_info",
       "column": 6
     },
     {
-      "name": "decoder_channel_up",
+      "name": "horizon_channel_up",
       "offset": 2
     }
   ],
@@ -67,12 +67,12 @@
       "text": "Vol"
     },
     {
-      "name": "decoder_exit",
+      "name": "horizon_exit",
       "column": 6,
       "offset": 2
     },
     {
-      "name": "decoder_guide",
+      "name": "horizon_guide",
       "column": 6
     },
     {
@@ -82,18 +82,18 @@
     }
   ],
   [
-    "decoder_volume_down",
+    "horizon_volume_down",
     {
-      "name": "decoder_color_yellow",
+      "name": "horizon_color_yellow",
       "column": 6,
       "offset": 2
     },
     {
-      "name": "decoder_favourite",
+      "name": "horizon_favourite",
       "column": 6
     },
     {
-      "name": "decoder_channel_down",
+      "name": "horizon_channel_down",
       "offset": 2
     }
   ],
@@ -105,20 +105,20 @@
   ],
   [
     {
-      "name": "decoder_playback_back",
+      "name": "horizon_playback_back",
       "offset": 4
     },
-    "decoder_playback_pause",
-    "decoder_playback_resume",
-    "decoder_playback_forward"
+    "horizon_playback_pause",
+    "horizon_playback_resume",
+    "horizon_playback_forward"
   ],
   [
     {
-      "name": "decoder_playback_stop",
+      "name": "horizon_playback_stop",
       "offset": 8
     },
     {
-      "name": "decoder_record_start",
+      "name": "horizon_record_start",
       "btn_class": "btn-light text-danger"
     }
   ],
@@ -130,34 +130,34 @@
   ],
   [
     {
-      "name": "decoder_digit_1",
+      "name": "horizon_digit_1",
       "offset": 6
     },
-    "decoder_digit_2",
-    "decoder_digit_3"
+    "horizon_digit_2",
+    "horizon_digit_3"
   ],
   [
     {
-      "name": "decoder_digit_4",
+      "name": "horizon_digit_4",
       "offset": 6
     },
-    "decoder_digit_5",
-    "decoder_digit_6"
+    "horizon_digit_5",
+    "horizon_digit_6"
   ],
   [
     {
-      "name": "decoder_digit_7",
+      "name": "horizon_digit_7",
       "offset": 6
     },
-    "decoder_digit_8",
-    "decoder_digit_9"
+    "horizon_digit_8",
+    "horizon_digit_9"
   ],
   [
     {
-      "name": "decoder_digit_asterisk",
+      "name": "horizon_digit_asterisk",
       "offset": 6
     },
-    "decoder_digit_0",
-    "decoder_digit_hash"
+    "horizon_digit_0",
+    "horizon_digit_hash"
   ]
 ]
