@@ -1,7 +1,12 @@
 language: node_js
 node_js:
     - "11"
+
+before_script:
+    - npm install grunt-cli -g
+
 install:
     - scripts/download_jqueryui.sh
+
 script:
     - npm run-script build
