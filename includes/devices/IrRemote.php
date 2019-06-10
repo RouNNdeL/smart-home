@@ -38,6 +38,10 @@ class IrRemote extends PhysicalDevice {
     const MAX_VOLUME_INCREASE = 20;
     const MAX_CHANNEL_CHANGE = 5;
 
+    const ASSISTANT_INPUT_MODE = "input source";
+    const ASSISTANT_INPUT_CHROMECAST = "chromecast";
+    const ASSISTANT_INPUT_TV = "tv";
+
     const PROTOCOL_NEC = 0xA1;
     const PROTOCOL_PANASONIC = 0xA2;
     const PROTOCOL_RAW = 0xA3;
@@ -149,6 +153,23 @@ class IrRemote extends PhysicalDevice {
                                 $ir_action = RemoteAction::byId($ms > 0 ? "horizon_playback_forward" : "horizon_playback_back", "horizon");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
+                            case VirtualDevice::DEVICE_COMMAND_SET_MODES:
+                                $modes = $item["params"]["updateModeSettings"];
+                                if(isset($modes[IrRemote::ASSISTANT_INPUT_MODE])) {
+                                    switch($modes[IrRemote::ASSISTANT_INPUT_MODE]){
+                                        case IrRemote::ASSISTANT_INPUT_TV:
+                                            $ir_action = RemoteAction::byId("av_input_hdmi2", "av");
+                                            $this->sendCode(IrRemote::PROTOCOL_NEC, $ir_action);
+                                            break;
+                                        case IrRemote::ASSISTANT_INPUT_CHROMECAST:
+                                            $ir_action = RemoteAction::byId("av_input_hdmi3", "av");
+                                            $this->sendCode(IrRemote::PROTOCOL_NEC, $ir_action);
+                                            break;
+                                        default:
+                                            $status = "ERROR:notSupported";
+                                    }
+                                }
+                                break;
                             default:
                                 $status = "ERROR:notSupported";
                         }
@@ -199,7 +220,7 @@ class IrRemote extends PhysicalDevice {
     }
 
     public function sendCodeRaw(string $code) {
-        $data = "p=".IrRemote::PROTOCOL_RAW."&r=" . $code;
+        $data = "p=" . IrRemote::PROTOCOL_RAW . "&r=" . $code;
 
         $headers = array(
             "Content-Type: application/x-www-form-urlencoded"

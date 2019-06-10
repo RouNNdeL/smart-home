@@ -65,6 +65,7 @@ abstract class VirtualDevice {
     const DEVICE_TRAIT_COLOR_TEMPERATURE = "action.devices.traits.ColorTemperature";
     const DEVICE_TRAIT_ON_OFF = "action.devices.traits.OnOff";
     const DEVICE_TRAIT_TOGGLES = "action.devices.traits.Toggles";
+    const DEVICE_TRAIT_MODES = "action.devices.traits.Modes";
     const DEVICE_TRAIT_SCENE = "action.devices.traits.Scene";
     const DEVICE_TRAIT_VOLUME = "action.devices.traits.Volume";
     const DEVICE_TRAIT_CHANNEL = "action.devices.traits.Channel";
@@ -104,6 +105,7 @@ abstract class VirtualDevice {
     const DEVICE_COMMAND_MEDIA_STOP = "action.devices.commands.mediaStop";
     const DEVICE_COMMAND_MEDIA_SEEK_RELATIVE = "action.devices.commands.mediaSeekRelative";
     const DEVICE_COMMAND_MEDIA_SEEK_TO_POSITION = "action.devices.commands.mediaSeekToPosition";
+    const DEVICE_COMMAND_SET_MODES = "action.devices.commands.SetModes";
 
     /** @var string */
     protected $device_type;

@@ -55,7 +55,7 @@ class IrControlledDevice extends VirtualDevice {
             VirtualDevice::DEVICE_TRAIT_VOLUME,
             VirtualDevice::DEVICE_TRAIT_CHANNEL,
             VirtualDevice::DEVICE_TRAIT_MEDIA_STATE,
-            VirtualDevice::DEVICE_TRAIT_INPUT_SELECTOR,
+            VirtualDevice::DEVICE_TRAIT_MODES,
             VirtualDevice::DEVICE_TRAIT_RECORD];
     }
 
@@ -64,7 +64,20 @@ class IrControlledDevice extends VirtualDevice {
     }
 
     public function getAttributes() {
-        return [];
+        return ["availableModes" => [[
+            "name" => IrRemote::ASSISTANT_INPUT_MODE,
+            "name_values" => [["lang" => "en", "name_synonym" => ["input source"]]],
+            "settings" => [
+                [
+                    "setting_name" => IrRemote::ASSISTANT_INPUT_CHROMECAST,
+                    "setting_values" => [["lang" => "en", "setting_synonym" => ["chromecast"]]]
+                ],
+                [
+                    "setting_name" => IrRemote::ASSISTANT_INPUT_TV,
+                    "setting_values" => [["lang" => "en", "setting_synonym" => ["tv", "television", "tv position", "television position", "watching tv", "watching tv position"]]]
+                ]
+            ]
+        ]]];
     }
 
     /**
