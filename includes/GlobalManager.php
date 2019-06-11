@@ -44,6 +44,9 @@ class GlobalManager {
     /** @var UserDeviceManager */
     private $userDeviceManager = null;
 
+    /** @var ExtensionManager[] */
+    private $extensionManagers = [];
+
     /** @var RequestLogger */
     private $requestLogger = null;
 
@@ -55,6 +58,20 @@ class GlobalManager {
      */
     private function __construct() {
 
+    }
+
+    /**
+     * Only use when user has already been authenticated
+     * @param int $user_id
+     */
+    public static function forWebhook(int $user_id) {
+        $manager = new GlobalManager();
+
+        $manager->loadIpTrustManager();
+        $manager->loadExtensionManagers($user_id);
+        $manager->loadUserDeviceManagerManually($user_id);
+
+        return $manager;
     }
 
     public static function minimal() {
@@ -107,6 +124,38 @@ class GlobalManager {
             $this->userDeviceManager = UserDeviceManager::forUserId($this->sessionManager->getUserId());
         else
             $this->userDeviceManager = UserDeviceManager::forUserIdAndScope($this->sessionManager->getUserId(), $scopes);
+    }
+
+    public function loadUserDeviceManagerManually(int $user_id){
+        $this->userDeviceManager = UserDeviceManager::forUserId($user_id);
+    }
+
+    public function loadExtensionManagers(int $user_id) {
+        $this->extensionManagers = ExtensionManager::getExtensionManagersByUserId($user_id);
+    }
+
+    public function actionsGetSync() {
+        $payload = $this->userDeviceManager->getSync();
+        foreach($this->extensionManagers as $extensionManager) {
+            $payload = array_merge($payload, $extensionManager->getSync());
+        }
+        return $payload;
+    }
+
+    public function actionsProcessQuery(array $payload) {
+        $response = $this->userDeviceManager->processQuery($payload);
+        foreach($this->extensionManagers as $extensionManager) {
+            $response = array_merge($response, $extensionManager->processQuery($payload));
+        }
+        return $response;
+    }
+
+    public function actionsProcessExecute(array $payload) {
+        $response = $this->userDeviceManager->processExecute($payload);
+        foreach($this->extensionManagers as $extensionManager) {
+            $response = array_merge($response, $extensionManager->processExecute($payload));
+        }
+        return $response;
     }
 
     /**

@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,9 @@
  * Time: 13:11
  */
 require_once __DIR__ . "/Scene.php";
+require_once __DIR__ . "/../../ExtensionManager.php";
 
-class SceneManager {
+class SceneManager extends ExtensionManager {
     /** @var Scene[] */
     private $scenes;
 

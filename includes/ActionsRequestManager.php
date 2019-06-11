@@ -32,6 +32,7 @@
 
 require_once __DIR__ . "/database/DeviceDbHelper.php";
 require_once __DIR__ . "/UserDeviceManager.php";
+require_once __DIR__ . "/GlobalManager.php";
 require_once __DIR__ . "/effects/scenes/SceneManager.php";
 require_once __DIR__ . "/database/HomeUser.php";
 require_once __DIR__ . "/../includes/database/DbUtils.php";
@@ -63,28 +64,26 @@ class ActionsRequestManager {
 
         $payload = [];
         $request_id = $request["requestId"];
+
+        $manager = GlobalManager::forWebhook($user_id);
+
         foreach($request["inputs"] as $input) {
-            $userDeviceManager = UserDeviceManager::forUserId($user_id);
-            $sceneManager = SceneManager::forUserId($user_id);
             switch($input["intent"]) {
                 case self::ACTION_INTENT_SYNC:
                     $payload["agentUserId"] = (string)$user_id;
-                    $devices_payload = $userDeviceManager->getSync();
-                    $devices_payload = array_merge($devices_payload, $sceneManager->getSync());
+                    $devices_payload = $manager->actionsGetSync();
                     $payload["devices"] = $devices_payload;
                     HomeUser::setActionsRegistered(DbUtils::getConnection(), $user_id, true);
-                    $userDeviceManager->sendReportState($request_id);
+                    $manager->getUserDeviceManager()->sendReportState($request_id);
                     break;
                 case self::ACTION_INTENT_QUERY:
-                    $device_response = $userDeviceManager->processQuery($input["payload"]);
-                    $scene_response = $sceneManager->processQuery($input["payload"]);
-                    $payload["devices"] = array_merge($device_response, $scene_response);
+                    $response = $manager->actionsProcessQuery($input["payload"]);
+                    $payload["devices"] = $response;
                     break;
                 case self::ACTION_INTENT_EXECUTE:
-                    $device_response = $userDeviceManager->processExecute($input["payload"]);
-                    $scene_response = $sceneManager->processExecute($input["payload"]);
+                    $response = $manager->actionsProcessExecute($input["payload"]);
                     $commands_response_array = [];
-                    foreach(array_merge($device_response, $scene_response) as $key => $value) {
+                    foreach($response as $key => $value) {
                         $arr = explode(":", $key);
                         if(sizeof($arr) >= 2) {
                             $commands_response_array[] = ["ids" => $value, "status" => $arr[0], "errorCode" => $arr[1]];
@@ -93,7 +92,7 @@ class ActionsRequestManager {
                         }
                     }
                     $payload["commands"] = $commands_response_array;
-                    $userDeviceManager->sendReportState($request_id);
+                    $manager->getUserDeviceManager()->sendReportState($request_id);
                     break;
                 case self::ACTION_INTENT_DISCONNECT:
                     HomeUser::setActionsRegistered(DbUtils::getConnection(), $user_id, false);
