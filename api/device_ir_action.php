@@ -85,7 +85,7 @@ if($virtual === null || !$virtual instanceof IrControlledDevice)
     exit();
 }
 
-$physical->sendCode($virtual->getProtocol(), $action);
+$physical->sendCode($action);
 $response = ["status" => "success"];
 http_response_code(200);
 echo json_encode($response);

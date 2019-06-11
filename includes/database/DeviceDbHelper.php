@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -91,7 +91,7 @@ class DeviceDbHelper {
      */
     public static function queryVirtualDevicesForPhysicalDevice(mysqli $conn, string $physical_device_id) {
         $sql = "SELECT devices_virtual.id, type, display_name, synonyms, home_actions, will_report_state, state,
-  brightness, color, toggles, ir_protocol, ir_nec_return, max_profile_count, color_count, active_profile_count
+  brightness, color, toggles, max_profile_count, color_count, active_profile_count
         FROM devices_virtual
           LEFT JOIN devices_effect_properties ON devices_effect_properties.id = parent_id
         WHERE parent_id = ?";

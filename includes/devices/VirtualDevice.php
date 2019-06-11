@@ -243,7 +243,7 @@ abstract class VirtualDevice {
                 );
             case self::DEVICE_TYPE_REMOTE_CONTROLLED:
                 return new IrControlledDevice(
-                    $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["ir_protocol"], $row["state"]);
+                    $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["state"]);
             default:
                 throw new InvalidArgumentException("Invalid device type " . $row["type"]);
         }

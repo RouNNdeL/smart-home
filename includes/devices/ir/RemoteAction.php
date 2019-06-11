@@ -33,6 +33,10 @@
 require_once __DIR__ . "/../../database/DbUtils.php";
 
 class RemoteAction {
+    const PROTOCOL_NEC = 0xA1;
+    const PROTOCOL_PANASONIC = 0xA2;
+    const PROTOCOL_RAW = 0xA3;
+
     private $id;
 
     private $device_id;
@@ -42,6 +46,8 @@ class RemoteAction {
     private $support_code;
 
     private $raw_code;
+
+    private $protocol;
 
     private $display_name;
 
@@ -56,26 +62,27 @@ class RemoteAction {
      * @param $display_name
      * @param $icon
      */
-    private function __construct(string $id, string $device_id, $primary_code, $support_code, $raw_code, string $display_name, $icon) {
+    private function __construct(string $id, string $device_id, $primary_code, $support_code, $raw_code, int $protocol, string $display_name, $icon) {
         $this->id = $id;
         $this->device_id = $device_id;
         $this->primary_code = $primary_code;
         $this->support_code = $support_code;
         $this->raw_code = $raw_code;
+        $this->protocol = $protocol;
         $this->display_name = $display_name;
         $this->icon = $icon;
     }
 
     public static function byId(string $id) {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT primary_code, device_id, support_code, raw_code, display_name, icon 
+        $sql = "SELECT primary_code, device_id, support_code, raw_code, protocol, display_name, icon 
                 FROM ir_codes WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $id);
-        $stmt->bind_result($primary_code, $device_id, $support_code, $raw_code, $display_name, $icon);
+        $stmt->bind_result($primary_code, $device_id, $support_code, $raw_code, $protocol, $display_name, $icon);
         $stmt->execute();
         if($stmt->fetch()) {
-            return new RemoteAction($id, $device_id, $primary_code, $support_code, $raw_code, $display_name, $icon);
+            return new RemoteAction($id, $device_id, $primary_code, $support_code, $raw_code, $protocol, $display_name, $icon);
         }
         return null;
     }
@@ -86,14 +93,14 @@ class RemoteAction {
      */
     public static function forDeviceId(string $device_id) {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, primary_code, support_code, raw_code, display_name, icon FROM ir_codes WHERE device_id = ?";
+        $sql = "SELECT id, primary_code, support_code, raw_code, protocol, display_name, icon FROM ir_codes WHERE device_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $device_id);
-        $stmt->bind_result($id, $primary_code, $support_code, $raw_code, $display_name, $icon);
+        $stmt->bind_result($id, $primary_code, $support_code, $raw_code, $protocol, $display_name, $icon);
         $stmt->execute();
         $arr = [];
         while($stmt->fetch()) {
-            $arr[$id] = new RemoteAction($id, $device_id, $primary_code, $support_code, $raw_code, $display_name, $icon);
+            $arr[$id] = new RemoteAction($id, $device_id, $primary_code, $support_code, $raw_code, $protocol, $display_name, $icon);
         }
         $stmt->close();
         return $arr;
@@ -146,5 +153,12 @@ class RemoteAction {
      */
     public function getDeviceId(): string {
         return $this->device_id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProtocol() {
+        return $this->protocol;
     }
 }
