@@ -135,7 +135,7 @@ HTML;
                 else return RemoteAction::byId("tv_power_off");
                 break;
             case IrControlledDevice::ID_HORIZON:
-                return RemoteAction::byId("horizon_power_toggled");
+                return RemoteAction::byId("horizon_power_toggle");
                 break;
             case IrControlledDevice::ID_AV:
                 if($on) return RemoteAction::byId("av_power_on");
