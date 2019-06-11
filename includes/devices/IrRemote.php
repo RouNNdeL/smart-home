@@ -72,7 +72,7 @@ class IrRemote extends PhysicalDevice {
 
     public function handleAssistantAction(array $action) {
         $ids = [];
-        $status = ($this->isOnline() ? "SUCCESS" : "OFFLINE");
+        $status = ($this->isOnline() ? "SUCCESS" : "ERROR:deviceTurnedOff");
         foreach($action["commands"] as $command) {
             foreach($command["devices"] as $d) {
                 $device = $this->getVirtualDeviceById($d["id"]);

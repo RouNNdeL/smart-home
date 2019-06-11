@@ -78,9 +78,9 @@ class SceneManager extends ExtensionManager {
                     foreach($command["execution"] as $item) {
                         if($item["command"] === VirtualDevice::DEVICE_COMMAND_ACTIVATE_SCENE) {
                             $success = $this->activateScene($scene->getId());
-                            if(!isset($ids[$success ? "SUCCESS" : "OFFLINE"])) /* may not be required */
-                                $ids[$success ? "SUCCESS" : "OFFLINE"] = [];
-                            $ids[$success ? "SUCCESS" : "OFFLINE"][] = $scene->getPrefixedId();
+                            if(!isset($ids[$success ? "SUCCESS" : "ERROR:deviceTurnedOff"])) /* may not be required */
+                                $ids[$success ? "SUCCESS" : "ERROR:deviceTurnedOff"] = [];
+                            $ids[$success ? "SUCCESS" : "ERROR:deviceTurnedOff"][] = $scene->getPrefixedId();
                         }
                     }
                 }
