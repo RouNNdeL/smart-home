@@ -51,11 +51,11 @@ class SceneManager extends ExtensionManager {
 
 
     public function getSync() {
-        $devices_payload = [];
+        $payload = [];
         foreach($this->scenes as $scene) {
-            $devices_payload[] = $scene->getSyncJson();
+            $payload[] = $scene->getSyncJson();
         }
-        return $devices_payload;
+        return $payload;
     }
 
     public function processQuery(array $payload) {
@@ -110,7 +110,7 @@ class SceneManager extends ExtensionManager {
      * @return Scene
      */
     public function getSceneByPrefixedId(string $prefixed_id) {
-        $re = '/scene_(\d+)/m';
+        $re = '/'.Scene::ID_PREFIX.'(\d+)/m';
         preg_match_all($re, $prefixed_id, $matches, PREG_SET_ORDER, 0);
 
         if(sizeof($matches) < 1)
