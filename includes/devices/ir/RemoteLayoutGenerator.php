@@ -38,9 +38,6 @@ class RemoteLayoutGenerator {
     const TYPE_EMPTY_SPACE = "empty";
     const BREAKPOINT_DEFAULT = "_";
 
-    /** @var RemoteAction[] */
-    private $actions;
-
     private $device_id;
 
     private $default_column_width;
@@ -57,7 +54,6 @@ class RemoteLayoutGenerator {
         $this->device_id = $device_id;
         $this->default_column_width = $default_column_width;
         $this->column_count = $column_count;
-        $this->actions = RemoteAction::forDeviceId($this->device_id);
     }
 
     public function toHtml($layout) {
@@ -74,9 +70,9 @@ class RemoteLayoutGenerator {
                 $class = "";
                 $btn_class = "btn-light";
                 if(!is_array($item)) {
-                    if(!isset($this->actions[$item]))
+                    $action = RemoteAction::byId($item);
+                    if($action === null)
                         throw new InvalidArgumentException("Non existent action id: $item");
-                    $action = $this->actions[$item];
                 } else {
                     if(isset($item["offset"]))
                         $offset = self::resolveBreakpointArray($item["offset"], "offset");
@@ -111,9 +107,9 @@ class RemoteLayoutGenerator {
                         if(!isset($item["name"]))
                             throw new InvalidArgumentException("Missing action_id field at row $i, column $j");
 
-                        if(!isset($this->actions[$item["name"]]))
+                        $action = RemoteAction::byId($item["name"]);
+                        if($action === null)
                             throw new InvalidArgumentException("Non existent action id: $item[name]");
-                        $action = $this->actions[$item["name"]];
                     } else {
                         $action = null;
                         $class .= "text-center text-center-vertical";

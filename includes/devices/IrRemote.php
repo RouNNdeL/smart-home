@@ -93,7 +93,7 @@ class IrRemote extends PhysicalDevice {
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_VOLUME_RELATIVE:
                                 $steps = $item["params"]["volumeRelativeLevel"];
-                                $ir_action = RemoteAction::byId($steps > 0 ? "av_volume_up" : "av_volume_down", "av");
+                                $ir_action = RemoteAction::byId($steps > 0 ? "av_volume_up" : "av_volume_down");
                                 for($i = 0; $i < min(abs($steps), IrRemote::MAX_VOLUME_INCREASE); $i++) {
                                     $this->sendCode(IrRemote::PROTOCOL_NEC, $ir_action);
                                     usleep(250000);
@@ -101,7 +101,7 @@ class IrRemote extends PhysicalDevice {
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_SET_VOLUME:
                                 if($item["params"]["volumeLevel"] === 0) {
-                                    $ir_action = RemoteAction::byId("av_audio_mute", "av");
+                                    $ir_action = RemoteAction::byId("av_audio_mute");
                                     $this->sendCode(IrRemote::PROTOCOL_NEC, $ir_action);
                                 } else {
                                     $status = "ERROR:notSupported";
@@ -109,7 +109,7 @@ class IrRemote extends PhysicalDevice {
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_RELATIVE_CHANNEL:
                                 $steps = $item["params"]["relativeChannelChange"];
-                                $ir_action = RemoteAction::byId($steps > 0 ? "horizon_channel_up" : "horizon_channel_down", "horizon");
+                                $ir_action = RemoteAction::byId($steps > 0 ? "horizon_channel_up" : "horizon_channel_down");
                                 for($i = 0; $i < min(abs($steps), IrRemote::MAX_CHANNEL_CHANGE); $i++) {
                                     $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                     usleep(100000);
@@ -120,37 +120,37 @@ class IrRemote extends PhysicalDevice {
                                 $digits = str_split(strval($number));
                                 foreach($digits as $digit) {
                                     $code = "horizon_digit_" . $digit;
-                                    $ir_action = RemoteAction::byId($code, "horizon");
+                                    $ir_action = RemoteAction::byId($code);
                                     $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                     usleep(200000);
                                 }
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_START_RECORDING:
-                                $ir_action = RemoteAction::byId("horizon_record_start", "horizon");
+                                $ir_action = RemoteAction::byId("horizon_record_start");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_STOP_RECORDING:
-                                $ir_action = RemoteAction::byId("horizon_playback_stop", "horizon");
+                                $ir_action = RemoteAction::byId("horizon_playback_stop");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 sleep(1);
-                                $ir_action = RemoteAction::byId("horizon_ok", "horizon");
+                                $ir_action = RemoteAction::byId("horizon_ok");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_MEDIA_RESUME:
-                                $ir_action = RemoteAction::byId("horizon_playback_resume", "horizon");
+                                $ir_action = RemoteAction::byId("horizon_playback_resume");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_MEDIA_PAUSE:
-                                $ir_action = RemoteAction::byId("horizon_playback_pause", "horizon");
+                                $ir_action = RemoteAction::byId("horizon_playback_pause");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_MEDIA_STOP:
-                                $ir_action = RemoteAction::byId("horizon_playback_stop", "horizon");
+                                $ir_action = RemoteAction::byId("horizon_playback_stop");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_MEDIA_SEEK_RELATIVE:
                                 $ms = $item["params"]["relativePositionMs"];
-                                $ir_action = RemoteAction::byId($ms > 0 ? "horizon_playback_forward" : "horizon_playback_back", "horizon");
+                                $ir_action = RemoteAction::byId($ms > 0 ? "horizon_playback_forward" : "horizon_playback_back");
                                 $this->sendCode(IrRemote::PROTOCOL_RAW, $ir_action);
                                 break;
                             case VirtualDevice::DEVICE_COMMAND_SET_MODES:
@@ -158,11 +158,11 @@ class IrRemote extends PhysicalDevice {
                                 if(isset($modes[IrRemote::ASSISTANT_INPUT_MODE])) {
                                     switch($modes[IrRemote::ASSISTANT_INPUT_MODE]){
                                         case IrRemote::ASSISTANT_INPUT_TV:
-                                            $ir_action = RemoteAction::byId("av_input_hdmi2", "av");
+                                            $ir_action = RemoteAction::byId("av_input_hdmi2");
                                             $this->sendCode(IrRemote::PROTOCOL_NEC, $ir_action);
                                             break;
                                         case IrRemote::ASSISTANT_INPUT_CHROMECAST:
-                                            $ir_action = RemoteAction::byId("av_input_hdmi3", "av");
+                                            $ir_action = RemoteAction::byId("av_input_hdmi3");
                                             $this->sendCode(IrRemote::PROTOCOL_NEC, $ir_action);
                                             break;
                                         default:

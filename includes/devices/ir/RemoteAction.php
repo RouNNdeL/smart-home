@@ -35,6 +35,8 @@ require_once __DIR__ . "/../../database/DbUtils.php";
 class RemoteAction {
     private $id;
 
+    private $device_id;
+
     private $primary_code;
 
     private $support_code;
@@ -54,8 +56,9 @@ class RemoteAction {
      * @param $display_name
      * @param $icon
      */
-    private function __construct(string $id, $primary_code, $support_code, $raw_code, string $display_name, $icon) {
+    private function __construct(string $id, string $device_id, $primary_code, $support_code, $raw_code, string $display_name, $icon) {
         $this->id = $id;
+        $this->device_id = $device_id;
         $this->primary_code = $primary_code;
         $this->support_code = $support_code;
         $this->raw_code = $raw_code;
@@ -63,16 +66,16 @@ class RemoteAction {
         $this->icon = $icon;
     }
 
-    public static function byId(string $id, string $device_id) {
+    public static function byId(string $id) {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT primary_code, support_code, raw_code, display_name, icon 
-                FROM ir_codes WHERE id = ? AND device_id = ?";
+        $sql = "SELECT primary_code, device_id, support_code, raw_code, display_name, icon 
+                FROM ir_codes WHERE id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $id, $device_id);
-        $stmt->bind_result($primary_code, $support_code, $raw_code, $display_name, $icon);
+        $stmt->bind_param("s", $id);
+        $stmt->bind_result($primary_code, $device_id, $support_code, $raw_code, $display_name, $icon);
         $stmt->execute();
         if($stmt->fetch()) {
-            return new RemoteAction($id, $primary_code, $support_code, $raw_code, $display_name, $icon);
+            return new RemoteAction($id, $device_id, $primary_code, $support_code, $raw_code, $display_name, $icon);
         }
         return null;
     }
@@ -90,7 +93,7 @@ class RemoteAction {
         $stmt->execute();
         $arr = [];
         while($stmt->fetch()) {
-            $arr[$id] = new RemoteAction($id, $primary_code, $support_code, $raw_code, $display_name, $icon);
+            $arr[$id] = new RemoteAction($id, $device_id, $primary_code, $support_code, $raw_code, $display_name, $icon);
         }
         $stmt->close();
         return $arr;
@@ -136,5 +139,12 @@ class RemoteAction {
      */
     public function getRawCode() {
         return $this->raw_code;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceId(): string {
+        return $this->device_id;
     }
 }

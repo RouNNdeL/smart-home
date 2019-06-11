@@ -141,15 +141,15 @@ HTML;
     public function getRemoteActionForPower(bool $on) {
         switch($this->device_id) {
             case IrControlledDevice::ID_TV:
-                if($on) return RemoteAction::byId("tv_power_on", $this->device_id);
-                else return RemoteAction::byId("tv_power_off", $this->device_id);
+                if($on) return RemoteAction::byId("tv_power_on");
+                else return RemoteAction::byId("tv_power_off");
                 break;
             case IrControlledDevice::ID_HORIZON:
-                return RemoteAction::byId("horizon_power_toggled", $this->device_id);
+                return RemoteAction::byId("horizon_power_toggled");
                 break;
             case IrControlledDevice::ID_AV:
-                if($on) return RemoteAction::byId("av_power_on", $this->device_id);
-                else return RemoteAction::byId("av_power_off", $this->device_id);
+                if($on) return RemoteAction::byId("av_power_on");
+                else return RemoteAction::byId("av_power_off");
                 break;
             default:
                 return null;

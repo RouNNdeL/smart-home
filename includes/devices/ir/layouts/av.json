@@ -43,7 +43,7 @@
   [
     "av_volume_up",
     {
-      "name": "av_channel_up",
+      "name": "horizon_channel_up",
       "offset": 16
     }
   ],
@@ -70,7 +70,7 @@
       "offset": 6
     },
     {
-      "name": "av_channel_down",
+      "name": "horizon_channel_down",
       "offset": 6
     }
   ],

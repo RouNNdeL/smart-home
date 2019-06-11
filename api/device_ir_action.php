@@ -51,26 +51,9 @@ if($json === false || !isset($json["action_id"]) || !isset($json["device_id"]))
     exit();
 }
 
-$physical = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($json["device_id"]);
-if($physical === null || !$physical instanceof IrRemote)
-{
-    $response = ["status" => "error", "error" => "invalid_device_id"];
-    http_response_code(400);
-    echo json_encode($response);
-    exit();
-}
-
-$virtual = $physical->getVirtualDeviceById($json["device_id"]);
-if($virtual === null || !$virtual instanceof IrControlledDevice)
-{
-    $response = ["status" => "error", "error" => "invalid_device_id"];
-    http_response_code(400);
-    echo json_encode($response);
-    exit();
-}
 require_once __DIR__ . "/../includes/devices/ir/RemoteAction.php";
 
-$action = RemoteAction::byId($json["action_id"], $json["device_id"]);
+$action = RemoteAction::byId($json["action_id"]);
 if($action === null)
 {
     $response = ["status" => "error", "error" => "invalid_action_id"];
@@ -79,4 +62,30 @@ if($action === null)
     exit();
 }
 
+$action_device_id = $action->getDeviceId();
+
+/* Only allow the action to execute if both devices are part of the same VirtualDevice */
+$physical = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($action_device_id);
+$virtual_parent = $physical->getVirtualDeviceById($json["device_id"]);
+
+if($physical === null || $virtual_parent === null || !$physical instanceof IrRemote)
+{
+    $response = ["status" => "error", "error" => "invalid_device_id"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
+
+$virtual = $physical->getVirtualDeviceById($action_device_id);
+if($virtual === null || !$virtual instanceof IrControlledDevice)
+{
+    $response = ["status" => "error", "error" => "invalid_device_id"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
+
 $physical->sendCode($virtual->getProtocol(), $action);
+$response = ["status" => "success"];
+http_response_code(200);
+echo json_encode($response);
