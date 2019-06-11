@@ -262,25 +262,5 @@ class IrRemote extends PhysicalDevice {
         </div>
     </div>
 HTML;
-
-        /* Chromecast on/off profile */
-        /*<div class="col-auto float-right pr-0 pl-1 align-self-center d-none d-xs-block">
-            <button class="btn btn-danger full-width ir-multi-action-btn"
-             data-action-delay="250"
-            data-action-id="av_power_off _ tv_power_off"
-            data-device-id="av _ tv"
-            type="button" role="button" title="$button_title_off">
-                <i class="material-icons">cast</i>
-            </button>
-        </div>
-        <div class="col-auto float-right pl-1 pr-2 align-self-center d-none d-xs-block">
-            <button class="btn btn-success full-width ir-multi-action-btn"
-            data-action-delay="500"
-            data-action-id="tv_power_on _ av_power_on _ _ _ _ _ _ _ _ _ _ av_input_hdmi3 _ _ _ tv_input_hdmi2"
-            data-device-id="tv _ av _ _ _ _ _ _ _ _ _ _ av _ _ _ tv"
-            type="button" role="button" title="$button_title_chromecast_on">
-                <i class="material-icons">cast</i>
-            </button>
-        </div>*/
     }
 }
