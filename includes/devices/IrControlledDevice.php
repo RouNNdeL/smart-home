@@ -128,18 +128,18 @@ HTML;
         }
     }
 
-    public function getRemoteActionForPower(bool $on) {
+    public function getIrCodeForPower(bool $on) {
         switch($this->device_id) {
             case IrControlledDevice::ID_TV:
-                if($on) return RemoteAction::byId("tv_power_on");
-                else return RemoteAction::byId("tv_power_off");
+                if($on) return IrCode::byId("tv_power_on");
+                else return IrCode::byId("tv_power_off");
                 break;
             case IrControlledDevice::ID_HORIZON:
-                return RemoteAction::byId("horizon_power_toggle");
+                return IrCode::byId("horizon_power_toggle");
                 break;
             case IrControlledDevice::ID_AV:
-                if($on) return RemoteAction::byId("av_power_on");
-                else return RemoteAction::byId("av_power_off");
+                if($on) return IrCode::byId("av_power_on");
+                else return IrCode::byId("av_power_off");
                 break;
             default:
                 return null;

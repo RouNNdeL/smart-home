@@ -51,10 +51,10 @@ if($json === false || !isset($json["action_id"]) || !isset($json["device_id"]))
     exit();
 }
 
-require_once __DIR__ . "/../includes/devices/ir/RemoteAction.php";
+require_once __DIR__ . "/../includes/devices/ir/IrCode.php";
 
-$action = RemoteAction::byId($json["action_id"]);
-if($action === null)
+$ir_code = IrCode::byId($json["action_id"]);
+if($ir_code === null)
 {
     $response = ["status" => "error", "error" => "invalid_action_id"];
     http_response_code(400);
@@ -62,7 +62,7 @@ if($action === null)
     exit();
 }
 
-$action_device_id = $action->getDeviceId();
+$action_device_id = $ir_code->getDeviceId();
 
 /* Only allow the action to execute if both devices are part of the same VirtualDevice */
 $physical = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($action_device_id);
@@ -85,7 +85,7 @@ if($virtual === null || !$virtual instanceof IrControlledDevice)
     exit();
 }
 
-$physical->sendCode($action);
+$physical->sendCode($ir_code);
 $response = ["status" => "success"];
 http_response_code(200);
 echo json_encode($response);

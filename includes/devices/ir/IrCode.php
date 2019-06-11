@@ -32,7 +32,7 @@
 
 require_once __DIR__ . "/../../database/DbUtils.php";
 
-class RemoteAction {
+class IrCode {
     const PROTOCOL_NEC = 0xA1;
     const PROTOCOL_PANASONIC = 0xA2;
     const PROTOCOL_RAW = 0xA3;
@@ -55,7 +55,7 @@ class RemoteAction {
 
 
     /**
-     * RemoteAction constructor.
+     * IrCode constructor.
      * @param $id
      * @param $primary_code
      * @param $support_code
@@ -82,14 +82,14 @@ class RemoteAction {
         $stmt->bind_result($primary_code, $device_id, $support_code, $raw_code, $protocol, $display_name, $icon);
         $stmt->execute();
         if($stmt->fetch()) {
-            return new RemoteAction($id, $device_id, $primary_code, $support_code, $raw_code, $protocol, $display_name, $icon);
+            return new IrCode($id, $device_id, $primary_code, $support_code, $raw_code, $protocol, $display_name, $icon);
         }
         return null;
     }
 
     /**
      * @param string $device_id
-     * @return RemoteAction[]
+     * @return IrCode[]
      */
     public static function forDeviceId(string $device_id) {
         $conn = DbUtils::getConnection();
@@ -100,7 +100,7 @@ class RemoteAction {
         $stmt->execute();
         $arr = [];
         while($stmt->fetch()) {
-            $arr[$id] = new RemoteAction($id, $device_id, $primary_code, $support_code, $raw_code, $protocol, $display_name, $icon);
+            $arr[$id] = new IrCode($id, $device_id, $primary_code, $support_code, $raw_code, $protocol, $display_name, $icon);
         }
         $stmt->close();
         return $arr;

@@ -30,7 +30,7 @@
  * Time: 16:45
  */
 
-require_once __DIR__ . "/RemoteAction.php";
+require_once __DIR__ . "/IrCode.php";
 
 class RemoteLayoutGenerator {
     const TYPE_BUTTON = "button";
@@ -70,7 +70,7 @@ class RemoteLayoutGenerator {
                 $class = "";
                 $btn_class = "btn-light";
                 if(!is_array($item)) {
-                    $action = RemoteAction::byId($item);
+                    $action = IrCode::byId($item);
                     if($action === null)
                         throw new InvalidArgumentException("Non existent action id: $item");
                 } else {
@@ -107,7 +107,7 @@ class RemoteLayoutGenerator {
                         if(!isset($item["name"]))
                             throw new InvalidArgumentException("Missing action_id field at row $i, column $j");
 
-                        $action = RemoteAction::byId($item["name"]);
+                        $action = IrCode::byId($item["name"]);
                         if($action === null)
                             throw new InvalidArgumentException("Non existent action id: $item[name]");
                     } else {
