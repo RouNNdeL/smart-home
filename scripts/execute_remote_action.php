@@ -27,21 +27,23 @@
  * Created by PhpStorm.
  * User: Krzysiek
  * Date: 2019-06-11
- * Time: 15:31
+ * Time: 13:59
  */
 
-require_once __DIR__ . "/effects/scenes/SceneManager.php";
-require_once __DIR__ . "/remote_actions/RemoteActionManager.php";
+if(php_sapi_name() != 'cli') exit;
 
-
-abstract class ExtensionManager {
-    public abstract function getSync();
-
-    public abstract function processQuery(array $payload);
-
-    public abstract function processExecute(array $payload);
-
-    public static function getExtensionManagersByUserId(int $user_id) {
-        return [SceneManager::forUserId($user_id), RemoteActionManager::forUserId($user_id)];
+if(isset($argv[1]) && isset($argv[2])) {
+    require_once __DIR__ . "/../includes/UserDeviceManager.php";
+    $manager = UserDeviceManager::forUserId($argv[2]);
+    if($manager === null) {
+        throw new InvalidArgumentException("Invalid user id: $argv[2]");
     }
+
+    require_once __DIR__."/../includes/remote_actions/RemoteAction.php";
+
+    $action = RemoteAction::byId($argv[1]);
+    $action->executeAction($manager);
+}
+else {
+    echo "You need to provide an action id and user id";
 }
