@@ -39,7 +39,6 @@ const COLORPICKER_OPTIONS = {
     useAlpha: false,
     inline: true,
     container: true,
-    customClass: "colorpicker-big",
     format: "hex",
     sliders: {
         saturation: {

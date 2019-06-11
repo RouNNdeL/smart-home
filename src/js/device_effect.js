@@ -40,7 +40,7 @@ const URL_EFFECT_REMOVE = "/api/device_effect_remove.php";
 const DEFAULT_COLORS = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ffffff"];
 const COLORPICKER_OPTIONS = {
     useAlpha: false,
-    component: ".color-swatch-handle",
+    container: ".color-swatch-handle",
     format: "hex",
     fallbackColor: "#ff0000",
     extensions: [{

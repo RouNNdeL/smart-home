@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -109,7 +109,7 @@ abstract class Effect {
                 <div class=\"input-group colorpicker-component\">
                     <input type=\"text\" class=\"form-control color-input\" value=\"\$color\" autocomplete=\"off\" 
                     aria-autocomplete=\"none\" spellcheck=\"false\"/>
-                    <div class='input-group-append'><span class=\"input-group-text color-swatch-handle add-on\"><i></i></span></div>
+                    <div class='input-group-append'><span class=\"input-group-text color-swatch-handle colorpicker-input-addon\"><i></i></span></div>
                 </div>
             </div>
         </div>";
