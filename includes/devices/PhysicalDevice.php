@@ -239,7 +239,7 @@ HTML;
 
         $scopes = isset($row["scope"]) ? explode(" ", $row["scope"]) : [];
         return $row["device_driver"]::load($row["id"], $row["owner_id"],
-            $row["display_name"], $row["hostname"], $row["port"], $scopes);
+            $row["display_name"], trim($row["hostname"]), $row["port"], $scopes);
     }
 
     /**
