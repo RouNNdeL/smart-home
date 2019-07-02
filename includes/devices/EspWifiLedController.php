@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -159,7 +159,7 @@ URL;
      */
     public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port, array $scopes) {
         $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
-        return new EspWifiLedController($device_id, $owner_id, $display_name, $hostname, $port, 0, true, 0, [], $virtual, $scopes);
+        return new EspWifiLedController($device_id, $owner_id, $display_name, $hostname, $port, 0, 0, [], $virtual, $scopes);
     }
 
     public function saveEffectForDevice(string $device_id, int $index) {
