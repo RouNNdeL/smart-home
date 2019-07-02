@@ -174,7 +174,7 @@ class IrRemote extends PhysicalDevice {
             }
         }
 
-        if($this->save()) {
+        if($this->save("google_assistant_action")) {
             $this->sendData(false);
         }
 

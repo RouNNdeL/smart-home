@@ -92,14 +92,16 @@ abstract class PhysicalDevice {
     }
 
     /**
+     * @param string $issuer_id
      * @return bool - whether any changes were made to the Database
      */
-    public function save() {
+    public function save(string $issuer_id) {
         $changed = false;
         foreach($this->virtual_devices as $virtual_device) {
             $d_changed = $virtual_device->toDatabase();
             if($d_changed) {
-                DeviceModManager::insertDeviceModification(DbUtils::getConnection(), $this->id, $virtual_device->getDeviceId(), DeviceModManager::DEVICE_MOD_SIMPLE_SETTINGS);
+                DeviceModManager::insertDeviceModification(DbUtils::getConnection(), $this->id,
+                    $virtual_device->getDeviceId(), DeviceModManager::DEVICE_MOD_SIMPLE_SETTINGS, $issuer_id);
             }
             $changed = $changed || $d_changed;
         }
@@ -141,7 +143,7 @@ abstract class PhysicalDevice {
             }
         }
 
-        if($this->save()) {
+        if($this->save("google_assistant_action")) {
             $this->sendData(false);
         }
 

@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -134,7 +134,7 @@ class EspWiFiLamp extends PhysicalDevice {
                 $device->setBrightness(EspWiFiLamp::BRIGHTNESS_LOOKUP_INVERSE[$state] * 100 / 255);
             }
         }
-        $this->save();
+        $this->save("device_reported_state");
         parent::handleDeviceReportedState($state);
     }
 }

@@ -38,10 +38,10 @@ class DeviceModManager {
     const DEVICE_MOD_SIMPLE_SETTINGS = 0x11;
     const DEVICE_MOD_EFFECT = 0x12;
 
-    public static function insertDeviceModification(mysqli $conn, string $physical_id, $virtual_id, int $type) {
-        $sql = "INSERT INTO device_modifications (physical_id, virtual_id, type) VALUES (?, ?, ?)";
+    public static function insertDeviceModification(mysqli $conn, string $physical_id, $virtual_id, int $type, string $issuer_id) {
+        $sql = "INSERT INTO device_modifications (physical_id, virtual_id, type, issuer_id) VALUES (?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssi", $physical_id, $virtual_id, $type);
+        $stmt->bind_param("ssis", $physical_id, $virtual_id, $type, $issuer_id);
         $success = $stmt->execute();
         $stmt->close();
         return $success;
@@ -132,18 +132,19 @@ class DeviceModManager {
      * @return null
      */
     public static function queryNewMods(mysqli $conn, string $last_date, int $user_id, $physical_id, $virtual_id, $types) {
-        $sql = "SELECT device_modifications.id, date, physical_id, virtual_id, type FROM device_modifications 
+        $sql = "SELECT device_modifications.id, date, physical_id, virtual_id, type, device_modifications.issuer_id FROM device_modifications 
                     JOIN devices_physical dp ON device_modifications.physical_id = dp.id 
                     LEFT JOIN device_shares share2 on dp.id = share2.subject_id and dp.owner_id = share2.issuer_id
                     WHERE date > '$last_date' AND %WHERE% ORDER BY date";
 
         $stmt = DeviceModManager::getStatementForParams($conn, $sql, $user_id, $physical_id, $virtual_id, $types);
-        $stmt->bind_result($id, $_date, $_physical_id, $_virtual_id, $_type);
+        $stmt->bind_result($id, $_date, $_physical_id, $_virtual_id, $_type, $issuer_id);
         $stmt->execute();
 
         $array = [];
         while($stmt->fetch()) {
-            $array[$id] = ["date" => $_date, "physical_id" => "$_physical_id", "virtual_id" => $_virtual_id, "type" => "$_type"];
+            $array[$id] = ["date" => $_date, "physical_id" => "$_physical_id",
+                "virtual_id" => $_virtual_id, "type" => "$_type", "issuer_id" => "$issuer_id"];
         }
 
         $stmt->close();

@@ -34,6 +34,9 @@ import ir_init from './_device_ir';
 const MIN_UPDATE_DELAY = 500;
 const REPORT_STATE_DELAY = 2500;
 const UPDATE_URL = "/api/device_save.php";
+const INSTANCE_ID = (Math.random() * 10e16).toString(16) + (Math.random() * 10e16).toString(16);
+
+const HEADERS = {"X-Smart-Home-Web-Instance-Id": INSTANCE_ID};
 
 const STATE_FIELD_MAPPING = {
     "on": "state",
@@ -79,6 +82,8 @@ $(function() {
     let update_lock = false;
     let input_cloning = false;
 
+    let ignore_updates = false;
+
     ir_init();
 
     $(function() {
@@ -114,7 +119,8 @@ $(function() {
             method: "POST",
             dataType: "json",
             contentType: "json",
-            data: JSON.stringify({device_id: $(this).data("device-id")})
+            data: JSON.stringify({device_id: $(this).data("device-id")}),
+            headers: HEADERS
         }).done(resp => {
             showSnackbar(resp.message);
         }).fail(resp => {
@@ -128,6 +134,8 @@ $(function() {
      * @param {String} id
      */
     function updateById(id) {
+        if(ignore_updates)
+            return;
         const parent = $(`.device-parent[data-device-id="${id}"]`);
         const parent_id = parent.data("parent-id");
         const form = serializeToAssociative(parent.find("form").serializeArray());
@@ -148,7 +156,8 @@ $(function() {
             method: "POST",
             dataType: "json",
             contentType: "application/json",
-            data: JSON.stringify(all)
+            data: JSON.stringify(all),
+            headers: HEADERS
         }).done(() => {
             last_call_duration = Date.now() - last_call;
         });
@@ -179,7 +188,8 @@ $(function() {
             dataType: "json",
             contentType: "application/json",
             data: JSON.stringify(all),
-            async: async
+            async: async,
+            headers: HEADERS
         }).done(() => {
             update_lock = false;
             last_call_duration = Date.now() - last_call;
@@ -226,7 +236,10 @@ $(function() {
     if(typeof (EventSource) !== "undefined") {
         const source = new EventSource(`/api/mod_stream.php?type=16&physical_id=${parent_id}`);
         source.onmessage = function() {
-            $.ajax(`/api/device_get_info.php?device_id=${parent_id}`).done(function(response) { // jshint ignore:line
+            $.ajax({
+                url: `/api/device_get_info.php?device_id=${parent_id}`,
+                headers: HEADERS
+            }).done(function(response) { // jshint ignore:line
                 const info = response.data;
                 $(".device-offline-text").toggleClass("invisible", info.online);
             });
@@ -237,7 +250,16 @@ $(function() {
             const updates = JSON.parse(event.data);
             for(let i = 0; i < updates.length; i++) {
                 const virtual_id = updates[i].virtual_id;
-                $.ajax(`/api/device_get_state.php?virtual_device_id=${virtual_id}`).done(function(response) { // jshint ignore:line
+                if(updates[i].issuer_id === INSTANCE_ID) {
+                    continue;
+                }
+
+                $.ajax({
+                    url: `/api/device_get_state.php?virtual_device_id=${virtual_id}`,
+                    headers: HEADERS
+                }).done(function(response) { // jshint ignore:line
+                    /* Ugly way to ignore all event listeners */
+                    ignore_updates = true;
                     const info = response.data;
                     const flat = flattenObject(info.state);
                     for(let k in flat) {
@@ -265,6 +287,7 @@ $(function() {
                             }
                         }
                     }
+                    ignore_updates = false;
                 });
             }
         };

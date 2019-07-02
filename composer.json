@@ -5,6 +5,7 @@
     "firebase/php-jwt": "^5.0",
     "ext-curl": "*",
     "ext-json": "*",
-    "ext-mysqli": "*"
+    "ext-mysqli": "*",
+    "ext-apache": "*"
   }
 }

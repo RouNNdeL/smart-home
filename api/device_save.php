@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +51,14 @@ if($json === false || !isset($json["devices"]) || !isset($json["report_state"]))
     exit();
 }
 
+$issuer_id = apache_request_headers()["X-Smart-Home-Web-Instance-Id"];
+if($issuer_id === null) {
+    $response = ["status" => "error", "error" => "missing_instance_id"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
+
 $response = [];
 foreach($json["devices"] as $id => $physical) {
     $physical_device = $manager->getUserDeviceManager()->getPhysicalDeviceById($id);
@@ -66,7 +74,7 @@ foreach($json["devices"] as $id => $physical) {
         $virtualDevice->handleSaveJson($virtual);
     }
 
-    if($physical_device->save()) {
+    if($physical_device->save($issuer_id)) {
         if($physical_device->sendData(true))
             $response[$id] = "success";
         else
