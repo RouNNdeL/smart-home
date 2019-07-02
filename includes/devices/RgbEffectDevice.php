@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -340,11 +340,12 @@ abstract class RgbEffectDevice extends PhysicalDevice
         }
 
         $checked = $on ? "checked" : "";
+        $name = $this->getNameWithState();
 
         return <<<HTML
     <div class="row">
         <div class="col text-center-vertical">
-            <h4>$this->display_name</h4>
+            <h4>$name</h4>
         </div>
         <div class="col-auto float-right pl-0 align-self-center">
             <div class="form-check">
