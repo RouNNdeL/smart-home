@@ -137,6 +137,7 @@ abstract class BaseEffectDevice extends SimpleRgbDevice {
 
         $center_row = strlen($footer_html) === 0 ? "justify-content-center" : "";
         $center_col = strlen($footer_html) === 0 ? "col-auto" : "col";
+
         return <<<HTML
         <form>
             <div class="card-header">
@@ -291,7 +292,7 @@ HTML;
         foreach($this->effect_indexes as $effect_id) {
             $effect = $this->getEffectById($effect_id);
             $d = $effect->getLastModificationDate();
-            if($d < $old) {
+            if($d <= $old) {
                 $old = $d;
                 $id = $effect_id;
             }

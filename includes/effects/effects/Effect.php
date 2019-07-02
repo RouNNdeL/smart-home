@@ -526,7 +526,7 @@ abstract class Effect {
                 (id, effect, name, time0, time1, time2, time3, time4, time5, 
                 arg0, arg1, arg2, arg3, arg4, arg5) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
                 ON DUPLICATE KEY UPDATE effect = ?, name = ?, time0 = ?, time1 = ?, time2 = ?, time3 = ?, time4 = ?, time5 = ?, 
-                arg0 = ?, arg1 = ?, arg2 = ?, arg3 = ?, arg4 = ?, arg5 = ?, last_modified = NOW()";
+                arg0 = ?, arg1 = ?, arg2 = ?, arg3 = ?, arg4 = ?, arg5 = ?";
         $stmt = $conn->prepare($sql);
         $effectId = $this->getEffectId();
         $id = $this->id >= 0 ? $this->id : null;
@@ -537,8 +537,9 @@ abstract class Effect {
             $this->timings[3], $this->timings[4], $this->timings[5], $args[0], $args[1], $args[2],
             $args[3], $args[4], $args[5]
         );
+
         $stmt->execute();
-        $this->id = (int)$stmt->insert_id;
+        $this->id = $this->id >= 0 ? $this->id : (int)$conn->insert_id;
         $changes = $stmt->affected_rows > 0 ? true : false;
         $stmt->close();
         $this->saveColors();
