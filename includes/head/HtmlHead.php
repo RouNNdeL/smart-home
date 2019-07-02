@@ -61,8 +61,6 @@ class HtmlHead
         $this->entries = array_merge($this->entries, StyleSheetEntry::getDefaults());
     }
 
-
-
     public function addEntry(HeadEntry $entry)
     {
         $this->entries[] = $entry;
