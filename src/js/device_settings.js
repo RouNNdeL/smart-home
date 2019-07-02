@@ -42,14 +42,14 @@ const COLORPICKER_OPTIONS = {
     format: "hex",
     sliders: {
         saturation: {
-            maxLeft: 150,
-            maxTop: 150
+            maxLeft: 125,
+            maxTop: 125
         },
         hue: {
-            maxTop: 150
+            maxTop: 125
         },
         alpha: {
-            maxTop: 150
+            maxTop: 125
         }
     }
 };
