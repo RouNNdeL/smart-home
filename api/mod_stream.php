@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -74,11 +74,15 @@ $last_event = DeviceModManager::getLastModDate(DbUtils::getConnection(),
 while(1) {
     $new_mods = DeviceModManager::queryNewMods(DbUtils::getConnection(),
         $last_event, $user_id, $physical_id, $virtual_id, $types);
+    $arr = [];
+    foreach($new_mods as $new_mod) {
+        $arr[] = $new_mod;
+    }
 
     if(sizeof($new_mods) > 0) {
         $last_event = DeviceModManager::getLastModDate(DbUtils::getConnection(),
             $user_id, $physical_id, $virtual_id, $types);
-        echo "data: ".json_encode($new_mods) . "\n\n";
+        echo "data: ".json_encode($arr) . "\n\n";
         flush();
         ob_end_flush();
     }

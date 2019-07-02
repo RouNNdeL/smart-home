@@ -4,6 +4,7 @@
     "components/jqueryui": "^1.12",
     "firebase/php-jwt": "^5.0",
     "ext-curl": "*",
-    "ext-json": "*"
+    "ext-json": "*",
+    "ext-mysqli": "*"
   }
 }

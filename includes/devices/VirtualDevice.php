@@ -52,14 +52,14 @@ abstract class VirtualDevice {
 
     /**
      * @var string
-     * @deprecated use as DEVICE_TRAIT_COLOR_SETTING
+     * @deprecated use DEVICE_TRAIT_COLOR_SETTING
      * as per Google Docs https://developers.google.com/actions/smarthome/traits/colorspectrum
      */
     const DEVICE_TRAIT_COLOR_SPECTRUM = "action.devices.traits.ColorSpectrum";
 
     /**
      * @var string
-     * @deprecated use as DEVICE_TRAIT_COLOR_SETTING
+     * @deprecated use DEVICE_TRAIT_COLOR_SETTING
      * as per Google Docs https://developers.google.com/actions/smarthome/traits/colortemperature
      */
     const DEVICE_TRAIT_COLOR_TEMPERATURE = "action.devices.traits.ColorTemperature";

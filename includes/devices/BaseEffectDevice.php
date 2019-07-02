@@ -98,6 +98,7 @@ abstract class BaseEffectDevice extends SimpleRgbDevice {
     public function getStateJson(bool $online = false) {
         $json = parent::getStateJson($online);
         $json["currentToggleSettings"][BaseEffectDevice::ACTIONS_TOGGLE_EFFECT] = $this->effects_enabled;
+        return $json;
     }
 
 

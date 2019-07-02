@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -132,18 +132,18 @@ class DeviceModManager {
      * @return null
      */
     public static function queryNewMods(mysqli $conn, string $last_date, int $user_id, $physical_id, $virtual_id, $types) {
-        $sql = "SELECT date, physical_id, virtual_id, type FROM device_modifications 
+        $sql = "SELECT device_modifications.id, date, physical_id, virtual_id, type FROM device_modifications 
                     JOIN devices_physical dp ON device_modifications.physical_id = dp.id 
                     LEFT JOIN device_shares share2 on dp.id = share2.subject_id and dp.owner_id = share2.issuer_id
                     WHERE date > '$last_date' AND %WHERE% ORDER BY date";
 
         $stmt = DeviceModManager::getStatementForParams($conn, $sql, $user_id, $physical_id, $virtual_id, $types);
-        $stmt->bind_result($_date, $_physical_id, $_virtual_id, $_type);
+        $stmt->bind_result($id, $_date, $_physical_id, $_virtual_id, $_type);
         $stmt->execute();
 
         $array = [];
         while($stmt->fetch()) {
-            $array[] = ["date" => $_date, "physical_id" => "$_physical_id", "virtual_id" => $_virtual_id, "type" => "$_type"];
+            $array[$id] = ["date" => $_date, "physical_id" => "$_physical_id", "virtual_id" => $_virtual_id, "type" => "$_type"];
         }
 
         $stmt->close();

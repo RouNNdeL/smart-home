@@ -35,6 +35,13 @@ const MIN_UPDATE_DELAY = 500;
 const REPORT_STATE_DELAY = 2500;
 const UPDATE_URL = "/api/device_save.php";
 
+const STATE_FIELD_MAPPING = {
+    "on": "state",
+    "brightness": "brightness",
+    "color.spectrumRgb": "color",
+    "currentToggleSettings.effect": "effects"
+};
+
 const COLORPICKER_OPTIONS = {
     useAlpha: false,
     inline: true,
@@ -53,6 +60,14 @@ const COLORPICKER_OPTIONS = {
         }
     }
 };
+
+const flattenObject = (obj, prefix = '') =>
+    Object.keys(obj).reduce((acc, k) => {
+        const pre = prefix.length ? prefix + '.' : '';
+        if(typeof obj[k] === 'object') Object.assign(acc, flattenObject(obj[k], pre + k));
+        else acc[pre + k] = obj[k];
+        return acc;
+    }, {});
 
 $(function() {
     const parent_id = $(".device-settings-content").data("device-id");
@@ -199,8 +214,7 @@ $(function() {
         if(Date.now() > last_update + update_delay) {
             updateById(id);
             last_update = Date.now();
-        }
-        else {
+        } else {
             clearTimeout(update_timeouts[id]);
             update_timeouts[id] = setTimeout(update.bind(this, e), last_update + MIN_UPDATE_DELAY - Date.now());
         }
@@ -209,13 +223,50 @@ $(function() {
         update_timeout_global = setTimeout(reportState, REPORT_STATE_DELAY);
     }
 
-    if(typeof(EventSource) !== "undefined") {
+    if(typeof (EventSource) !== "undefined") {
         const source = new EventSource(`/api/mod_stream.php?type=16&physical_id=${parent_id}`);
         source.onmessage = function() {
             $.ajax(`/api/device_get_info.php?device_id=${parent_id}`).done(function(response) { // jshint ignore:line
                 const info = response.data;
                 $(".device-offline-text").toggleClass("invisible", info.online);
             });
+        };
+
+        const source2 = new EventSource(`/api/mod_stream.php?type=17&physical_id=${parent_id}`);
+        source2.onmessage = function(event) {
+            const updates = JSON.parse(event.data);
+            for(let i = 0; i < updates.length; i++) {
+                const virtual_id = updates[i].virtual_id;
+                $.ajax(`/api/device_get_state.php?virtual_device_id=${virtual_id}`).done(function(response) { // jshint ignore:line
+                    const info = response.data;
+                    const flat = flattenObject(info.state);
+                    for(let k in flat) {
+                        if(!flat.hasOwnProperty(k)) {
+                            continue;
+                        }
+
+                        const mapped_field = STATE_FIELD_MAPPING[k];
+                        const field_input = $(`input#${mapped_field}-${virtual_id}`);
+                        const value = flat[k];
+
+                        switch(mapped_field) {
+                            case "state":
+                            case "effects": {
+                                field_input.bootstrapSwitch("state", value, false);
+                                break;
+                            }
+                            case "brightness": {
+                                field_input.data("ionRangeSlider").update({from: value});
+                                break;
+                            }
+                            case "color": {
+                                field_input.parent().colorpicker("setValue", value);
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
         };
     }
 });

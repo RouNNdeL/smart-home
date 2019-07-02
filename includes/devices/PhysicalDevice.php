@@ -98,6 +98,9 @@ abstract class PhysicalDevice {
         $changed = false;
         foreach($this->virtual_devices as $virtual_device) {
             $d_changed = $virtual_device->toDatabase();
+            if($d_changed) {
+                DeviceModManager::insertDeviceModification(DbUtils::getConnection(), $this->id, $virtual_device->getDeviceId(), DeviceModManager::DEVICE_MOD_SIMPLE_SETTINGS);
+            }
             $changed = $changed || $d_changed;
         }
         return $changed;
