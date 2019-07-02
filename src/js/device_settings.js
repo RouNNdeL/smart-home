@@ -84,6 +84,15 @@ $(function() {
 
     let ignore_updates = false;
 
+    let mouse_down = false;
+    let mouse_timeout = -1;
+    $(document).mousedown(function() {
+        clearTimeout(mouse_timeout);
+        mouse_down = true;
+    }).mouseup(function() {
+        mouse_timeout = setTimeout(() => mouse_down = false, 2000);
+    });
+
     ir_init();
 
     $(function() {
@@ -259,7 +268,13 @@ $(function() {
                     headers: HEADERS
                 }).done(function(response) { // jshint ignore:line
                     /* Ugly way to ignore all event listeners */
+                    if(mouse_down) {
+                        return;
+                    }
+
                     ignore_updates = true;
+                    clearTimeout(update_timeout_global);
+
                     const info = response.data;
                     const flat = flattenObject(info.state);
                     for(let k in flat) {
