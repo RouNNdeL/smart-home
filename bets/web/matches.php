@@ -127,14 +127,24 @@ HTML;
         else
             $matches = Match::todayAndUpcoming();
 
-        foreach($matches as $match) {
-            $match->loadPredictions($manager->getSessionManager()->getUserId());
-            $points = $match->getPoints();
-            $html = $match->toCardHtml();
+        if(sizeof($matches) > 0) {
+
+            foreach($matches as $match) {
+                $match->loadPredictions($manager->getSessionManager()->getUserId());
+                $points = $match->getPoints();
+                $html = $match->toCardHtml();
+                echo <<<HTML
+                    <div class="col-xs-24 col-md-12 col-lg-8 mb-3 px-md-2">
+                        $html
+                    </div>
+HTML;
+
+            }
+        } else {
             echo <<<HTML
-            <div class="col-xs-24 col-md-12 col-lg-8 mb-3 px-md-2">
-            $html
-</div>
+                <div class="col-xs-24 col-md-12 col-lg-8 mb-3 px-md-2 offset-md-6 offset-lg-8 py-4">
+                    <p class="text-center">No matches to display</p>
+                </div>
 HTML;
 
         }
