@@ -34,8 +34,7 @@ require_once __DIR__ . "/Team.php";
 require_once __DIR__ . "/MatchUtils.php";
 require_once __DIR__ . "/../database/DbUtils.php";
 
-class Match
-{
+class Match {
     /** @var int */
     private $id;
 
@@ -86,8 +85,7 @@ class Match
      */
     public function __construct(int $id, Team $teamA, Team $teamB, int $start_date, $scoreA, $scoreB,
                                 string $stage, bool $can_draw, $final_win
-    )
-    {
+    ) {
         $this->id = $id;
         $this->teamA = $teamA;
         $this->teamB = $teamB;
@@ -103,16 +101,14 @@ class Match
      * @param int $match_id
      * @return Match|null
      */
-    public static function byId(int $match_id)
-    {
+    public static function byId(int $match_id) {
         $conn = DbUtils::getConnection();
         $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage, can_draw, penalties FROM bet_matches WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $match_id);
         $stmt->execute();
 
-        if($result = $stmt->get_result())
-        {
+        if($result = $stmt->get_result()) {
             $row = $result->fetch_assoc();
             $stmt->close();
             if($row !== null)
@@ -126,8 +122,7 @@ class Match
      * @param array $row
      * @return Match
      */
-    private static function fromDbRow(array $row)
-    {
+    private static function fromDbRow(array $row) {
         $teamA = Team::byId($row["teamA"]);
         $teamB = Team::byId($row["teamB"]);
         $date = strtotime($row["date"]);
@@ -140,8 +135,7 @@ class Match
      * @param bool $reverse
      * @return Match[]
      */
-    public static function finished($reverse = false)
-    {
+    public static function finished($reverse = false) {
         $order = $reverse ? "DESC" : "ASC";
         $conn = DbUtils::getConnection();
         $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage, can_draw, penalties FROM bet_matches 
@@ -149,10 +143,8 @@ class Match
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $arr = [];
-        if($result = $stmt->get_result())
-        {
-            while($row = $result->fetch_assoc())
-            {
+        if($result = $stmt->get_result()) {
+            while($row = $result->fetch_assoc()) {
                 $arr[] = Match::fromDbRow($row);
             }
         }
@@ -164,8 +156,7 @@ class Match
     /**
      * @return Match[]
      */
-    public static function today()
-    {
+    public static function today() {
         $conn = DbUtils::getConnection();
         $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage, can_draw, penalties FROM bet_matches 
                 WHERE DATE(date) = DATE(NOW())
@@ -173,10 +164,8 @@ class Match
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $arr = [];
-        if($result = $stmt->get_result())
-        {
-            while($row = $result->fetch_assoc())
-            {
+        if($result = $stmt->get_result()) {
+            while($row = $result->fetch_assoc()) {
                 $arr[] = Match::fromDbRow($row);
             }
         }
@@ -188,8 +177,7 @@ class Match
     /**
      * @return Match[]
      */
-    public static function todayAndUpcoming()
-    {
+    public static function todayAndUpcoming() {
         $conn = DbUtils::getConnection();
         $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage, can_draw, penalties FROM bet_matches 
                 WHERE DATE(date) >= DATE(NOW()) 
@@ -197,10 +185,8 @@ class Match
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $arr = [];
-        if($result = $stmt->get_result())
-        {
-            while($row = $result->fetch_assoc())
-            {
+        if($result = $stmt->get_result()) {
+            while($row = $result->fetch_assoc()) {
                 $arr[] = Match::fromDbRow($row);
             }
         }
@@ -212,18 +198,15 @@ class Match
     /**
      * @return Match[]
      */
-    public static function upcoming()
-    {
+    public static function upcoming() {
         $conn = DbUtils::getConnection();
         $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage, can_draw, penalties FROM bet_matches
                 WHERE date > NOW() ORDER BY date ASC";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $arr = [];
-        if($result = $stmt->get_result())
-        {
-            while($row = $result->fetch_assoc())
-            {
+        if($result = $stmt->get_result()) {
+            while($row = $result->fetch_assoc()) {
                 $arr[] = Match::fromDbRow($row);
             }
         }
@@ -236,8 +219,7 @@ class Match
      * @param bool $reverse
      * @return Match[]
      */
-    public static function all($reverse = false)
-    {
+    public static function all($reverse = false) {
         $order = $reverse ? "DESC" : "ASC";
         $conn = DbUtils::getConnection();
         $sql = "SELECT id, teamA, teamB, date, scoreA, scoreB, stage, can_draw, penalties 
@@ -245,10 +227,8 @@ class Match
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $arr = [];
-        if($result = $stmt->get_result())
-        {
-            while($row = $result->fetch_assoc())
-            {
+        if($result = $stmt->get_result()) {
+            while($row = $result->fetch_assoc()) {
                 $arr[] = Match::fromDbRow($row);
             }
         }
@@ -260,18 +240,17 @@ class Match
     /**
      * @return int|null
      */
-    public function getPoints()
-    {
+    public function getPoints() {
         $points = !$this->can_draw && $this->final_win !== null &&
-                    $this->final_win === $this->final_win_prediction ? 1 : 0;
+        $this->final_win === $this->final_win_prediction ? 1 : 0;
         if($this->scoreA === null || $this->scoreB === null)
             return null;
         if($this->predictionA === null || $this->predictionB === null)
             return 0;
         if($this->predictionA === $this->scoreA && $this->predictionB === $this->scoreB)
-            return $points+4;
+            return $points + 4;
         if($this->predictionA - $this->predictionB === $this->scoreA - $this->scoreB)
-            return $points+2;
+            return $points + 2;
         if($this->scoreA === $this->scoreB || $this->predictionA === $this->predictionB)
             return 0;
         if(!($this->predictionA > $this->predictionB xor $this->scoreA > $this->scoreB))
@@ -279,25 +258,20 @@ class Match
         return 0;
     }
 
-    public function loadPredictions(int $user_id)
-    {
+    public function loadPredictions(int $user_id) {
         $prediction = MatchUtils::getPredictionForUserAndMatch($user_id, $this->id);
-        if($prediction === null)
-        {
+        if($prediction === null) {
             $this->predictionA = null;
             $this->predictionB = null;
             $this->final_win_prediction = null;
-        }
-        else
-        {
+        } else {
             $this->predictionA = $prediction["a"];
             $this->predictionB = $prediction["b"];
             $this->final_win_prediction = $prediction["final_win"];
         }
     }
 
-    public function toBigHtml(int $user_id)
-    {
+    public function toBigHtml(int $user_id) {
         $nameTeamA = $this->teamA->getName();
         $nameTeamB = $this->teamB->getName();
 
@@ -308,43 +282,32 @@ class Match
         $time = $this->getTimeString();
 
         $user_picked = true;
-        if($this->picksOpen())
-        {
+        if($this->picksOpen()) {
             $user_pick = MatchUtils::getPredictionPointsForUserAndMatch($user_id, $this->id);
             if($user_pick === null)
                 $user_picked = false;
             $rows = [$user_pick];
-        }
-        else
-        {
+        } else {
             $rows = MatchUtils::getUserNamesIdsAndPredictionForMatch($this->id);
         }
 
         $table_rows = "";
-        if($user_picked)
-        {
-            if(sizeof($rows) > 0)
-            {
-                foreach($rows as $row)
-                {
+        if($user_picked) {
+            if(sizeof($rows) > 0) {
+                foreach($rows as $row) {
                     $table_rows .= MatchUtils::predictionRow(
                         $row["name"], $row["score"], $row["points"],
                         $user_id === $row["user_id"]
                     );
                 }
-            }
-            else
-            {
+            } else {
                 $table_rows .= "<tr><td colspan='3'>No predictions for this match</td></tr>";
             }
-        }
-        else
-        {
+        } else {
             $table_rows .= "<tr><td colspan='3'>You have not placed a pick for this match yet</td></tr>";
         }
 
-        if($this->picksOpen())
-        {
+        if($this->picksOpen()) {
             $table_rows .= "<tr><td colspan='3'>Other user's predictions will be shown once the picks are locked</td></tr>";
         }
 
@@ -418,8 +381,7 @@ HTML;
     }
 
     private
-    function getTimeString()
-    {
+    function getTimeString() {
         if($this->matchInProgress())
             return "In Progress";
         if($this->scoreA !== null && $this->scoreB !== null)
@@ -427,18 +389,15 @@ HTML;
         return MatchUtils::formatDate($this->start_date);
     }
 
-    public function matchInProgress()
-    {
+    public function matchInProgress() {
         return time() > $this->start_date && $this->scoreB === null && $this->scoreA === null;
     }
 
-    public function picksOpen()
-    {
+    public function picksOpen() {
         return time() < $this->start_date - MatchUtils::PICK_LOCK_MINUTES * 60;
     }
 
-    private function getPickLock($element = "small")
-    {
+    private function getPickLock($element = "small") {
         $pick_warn = $this->warnPicks();
         $bold = $pick_warn ? "font-weight-bold" : "";
         $text = $pick_warn ? "text-light" : "text-muted";
@@ -449,8 +408,7 @@ HTML;
             "<$element class='text-muted float-right align-middle'>Locked</$element>";
     }
 
-    public function warnPicks()
-    {
+    public function warnPicks() {
         return $this->start_date - (MatchUtils::PICK_LOCK_WARNING + MatchUtils::PICK_LOCK_MINUTES) * 60 < time();
     }
 
@@ -458,8 +416,7 @@ HTML;
      * @return string
      */
     public
-    function toCardHtml()
-    {
+    function toCardHtml() {
         $pickA = $this->predictionA === null ? "" : $this->predictionA;
         $pickB = $this->predictionB === null ? "" : $this->predictionB;
 
@@ -478,10 +435,8 @@ HTML;
         $time = $this->getTimeString();
         $top = "";
         $bottom = "";
-        if($picks_locked)
-        {
-            if($scores)
-            {
+        if($picks_locked) {
+            if($scores) {
                 $score = $this->scoreA . " ‒ " . $this->scoreB;
                 $top = <<<HTML
                     <div class="row btn-mock">
@@ -490,9 +445,7 @@ HTML;
                         </div>
                     </div>
 HTML;
-            }
-            else
-            {
+            } else {
                 $top = <<<HTML
                     <div class="row btn-mock">
                         <div class="col">
@@ -501,9 +454,7 @@ HTML;
                     </div>
 HTML;
             }
-        }
-        else
-        {
+        } else {
 
             $bottom = "<button class=\"btn btn-primary match-submit-button\" role=\"button\" type=\"button\">Save</button>";
         }
@@ -592,8 +543,7 @@ HTML;
     }
 
     public
-    function getTeamString()
-    {
+    function getTeamString() {
         return $this->teamA->getName() . "-" . $this->teamB->getName();
     }
 
@@ -601,8 +551,7 @@ HTML;
      * @return int
      */
     public
-    function getId(): int
-    {
+    function getId(): int {
         return $this->id;
     }
 }

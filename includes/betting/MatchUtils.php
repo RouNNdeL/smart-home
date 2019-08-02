@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,7 @@
 
 require_once __DIR__ . "/Match.php";
 
-class MatchUtils
-{
+class MatchUtils {
     const TEAM_A = 0;
     const TEAM_B = 1;
 
@@ -41,30 +40,22 @@ class MatchUtils
     const PICK_LOCK_WARNING = 60;
     const TOP_LOCK_MATCH_ID = 50;
 
-    public static function formatDate(int $dateTime)
-    {
+    public static function formatDate(int $dateTime) {
         $day_diff = floor($dateTime / 86400) - floor(time() / 86400);
         $time_string = date("g:iA", $dateTime);
-        if($day_diff == 0)
-        {
+        if($day_diff == 0) {
             return "Today • " . $time_string;
-        }
-        else if($day_diff == 1)
-        {
+        } else if($day_diff == 1) {
             return "Tomorrow • " . $time_string;
-        }
-        else
-        {
+        } else {
             return date("D, j/n • ", $dateTime) . $time_string;
         }
     }
 
-    public static function formatDuration(int $time)
-    {
+    public static function formatDuration(int $time) {
         $str = "";
         $days = floor($time / 86400);
-        if($days > 0)
-        {
+        if($days > 0) {
             $str .= "$days day" . ($days == 1 ? " " : "s ");
         }
         $hours = str_pad(floor($time / 3600) % 24, 2, "0", STR_PAD_LEFT);
@@ -75,8 +66,7 @@ class MatchUtils
         return $str;
     }
 
-    public static function getLeaderboard()
-    {
+    public static function getLeaderboard() {
         $conn = DbUtils::getConnection();
         $sql = "
         SELECT
@@ -97,24 +87,21 @@ class MatchUtils
         $stmt->bind_result($name, $points);
         $stmt->execute();
         $arr = [];
-        while($stmt->fetch())
-        {
+        while($stmt->fetch()) {
             $arr[] = ["name" => $name, "points" => (int)$points];
         }
         $stmt->close();
         return $arr;
     }
 
-    public static function getPredictionForUserAndMatch(int $user_id, int $match_id)
-    {
+    public static function getPredictionForUserAndMatch(int $user_id, int $match_id) {
         $conn = DbUtils::getConnection();
         $sql = "SELECT scoreA, scoreB, final_win FROM bet_predictions WHERE user_id = ? AND match_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ii", $user_id, $match_id);
         $stmt->bind_result($scoreA, $scoreB, $final_win);
         $stmt->execute();
-        if(!$stmt->fetch())
-        {
+        if(!$stmt->fetch()) {
             $stmt->close();
             return null;
         }
@@ -122,8 +109,7 @@ class MatchUtils
         return ["a" => $scoreA, "b" => $scoreB, "final_win" => $final_win];
     }
 
-    public static function updatePredictionPoints(int $prediction_id, int $points)
-    {
+    public static function updatePredictionPoints(int $prediction_id, int $points) {
         $conn = DbUtils::getConnection();
         $sql = "UPDATE bet_predictions SET points = ? WHERE id = ?";
         $stmt = $conn->prepare($sql);
@@ -133,8 +119,7 @@ class MatchUtils
         return $result;
     }
 
-    public static function insertPrediction(int $user_id, int $match_id, int $scoreA, int $scoreB, $final_win)
-    {
+    public static function insertPrediction(int $user_id, int $match_id, int $scoreA, int $scoreB, $final_win) {
         if(!Match::byId($match_id)->picksOpen())
             return false;
         $conn = DbUtils::getConnection();
@@ -147,8 +132,7 @@ class MatchUtils
         return $result;
     }
 
-    public static function getUserIdsAndPredictionIdsForMatch(int $match_id)
-    {
+    public static function getUserIdsAndPredictionIdsForMatch(int $match_id) {
         $conn = DbUtils::getConnection();
         $sql = "SELECT id, user_id FROM bet_predictions WHERE match_id = ?";
         $stmt = $conn->prepare($sql);
@@ -156,16 +140,14 @@ class MatchUtils
         $stmt->bind_result($id, $user_id);
         $stmt->execute();
         $arr = [];
-        while($stmt->fetch())
-        {
+        while($stmt->fetch()) {
             $arr[] = ["id" => $id, "user_id" => $user_id];
         }
         $stmt->close();
         return $arr;
     }
 
-    public static function getPredictionPointsForUserAndMatch(int $user_id, int $match_id)
-    {
+    public static function getPredictionPointsForUserAndMatch(int $user_id, int $match_id) {
         $conn = DbUtils::getConnection();
         $sql = "SELECT user_id, concat(first_name, ' ', last_name),
   concat(bet_predictions.scoreA, '-', bet_predictions.scoreB,
@@ -182,8 +164,7 @@ class MatchUtils
         $stmt->bind_param("ii", $match_id, $user_id);
         $stmt->bind_result($user_id, $name, $score, $points);
         $stmt->execute();
-        if($stmt->fetch())
-        {
+        if($stmt->fetch()) {
             $stmt->close();
             return ["user_id" => $user_id, "name" => $name, "score" => $score, "points" => $points];
         }
@@ -191,8 +172,7 @@ class MatchUtils
         return null;
     }
 
-    public static function getUserNamesIdsAndPredictionForMatch(int $match_id)
-    {
+    public static function getUserNamesIdsAndPredictionForMatch(int $match_id) {
         $conn = DbUtils::getConnection();
         $sql = "SELECT user_id, concat(first_name, ' ', last_name),
   concat(bet_predictions.scoreA, '-', bet_predictions.scoreB,
@@ -210,30 +190,25 @@ class MatchUtils
         $stmt->bind_result($user_id, $name, $score, $points);
         $stmt->execute();
         $arr = [];
-        while($stmt->fetch())
-        {
+        while($stmt->fetch()) {
             $arr[] = ["user_id" => $user_id, "name" => $name, "score" => $score, "points" => $points];
         }
         $stmt->close();
         return $arr;
     }
 
-    public static function refreshPoints()
-    {
+    public static function refreshPoints() {
         $matches = Match::finished();
-        foreach($matches as $match)
-        {
+        foreach($matches as $match) {
             $predictions = MatchUtils::getUserIdsAndPredictionIdsForMatch($match->getId());
-            foreach($predictions as $prediction)
-            {
+            foreach($predictions as $prediction) {
                 $match->loadPredictions($prediction["user_id"]);
                 MatchUtils::updatePredictionPoints($prediction["id"], $match->getPoints());
             }
         }
     }
 
-    public static function predictionRow($name, $score, $points, $highlight = false)
-    {
+    public static function predictionRow($name, $score, $points, $highlight = false) {
         $highlight_class = $highlight ? "class=\"table-success\"" : "";
         return <<<HTML
         <tr $highlight_class>
@@ -245,8 +220,7 @@ HTML;
 
     }
 
-    public static function leaderboardRow($position, $name, $points)
-    {
+    public static function leaderboardRow($position, $name, $points) {
         return <<<HTML
         <tr>
             <th scope="row">$position</th>
@@ -262,15 +236,13 @@ HTML;
      * @param int|null $selected_id
      * @return string
      */
-    public static function getTeamsOptions(array $teams, $selected_id = null)
-    {
+    public static function getTeamsOptions(array $teams, $selected_id = null) {
         $str = "";
-        foreach($teams as $team)
-        {
+        foreach($teams as $team) {
             $name = $team->getName();
             $id = $team->getId();
             $selected = $id === $selected_id ? "selected" : "";
-            $str.="<option value='$id' $selected>$name</option>";
+            $str .= "<option value='$id' $selected>$name</option>";
         }
         return $str;
     }
@@ -282,8 +254,7 @@ HTML;
      * @param int $team2
      * @return bool
      */
-    public static function insertTopPrediction(int $user_id, int $team0, int $team1, int $team2)
-    {
+    public static function insertTopPrediction(int $user_id, int $team0, int $team1, int $team2) {
         if(!Match::byId(MatchUtils::TOP_LOCK_MATCH_ID)->picksOpen())
             return false;
         $conn = DbUtils::getConnection();
@@ -296,16 +267,14 @@ HTML;
         return $result;
     }
 
-    public static function getTopPrediction(int $user_id)
-    {
+    public static function getTopPrediction(int $user_id) {
         $conn = DbUtils::getConnection();
         $sql = "SELECT team0, team1, team2 FROM bet_top_predictions WHERE user_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
         $stmt->bind_result($team0, $team1, $team2);
         $stmt->execute();
-        if($stmt->fetch())
-        {
+        if($stmt->fetch()) {
             $stmt->close();
             return [$team0, $team1, $team2];
         }

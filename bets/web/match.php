@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,15 +34,13 @@ require_once __DIR__ . "/../../includes/GlobalManager.php";
 
 $manager = GlobalManager::withSessionManager(false);
 
-if(!$manager->getSessionManager()->isLoggedIn())
-{
+if(!$manager->getSessionManager()->isLoggedIn()) {
     $params = ["next" => "https://bets.zdul.xyz" . $_SERVER["REQUEST_URI"]];
     header("Location: https://home.zdul.xyz/login?" . http_build_query($params));
     exit(0);
 }
 
-if(!isset($_GET["id"]))
-{
+if(!isset($_GET["id"])) {
     echo "Invalid request";
     http_response_code(400);
     exit();
@@ -51,15 +49,13 @@ if(!isset($_GET["id"]))
 require_once __DIR__ . "/../../includes/betting/Match.php";
 
 $match = Match::byId($_GET["id"]);
-if($match === null)
-{
-    require __DIR__."/../../web/error/404.php";
+if($match === null) {
+    require __DIR__ . "/../../web/error/404.php";
     http_response_code(404);
     exit(0);
 }
 
-if(isset($_GET["name"]) && $_GET["name"] === "false")
-{
+if(isset($_GET["name"]) && $_GET["name"] === "false") {
     require_once __DIR__ . "/../../includes/Utils.php";
     $name = urlencode($match->getTeamString());
     header("Location: /match/$name/$_GET[id]");

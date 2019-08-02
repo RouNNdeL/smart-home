@@ -34,8 +34,7 @@ require_once __DIR__ . "/../../includes/GlobalManager.php";
 
 $manager = GlobalManager::withSessionManager(false);
 
-if(!$manager->getSessionManager()->isLoggedIn())
-{
+if(!$manager->getSessionManager()->isLoggedIn()) {
     $params = ["next" => "https://bets.zdul.xyz/leaderboard"];
     header("Location: https://home.zdul.xyz/login?" . http_build_query($params));
     exit(0);
@@ -111,25 +110,24 @@ echo $head->toString();
                     <h5>Choose the top 3 teams (order is ambiguous)</h5>
                     <br>
                     <form>
-                    <?php
-                    require_once __DIR__ . "/../../includes/betting/MatchUtils.php";
-                    require_once __DIR__ . "/../../includes/betting/Team.php";
+                        <?php
+                        require_once __DIR__ . "/../../includes/betting/MatchUtils.php";
+                        require_once __DIR__ . "/../../includes/betting/Team.php";
 
-                    $chosen_ids = MatchUtils::getTopPrediction($manager->getSessionManager()->getUserId());
+                        $chosen_ids = MatchUtils::getTopPrediction($manager->getSessionManager()->getUserId());
 
-                    for($i = 0; $i < 3; $i++)
-                    {
-                        $teamsOptions = MatchUtils::getTeamsOptions(Team::getAll(), $chosen_ids[$i]);
-                        $options = "<option value='null'>Select a team</option>" . $teamsOptions;
+                        for($i = 0; $i < 3; $i++) {
+                            $teamsOptions = MatchUtils::getTeamsOptions(Team::getAll(), $chosen_ids[$i]);
+                            $options = "<option value='null'>Select a team</option>" . $teamsOptions;
 
-                        echo <<<HTML
+                            echo <<<HTML
                     <div class="form-group">
                         <select name="team_$i" class="form-control top-team-select">$options</select>
                     </div>
 HTML;
-                    }
+                        }
 
-                    ?>
+                        ?>
                         <button id="top-submit-btn" class="btn btn-primary" role="button" type="button">Save</button>
                     </form>
                 </div>

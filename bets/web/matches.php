@@ -34,9 +34,8 @@ require_once __DIR__ . "/../../includes/GlobalManager.php";
 
 $manager = GlobalManager::withSessionManager(false);
 
-if(!$manager->getSessionManager()->isLoggedIn())
-{
-    $params = ["next" => "https://".$_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"]];
+if(!$manager->getSessionManager()->isLoggedIn()) {
+    $params = ["next" => "https://" . $_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"]];
     header("Location: https://home.zdul.xyz/login?" . http_build_query($params));
     exit(0);
 }
@@ -128,8 +127,7 @@ HTML;
         else
             $matches = Match::todayAndUpcoming();
 
-        foreach($matches as $match)
-        {
+        foreach($matches as $match) {
             $match->loadPredictions($manager->getSessionManager()->getUserId());
             $points = $match->getPoints();
             $html = $match->toCardHtml();

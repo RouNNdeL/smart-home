@@ -35,8 +35,7 @@ require_once __DIR__ . "/../../includes/GlobalManager.php";
 
 $manager = GlobalManager::withSessionManager(false);
 
-if(!$manager->getSessionManager()->isLoggedIn())
-{
+if(!$manager->getSessionManager()->isLoggedIn()) {
     $params = ["next" => "https://bets.zdul.xyz/leaderboard"];
     header("Location: https://home.zdul.xyz/login?" . http_build_query($params));
     exit(0);
@@ -121,12 +120,10 @@ echo $head->toString();
 
                     $position = 0;
                     $last_points = -1;
-                    foreach(MatchUtils::getLeaderboard() as $i => $item)
-                    {
-                        if($last_points === -1 || $item["points"] < $last_points)
-                        {
+                    foreach(MatchUtils::getLeaderboard() as $i => $item) {
+                        if($last_points === -1 || $item["points"] < $last_points) {
                             $last_points = $item["points"];
-                            $position = $i+1;
+                            $position = $i + 1;
                         }
                         echo MatchUtils::leaderboardRow($position, $item["name"], $item["points"]);
                     }

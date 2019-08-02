@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,10 +30,10 @@
  * Time: 18:20
  */
 
-require_once __DIR__."/../../includes/GlobalManager.php";
+require_once __DIR__ . "/../../includes/GlobalManager.php";
 
 $manager = GlobalManager::withSessionManager(true);
 
-require_once __DIR__."/../../includes/betting/MatchUtils.php";
+require_once __DIR__ . "/../../includes/betting/MatchUtils.php";
 MatchUtils::refreshPoints();
 header("Location: /leaderboard");

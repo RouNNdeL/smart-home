@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,8 +35,7 @@ require_once __DIR__ . "/../../includes/betting/MatchUtils.php";
 
 $manager = GlobalManager::withSessionManager(true);
 
-if($_SERVER["REQUEST_METHOD"] !== "POST")
-{
+if($_SERVER["REQUEST_METHOD"] !== "POST") {
     $response = ["error" => "invalid_request"];
     http_response_code(400);
     exit();
@@ -44,8 +43,7 @@ if($_SERVER["REQUEST_METHOD"] !== "POST")
 
 $json = json_decode(file_get_contents("php://input"), true);
 if($json === false || !isset($json["team_0"]) || !isset($json["team_1"]) || !isset($json["team_2"])
-    || !ctype_digit($json["team_0"]) || !ctype_digit($json["team_1"]) || !ctype_digit($json["team_2"]))
-{
+    || !ctype_digit($json["team_0"]) || !ctype_digit($json["team_1"]) || !ctype_digit($json["team_2"])) {
     $response = ["error" => "invalid_json", "message" => "Invalid input!"];
     http_response_code(400);
     echo json_encode($response);
