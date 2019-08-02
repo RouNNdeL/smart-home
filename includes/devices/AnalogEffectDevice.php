@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,13 +31,11 @@
  */
 
 require_once __DIR__ . "/BaseEffectDevice.php";
-require_once __DIR__ . "/../effects/Effect.php";
+require_once __DIR__ . "/../effects/effects/Effect.php";
 
-class AnalogEffectDevice extends BaseEffectDevice
-{
+class AnalogEffectDevice extends BaseEffectDevice {
 
-    public function getAvailableEffects()
-    {
+    public function getAvailableEffects() {
         return [Effect::EFFECT_OFF => "off",
             Effect::EFFECT_STATIC => "static",
             Effect::EFFECT_BREATHING => "breathe",
@@ -45,5 +43,9 @@ class AnalogEffectDevice extends BaseEffectDevice
             Effect::EFFECT_FADING => "fade",
             Effect::EFFECT_SIMPLE_RAINBOW => "rainbow"
         ];
+    }
+
+    public function getDefaultEffect() {
+        return Effect::EFFECT_STATIC;
     }
 }

@@ -1,10 +1,79 @@
 [
   [
-    "tv_power_toggle",
     {
-      "name": "tv_input_hdmi2",
-      "offset": 14,
+      "name": "tv_power_toggle",
+      "btn_class": "btn-info"
+    }
+  ],
+  [
+    {
+      "name": "tv_arrow_up",
+      "offset": 10,
+      "btn_class": "btn-secondary"
+    }
+  ],
+  [
+    {
+      "name": "tv_arrow_left",
+      "offset": 6,
+      "btn_class": "btn-secondary"
+    },
+    {
+      "name": "tv_ok",
+      "btn_class": "btn-dark"
+    },
+    {
+      "name": "tv_arrow_right",
+      "btn_class": "btn-secondary"
+    }
+  ],
+  [
+    {
+      "name": "tv_exit",
+      "offset": 6
+    },
+    {
+      "name": "tv_arrow_down",
+      "btn_class": "btn-secondary"
+    },
+    "tv_back"
+  ],
+  [
+    {
+      "type": "empty",
+      "size": 0.5
+    }
+  ],
+  [
+    {
+      "name": "tv_menu",
+      "offset": 6,
+      "column": 6
+    },
+    {
+      "name": "tv_input_change",
       "column": 6
     }
-  ]
+  ],
+  [
+    {
+      "name": "tv_options",
+      "offset": 6,
+      "column": 6
+    },
+    {
+      "name": "tv_aspect_ratio",
+      "column": 6
+    }
+  ],[
+  {
+    "name": "tv_viera_cast",
+    "offset": 6,
+    "column": 6
+  },
+  {
+    "name": "tv_input_hdmi2",
+    "column": 6
+  }
+]
 ]

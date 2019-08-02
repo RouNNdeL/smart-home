@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,17 +30,13 @@
  * Time: 16:45
  */
 
-require_once __DIR__ . "/RemoteAction.php";
+require_once __DIR__ . "/IrCode.php";
 
-class RemoteLayoutGenerator
-{
+class RemoteLayoutGenerator {
     const TYPE_BUTTON = "button";
     const TYPE_TEXT = "text";
     const TYPE_EMPTY_SPACE = "empty";
     const BREAKPOINT_DEFAULT = "_";
-
-    /** @var RemoteAction[] */
-    private $actions;
 
     private $device_id;
 
@@ -54,22 +50,17 @@ class RemoteLayoutGenerator
      * @param $default_column_width
      * @param $column_count
      */
-    public function __construct($device_id, $default_column_width = 4, $column_count = 24)
-    {
+    public function __construct($device_id, $default_column_width = 4, $column_count = 24) {
         $this->device_id = $device_id;
         $this->default_column_width = $default_column_width;
         $this->column_count = $column_count;
-        $this->actions = RemoteAction::forDeviceId($this->device_id);
     }
 
-    public function toHtml($layout)
-    {
+    public function toHtml($layout) {
         $html = "";
-        foreach($layout as $i => $row)
-        {
+        foreach($layout as $i => $row) {
             $html .= "<div class=\"row\">";
-            foreach($row as $j => $item)
-            {
+            foreach($row as $j => $item) {
                 $type = RemoteLayoutGenerator::TYPE_BUTTON;
                 $offset = "";
                 $column = "col-$this->default_column_width";
@@ -77,41 +68,29 @@ class RemoteLayoutGenerator
                 $margin = "";
                 $title = "";
                 $class = "";
-                if(!is_array($item))
-                {
-                    if(!isset($this->actions[$item]))
+                $btn_class = "btn-light";
+                if(!is_array($item)) {
+                    $action = IrCode::byId($item);
+                    if($action === null)
                         throw new InvalidArgumentException("Non existent action id: $item");
-                    $action = $this->actions[$item];
-                }
-                else
-                {
+                } else {
                     if(isset($item["offset"]))
                         $offset = self::resolveBreakpointArray($item["offset"], "offset");
-                    if(isset($item["padding"]))
-                    {
-                        if(is_array($item["padding"]))
-                        {
-                            foreach($item["padding"] as $m => $v)
-                            {
+                    if(isset($item["padding"])) {
+                        if(is_array($item["padding"])) {
+                            foreach($item["padding"] as $m => $v) {
                                 $padding .= self::resolveBreakpointArray($v, "p$m");
                             }
-                        }
-                        else
-                        {
+                        } else {
                             $padding = self::resolveBreakpointArray($item["padding"], "p");
                         }
                     }
-                    if(isset($item["margin"]))
-                    {
-                        if(is_array($item["margin"]))
-                        {
-                            foreach($item["margin"] as $m => $v)
-                            {
+                    if(isset($item["margin"])) {
+                        if(is_array($item["margin"])) {
+                            foreach($item["margin"] as $m => $v) {
                                 $margin .= self::resolveBreakpointArray($v, "m$m");
                             }
-                        }
-                        else
-                        {
+                        } else {
                             $margin = self::resolveBreakpointArray($item["margin"], "m");
                         }
                     }
@@ -119,42 +98,36 @@ class RemoteLayoutGenerator
                         $column = self::resolveBreakpointArray($item["column"], "col");
                     if(isset($item["type"]))
                         $type = $item["type"];
+                    if(isset($item["class"]))
+                        $class .= " " . $item["class"] . " ";
+                    if(isset($item["btn_class"]))
+                        $btn_class = $item["btn_class"];
 
-                    if($type == RemoteLayoutGenerator::TYPE_BUTTON)
-                    {
+                    if($type == RemoteLayoutGenerator::TYPE_BUTTON) {
                         if(!isset($item["name"]))
                             throw new InvalidArgumentException("Missing action_id field at row $i, column $j");
 
-                        if(!isset($this->actions[$item["name"]]))
+                        $action = IrCode::byId($item["name"]);
+                        if($action === null)
                             throw new InvalidArgumentException("Non existent action id: $item[name]");
-                        $action = $this->actions[$item["name"]];
-                    }
-                    else
-                    {
+                    } else {
                         $action = null;
-                        $class = "text-center text-center-vertical";
+                        $class .= "text-center text-center-vertical";
                     }
                 }
 
                 $html .= "<div class=\"col $column $padding $margin $offset $class\">";
-                if($type === RemoteLayoutGenerator::TYPE_BUTTON)
-                {
+                if($type === RemoteLayoutGenerator::TYPE_BUTTON) {
                     $action_id = $action->getId();
                     $icon = $action->getIcon();
                     preg_match("/^material_(.*)/", $icon, $material_icon_match);
                     preg_match("/^iconic-(.*)/", $icon, $iconic_icon_match);
-                    if(sizeof($material_icon_match) > 0)
-                    {
+                    if(sizeof($material_icon_match) > 0) {
                         $icon_html = "<i class=\"material-icons\">$material_icon_match[1]</i>";
-                    }
-                    else
-                    {
-                        if(sizeof($iconic_icon_match) > 0)
-                        {
+                    } else {
+                        if(sizeof($iconic_icon_match) > 0) {
                             $icon_html = "<span class=\"oi oi-$iconic_icon_match[1]\"></span>";
-                        }
-                        else
-                        {
+                        } else {
                             $icon_html = null;
                         }
                     }
@@ -163,17 +136,12 @@ class RemoteLayoutGenerator
                         $icon_html = $action->getDisplayName();
                     else
                         $title = "title=\"" . $action->getDisplayName() . "\"";
-                    $html .= "<button class=\"btn full-width\" type=\"button\" role=\"button\" 
+                    $html .= "<button class=\"btn full-width $btn_class\" type=\"button\" role=\"button\" 
                     data-action-id=\"$action_id\" $title>$icon_html</button>";
-                }
-                else if($type === RemoteLayoutGenerator::TYPE_TEXT)
-                {
+                } else if($type === RemoteLayoutGenerator::TYPE_TEXT) {
                     $html .= "<span>$item[text]</span>";
-                }
-                else if($type === RemoteLayoutGenerator::TYPE_EMPTY_SPACE)
-                {
-                    switch($item["size"])
-                    {
+                } else if($type === RemoteLayoutGenerator::TYPE_EMPTY_SPACE) {
+                    switch($item["size"]) {
                         case 0.25:
                             $c = "s025";
                             break;
@@ -190,9 +158,7 @@ class RemoteLayoutGenerator
                             $c = "";
                     }
                     $html .= "<div class='button-row $c'></div>";
-                }
-                else
-                {
+                } else {
                     throw new InvalidArgumentException("Invalid type: '$type' at row $i, column $j");
                 }
                 $html .= "</div>";
@@ -202,19 +168,14 @@ class RemoteLayoutGenerator
         return $html;
     }
 
-    private static function resolveBreakpointArray($item, $name)
-    {
-        if(is_array($item))
-        {
+    private static function resolveBreakpointArray($item, $name) {
+        if(is_array($item)) {
             $html = "";
-            foreach($item as $breakpoint => $value)
-            {
+            foreach($item as $breakpoint => $value) {
                 $html = $breakpoint !== RemoteLayoutGenerator::BREAKPOINT_DEFAULT ?
                     $html . " $name-$breakpoint-$value" : $html . " $name-$value";
             }
-        }
-        else
-        {
+        } else {
             $html = "$name-$item";
         }
         return $html;

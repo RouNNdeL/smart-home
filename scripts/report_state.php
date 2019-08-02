@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,19 +30,16 @@
  * Time: 00:00
  */
 
-if (php_sapi_name() !='cli') exit;
+if(php_sapi_name() != 'cli') exit;
 
-if(isset($argv[1]))
-{
-    require_once __DIR__."/../includes/UserDeviceManager.php";
-    $manager = UserDeviceManager::fromUserId($argv[1]);
-    if($manager === null)
-    {
+if(isset($argv[1])) {
+    require_once __DIR__ . "/../includes/UserDeviceManager.php";
+    $manager = UserDeviceManager::forUserId($argv[1]);
+    if($manager === null) {
         throw new InvalidArgumentException("Invalid user id: $argv[1]");
     }
     $manager->sendReportState();
 }
-else
-{
+else {
     echo "You need to provide a user id";
 }

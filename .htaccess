@@ -3,6 +3,9 @@ ErrorDocument 500 /web/error/500.php
 
 RewriteEngine on
 
+RewriteCond %{SERVER_NAME} iot-api.zdul.xyz
+RewriteRule ^ /iot_api%{REQUEST_URI} [END]
+
 RewriteCond %{SERVER_NAME} !dev.zdul.xyz
 RewriteCond %{SERVER_NAME} !bets.zdul.xyz
 RewriteCond %{SERVER_NAME} !home.zdul.xyz
@@ -13,8 +16,9 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)/$ /$1 [L,R=301]
 
 RewriteRule ^$ /login [L]
-RewriteRule ^/?effect/.*?/(.+)$ /advanced_device_settings?device_id=$1 [L]
-RewriteRule ^/?effect/.*?/(.+)$ /advanced_device_settings_advanced?device_id=$1 [L]
+RewriteRule ^/?effect/.*?/(.+)$ /device_effect?device_id=$1 [L]
+RewriteRule ^/?effect/(.+)$ /device_effect?device_id=$1&name=false [L]
+RewriteRule ^/?scenes /device_scenes [L]
 RewriteRule ^/?device/.*?/(.+)$ /device_settings?device_id=$1 [L]
 RewriteRule ^/?device/(.+)$ /device_settings?device_id=$1&name=false [L]
 
@@ -27,7 +31,6 @@ RewriteRule ^ - [L]
 RewriteRule ^bootstrap/(.*) /vendor/twbs/bootstrap/$1 [L]
 RewriteRule ^jquery/(.*) /vendor/components/jquery/$1 [L]
 RewriteRule ^jqueryui/(.*) /vendor/components/jqueryui/$1 [L]
-RewriteRule ^colorpicker/(.*) /lib/bootstrap-colorpicker/$1 [L] #using 7763122916206 commit from Github
 RewriteRule ^slider/(.*) /node_modules/ion-rangeslider/$1 [L]
 RewriteRule ^switch/(.*) /node_modules/bootstrap-switch/$1 [L]
 RewriteRule ^tether/(.*) /node_modules/tether/$1 [L]

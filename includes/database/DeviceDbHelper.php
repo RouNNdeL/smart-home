@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,23 +33,20 @@
 require_once __DIR__ . "/../devices/PhysicalDevice.php";
 require_once __DIR__ . "/../database/HomeUser.php";
 
-class DeviceDbHelper
-{
+class DeviceDbHelper {
 
     /**
      * @param mysqli $conn
      * @param string $physical_device_id
      * @return PhysicalDevice
      */
-    public static function queryPhysicalDeviceById(mysqli $conn, string $physical_device_id)
-    {
+    public static function queryPhysicalDeviceById(mysqli $conn, string $physical_device_id) {
         // TODO: Add Devices shared by other users
-        $sql = "SELECT id, display_name, device_driver, hostname, owner_id FROM devices_physical WHERE id = ?";
+        $sql = "SELECT id, display_name, device_driver, hostname, port, owner_id FROM devices_physical WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $physical_device_id);
         $stmt->execute();
-        if($result = $stmt->get_result())
-        {
+        if($result = $stmt->get_result()) {
             $row = $result->fetch_assoc();
             $stmt->close();
             return PhysicalDevice::fromDatabaseRow($row);
@@ -64,18 +61,15 @@ class DeviceDbHelper
      * @param int $user_id
      * @return PhysicalDevice[]
      */
-    public static function queryPhysicalDevicesForUser(mysqli $conn, int $user_id)
-    {
+    public static function queryPhysicalDevicesForUser(mysqli $conn, int $user_id) {
         // TODO: Add Devices shared by other users
-        $sql = "SELECT id, display_name, device_driver, hostname, owner_id FROM devices_physical WHERE owner_id = ?";
+        $sql = "SELECT id, display_name, device_driver, hostname, port, owner_id FROM devices_physical WHERE owner_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
         $rows = [];
-        if($result = $stmt->get_result())
-        {
-            while($row = $result->fetch_assoc())
-            {
+        if($result = $stmt->get_result()) {
+            while($row = $result->fetch_assoc()) {
                 $rows[] = $row;
             }
         }
@@ -83,8 +77,7 @@ class DeviceDbHelper
         $stmt->close();
 
         $arr = [];
-        foreach($rows as $row)
-        {
+        foreach($rows as $row) {
             $arr[] = PhysicalDevice::fromDatabaseRow($row);
         }
 
@@ -96,21 +89,60 @@ class DeviceDbHelper
      * @param string $physical_device_id
      * @return VirtualDevice[]
      */
-    public static function queryVirtualDevicesForPhysicalDevice(mysqli $conn, string $physical_device_id)
-    {
-        $sql = "SELECT id, type, display_name, synonyms, home_actions, will_report_state, state, 
-                       brightness, color, toggles, ir_protocol, ir_nec_return
-                FROM devices_virtual WHERE parent_id = ?";
+    public static function queryVirtualDevicesForPhysicalDevice(mysqli $conn, string $physical_device_id) {
+        $sql = "SELECT devices_virtual.id, type, display_name, synonyms, home_actions, will_report_state, state,
+  brightness, color, toggles, max_profile_count, color_count, active_profile_count
+        FROM devices_virtual
+          LEFT JOIN devices_effect_properties ON devices_effect_properties.id = parent_id
+        WHERE parent_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $physical_device_id);
         $stmt->execute();
         $arr = [];
 
-        if($result = $stmt->get_result())
-        {
-            while($row = $result->fetch_assoc())
-            {
+        if($result = $stmt->get_result()) {
+            while($row = $result->fetch_assoc()) {
                 $arr[] = VirtualDevice::fromDatabaseRow($row);
+            }
+        }
+
+        $stmt->close();
+        return $arr;
+    }
+
+    /**
+     * @param mysqli $conn
+     * @param int $physical_device_id
+     * @return VirtualDevice[]
+     */
+    public static function queryVirtualDevicesForProfileId(mysqli $conn, int $profile_id) {
+        $sql = "SELECT
+                  v.id,
+                  type,
+                  display_name,
+                  synonyms,
+                  home_actions,
+                  will_report_state,
+                  state,
+                  brightness,
+                  color,
+                  toggles,
+                  ir_protocol,
+                  ir_nec_return
+                FROM devices_effect_scenes
+                  JOIN device_effect_profiles on devices_effect_scenes.id = device_effect_profiles.profile_id
+                  JOIN devices_effect_join dde on device_effect_profiles.device_effect_id = dde.id
+                  JOIN devices_virtual v on dde.device_id = v.id
+                WHERE profile_id = ?
+                GROUP BY v.id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $profile_id);
+        $stmt->execute();
+        $arr = [];
+
+        if($result = $stmt->get_result()) {
+            while($row = $result->fetch_assoc()) {
+                $arr[$row["id"]] = VirtualDevice::fromDatabaseRow($row);
             }
         }
 
@@ -123,8 +155,7 @@ class DeviceDbHelper
      * @param string $physical_device_id
      * @return HomeUser[]
      */
-    public static function queryUsersForDevice(mysqli $conn, string $physical_device_id)
-    {
+    public static function queryUsersForDevice(mysqli $conn, string $physical_device_id) {
         // TODO: Add User ids from shared devices
         $sql = "SELECT owner_id FROM devices_physical WHERE id = ?";
         $stmt = $conn->prepare($sql);
@@ -132,74 +163,76 @@ class DeviceDbHelper
         $stmt->bind_result($owner_id);
         $stmt->execute();
         $arr = [];
-        if($stmt->fetch())
-        {
+        if($stmt->fetch()) {
             $stmt->close();
             $arr[] = HomeUser::queryUserById($conn, $owner_id);
-        }
-        else $stmt->close();
+        } else $stmt->close();
 
         return $arr;
     }
 
-    public static function setOnline(mysqli $conn, string $physical_device_id, bool $online)
-    {
+    public static function setOnline(mysqli $conn, string $physical_device_id, bool $online) {
         $state = $online ? 1 : 0;
         $sql = "UPDATE devices_physical SET online = $state WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $physical_device_id);
         $stmt->execute();
+        $changed = $stmt->affected_rows;
         $stmt->close();
+        if($changed) {
+            DeviceModManager::insertDeviceModification($conn, $physical_device_id, null,
+                DeviceModManager::DEVICE_MOD_ONLINE_STATE);
+        }
     }
 
-    public static function getActiveProfileCount(mysqli $conn, string $physical_device_id)
-    {
+    public static function getActiveProfileCount(mysqli $conn, string $physical_device_id) {
         $sql = "SELECT active_profile_count FROM devices_effect_properties WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $physical_device_id);
         $stmt->bind_result($value);
         $stmt->execute();
-        if($stmt->fetch())
-        {
+        if($stmt->fetch()) {
             $stmt->close();
             return $value;
-        }
-        else $stmt->close();
+        } else $stmt->close();
 
         return null;
     }
 
-    public static function getMaxProfileCount(mysqli $conn, string $physical_device_id)
-    {
+    public static function getMaxProfileCount(mysqli $conn, string $physical_device_id) {
         $sql = "SELECT max_profile_count FROM devices_effect_properties WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $physical_device_id);
         $stmt->bind_result($value);
         $stmt->execute();
-        if($stmt->fetch())
-        {
+        if($stmt->fetch()) {
             $stmt->close();
             return $value;
-        }
-        else $stmt->close();
+        } else $stmt->close();
 
         return null;
     }
 
-    public static function getMaxColorCount(mysqli $conn, string $physical_device_id)
-    {
+    public static function getMaxColorCount(mysqli $conn, string $physical_device_id) {
         $sql = "SELECT color_count FROM devices_effect_properties WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $physical_device_id);
         $stmt->bind_result($value);
         $stmt->execute();
-        if($stmt->fetch())
-        {
+        if($stmt->fetch()) {
             $stmt->close();
             return $value;
-        }
-        else $stmt->close();
+        } else $stmt->close();
 
         return null;
+    }
+
+    public static function updateDeviceConnectionInfo(mysqli $conn, string $device_id, string $hostname, int $port) {
+        $sql = "UPDATE devices_physical SET hostname = ?, port = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sis", $hostname, $port, $device_id);
+        $success = $stmt->execute();
+        $stmt->close();
+        return $success;
     }
 }

@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ if($_SERVER["REQUEST_METHOD"] !== "POST")
 
 require_once __DIR__ . "/../includes/GlobalManager.php";
 
-$manager = GlobalManager::all();
+$manager = GlobalManager::all([ShareManager::SCOPE_SIMPLE_CONTROL]);
 
 $json = json_decode(file_get_contents("php://input"), true);
 if($json === false || !isset($json["action_id"]) || !isset($json["device_id"]))
@@ -51,27 +51,10 @@ if($json === false || !isset($json["action_id"]) || !isset($json["device_id"]))
     exit();
 }
 
-$physical = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($json["device_id"]);
-if($physical === null || !$physical instanceof IrRemote)
-{
-    $response = ["status" => "error", "error" => "invalid_device_id"];
-    http_response_code(400);
-    echo json_encode($response);
-    exit();
-}
+require_once __DIR__ . "/../includes/devices/ir/IrCode.php";
 
-$virtual = $physical->getVirtualDeviceById($json["device_id"]);
-if($virtual === null || !$virtual instanceof IrControlledDevice)
-{
-    $response = ["status" => "error", "error" => "invalid_device_id"];
-    http_response_code(400);
-    echo json_encode($response);
-    exit();
-}
-require_once __DIR__ . "/../includes/devices/ir/RemoteAction.php";
-
-$action = RemoteAction::byId($json["action_id"], $json["device_id"]);
-if($action === null)
+$ir_code = IrCode::byId($json["action_id"]);
+if($ir_code === null)
 {
     $response = ["status" => "error", "error" => "invalid_action_id"];
     http_response_code(400);
@@ -79,4 +62,30 @@ if($action === null)
     exit();
 }
 
-$physical->sendCode($virtual->getProtocol(), $action->getPrimaryCodeHex(), $action->getSupportCodeHex());
+$action_device_id = $ir_code->getDeviceId();
+
+/* Only allow the action to execute if both devices are part of the same VirtualDevice */
+$physical = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($action_device_id);
+$virtual_parent = $physical->getVirtualDeviceById($json["device_id"]);
+
+if($physical === null || $virtual_parent === null || !$physical instanceof IrRemote)
+{
+    $response = ["status" => "error", "error" => "invalid_device_id"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
+
+$virtual = $physical->getVirtualDeviceById($action_device_id);
+if($virtual === null || !$virtual instanceof IrControlledDevice)
+{
+    $response = ["status" => "error", "error" => "invalid_device_id"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
+
+$physical->sendCode($ir_code);
+$response = ["status" => "success"];
+http_response_code(200);
+echo json_encode($response);

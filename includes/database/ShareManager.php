@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,23 +30,71 @@
  * Time: 16:43
  */
 
+require_once __DIR__ . "/DeviceModManager.php";
 
-class ShareManager
-{
+class ShareManager {
+    const SCOPE_ANY = "%";
+    const SCOPE_NONE = "_";
+
     const SCOPE_SIMPLE_CONTROL = "simple_control";
-    const SCOPE_VIEW_PROFILES = "view_profiles";
-    const SCOPE_EDIT_PROFILES = "edit_profiles";
-    const SCOPE_FULL_PROFILES = "full_profiles";
-    const SCOPE_ASSISTANT = "google_assistant";
+    const SCOPE_REBOOT = "reboot";
 
-    public static function getDevicesForScope(int $audience_id, string $scope)
-    {
+    const SCOPE_VIEW_EFFECTS = "view_effects";
+    const SCOPE_EDIT_EFFECTS = ShareManager::SCOPE_VIEW_EFFECTS . " edit_effects";
+    const SCOPE_FULL_PROFILES = ShareManager::SCOPE_EDIT_EFFECTS . " delete_effects";
+
+    const SCOPE_VIEW_SCENES = "view_scenes";
+
+    public static function getDevicesForScope(int $audience_id, array $scopes) {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT subject_id FROM device_shares WHERE audience_id = ? AND scope LIKE ?";
+        $sql = "SELECT devices_physical.id, display_name, device_driver, hostname, port, owner_id, scope FROM device_shares 
+                JOIN devices_physical ON device_shares.subject_id = devices_physical.id 
+                WHERE audience_id = ? AND scope LIKE ?";
         $stmt = $conn->prepare($sql);
-        $like = "* $scope *";
-        $stmt->bind_param("i", $audience_id, $like);
-        $stmt->bind_result($password_hash, $user_id);
+        $like = ShareManager::getScopeLike($scopes);
+        $stmt->bind_param("is", $audience_id, $like);
         $stmt->execute();
+
+        $rows = [];
+        if($result = $stmt->get_result()) {
+            while($row = $result->fetch_assoc()) {
+                $rows[] = $row;
+            }
+        }
+
+        $stmt->close();
+
+        $arr = [];
+        foreach($rows as $row) {
+            $arr[] = PhysicalDevice::fromDatabaseRow($row);
+        }
+
+        return $arr;
+    }
+
+    public static function getScopeForModType(int $type) {
+        switch($type) {
+            case DeviceModManager::DEVICE_MOD_ONLINE_STATE:
+            case DeviceModManager::DEVICE_MOD_SIMPLE_SETTINGS:
+                return ShareManager::SCOPE_SIMPLE_CONTROL;
+            case DeviceModManager::DEVICE_MOD_EFFECT:
+                return ShareManager::SCOPE_VIEW_EFFECTS;
+            default:
+                return ShareManager::SCOPE_NONE;
+        }
+    }
+
+    public static function sortScopes(array $scopes) {
+        sort($scopes);
+        return $scopes;
+    }
+
+    public static function getScopeLike(array $scopes) {
+        $like = "%";
+        foreach(ShareManager::sortScopes($scopes) as $scope) {
+            $like .= "$scope ";
+        }
+        $like .= "%";
+        return $like;
     }
 }

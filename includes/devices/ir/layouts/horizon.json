@@ -1,0 +1,157 @@
+[
+  [
+    {
+      "name": "horizon_power_toggle",
+      "btn_class": "btn-info"
+    }
+  ],
+  [
+    {
+      "name": "horizon_arrow_up",
+      "offset": 10,
+      "btn_class": "btn-secondary"
+    }
+  ],
+  [
+    {
+      "name": "horizon_arrow_left",
+      "offset": 6,
+      "btn_class": "btn-secondary"
+    },
+    {
+      "name": "horizon_ok",
+      "btn_class": "btn-dark"
+    },
+    {
+      "name": "horizon_arrow_right",
+      "btn_class": "btn-secondary"
+    }
+  ],
+  [
+    {
+      "name": "horizon_arrow_down",
+      "btn_class": "btn-secondary",
+      "offset": 10
+    }
+  ],
+  [
+    {
+      "type": "empty",
+      "size": 0.25
+    }
+  ],
+  [
+    "av_volume_up",
+    {
+      "name": "horizon_menu",
+      "column": 6,
+      "offset": 2
+    },
+    {
+      "name": "horizon_info",
+      "column": 6
+    },
+    {
+      "name": "horizon_channel_up",
+      "offset": 2
+    }
+  ],
+  [
+    {
+      "type": "text",
+      "text": "Vol"
+    },
+    {
+      "name": "horizon_exit",
+      "column": 6,
+      "offset": 2
+    },
+    {
+      "name": "horizon_guide",
+      "column": 6
+    },
+    {
+      "type": "text",
+      "text": "Ch",
+      "offset": 2
+    }
+  ],
+  [
+    "av_volume_down",
+    {
+      "name": "horizon_vod",
+      "column": 6,
+      "offset": 2
+    },
+
+    {
+      "name": "horizon_back",
+      "column": 6
+    },
+    {
+      "name": "horizon_channel_down",
+      "offset": 2
+    }
+  ],
+  [
+    {
+      "type": "empty",
+      "size": 0.25
+    }
+  ],
+  [
+    {
+      "name": "horizon_playback_back",
+      "offset": 4
+    },
+    "horizon_playback_pause",
+    "horizon_playback_resume",
+    "horizon_playback_forward"
+  ],
+  [
+    {
+      "name": "horizon_playback_stop",
+      "offset": 8
+    },
+    {
+      "name": "horizon_record_start",
+      "btn_class": "btn-light text-danger"
+    }
+  ],
+  [
+    {
+      "type": "empty",
+      "size": 0.25
+    }
+  ],
+  [
+    {
+      "name": "horizon_digit_1",
+      "offset": 6
+    },
+    "horizon_digit_2",
+    "horizon_digit_3"
+  ],
+  [
+    {
+      "name": "horizon_digit_4",
+      "offset": 6
+    },
+    "horizon_digit_5",
+    "horizon_digit_6"
+  ],
+  [
+    {
+      "name": "horizon_digit_7",
+      "offset": 6
+    },
+    "horizon_digit_8",
+    "horizon_digit_9"
+  ],
+  [
+    {
+      "name": "horizon_digit_0",
+      "offset": 10
+    }
+  ]
+]

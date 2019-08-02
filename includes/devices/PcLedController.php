@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,137 +26,82 @@
 /**
  * Created by PhpStorm.
  * User: Krzysiek
- * Date: 2018-05-14
- * Time: 19:41
+ * Date: 2018-12-02
+ * Time: 13:30
  */
 
-require_once __DIR__."/RgbEffectDevice.php";
-class PcLedController extends RgbEffectDevice
-{
+require_once __DIR__ . "/../Utils.php";
+require_once __DIR__ . "/../database/DeviceDbHelper.php";
+require_once __DIR__ . "/RgbEffectDevice.php";
 
-    const SAVE_PATH = "/_data/pc_controller.dat";
-    const UPDATE_PATH = "/_data/pc_controller_update.dat";
+class PcLedController extends RgbEffectDevice {
+    const DEVICE_INDEXES = ["pc_case" => 0, "pc_gpu" => 1, "pc_fan1" => 2, "pc_fan2" => 3, "pc_strip" => 5];
 
-    private $fan_count;
-    private $csgo_enabled;
+    public function sendData(bool $quick) {
+        if($this->isOnline()) {
+            $size = 6;
+            $brightness = array_fill(0, $size, 0);
+            $color = array_fill(0, $size, 0);
+            $flags = array_fill(0, $size, 0);
+            $current_device_profile = array_fill(0, $size, 0);
+            $profiles = array_fill(0, $size * $this->max_active_effect_count, 0);
+
+            foreach(PcLedController::DEVICE_INDEXES as $id => $index) {
+                $device = $this->getVirtualDeviceById($id);
+                if(!($device instanceof BaseEffectDevice))
+                    throw new UnexpectedValueException("Children of EspWifiLedController should be of type BaseEffectDevice");
+                $brightness[$index] = $device->getBrightness();
+                $color[$index] = $device->getColor();
+                $flags[$index] = (($device->isOn() ? 1 : 0) << 0) | (($device->areEffectsEnabled() ? 1 : 0) << 1);
+            }
+
+            $data = array();
+
+            $data["brightness"] = $brightness;
+            $data["color"] = $color;
+            $data["flags"] = $flags;
+            $data["current_device_profile"] = $current_device_profile;
+            $data["profile_count"] = 0;
+            $data["current_profile"] = 0;
+            $data["fan_count"] = 2;
+            $data["auto_increment"] = $this->auto_increment;
+            $data["fan_config"] = array(2, 0, 0);
+            $data["profiles"] = $profiles;
+            $data["profile_flags"] = 0;
+
+            $json = array("type" => $quick ? "quick_globals" :"globals_update", "data" => $data);
+
+            $fp = fsockopen($this->hostname, $this->port, $errno, $errstr, 0.2);
+            fwrite($fp, json_encode($json));
+            fclose($fp);
+        }
+
+        return $this->isOnline();
+    }
 
     /**
-     * PcLedController constructor.
+     * @param string $device_id
      * @param int $owner_id
      * @param string $display_name
      * @param string $hostname
-     * @param int $current_profile
-     * @param bool $enabled
-     * @param int $fan_count
-     * @param int $auto_increment
-     * @param bool $csgo_enabled
-     * @param array $profiles
-     * @param array $virtual_devices
-     * @param array $brightness_array
+     * @return PhysicalDevice
      */
-    protected function __construct(int $owner_id, string $display_name, string $hostname, int $current_profile, bool $enabled, int $fan_count, int $auto_increment,
-                                   bool $csgo_enabled, array $profiles, array $virtual_devices, array $brightness_array
-    )
-    {
-        $this->fan_count = $fan_count;
-        $this->csgo_enabled = $csgo_enabled;
-        parent::__construct(PcLedController::DEVICE_ID, $owner_id, $display_name, $hostname,
-            $current_profile, $enabled, $auto_increment, $profiles, $virtual_devices);
+    public static function load(string $device_id, int $owner_id, string $display_name,
+                                string $hostname, int $port, array $scopes
+    ) {
+        $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
+        return new PcLedController($device_id, $owner_id, $display_name, $hostname, $port, 0, 0, [], $virtual, $scopes);
     }
 
-
-    /**
-     * @return int
-     */
-    public function getFanCount(): int
-    {
-        return $this->fan_count;
+    public function reboot() {
+        // TODO: Implement reboot() method.
     }
 
-    /**
-     * @param int $fan_count
-     */
-    public function setFanCount(int $fan_count)
-    {
-        $this->fan_count = $fan_count;
-    }
-
-    public function isOnline()
-    {
-        return $this->tcp_send();
-    }
-
-
-    public function reboot()
-    {
-        $request = ["type" => "reboot"];
-        return $this->tcp_send(json_encode($request));
-    }
-
-    public function save(bool $quick)
-    {
-        $path = $_SERVER["DOCUMENT_ROOT"] . self::SAVE_PATH;
-        $path_update = $_SERVER["DOCUMENT_ROOT"] . self::UPDATE_PATH;
-        $dirname = dirname($path);
-        if(!is_dir($dirname))
-        {
-            mkdir($dirname);
-        }
-        file_put_contents($path_update, $this->globalsToJson(true));
-        file_put_contents($path, serialize($this));
-    }
-
-    public static function load(string $id, int $owner_id, string $display_name, string $hostname)
-    {
-
-
-        return new PcLedController($owner_id, $display_name, $hostname, 0, true, 1, 0, true, [], []);
-    }
-
-    function tcp_send($string = null)
-    {
-        error_reporting(0);
-        $filename = __DIR__ . "/../_status/pc_interface.dat";
-        $filename_status = __DIR__ . "../_status/status";
-        $interface = explode(":", file_get_contents($filename));
-        $fp = fsockopen($interface[0], $interface[1], $errno, $errstr, 0.1);
-        error_reporting(E_ALL);
-        if(!$fp)
-        {
-            if(file_exists($filename_status)) unlink($filename_status);
-            return false;
-        }
-        else
-        {
-            file_put_contents($filename_status, "");
-            if($string !== null) fwrite($fp, $string);
-            fclose($fp);
-            return true;
-        }
-    }
-
-    public function globalsToJson($web = false)
-    {
-        $array = array();
-
-        $array["brightness"] = $this->brightness_array;
-        $array["profile_count"] = sizeof($this->active_indexes);
-        $array["current_profile"] = $this->current_profile;
-        $array["highlight_profile_index"] = $this->getActiveProfileIndex();
-        $array["highlight_index"] = $this->getHighlightIndex();
-        $array["active_indexes"] = $this->active_indexes;
-        $array["leds_enabled"] = $this->enabled;
-        $array["csgo_enabled"] = $this->csgo_enabled;
-        $array["fan_count"] = $this->fan_count;
-        $array["auto_increment"] = $web ? RgbProfileDevice::getIncrementTiming($this->auto_increment) : $this->auto_increment;
-        $array["fan_config"] = array(2, 0, 0);
-        $array["profile_order"] = $this->getAvrOrder();
-
-        return json_encode(array("type" => "globals_update", "data" => $array));
-    }
-
-    public function saveEffectForDevice(string $device_id, int $index)
-    {
+    public function saveEffectForDevice(string $device_id, int $index) {
         // TODO: Implement saveEffectForDevice() method.
+    }
+
+    public function previewEffect(string $device_id, int $index) {
+        // TODO: Implement previewEffect() method.
     }
 }

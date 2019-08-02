@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -55,15 +55,15 @@ abstract class RgbEffectDevice extends PhysicalDevice
     protected $avr_order;
     
     /** @var int */
-    protected $active_profile_count;
+    protected $max_active_effect_count;
     
     /** @var int */
-    protected $max_profile_count;
+    protected $max_effect_count;
 
     /** @var int */
     protected $max_color_count;
 
-    /** @var Profile[] */
+    /** @var Scene[] */
     protected $profiles;
 
     /**
@@ -77,28 +77,28 @@ abstract class RgbEffectDevice extends PhysicalDevice
      * @param array $profiles
      * @param array $virtual_devices
      */
-    protected function __construct(string $id, int $owner_id, string $display_name, string $hostname, int $current_profile, bool $enabled, int $auto_increment,
-                                   array $profiles, array $virtual_devices)
+    protected function __construct(string $id, int $owner_id, string $display_name, string $hostname, int $port, int $current_profile, int $auto_increment,
+                                   array $profiles, array $virtual_devices, array $scopes)
     {
-        parent::__construct($id, $owner_id, $display_name, $hostname, $virtual_devices);
+        parent::__construct($id, $owner_id, $display_name, $hostname, $port, $virtual_devices, $scopes);
 
         $this->current_profile = $current_profile;
         $this->auto_increment = $auto_increment;
         $this->profiles = $profiles;
-        $this->max_profile_count = DeviceDbHelper::getMaxProfileCount(DbUtils::getConnection(), $id);
-        $this->active_profile_count = DeviceDbHelper::getActiveProfileCount(DbUtils::getConnection(), $id);
+        $this->max_effect_count = DeviceDbHelper::getMaxProfileCount(DbUtils::getConnection(), $id);
+        $this->max_active_effect_count = DeviceDbHelper::getActiveProfileCount(DbUtils::getConnection(), $id);
         $this->max_color_count = DeviceDbHelper::getMaxColorCount(DbUtils::getConnection(), $id);
-        if($this->max_profile_count === null || $this->active_profile_count === null)
+        if($this->max_effect_count === null || $this->max_active_effect_count === null)
         {
             throw new UnexpectedValueException("Missing max_profile_count or active_profile_count for $id, 
             please add the appropriate record in the database");
         }
-        if (sizeof($profiles) <= $this->max_profile_count) {
+        if (sizeof($profiles) <= $this->max_effect_count) {
             $this->active_indexes = range(0, sizeof($profiles) - 1);
             $this->inactive_indexes = array();
         } else {
-            $this->active_indexes = range(0,$this->max_profile_count - 1);
-            $this->inactive_indexes = range($this->max_profile_count, sizeof($profiles) - $this->active_profile_count - 1);
+            $this->active_indexes = range(0,$this->max_effect_count - 1);
+            $this->inactive_indexes = range($this->max_effect_count, sizeof($profiles) - $this->max_active_effect_count - 1);
         }
         $this->avr_indexes = $this->active_indexes;
         $this->avr_order = $this->getAvrOrder();
@@ -110,14 +110,14 @@ abstract class RgbEffectDevice extends PhysicalDevice
         return sizeof($this->profiles);
     }
 
-    public function addProfile(Profile $profile)
+    public function addProfile(Scene $profile)
     {
-        if (sizeof($this->profiles) >= $this->max_profile_count)
+        if (sizeof($this->profiles) >= $this->max_effect_count)
             return false;
         array_push($this->profiles, $profile);
-        if (sizeof($this->active_indexes) < $this->active_profile_count) {
+        if (sizeof($this->active_indexes) < $this->max_active_effect_count) {
             array_push($this->active_indexes, $this->getMaxIndex());
-            for ($i = 0; $i < $this->active_profile_count; $i++) {
+            for ($i = 0; $i < $this->max_active_effect_count; $i++) {
                 if (!isset($this->avr_indexes[$i])) {
                     $this->avr_indexes[$i] = $this->getMaxIndex();
                     break;
@@ -148,7 +148,7 @@ abstract class RgbEffectDevice extends PhysicalDevice
         }
         foreach ($active as $item) {
             if (array_search($item, $this->active_indexes) === false) {
-                for ($i = 0; $i < $this->active_profile_count; $i++) {
+                for ($i = 0; $i < $this->max_active_effect_count; $i++) {
                     if (!isset($this->avr_indexes[$i])) {
                         $this->avr_indexes[$i] = $item;
                         $avr_i = $i;
@@ -199,7 +199,7 @@ abstract class RgbEffectDevice extends PhysicalDevice
     }
 
     /**
-     * @return Profile[]
+     * @return Scene[]
      */
     public function getProfiles()
     {
@@ -212,7 +212,7 @@ abstract class RgbEffectDevice extends PhysicalDevice
     }
 
     /**
-     * @return Profile[]
+     * @return Scene[]
      */
     public function getActiveProfilesInOrder()
     {
@@ -224,7 +224,7 @@ abstract class RgbEffectDevice extends PhysicalDevice
     }
 
     /**
-     * @return Profile[]
+     * @return Scene[]
      */
     public function getInactiveProfilesInOrder()
     {
@@ -328,4 +328,47 @@ abstract class RgbEffectDevice extends PhysicalDevice
     }
 
     public abstract function saveEffectForDevice(string $device_id, int $index);
+
+    public abstract function previewEffect(string $device_id, int $index);
+
+    public function getHtmlHeader() {
+        $on = false;
+        foreach($this->virtual_devices as $device) {
+            if(!$device instanceof BaseEffectDevice)
+                throw new UnexpectedValueException("Children of EspWiFiLedController should be of type RgbEffectDevice");
+            $on = $on || $device->isOn();
+        }
+
+        $checked = $on ? "checked" : "";
+        $name = $this->getNameWithState();
+
+        return <<<HTML
+    <div class="row">
+        <div class="col text-center-vertical">
+            <h4>$name</h4>
+        </div>
+        <div class="col-auto float-right pl-0 align-self-center">
+            <div class="form-check">
+                <input class="device-global-switch" type="checkbox" name="state" $checked
+                            data-size="small" data-label-width="10" id="device-global-switch">
+            </div>
+        </div>
+    </div>
+HTML;
+
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxEffectCount(): int {
+        return $this->max_effect_count;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxActiveEffectCount(): int {
+        return $this->max_active_effect_count;
+    }
 }

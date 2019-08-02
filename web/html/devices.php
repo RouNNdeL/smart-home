@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@
 
 require_once __DIR__ . "/../../includes/GlobalManager.php";
 
-$manager = GlobalManager::all();
+$manager = GlobalManager::all([ShareManager::SCOPE_SIMPLE_CONTROL]);
 
 ?>
 
@@ -42,7 +42,7 @@ $manager = GlobalManager::all();
 require_once __DIR__."/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("Smart Home Devices");
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICES));
-$head->addEntry(new JavaScriptEntry(JavaScriptEntry::CORE));
+$head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICES));
 echo $head->toString();
 
 
@@ -53,7 +53,7 @@ require_once __DIR__."/../../includes/navbar/Nav.php";
 
 echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
 ?>
-<div class="container ">
+<div class="container mt-3">
 
     <?php
     foreach ($manager->getUserDeviceManager()->getPhysicalDevices() as $physicalDevice) {

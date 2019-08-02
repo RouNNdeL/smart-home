@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,10 @@
  */
 
 import $ from "jquery";
+
+export function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 export function showSnackbar(text, duration = 2500, cls = "snackbar") {
     const snackbar = $(`.${cls}`);

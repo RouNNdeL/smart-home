@@ -2,6 +2,10 @@
   "require": {
     "sonata-project/google-authenticator": "^2.0",
     "components/jqueryui": "^1.12",
-    "firebase/php-jwt": "^5.0"
+    "firebase/php-jwt": "^5.0",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-mysqli": "*",
+    "ext-apache": "*"
   }
 }

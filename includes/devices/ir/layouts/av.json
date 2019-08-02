@@ -1,32 +1,49 @@
 [
   [
-    "av_power_toggle"
+    {
+      "name": "av_power_toggle",
+      "btn_class": "btn-info"
+    }
   ],
   [
     {
       "name": "av_arrow_up",
-      "offset": 10
+      "offset": 10,
+      "btn_class": "btn-secondary"
     }
   ],
   [
     {
       "name": "av_arrow_left",
-      "offset": 6
+      "offset": 6,
+      "btn_class": "btn-secondary"
     },
-    "av_ok",
-    "av_arrow_right"
+    {
+      "name": "av_ok",
+      "btn_class": "btn-dark"
+    },
+    {
+      "name": "av_arrow_right",
+      "btn_class": "btn-secondary"
+    }
   ],
   [
     {
       "name": "av_arrow_down",
-      "offset": 10
+      "offset": 10,
+      "btn_class": "btn-secondary"
     }
   ],
-  [{"type": "empty", "size": 0.25}],
+  [
+    {
+      "type": "empty",
+      "size": 0.25
+    }
+  ],
   [
     "av_volume_up",
     {
-      "name": "av_channel_up",
+      "name": "horizon_channel_up",
       "offset": 16
     }
   ],
@@ -37,7 +54,8 @@
     },
     {
       "name": "av_audio_mute",
-      "offset": 6
+      "offset": 6,
+      "btn_class": "btn-warning"
     },
     {
       "type": "text",
@@ -52,21 +70,34 @@
       "offset": 6
     },
     {
-      "name": "av_channel_down",
+      "name": "horizon_channel_down",
       "offset": 6
     }
   ],
-  [{"type": "empty", "size": 0.5}],
+  [
+    {
+      "type": "empty",
+      "size": 0.5
+    }
+  ],
   [
     {
       "name": "av_input_hdmi2",
       "offset": 6
     },
+    "av_input_hdmi3",
+    "av_input_dvd"
+  ],
+  [
     {
-      "name": "av_input_hdmi3"
+      "name": "av_audio_stereo",
+      "column": 6,
+      "offset": 4
     },
+    "av_audio_alc",
     {
-      "name": "av_input_dvd"
+      "name": "av_audio_standard",
+      "column": 6
     }
   ]
 ]

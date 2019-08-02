@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,12 +32,13 @@
 
 require_once __DIR__ . "/database/DeviceDbHelper.php";
 require_once __DIR__ . "/UserDeviceManager.php";
+require_once __DIR__ . "/GlobalManager.php";
+require_once __DIR__ . "/effects/scenes/SceneManager.php";
 require_once __DIR__ . "/database/HomeUser.php";
 require_once __DIR__ . "/../includes/database/DbUtils.php";
 require_once __DIR__ . "/../includes/oauth/OAuthUtils.php";
 
-class ActionsRequestManager
-{
+class ActionsRequestManager {
     const ACTION_INTENT_SYNC = "action.devices.SYNC";
     const ACTION_INTENT_QUERY = "action.devices.QUERY";
     const ACTION_INTENT_EXECUTE = "action.devices.EXECUTE";
@@ -48,39 +49,50 @@ class ActionsRequestManager
      * @param string $token
      * @return array
      */
-    public static function processRequest(array $request, string $token)
-    {
+    public static function processRequest(array $request, string $token) {
         $user_id = OAuthUtils::getUserIdForToken(DbUtils::getConnection(), $token);
-        if($user_id == null)
-        {
+        if($user_id == null) {
             http_response_code(400);
             return ["error" => "invalid_grant"];
         }
 
         $scopes = OAuthUtils::getScopesForToken(DbUtils::getConnection(), $token);
-        if(strpos($scopes, OAuthUtils::SCOPE_HOME_CONTROL) === false)
-        {
+        if(strpos($scopes, OAuthUtils::SCOPE_HOME_CONTROL) === false) {
             http_response_code(400);
             return ["error" => "invalid_scope"];
         }
 
         $payload = [];
         $request_id = $request["requestId"];
-        foreach($request["inputs"] as $input)
-        {
-            switch($input["intent"])
-            {
+
+        $manager = GlobalManager::forWebhook($user_id);
+
+        foreach($request["inputs"] as $input) {
+            switch($input["intent"]) {
                 case self::ACTION_INTENT_SYNC:
                     $payload["agentUserId"] = (string)$user_id;
-                    $payload["devices"] = UserDeviceManager::fromUserId($user_id)->getSync();
+                    $devices_payload = $manager->actionsGetSync();
+                    $payload["devices"] = $devices_payload;
                     HomeUser::setActionsRegistered(DbUtils::getConnection(), $user_id, true);
+                    $manager->getUserDeviceManager()->sendReportState($request_id);
                     break;
                 case self::ACTION_INTENT_QUERY:
-                    $payload["errorCode"] = "notSupported";
+                    $response = $manager->actionsProcessQuery($input["payload"]);
+                    $payload["devices"] = $response;
                     break;
                 case self::ACTION_INTENT_EXECUTE:
-                    $payload["commands"] =
-                        UserDeviceManager::fromUserId($user_id)->processExecute($input["payload"], $request_id);
+                    $response = $manager->actionsProcessExecute($input["payload"]);
+                    $commands_response_array = [];
+                    foreach($response as $key => $value) {
+                        $arr = explode(":", $key);
+                        if(sizeof($arr) >= 2) {
+                            $commands_response_array[] = ["ids" => $value, "status" => $arr[0], "errorCode" => $arr[1]];
+                        } else {
+                            $commands_response_array[] = ["ids" => $value, "status" => $arr[0]];
+                        }
+                    }
+                    $payload["commands"] = $commands_response_array;
+                    $manager->getUserDeviceManager()->sendReportState($request_id);
                     break;
                 case self::ACTION_INTENT_DISCONNECT:
                     HomeUser::setActionsRegistered(DbUtils::getConnection(), $user_id, false);
@@ -96,8 +108,7 @@ class ActionsRequestManager
 
     private static function insertRequest(int $user_id, string $request_id, string $type,
                                           string $request_payload, string $response_payload
-    )
-    {
+    ) {
         $sql = "INSERT INTO actions_requests 
                   (user_id, request_id, type, request_payload, response_payload) 
                 VALUES ($user_id, ?, ?, ?, ?)";

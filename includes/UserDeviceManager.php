@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,39 +35,40 @@ require_once __DIR__ . "/database/HomeGraphTokenManager.php";
 require_once __DIR__ . "/database/DbUtils.php";
 require_once __DIR__ . "/database/HomeUser.php";
 require_once __DIR__ . "/database/DeviceDbHelper.php";
+require_once __DIR__ . "/database/ShareManager.php";
 require_once __DIR__ . "/../secure_config.php";
 
-class UserDeviceManager
-{
+class UserDeviceManager {
     /** @var PhysicalDevice[] */
     private $physical_devices;
 
     /** @var int */
     private $user_id;
 
+    /** @var string */
+    private $share_scope;
+
     /**
      * UserDeviceManager constructor.
      * @param PhysicalDevice[] $physical_devices
      * @param int $user_id
      */
-    private function __construct(int $user_id, array $physical_devices)
-    {
+    private function __construct(int $user_id, array $physical_devices) {
         $this->user_id = $user_id;
         $this->physical_devices = $physical_devices;
     }
 
-    public function sendReportState(string $requestId = null)
-    {
+    public function sendReportState(string $requestId = null) {
         $token = HomeGraphTokenManager::getToken();
         $states = [];
-        foreach ($this->physical_devices as $physicalDevice) {
-            foreach ($physicalDevice->getVirtualDevices() as $virtualDevice) {
+        foreach($this->physical_devices as $physicalDevice) {
+            foreach($physicalDevice->getVirtualDevices() as $virtualDevice) {
                 $states[$virtualDevice->getDeviceId()] = $virtualDevice->getStateJson($physicalDevice->isOnline());
             }
         }
 
         $payload = ["agentUserId" => (string)$this->user_id, "payload" => ["devices" => ["states" => $states]]];
-        if ($requestId !== null)
+        if($requestId !== null)
             $payload["requestId"] = $requestId;
 
         $header = [];
@@ -90,8 +91,7 @@ class UserDeviceManager
         return $response;
     }
 
-    public function requestSync()
-    {
+    public function requestSync() {
         $token = HomeGraphTokenManager::getToken();
         $payload = ["agentUserId" => (string)($this->user_id)];
 
@@ -112,14 +112,12 @@ class UserDeviceManager
         return $response;
     }
 
-    public function processExecute(array $payload, string $request_id)
-    {
+    public function processExecute(array $payload) {
         $commands_response = [];
-        foreach ($this->physical_devices as $device) {
-            $result = $device->handleAssistantAction($payload, $request_id);
+        foreach($this->physical_devices as $device) {
+            $result = $device->handleAssistantAction($payload);
             $status = $result["status"];
-            if(sizeof($result["ids"]) > 0)
-            {
+            if(sizeof($result["ids"]) > 0) {
                 if(!isset($commands_response[$status]))
                     $commands_response[$status] = [];
 
@@ -127,18 +125,23 @@ class UserDeviceManager
             }
         }
 
-        $commands_response_array = [];
-        foreach ($commands_response as $key => $value) {
-            $commands_response_array[] = ["ids" => $value, "status" => $key];
-        }
-        return $commands_response_array;
+        return $commands_response;
     }
 
-    public function getSync()
-    {
+    public function processQuery(array $payload) {
+        $response = [];
+        foreach($payload["devices"] as $device) {
+            $id = $device["id"];
+            $online = $this->getPhysicalDeviceByVirtualId($id)->isOnline();
+            $response[$id] = $this->getVirtualDeviceById($id)->getStateJson($online);
+        }
+        return $response;
+    }
+
+    public function getSync() {
         $devices_payload = [];
-        foreach ($this->physical_devices as $device) {
-            foreach ($device->getVirtualDevices() as $virtualDevice) {
+        foreach($this->physical_devices as $device) {
+            foreach($device->getVirtualDevices() as $virtualDevice) {
                 $syncJson = $virtualDevice->getSyncJson();
                 if($syncJson !== null)
                     $devices_payload[] = $syncJson;
@@ -150,26 +153,32 @@ class UserDeviceManager
     /**
      * @return array
      */
-    public static function requestSyncForAll()
-    {
+    public static function requestSyncForAll() {
         $responses = [];
-        foreach (HomeUser::queryAllRegistered(DbUtils::getConnection()) as $user) {
-            $responses[$user->id] = UserDeviceManager::fromUserId($user->id)->requestSync();
+        foreach(HomeUser::queryAllRegistered(DbUtils::getConnection()) as $user) {
+            $responses[$user->id] = UserDeviceManager::forUserId($user->id)->requestSync();
         }
         return $responses;
     }
 
-    public static function fromUserId(int $id)
-    {
+    public static function forUserIdAndScope(int $user_id, array $scope){
+        $owned = DeviceDbHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $user_id);
+        $shared = ShareManager::getDevicesForScope($user_id, $scope);
+        return new UserDeviceManager(
+            $user_id,
+            array_merge($owned, $shared)
+        );
+    }
+
+    public static function forUserId(int $id) {
         return new UserDeviceManager(
             $id,
             DeviceDbHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $id)
         );
     }
 
-    private function insertStateChange($request_id, string $payload)
-    {
-        if (!is_string($request_id) && $request_id != null)
+    private function insertStateChange($request_id, string $payload) {
+        if(!is_string($request_id) && $request_id != null)
             throw new InvalidArgumentException("request_id has to be of type string or 'null'");
         $conn = DbUtils::getConnection();
         $sql = "INSERT INTO state_changes (user_id, request_id, payload) VALUES ($this->user_id, ?, ?)";
@@ -181,8 +190,7 @@ class UserDeviceManager
     /**
      * @return PhysicalDevice[]
      */
-    public function getPhysicalDevices(): array
-    {
+    public function getPhysicalDevices(): array {
         return $this->physical_devices;
     }
 
@@ -190,10 +198,9 @@ class UserDeviceManager
      * @param string $id
      * @return PhysicalDevice|null
      */
-    public function getPhysicalDeviceById(string $id)
-    {
-        foreach ($this->physical_devices as $physical_device) {
-            if ($physical_device->getId() === $id)
+    public function getPhysicalDeviceById(string $id) {
+        foreach($this->physical_devices as $physical_device) {
+            if($physical_device->getId() === $id)
                 return $physical_device;
         }
         return null;
@@ -203,9 +210,8 @@ class UserDeviceManager
      * @param string $id
      * @return VirtualDevice|null
      */
-    public function getVirtualDeviceById(string $id)
-    {
-        foreach ($this->physical_devices as $physical_device) {
+    public function getVirtualDeviceById(string $id) {
+        foreach($this->physical_devices as $physical_device) {
             $device = $physical_device->getVirtualDeviceById($id);
             if($device !== null)
                 return $device;
@@ -217,9 +223,8 @@ class UserDeviceManager
      * @param string $id
      * @return PhysicalDevice|null
      */
-    public function getPhysicalDeviceByVirtualId(string $id)
-    {
-        foreach ($this->physical_devices as $physical_device) {
+    public function getPhysicalDeviceByVirtualId(string $id) {
+        foreach($this->physical_devices as $physical_device) {
             $device = $physical_device->getVirtualDeviceById($id);
             if($device !== null)
                 return $physical_device;

@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,7 @@
  * Date: 2018-06-07
  * Time: 18:12
  */
-class LampAnalog extends VirtualDevice
-{
+class LampAnalog extends VirtualDevice {
     /** @var int */
     protected $brightness;
 
@@ -47,8 +46,7 @@ class LampAnalog extends VirtualDevice
      * @param int $brightness
      * @param bool $on
      */
-    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions, bool $will_report_state, int $brightness = 100, bool $on = true)
-    {
+    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions, bool $will_report_state, int $brightness = 100, bool $on = true) {
         parent::__construct($device_id, $device_name, $synonyms, VirtualDevice::DEVICE_TYPE_LAMP_ANALOG, $home_actions, $will_report_state);
         $this->brightness = $brightness;
         $this->on = $on;
@@ -58,10 +56,8 @@ class LampAnalog extends VirtualDevice
     /**
      * @param array $command
      */
-    public function handleAssistantAction($command)
-    {
-        switch($command["command"])
-        {
+    public function handleAssistantAction($command) {
+        switch($command["command"]) {
             case VirtualDevice::DEVICE_COMMAND_BRIGHTNESS_ABSOLUTE:
                 $this->brightness = $command["params"]["brightness"];
                 $this->on = $this->brightness !== 0 ? true : false;
@@ -78,8 +74,7 @@ class LampAnalog extends VirtualDevice
     /**
      * @param array $json
      */
-    public function handleSaveJson($json)
-    {
+    public function handleSaveJson($json) {
         if(isset($json["state"]))
             $this->on = $json["state"];
         if(isset($json["brightness"]))
@@ -90,8 +85,7 @@ class LampAnalog extends VirtualDevice
      * @param bool $online
      * @return array
      */
-    public function getStateJson(bool $online = false)
-    {
+    public function getStateJson(bool $online = false) {
         return [
             "on" => $this->on,
             "online" => $online,
@@ -99,73 +93,107 @@ class LampAnalog extends VirtualDevice
         ];
     }
 
-    public function toDatabase()
-    {
+    public function toDatabase() {
+        $state = $this->on ? 1 : 0;
         $conn = DbUtils::getConnection();
         $sql = "UPDATE devices_virtual SET 
-                  brightness = $this->brightness, 
-                  state = $this->on WHERE id = ?";
+                  brightness = ?, 
+                  state = ? WHERE id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $this->device_id);
+        $stmt->bind_param("iis", $this->brightness, $state, $this->device_id);
         $stmt->execute();
+        $changes = $stmt->affected_rows > 0 ? true : false;
         $stmt->close();
+        return $changes;
     }
 
     /**
-     * @param null $header_name
+     * @param string $header_name
      * @param string $footer_html
      * @return string
      */
     public function toHtml($header_name = null, $footer_html = "")
     {
-        // TODO: Implement toHTML() method.
-        return "";
+        if($header_name !== null)
+            $name = $header_name;
+        else
+            $name = $this->device_name;
+        $checked = $this->on ? "checked" : "";
+
+        $center_row = strlen($footer_html) === 0 ? "justify-content-center" : "";
+        $center_col = strlen($footer_html) === 0 ? "col-auto" : "col";
+        return <<<HTML
+        <form>
+            <div class="card-header">
+                <div class="row">
+                    <div class="col text-center-vertical"><h6 class="mb-0">$name</h6></div>
+                    <div class="col-auto float-right pl-0">
+                        <input class="checkbox-switch change-listen" type="checkbox" name="state" $checked
+                            data-size="small" data-label-width="10" id="state-$this->device_id">
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row $center_row">
+                    <div class="$center_col">
+                        <p class="mb-2">Brightness</p>
+                        <div class="slider-container"> 
+                            <input
+                                class="slider change-listen"
+                                type="text"
+                                name="brightness"
+                                id="brightness-$this->device_id"
+                                value="$this->brightness">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer py-2">
+                <div class="row">
+                    $footer_html
+                </div>
+            </div>
+    </form>
+HTML;
     }
 
-    public function getTraits()
-    {
+    public function getTraits() {
         return [self::DEVICE_TRAIT_ON_OFF, self::DEVICE_TRAIT_BRIGHTNESS];
     }
 
-    public function getActionsDeviceType()
-    {
+    public function getActionsDeviceType() {
         return self::DEVICE_TYPE_ACTIONS_LIGHT;
     }
 
-    public function getAttributes()
-    {
+    public function getAttributes() {
         return [];
     }
 
     /**
      * @return bool
      */
-    public function isOn(): bool
-    {
+    public function isOn(): bool {
         return $this->on;
     }
 
     /**
      * @return int
      */
-    public function getBrightness(): int
-    {
+    public function getBrightness(): int {
         return $this->brightness;
     }
 
     /**
      * @param int $brightness
      */
-    public function setBrightness(int $brightness)
-    {
+    public function setBrightness(int $brightness) {
         $this->brightness = $brightness;
     }
 
     /**
      * @param bool $on
      */
-    public function setOn(bool $on)
-    {
+    public function setOn(bool $on) {
         $this->on = $on;
     }
 }

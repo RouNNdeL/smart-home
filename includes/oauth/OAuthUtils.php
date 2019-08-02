@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,10 +30,12 @@
  * Time: 15:57
  */
 
+require_once __DIR__."/../database/HomeUser.php";
+
 class OAuthUtils
 {
     const SCOPE_HOME_CONTROL = "home_control";
-    const SCOPE_ADVANCED_CONTROL = "advanced_control";
+    const SCOPE_EFFECT_CONTROL = "effect_control";
 
     const SUPPORTED_SCOPES = [OAuthUtils::SCOPE_HOME_CONTROL];
 
@@ -71,6 +73,29 @@ class OAuthUtils
         return null;
     }
 
+    public static function exchangePasswordForTokens(mysqli $conn, string $client_id, string $username, string $password, string $scopes)
+    {
+        if(!OAuthUtils::checkScopes($scopes))
+            throw new InvalidArgumentException("Invalid scope");
+        $sql = "SELECT password, id FROM home_users WHERE username = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $username);
+        $stmt->bind_result($password_hash, $user_id);
+        $stmt->execute();
+        if(!$stmt->fetch())
+        {
+            $stmt->close();
+            return null;
+        }
+        if(!HomeUser::verifyPassword($password, $password_hash))
+        {
+            $stmt->close();
+            return null;
+        }
+        $stmt->close();
+        return OAuthUtils::generateAndInsertTokens($conn, $client_id, $user_id, $scopes);
+    }
+
     /**
      * @param $conn mysqli
      * @param $auth_code
@@ -106,7 +131,7 @@ class OAuthUtils
     {
         $access_token = base64_encode(openssl_random_pseudo_bytes(128));
         $sql = "INSERT INTO oauth_tokens (token, client_id, user_id, scopes, type, expires) VALUES 
-                    ('$access_token', ?, $user_id, ?, 'access_token', (NOW() + INTERVAL 30 DAY ))";
+                    ('$access_token', ?, $user_id, ?, 'access_token', (NOW() + INTERVAL 90 DAY ))";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $client_id, $scopes);
         $stmt->execute();

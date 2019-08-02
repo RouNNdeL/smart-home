@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,9 @@
  * Time: 09:49
  */
 
-if($_SERVER["REQUEST_METHOD"] !== "POST")
-{
+header("Content-Type: application/json");
+
+if($_SERVER["REQUEST_METHOD"] !== "POST") {
     $response = ["status" => "error", "error" => "invalid_request"];
     http_response_code(400);
     echo json_encode($response);
@@ -40,43 +41,53 @@ if($_SERVER["REQUEST_METHOD"] !== "POST")
 
 require_once __DIR__ . "/../includes/GlobalManager.php";
 
-$manager = GlobalManager::all();
+$manager = GlobalManager::all([ShareManager::SCOPE_SIMPLE_CONTROL]);
 
 $json = json_decode(file_get_contents("php://input"), true);
-if($json === false || !isset($json["devices"])|| !isset($json["report_state"]))
-{
+if($json === false || !isset($json["devices"]) || !isset($json["report_state"])) {
     $response = ["status" => "error", "error" => "invalid_json"];
     http_response_code(400);
     echo json_encode($response);
     exit();
 }
 
+$issuer_id = apache_request_headers()["X-Smart-Home-Web-Instance-Id"];
+if($issuer_id === null) {
+    $response = ["status" => "error", "error" => "missing_instance_id"];
+    http_response_code(400);
+    echo json_encode($response);
+    exit();
+}
+
 $response = [];
-foreach($json["devices"] as $id => $device)
-{
-    $physical_device = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($id);
-    if($physical_device === null)
-    {
+foreach($json["devices"] as $id => $physical) {
+    $physical_device = $manager->getUserDeviceManager()->getPhysicalDeviceById($id);
+    if($physical_device === null) {
         $response = ["status" => "error", "error" => "invalid_device_id"];
         http_response_code(400);
         echo json_encode($response);
         exit();
     }
 
-    $virtualDevice = $physical_device->getVirtualDeviceById($id);
-    $virtualDevice->handleSaveJson($json["devices"][$id]);
+    foreach($physical as $virtual_id => $virtual) {
+        $virtualDevice = $physical_device->getVirtualDeviceById($virtual_id);
+        $virtualDevice->handleSaveJson($virtual);
+    }
 
-    if($physical_device->save(true))
-        $response[$id] = "success";
-    else
-        $response[$id] = "offline";
+    if($physical_device->save($issuer_id)) {
+        if($physical_device->sendData(true))
+            $response[$id] = "success";
+        else
+            $response[$id] = "offline";
+    } else {
+        $response[$id] = "not_changed";
+    }
 
 }
 echo json_encode($response);
 
-if($json["report_state"])
-{
+if($json["report_state"]) {
     $user_id = $manager->getSessionManager()->getUserId();
-    $script = __DIR__."/../scripts/report_state.php";
-    exec ("php $script $user_id >/dev/null &");
+    $script = __DIR__ . "/../scripts/report_state.php";
+    exec("php $script $user_id >/dev/null &");
 }

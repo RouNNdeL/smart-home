@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,8 @@ class StyleSheetEntry extends HeadEntry
     const LOGIN = "/dist/css/login";
     const DEVICES = "/dist/css/devices";
     const DEVICE_SETTINGS = "/dist/css/device_settings";
-    const DEVICE_ADVANCED = "/dist/css/device_advanced";
+    const DEVICE_ADVANCED = "/dist/css/device_effect";
+    const DEVICE_SCENES = "/dist/css/device_scenes";
 
     const VENDOR = "/dist/vendor/css/vendor";
     const MATERIAL_ICONS = "https://fonts.googleapis.com/icon?family=Material+Icons";

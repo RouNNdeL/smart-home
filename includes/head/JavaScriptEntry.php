@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,9 @@ class JavaScriptEntry extends HeadEntry
     const GOOGLE_PLATFORM = "https://apis.google.com/js/platform";
     const LOGIN = "/dist/js/login";
     const DEVICE_SETTINGS = "/dist/js/device_settings";
-    const DEVICE_ADVANCED = "/dist/js/device_advanced";
+    const DEVICE_ADVANCED = "/dist/js/device_effect";
+    const DEVICE_SCENES = "/dist/js/device_scenes";
+    const DEVICES = "/dist/js/devices";
     const CORE = "/dist/js/core";
 
     const VENDOR = "/dist/vendor/js/vendor";

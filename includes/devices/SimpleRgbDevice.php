@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,7 @@
  * Date: 2018-05-14
  * Time: 20:03
  */
-class SimpleRgbDevice extends VirtualDevice
-{
+class SimpleRgbDevice extends VirtualDevice {
     /** @var int */
     protected $color;
 
@@ -51,8 +50,7 @@ class SimpleRgbDevice extends VirtualDevice
      * @param int $brightness
      * @param bool $on
      */
-    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions, bool $will_report_state, int $color = 0xffffff, int $brightness = 100, bool $on = true)
-    {
+    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions, bool $will_report_state, int $color = 0xffffff, int $brightness = 100, bool $on = true) {
         parent::__construct($device_id, $device_name, $synonyms, VirtualDevice::DEVICE_TYPE_RGB, $home_actions, $will_report_state);
         $this->color = $color;
         $this->brightness = $brightness;
@@ -63,10 +61,8 @@ class SimpleRgbDevice extends VirtualDevice
     /**
      * @param array $command
      */
-    public function handleAssistantAction($command)
-    {
-        switch($command["command"])
-        {
+    public function handleAssistantAction($command) {
+        switch($command["command"]) {
             case VirtualDevice::DEVICE_COMMAND_BRIGHTNESS_ABSOLUTE:
                 $this->brightness = $command["params"]["brightness"];
                 $this->on = $this->brightness !== 0 ? true : false;
@@ -89,8 +85,7 @@ class SimpleRgbDevice extends VirtualDevice
     /**
      * @param array $json
      */
-    public function handleSaveJson($json)
-    {
+    public function handleSaveJson($json) {
         if(isset($json["state"]))
             $this->on = $json["state"];
         if(isset($json["brightness"]))
@@ -103,27 +98,28 @@ class SimpleRgbDevice extends VirtualDevice
      * @param bool $online
      * @return array
      */
-    public function getStateJson(bool $online = false)
-    {
+    public function getStateJson(bool $online = false) {
         return [
             "on" => $this->on,
             "online" => $online,
             "brightness" => $this->brightness,
-            "color" => ["spectrumRGB" => $this->color]
+            "color" => ["spectrumRgb" => $this->color]
         ];
     }
 
-    public function toDatabase()
-    {
+    public function toDatabase() {
+        $state = $this->on ? 1 : 0;
         $conn = DbUtils::getConnection();
         $sql = "UPDATE devices_virtual SET 
-                  color = $this->color,
-                  brightness = $this->brightness, 
-                  state = $this->on WHERE id = ?";
+                  color = ?,
+                  brightness = ?, 
+                  state = ? WHERE id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $this->device_id);
+        $stmt->bind_param("iiis", $this->color, $this->brightness, $state, $this->device_id);
         $stmt->execute();
+        $changes = $stmt->affected_rows > 0 ? true : false;
         $stmt->close();
+        return $changes;
     }
 
     /**
@@ -131,8 +127,7 @@ class SimpleRgbDevice extends VirtualDevice
      * @param string $footer_html
      * @return string
      */
-    public function toHtml($header_name = null, $footer_html = "")
-    {
+    public function toHtml($header_name = null, $footer_html = "") {
         if($header_name !== null)
             $name = $header_name;
         else
@@ -180,66 +175,57 @@ HTML;
 
     }
 
-    public function getTraits()
-    {
-        return [self::DEVICE_TRAIT_ON_OFF, self::DEVICE_TRAIT_COLOR_SPECTRUM, self::DEVICE_TRAIT_BRIGHTNESS];
+    public function getTraits() {
+        return [self::DEVICE_TRAIT_ON_OFF, self::DEVICE_TRAIT_COLOR_SETTING, self::DEVICE_TRAIT_BRIGHTNESS];
     }
 
-    public function getActionsDeviceType()
-    {
+    public function getActionsDeviceType() {
         return self::DEVICE_TYPE_ACTIONS_LIGHT;
     }
 
-    public function getAttributes()
-    {
-        return [];
+    public function getAttributes() {
+        return [self::DEVICE_ATTRIBUTE_COLOR_MODEL => self::DEVICE_ATTRIBUTE_COLOR_MODEL_RGB];
     }
 
     /**
      * @return bool
      */
-    public function isOn(): bool
-    {
+    public function isOn(): bool {
         return $this->on;
     }
 
     /**
      * @return int
      */
-    public function getBrightness(): int
-    {
+    public function getBrightness(): int {
         return $this->brightness;
     }
 
     /**
      * @return int
      */
-    public function getColor(): int
-    {
+    public function getColor(): int {
         return $this->color;
     }
 
     /**
      * @param int $brightness
      */
-    public function setBrightness(int $brightness)
-    {
+    public function setBrightness(int $brightness) {
         $this->brightness = $brightness;
     }
 
     /**
      * @param bool $on
      */
-    public function setOn(bool $on)
-    {
+    public function setOn(bool $on) {
         $this->on = $on;
     }
 
     /**
      * @param int $color
      */
-    public function setColor(int $color)
-    {
+    public function setColor(int $color) {
         $this->color = $color;
     }
 }

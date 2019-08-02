@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+// Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,14 @@
 // SOFTWARE.
 
 $color-input-size: auto !default;
-$remote-button-width: 40px;
+$remote-button-size: 40px;
+
+%remote-button {
+  padding: .45em;
+  padding-left: .2em;
+  padding-right: .2em;
+  height: $remote-button-size;
+}
 
 .color-input {
   width: $color-input-size;
@@ -45,27 +52,37 @@ $device-offline-text-color: #dc3545 !default;
   color: $device-offline-text-color;
 }
 
+.ir-multi-action-btn {
+  @extend %remote-button;
+  width: $remote-button-size !important;
+}
+
 .device-remote {
   & button {
-    padding: .45em;
-    height: $remote-button-width;
+    @extend %remote-button;
   }
-  & div.button-row {
-    height: $remote-button-width;
+
+  & .button-row {
+    height: $remote-button-size;
+
     &.s025 {
-      height: $remote-button-width/4;
+      height: $remote-button-size / 4;
     }
+
     &.s05 {
-      height: $remote-button-width/2;
+      height: $remote-button-size / 2;
     }
+
     &.s1 {
-      height: $remote-button-width;
+      height: $remote-button-size;
     }
+
     &.s2 {
-      height: $remote-button-width*2;
+      height: $remote-button-size * 2;
     }
+
     &.s3 {
-      height: $remote-button-width*3;
+      height: $remote-button-size * 3;
     }
   }
 }
