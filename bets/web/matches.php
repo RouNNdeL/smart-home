@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -134,7 +134,7 @@ HTML;
             $points = $match->getPoints();
             $html = $match->toCardHtml();
             echo <<<HTML
-            <div class="col-xs-12 col-md-6 col-lg-4 mb-3 px-md-2">
+            <div class="col-xs-24 col-md-12 col-lg-8 mb-3 px-md-2">
             $html
 </div>
 HTML;

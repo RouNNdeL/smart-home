@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -105,7 +105,7 @@ echo $head->toString();
 </nav>
 <div class="container mt-3">
     <div class="row">
-        <div class="col col-lg-6 offset-lg-3">
+        <div class="col col-lg-12 offset-lg-6">
             <div class="card">
                 <div class="card-body">
                     <h5>Choose the top 3 teams (order is ambiguous)</h5>

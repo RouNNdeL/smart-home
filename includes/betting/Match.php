@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -353,7 +353,7 @@ class Match
             <caption>Predictions</caption>
             <thead>
                 <tr>
-                    <th scope="col" class="col-6">Name</th>
+                    <th scope="col" class="col-12">Name</th>
                     <th scope="col" class="text-center">Score</th>
                     <th scope="col" class="text-center">Points</th>
                 </tr>
@@ -379,19 +379,19 @@ HTML;
                 <div class="col"><p class="match-time">$time</p></div>
             </div>
             <div class="row text-center">
-                <div class="ml-sm-0 ml-05p m-sm-0p col-4 px-1 px-sm-3">
+                <div class="ml-sm-0 ml-05p m-sm-0p col-8 px-1 px-sm-3">
                     <div class="float-right">
                         <img src="$logoTeamA" class="team-icon icon-big mb-2">
                         <h4 class="d-none d-md-block">$nameTeamA</h4>
                         <h5 class="d-md-none">$nameTeamA</h5>
                     </div>
                 </div>
-                <div class="col-3 col-sm-4 px-1">
+                <div class="col-6 col-sm-8 px-1">
                     <h1 class="score-big d-none d-md-block">$scores</h1>
                     <h3 class="score-big d-none d-sm-block d-md-none">$scores</h3>
                     <h4 class="score-big d-sm-none">$scores</h4>
                 </div>
-                <div class="col-4 px-1 px-sm-3">
+                <div class="col-8 px-1 px-sm-3">
                     <div class="float-left">
                         <img src="$logoTeamB" class="team-icon icon-big mb-2">
                         <h4 class="d-none d-md-block">$nameTeamB</h4>
@@ -403,7 +403,7 @@ HTML;
                 <div class="col"><p class="match-time">$this->stage</p></div>
             </div>
             <div class="row">
-                <div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
+                <div class="col-24 col-md-20 offset-md-2 col-lg-16 offset-lg-4 col-xl-12 offset-xl-6">
                     $table
                 </div>
             </div>
@@ -544,12 +544,12 @@ HTML;
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-12">
                             <img src="$logoTeamA" class="team-icon mb-2">
                             <h5>$nameTeamA</h5>
 
                         </div>
-                        <div class="col-6">
+                        <div class="col-12">
                             <img src="$logoTeamB" class="team-icon mb-2">
                             <h5>$nameTeamB</h5>
                         </div>
@@ -566,11 +566,11 @@ HTML;
                                     </div>
                                 </div> 
                                 <div class="row">
-                                    <div class="col-4 offset-1">
+                                    <div class="col-8 offset-2">
                                         <input class="form-control text-center score-input" type="number" value="$pickA"
                                         min="0" name="teamA" $disabled>
                                     </div>
-                                    <div class="col-4 offset-2">
+                                    <div class="col-8 offset-4">
                                         <input class="form-control text-center score-input" type="number" value="$pickB"
                                         min="0" name="teamB" $disabled>
                                     </div>
