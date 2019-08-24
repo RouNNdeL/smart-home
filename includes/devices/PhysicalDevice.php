@@ -228,6 +228,7 @@ abstract class PhysicalDevice {
                 <p class="card-text">
                     $devices
                     - Owner: <b>$owner</b><br>
+                    - Hostname: <i>$this->hostname:$this->port</i>
                 </p>
             </div>
         </div>
@@ -290,7 +291,7 @@ HTML;
     /**
      * @return string
      */
-    public function getHostname(): string {
-        return $this->hostname;
+    public function getDisplayHostname(): string {
+        return $this->hostname.":".$this->port;
     }
 }

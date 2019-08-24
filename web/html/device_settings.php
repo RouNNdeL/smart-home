@@ -77,7 +77,7 @@ echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
     <div class="row device-settings-content" data-device-id="<?php echo $parent_id ?>">
         <div class="col">
             <?php
-            $device_hostname = $device->getHostname();
+            $device_hostname = $device->getDisplayHostname();
 
             $reboot_string = Utils::getString("device_reboot");
             $reboot_disabled = $device->getOwnerId() !== $manager->getSessionManager()->getUserId() &&
@@ -121,7 +121,7 @@ HTML;
                                 $virtual_html
                             </div>
                         </div>
-                        <div class="card-footer">
+                        <div class="card-footer row">
                              <div class="col"> 
                                  $reboot_btn
                              </div>
