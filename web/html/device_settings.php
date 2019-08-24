@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -77,6 +77,8 @@ echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
     <div class="row device-settings-content" data-device-id="<?php echo $parent_id ?>">
         <div class="col">
             <?php
+            $device_hostname = $device->getHostname();
+
             $reboot_string = Utils::getString("device_reboot");
             $reboot_disabled = $device->getOwnerId() !== $manager->getSessionManager()->getUserId() &&
                 !$device->hasScope(ShareManager::SCOPE_REBOOT);
@@ -120,15 +122,23 @@ HTML;
                             </div>
                         </div>
                         <div class="card-footer">
-                            $reboot_btn
+                             <div class="col"> 
+                                 $reboot_btn
+                             </div>
+                             <div class="col col-auto float-right text-center-vertical"> 
+                                 <small class="text-muted">$device_hostname</small>
+                             </div>
                         </div>
                     </div>
 HTML;
 
             } else {
                 $footer = <<<HTML
-                    <div class="col col-auto float-right"> 
+                    <div class="col"> 
                         $reboot_btn
+                    </div>
+                    <div class="col col-auto float-right text-center-vertical"> 
+                        <small class="text-muted">$device_hostname</small>
                     </div>
 HTML;
 

@@ -286,4 +286,11 @@ HTML;
     public function getHtmlHeader(){
         return "<h4>$this->display_name</h4>";
     }
+
+    /**
+     * @return string
+     */
+    public function getHostname(): string {
+        return $this->hostname;
+    }
 }
