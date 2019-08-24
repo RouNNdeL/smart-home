@@ -181,7 +181,7 @@ class DeviceDbHelper {
         $stmt->close();
         if($changed) {
             DeviceModManager::insertDeviceModification($conn, $physical_device_id, null,
-                DeviceModManager::DEVICE_MOD_ONLINE_STATE);
+                DeviceModManager::DEVICE_MOD_ONLINE_STATE, "server");
         }
     }
 
