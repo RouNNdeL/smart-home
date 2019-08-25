@@ -30,8 +30,8 @@
  * Time: 15:30
  */
 
-require_once __DIR__."/../ExtensionManager.php";
-require_once __DIR__."/RemoteAction.php";
+require_once __DIR__ . "/../ExtensionManager.php";
+require_once __DIR__ . "/RemoteAction.php";
 
 class RemoteActionManager extends ExtensionManager {
     /** @var RemoteAction[] */
@@ -70,6 +70,32 @@ class RemoteActionManager extends ExtensionManager {
         return $response;
     }
 
+    /**
+     * @return Scene
+     */
+    public function getActionByPrefixedId(string $prefixed_id) {
+        $re = '/' . RemoteAction::ID_PREFIX . '(\d+)/m';
+        preg_match_all($re, $prefixed_id, $matches, PREG_SET_ORDER, 0);
+
+        if(sizeof($matches) < 1)
+            return null;
+        return $this->getActionById($matches[0][1]);
+    }
+
+    public function getActionById(int $id) {
+        foreach($this->actions as $action) {
+            if($action->getId() === $id) {
+                return $action;
+            }
+        }
+        return null;
+    }
+
+    private function isActionOnline(int $action_id) {
+        //TODO: Check if corresponding device is online
+        return true;
+    }
+
     public function processExecute(array $payload) {
         $ids = [];
         foreach($payload["commands"] as $command) {
@@ -91,27 +117,6 @@ class RemoteActionManager extends ExtensionManager {
         return $ids;
     }
 
-    /**
-     * @return Scene
-     */
-    public function getActionByPrefixedId(string $prefixed_id) {
-        $re = '/'.RemoteAction::ID_PREFIX.'(\d+)/m';
-        preg_match_all($re, $prefixed_id, $matches, PREG_SET_ORDER, 0);
-
-        if(sizeof($matches) < 1)
-            return null;
-        return $this->getActionById($matches[0][1]);
-    }
-
-    public function getActionById(int $id) {
-        foreach($this->actions as $action) {
-            if($action->getId() === $id) {
-                return $action;
-            }
-        }
-        return null;
-    }
-
     private function executeAction($action_id) {
         $script = __DIR__ . "/../../scripts/execute_remote_action.php";
         exec("php $script $action_id $this->user_id >/dev/null &");
@@ -123,10 +128,5 @@ class RemoteActionManager extends ExtensionManager {
      */
     public static function forUserId(int $user_id) {
         return new RemoteActionManager(RemoteAction::forUserId($user_id), $user_id);
-    }
-
-    private function isActionOnline(int $action_id) {
-        //TODO: Check if corresponding device is online
-        return true;
     }
 }

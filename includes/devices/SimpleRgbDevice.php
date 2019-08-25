@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -195,17 +195,17 @@ HTML;
     }
 
     /**
-     * @return int
+     * @param bool $on
      */
-    public function getBrightness(): int {
-        return $this->brightness;
+    public function setOn(bool $on) {
+        $this->on = $on;
     }
 
     /**
      * @return int
      */
-    public function getColor(): int {
-        return $this->color;
+    public function getBrightness(): int {
+        return $this->brightness;
     }
 
     /**
@@ -216,10 +216,10 @@ HTML;
     }
 
     /**
-     * @param bool $on
+     * @return int
      */
-    public function setOn(bool $on) {
-        $this->on = $on;
+    public function getColor(): int {
+        return $this->color;
     }
 
     /**

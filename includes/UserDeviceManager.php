@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -91,25 +91,14 @@ class UserDeviceManager {
         return $response;
     }
 
-    public function requestSync() {
-        $token = HomeGraphTokenManager::getToken();
-        $payload = ["agentUserId" => (string)($this->user_id)];
-
-        $header = [];
-        $header[] = "Content-type: application/json";
-        $header[] = "Authorization: Bearer " . $token;
-        $header[] = "X-GFE-SSL: yes";
-
-        $ch = curl_init("https://homegraph.googleapis.com/v1/devices:requestSync");
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $data = curl_exec($ch);
-        $response = json_decode($data, true);
-        curl_close($ch);
-
-        return $response;
+    private function insertStateChange($request_id, string $payload) {
+        if(!is_string($request_id) && $request_id != null)
+            throw new InvalidArgumentException("request_id has to be of type string or 'null'");
+        $conn = DbUtils::getConnection();
+        $sql = "INSERT INTO state_changes (user_id, request_id, payload) VALUES ($this->user_id, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $request_id, $payload);
+        return $stmt->execute();
     }
 
     public function processExecute(array $payload) {
@@ -138,6 +127,32 @@ class UserDeviceManager {
         return $response;
     }
 
+    /**
+     * @param string $id
+     * @return PhysicalDevice|null
+     */
+    public function getPhysicalDeviceByVirtualId(string $id) {
+        foreach($this->physical_devices as $physical_device) {
+            $device = $physical_device->getVirtualDeviceById($id);
+            if($device !== null)
+                return $physical_device;
+        }
+        return null;
+    }
+
+    /**
+     * @param string $id
+     * @return VirtualDevice|null
+     */
+    public function getVirtualDeviceById(string $id) {
+        foreach($this->physical_devices as $physical_device) {
+            $device = $physical_device->getVirtualDeviceById($id);
+            if($device !== null)
+                return $device;
+        }
+        return null;
+    }
+
     public function getSync() {
         $devices_payload = [];
         foreach($this->physical_devices as $device) {
@@ -148,43 +163,6 @@ class UserDeviceManager {
             }
         }
         return $devices_payload;
-    }
-
-    /**
-     * @return array
-     */
-    public static function requestSyncForAll() {
-        $responses = [];
-        foreach(HomeUser::queryAllRegistered(DbUtils::getConnection()) as $user) {
-            $responses[$user->id] = UserDeviceManager::forUserId($user->id)->requestSync();
-        }
-        return $responses;
-    }
-
-    public static function forUserIdAndScope(int $user_id, array $scope){
-        $owned = DeviceDbHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $user_id);
-        $shared = ShareManager::getDevicesForScope($user_id, $scope);
-        return new UserDeviceManager(
-            $user_id,
-            array_merge($owned, $shared)
-        );
-    }
-
-    public static function forUserId(int $id) {
-        return new UserDeviceManager(
-            $id,
-            DeviceDbHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $id)
-        );
-    }
-
-    private function insertStateChange($request_id, string $payload) {
-        if(!is_string($request_id) && $request_id != null)
-            throw new InvalidArgumentException("request_id has to be of type string or 'null'");
-        $conn = DbUtils::getConnection();
-        $sql = "INSERT INTO state_changes (user_id, request_id, payload) VALUES ($this->user_id, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $request_id, $payload);
-        return $stmt->execute();
     }
 
     /**
@@ -207,28 +185,50 @@ class UserDeviceManager {
     }
 
     /**
-     * @param string $id
-     * @return VirtualDevice|null
+     * @return array
      */
-    public function getVirtualDeviceById(string $id) {
-        foreach($this->physical_devices as $physical_device) {
-            $device = $physical_device->getVirtualDeviceById($id);
-            if($device !== null)
-                return $device;
+    public static function requestSyncForAll() {
+        $responses = [];
+        foreach(HomeUser::queryAllRegistered(DbUtils::getConnection()) as $user) {
+            $responses[$user->id] = UserDeviceManager::forUserId($user->id)->requestSync();
         }
-        return null;
+        return $responses;
     }
 
-    /**
-     * @param string $id
-     * @return PhysicalDevice|null
-     */
-    public function getPhysicalDeviceByVirtualId(string $id) {
-        foreach($this->physical_devices as $physical_device) {
-            $device = $physical_device->getVirtualDeviceById($id);
-            if($device !== null)
-                return $physical_device;
-        }
-        return null;
+    public function requestSync() {
+        $token = HomeGraphTokenManager::getToken();
+        $payload = ["agentUserId" => (string)($this->user_id)];
+
+        $header = [];
+        $header[] = "Content-type: application/json";
+        $header[] = "Authorization: Bearer " . $token;
+        $header[] = "X-GFE-SSL: yes";
+
+        $ch = curl_init("https://homegraph.googleapis.com/v1/devices:requestSync");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $data = curl_exec($ch);
+        $response = json_decode($data, true);
+        curl_close($ch);
+
+        return $response;
+    }
+
+    public static function forUserId(int $id) {
+        return new UserDeviceManager(
+            $id,
+            DeviceDbHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $id)
+        );
+    }
+
+    public static function forUserIdAndScope(int $user_id, array $scope) {
+        $owned = DeviceDbHelper::queryPhysicalDevicesForUser(DbUtils::getConnection(), $user_id);
+        $shared = ShareManager::getDevicesForScope($user_id, $scope);
+        return new UserDeviceManager(
+            $user_id,
+            array_merge($owned, $shared)
+        );
     }
 }

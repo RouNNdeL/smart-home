@@ -80,6 +80,24 @@ abstract class BaseEffectDevice extends SimpleRgbDevice {
         $this->loadEffectIndexes();
     }
 
+    private function loadEffects() {
+        $this->effects = Effect::forDevice($this->device_id);
+    }
+
+    private function loadEffectIndexes() {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT effect_id, device_index FROM devices_effect_join WHERE device_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $this->device_id);
+        $stmt->bind_result($effect_id, $index);
+        $stmt->execute();
+        while($stmt->fetch()) {
+            if($index !== null && $index < $this->max_active_effect_count)
+                $this->effect_indexes[$index] = $effect_id;
+        }
+        $stmt->close();
+    }
+
     public function handleSaveJson($json) {
         parent::handleSaveJson($json);
         $this->effects_enabled = $json["effects_enabled"];
@@ -100,7 +118,6 @@ abstract class BaseEffectDevice extends SimpleRgbDevice {
         $json["currentToggleSettings"][BaseEffectDevice::ACTIONS_TOGGLE_EFFECT] = $this->effects_enabled;
         return $json;
     }
-
 
     public function getTraits() {
         $array = parent::getTraits();
@@ -249,6 +266,16 @@ HTML;
         return $html;
     }
 
+    public function getEffectById(int $effect_id) {
+        foreach($this->effects as $effect) {
+            if($effect->getId() === $effect_id)
+                return $effect;
+        }
+        return null;
+    }
+
+    public abstract function getAvailableEffects();
+
     public function updateEffect(Effect $effect) {
         foreach($this->effects as $i => $e) {
             if($e->getId() === $effect->getId()) {
@@ -300,18 +327,6 @@ HTML;
         return $id;
     }
 
-    public function getEffectIdByIndex(int $index) {
-        return $this->effects[$index]->getId();
-    }
-
-    public function getEffectById(int $effect_id) {
-        foreach($this->effects as $effect) {
-            if($effect->getId() === $effect_id)
-                return $effect;
-        }
-        return null;
-    }
-
     public function addEffect(Effect $effect) {
         $this->effects[] = $effect;
         $effect->toDatabase();
@@ -319,47 +334,11 @@ HTML;
         return sizeof($this->effects) - 1;
     }
 
-    public abstract function getAvailableEffects();
+    public function getEffectIdByIndex(int $index) {
+        return $this->effects[$index]->getId();
+    }
 
     public abstract function getDefaultEffect();
-
-    private function loadEffects() {
-        $this->effects = Effect::forDevice($this->device_id);
-    }
-
-    private function loadEffectIndexes() {
-        $conn = DbUtils::getConnection();
-        $sql = "SELECT effect_id, device_index FROM devices_effect_join WHERE device_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $this->device_id);
-        $stmt->bind_result($effect_id, $index);
-        $stmt->execute();
-        while($stmt->fetch()) {
-            if($index !== null && $index < $this->max_active_effect_count)
-                $this->effect_indexes[$index] = $effect_id;
-        }
-        $stmt->close();
-    }
-
-    public function saveEffectIndexes() {
-        $conn = DbUtils::getConnection();
-        $sql = "UPDATE devices_effect_join SET device_index = NULL WHERE device_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $this->device_id);
-        $stmt->execute();
-        $stmt->close();
-
-        $sql = /** @lang MySQL */
-            "INSERT devices_effect_join SET effect_id = ?, device_index = ?, device_id = ? 
-             ON DUPLICATE KEY UPDATE device_index = ?";
-        $stmt = $conn->prepare($sql);
-
-        $stmt->bind_param("iisi", $effect_id, $index, $this->device_id, $index);
-        foreach($this->effect_indexes as $index => $effect_id) {
-            $stmt->execute();
-        }
-        $stmt->close();
-    }
 
     public function toDatabase() {
         $conn = DbUtils::getConnection();
@@ -383,6 +362,26 @@ HTML;
 
         $this->saveEffectIndexes();
         return $changes;
+    }
+
+    public function saveEffectIndexes() {
+        $conn = DbUtils::getConnection();
+        $sql = "UPDATE devices_effect_join SET device_index = NULL WHERE device_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $this->device_id);
+        $stmt->execute();
+        $stmt->close();
+
+        $sql = /** @lang MySQL */
+            "INSERT devices_effect_join SET effect_id = ?, device_index = ?, device_id = ? 
+             ON DUPLICATE KEY UPDATE device_index = ?";
+        $stmt = $conn->prepare($sql);
+
+        $stmt->bind_param("iisi", $effect_id, $index, $this->device_id, $index);
+        foreach($this->effect_indexes as $index => $effect_id) {
+            $stmt->execute();
+        }
+        $stmt->close();
     }
 
     /**

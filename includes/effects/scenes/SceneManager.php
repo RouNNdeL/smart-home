@@ -69,6 +69,36 @@ class SceneManager extends ExtensionManager {
         return $response;
     }
 
+    /**
+     * @return Scene
+     */
+    public function getSceneByPrefixedId(string $prefixed_id) {
+        $re = '/' . Scene::ID_PREFIX . '(\d+)/m';
+        preg_match_all($re, $prefixed_id, $matches, PREG_SET_ORDER, 0);
+
+        if(sizeof($matches) < 1)
+            return null;
+        return $this->getSceneById($matches[0][1]);
+    }
+
+    public function getSceneById(int $id) {
+        foreach($this->scenes as $scene) {
+            if($scene->getId() === $id) {
+                return $scene;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param int $id
+     * @return bool true if all devices in the scene are online
+     */
+    public function isSceneOnline(int $id) {
+        //TODO: Implement method
+        return false;
+    }
+
     public function processExecute(array $payload) {
         $ids = [];
         foreach($payload["commands"] as $command) {
@@ -90,41 +120,11 @@ class SceneManager extends ExtensionManager {
     }
 
     /**
-     * @param int $id
-     * @return bool true if all devices in the scene are online
-     */
-    public function isSceneOnline(int $id) {
-        //TODO: Implement method
-        return false;
-    }
-
-    /**
      * @return bool true if all devices in the scene where online and received the activate command
      */
     public function activateScene(int $id) {
         //TODO: Implement method
         return false;
-    }
-
-    /**
-     * @return Scene
-     */
-    public function getSceneByPrefixedId(string $prefixed_id) {
-        $re = '/'.Scene::ID_PREFIX.'(\d+)/m';
-        preg_match_all($re, $prefixed_id, $matches, PREG_SET_ORDER, 0);
-
-        if(sizeof($matches) < 1)
-            return null;
-        return $this->getSceneById($matches[0][1]);
-    }
-
-    public function getSceneById(int $id) {
-        foreach($this->scenes as $scene) {
-            if($scene->getId() === $id) {
-                return $scene;
-            }
-        }
-        return null;
     }
 
     public static function forUserId(int $user_id) {

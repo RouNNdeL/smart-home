@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,10 +34,8 @@ use Firebase\JWT\JWT;
  * Date: 2018-05-16
  * Time: 21:56
  */
-class HomeGraphTokenManager
-{
-    public static function getToken()
-    {
+class HomeGraphTokenManager {
+    public static function getToken() {
         $token = self::queryToken(DbUtils::getConnection());
         if($token !== null)
             return $token;
@@ -46,33 +44,20 @@ class HomeGraphTokenManager
         return $token;
     }
 
-    private static function queryToken(mysqli $conn)
-    {
+    private static function queryToken(mysqli $conn) {
         $sql = "SELECT token FROM home_graph_token WHERE expiry_date > NOW()";
         $result = $conn->query($sql);
-        if($result->num_rows > 0)
-        {
+        if($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             return $row["token"];
         }
         return null;
     }
 
-    private static function insertToken(mysqli $conn, string $token)
-    {
-        /* We insert the token with the expiry of 59 minutes to account for clock differences */
-        $stmt = $conn->prepare("INSERT INTO home_graph_token (token, expiry_date) VALUES (?, DATE_ADD(NOW(), INTERVAL 59 MINUTE))");
-        $stmt->bind_param("s", $token);
-        $result = $stmt->execute();
-        $stmt->close();
-        return $result;
-    }
-
-    private static function fetchNewToken()
-    {
-        $key_file = json_decode(file_get_contents(__DIR__."/../../home_graph_key.json"), true);
+    private static function fetchNewToken() {
+        $key_file = json_decode(file_get_contents(__DIR__ . "/../../home_graph_key.json"), true);
         $host = "https://accounts.google.com/o/oauth2/token";
-        $payload = ["iat" => time(), "exp" => time() + 60*60, "iss" => $key_file["client_email"],
+        $payload = ["iat" => time(), "exp" => time() + 60 * 60, "iss" => $key_file["client_email"],
             "scope" => "https://www.googleapis.com/auth/homegraph", "aud" => $host];
         $jwt = JWT::encode($payload, $key_file["private_key"], "RS256");
 
@@ -93,5 +78,14 @@ class HomeGraphTokenManager
         $json_response = json_decode($data, true);
         curl_close($ch);
         return $json_response["access_token"];
+    }
+
+    private static function insertToken(mysqli $conn, string $token) {
+        /* We insert the token with the expiry of 59 minutes to account for clock differences */
+        $stmt = $conn->prepare("INSERT INTO home_graph_token (token, expiry_date) VALUES (?, DATE_ADD(NOW(), INTERVAL 59 MINUTE))");
+        $stmt->bind_param("s", $token);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
     }
 }

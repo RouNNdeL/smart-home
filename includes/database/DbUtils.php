@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,44 +32,35 @@
 
 require_once __DIR__ . "/../../secure_config.php";
 
-class DbUtils
-{
+class DbUtils {
     /** @var mysqli */
     private static $connection = null;
 
     /**
      * @return mysqli
      */
-    public static function getConnection()
-    {
+    public static function getConnection() {
         global $db_username;
         global $db_passwd;
 
-        if(self::$connection === null)
-        {
+        if(self::$connection === null) {
             mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
             return self::$connection = new mysqli("localhost", $db_username, $db_passwd, "smart_home");
-        }
-        else
-        {
+        } else {
             return self::$connection;
         }
     }
 
-    public static function getSecret(string $id)
-    {
+    public static function getSecret(string $id) {
         $sql = "SELECT value FROM secrets WHERE id = ?";
         $stmt = DbUtils::$connection->prepare($sql);
         $stmt->bind_param("s", $id);
         $stmt->bind_result($value);
         $stmt->execute();
-        if($stmt->fetch())
-        {
+        if($stmt->fetch()) {
             $stmt->close();
             return $value;
-        }
-        else
-        {
+        } else {
             $stmt->close();
             return null;
         }

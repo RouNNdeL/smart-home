@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,7 @@
  * Date: 2018-07-06
  * Time: 12:33
  */
-class Particles extends Effect
-{
+class Particles extends Effect {
     const TIME_PARTICLE_SPEED = 0;
     const TIME_PARTICLE_DELAY = 1;
 
@@ -42,16 +41,14 @@ class Particles extends Effect
     /**
      * @return int
      */
-    public function getTimingsForEffect()
-    {
+    public function getTimingsForEffect() {
         return (1 << Particles::TIME_PARTICLE_SPEED) | (1 << Particles::TIME_PARTICLE_DELAY) | (1 << Particles::TIME_DELAY);
     }
 
     /**
      * @return array
      */
-    public function packArgs()
-    {
+    public function packArgs() {
         $args = [];
         $args[0] = ($this->args[Particles::ARG_DIRECTION] << 0) | ($this->args[Particles::ARG_SMOOTH] << 1) |
             ($this->args[Particles::ARG_BLEND] << 2);
@@ -60,8 +57,7 @@ class Particles extends Effect
         return $args;
     }
 
-    public function unpackArgs(array $args)
-    {
+    public function unpackArgs(array $args) {
         $this->args[Particles::ARG_DIRECTION] = $args[0] & (1 << 0) ? 1 : 0;
         $this->args[Particles::ARG_SMOOTH] = $args[0] & (1 << 1) ? 1 : 0;
         $this->args[Particles::ARG_BLEND] = $args[0] & (1 << 2) ? 1 : 0;
@@ -69,8 +65,7 @@ class Particles extends Effect
         $this->args[Effect::ARG_COLOR_CYCLES] = $args[5];
     }
 
-    protected function getTimingStrings()
-    {
+    protected function getTimingStrings() {
         $strings = parent::getTimingStrings();
 
         $strings[Particles::TIME_PARTICLE_SPEED] = "particles_speed";
@@ -82,32 +77,28 @@ class Particles extends Effect
     /**
      * @return int
      */
-    public function avrEffect()
-    {
+    public function avrEffect() {
         return Effect::AVR_EFFECT_PARTICLES;
     }
 
     /**
      * @return int
      */
-    public function getEffectId()
-    {
+    public function getEffectId() {
         return Effect::EFFECT_PARTICLES;
     }
 
     /**
      * @return int
      */
-    public function getMaxColors()
-    {
+    public function getMaxColors() {
         return Effect::COLOR_COUNT_UNLIMITED;
     }
 
     /**
      * @return int
      */
-    public function getMinColors()
-    {
+    public function getMinColors() {
         return 1;
     }
 
@@ -115,8 +106,7 @@ class Particles extends Effect
      * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
      * The updated_effect JSON filed then contains those values and replaces them in the user interface
      */
-    public function overwriteValues()
-    {
+    public function overwriteValues() {
         if($this->args[Particles::ARG_PARTICLE_SIZE] < 1)
             $this->args[Particles::ARG_PARTICLE_SIZE] = 4;
 
@@ -125,23 +115,12 @@ class Particles extends Effect
     }
 
     /**
-     * @param int $id
-     * @return Effect
-     */
-    public static function getDefault(int $id)
-    {
-        return new Particles($id, [0xff0000], [2, 2], [7, 4]);
-    }
-
-    /**
      * @param $name
      * @return string
      */
-    public function getArgumentClass($name)
-    {
+    public function getArgumentClass($name) {
 
-        switch($name)
-        {
+        switch($name) {
             case Particles::ARG_DIRECTION:
                 return new DirectionArgument($name, $this->args[$name]);
             case Particles::ARG_SMOOTH:
@@ -150,5 +129,13 @@ class Particles extends Effect
             default:
                 return new Argument($name, $this->args[$name]);
         }
+    }
+
+    /**
+     * @param int $id
+     * @return Effect
+     */
+    public static function getDefault(int $id) {
+        return new Particles($id, [0xff0000], [2, 2], [7, 4]);
     }
 }

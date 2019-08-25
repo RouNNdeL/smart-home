@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,12 +30,11 @@
  * Time: 17:51
  */
 
-require_once __DIR__."/../GlobalManager.php";
-require_once __DIR__."/../database/DbUtils.php";
-require_once __DIR__."/../database/HomeUser.php";
+require_once __DIR__ . "/../GlobalManager.php";
+require_once __DIR__ . "/../database/DbUtils.php";
+require_once __DIR__ . "/../database/HomeUser.php";
 
-class NavDropdown extends NavItem implements NavPageSetListener
-{
+class NavDropdown extends NavItem implements NavPageSetListener {
     /** @var string */
     private $title;
 
@@ -47,8 +46,7 @@ class NavDropdown extends NavItem implements NavPageSetListener
      * @param string $title
      * @param DropdownItem[] $items
      */
-    public function __construct(string $title, array $items, string $class = "")
-    {
+    public function __construct(string $title, array $items, string $class = "") {
         parent::__construct($class);
         $this->title = $title;
         $this->items = $items;
@@ -56,12 +54,10 @@ class NavDropdown extends NavItem implements NavPageSetListener
 
 
     /** @return string */
-    public function toString()
-    {
-        $id = number_format( rand()*rand(), 0, '', '' );
+    public function toString() {
+        $id = number_format(rand() * rand(), 0, '', '');
         $items_html = "";
-        foreach($this->items as $item)
-        {
+        foreach($this->items as $item) {
             $items_html .= $item->toString();
         }
         return <<<HTML
@@ -78,19 +74,16 @@ HTML;
 
     }
 
-    public static function getDefaultUserDropDown()
-    {
-        $user_id = GlobalManager::withSessionManager()->getSessionManager()->getUserId();
-        $name = HomeUser::queryUserById(DbUtils::getConnection(), $user_id)->formatName();
-        return new NavDropdown($name, [new DropdownItem("/logout", Utils::getString("navbar_logout"))]);
-    }
-
-    function onPageSet(string $page)
-    {
-        foreach($this->items as $item)
-        {
+    function onPageSet(string $page) {
+        foreach($this->items as $item) {
             if($item instanceof NavPageSetListener)
                 $item->onPageSet($page);
         }
+    }
+
+    public static function getDefaultUserDropDown() {
+        $user_id = GlobalManager::withSessionManager()->getSessionManager()->getUserId();
+        $name = HomeUser::queryUserById(DbUtils::getConnection(), $user_id)->formatName();
+        return new NavDropdown($name, [new DropdownItem("/logout", Utils::getString("navbar_logout"))]);
     }
 }

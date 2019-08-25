@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,10 +30,9 @@
  * Time: 12:07
  */
 
-require_once __DIR__."/HeadEntry.php";
+require_once __DIR__ . "/HeadEntry.php";
 
-class MetaEntry extends HeadEntry
-{
+class MetaEntry extends HeadEntry {
     const VIEWPORT_NAME = "viewport";
     const VIEWPORT_CONTENT = "width=device-width, initial-scale=1, shrink-to-fit=no";
 
@@ -48,8 +47,7 @@ class MetaEntry extends HeadEntry
      * @param string $name
      * @param string $content
      */
-    public function __construct(string $name, string $content)
-    {
+    public function __construct(string $name, string $content) {
         $this->name = $name;
         $this->content = $content;
     }
@@ -59,13 +57,11 @@ class MetaEntry extends HeadEntry
      * @param bool $minified
      * @return string
      */
-    public function toString(bool $minified)
-    {
+    public function toString(bool $minified) {
         return "<meta name='$this->name' content='$this->content'>";
     }
 
-    public static function getDefaults()
-    {
+    public static function getDefaults() {
         $arr = [];
         $arr[] = new MetaEntry(MetaEntry::VIEWPORT_NAME, MetaEntry::VIEWPORT_CONTENT);
         return $arr;

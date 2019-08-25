@@ -87,18 +87,6 @@ class EspWiFiLamp extends PhysicalDevice {
         return false;
     }
 
-    /**
-     * @param string $device_id
-     * @param int $owner_id
-     * @param string $display_name
-     * @param string $hostname
-     * @return PhysicalDevice
-     */
-    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port, array $scopes) {
-        $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
-        return new EspWiFiLamp($device_id, $owner_id, $display_name, $hostname, $port, $virtual, $scopes);
-    }
-
     public function reboot() {
         $online = $this->isOnline();
         if($online) {
@@ -128,5 +116,17 @@ class EspWiFiLamp extends PhysicalDevice {
         }
         $this->save("device_reported_state");
         parent::handleDeviceReportedState($state);
+    }
+
+    /**
+     * @param string $device_id
+     * @param int $owner_id
+     * @param string $display_name
+     * @param string $hostname
+     * @return PhysicalDevice
+     */
+    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port, array $scopes) {
+        $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
+        return new EspWiFiLamp($device_id, $owner_id, $display_name, $hostname, $port, $virtual, $scopes);
     }
 }

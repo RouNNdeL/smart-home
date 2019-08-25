@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -56,42 +56,6 @@ class Scene {
         $this->entries = $entries;
     }
 
-    public static function fromId(int $scene_id) {
-        $conn = DbUtils::getConnection();
-        $sql = "SELECT name FROM devices_effect_scenes WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $scene_id);
-        $stmt->bind_result($name);
-        $stmt->execute();
-        if($stmt->fetch()) {
-            $stmt->close();
-            return new Scene($scene_id, $name, SceneEntry::getForSceneId($scene_id));
-        }
-        $stmt->close();
-        return null;
-    }
-
-    /**
-     * @param $user_id
-     * @return Scene[]
-     */
-    public static function allForUserId(int $user_id) {
-        $entries = SceneEntry::getForUserId($user_id);
-
-        $conn = DbUtils::getConnection();
-        $sql = "SELECT id, name FROM devices_effect_scenes WHERE user_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $user_id);
-        $stmt->bind_result($scene_id, $name);
-        $stmt->execute();
-        $arr = [];
-        while($stmt->fetch()) {
-            $entries_for_scene = isset($entries[$scene_id]) ? $entries[$scene_id] : [];
-            $arr[] = new Scene($scene_id, $name, $entries_for_scene);
-        }
-        return $arr;
-    }
-
     public function getSceneHtml(UserDeviceManager $manager) {
         $html = "<div class=\"list-group\">";
         foreach($this->entries as $entry) {
@@ -130,11 +94,6 @@ HTML;
         return $html;
     }
 
-    /** @return string */
-    public function getPrefixedId() {
-        return Scene::ID_PREFIX . $this->id;
-    }
-
     /**
      * @return int
      */
@@ -158,5 +117,46 @@ HTML;
             "willReportState" => false,
             "attributes" => [VirtualDevice::DEVICE_ATTRIBUTE_SCENE_REVERSIBLE => false]
         ];
+    }
+
+    /** @return string */
+    public function getPrefixedId() {
+        return Scene::ID_PREFIX . $this->id;
+    }
+
+    public static function fromId(int $scene_id) {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT name FROM devices_effect_scenes WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $scene_id);
+        $stmt->bind_result($name);
+        $stmt->execute();
+        if($stmt->fetch()) {
+            $stmt->close();
+            return new Scene($scene_id, $name, SceneEntry::getForSceneId($scene_id));
+        }
+        $stmt->close();
+        return null;
+    }
+
+    /**
+     * @param $user_id
+     * @return Scene[]
+     */
+    public static function allForUserId(int $user_id) {
+        $entries = SceneEntry::getForUserId($user_id);
+
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, name FROM devices_effect_scenes WHERE user_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $user_id);
+        $stmt->bind_result($scene_id, $name);
+        $stmt->execute();
+        $arr = [];
+        while($stmt->fetch()) {
+            $entries_for_scene = isset($entries[$scene_id]) ? $entries[$scene_id] : [];
+            $arr[] = new Scene($scene_id, $name, $entries_for_scene);
+        }
+        return $arr;
     }
 }

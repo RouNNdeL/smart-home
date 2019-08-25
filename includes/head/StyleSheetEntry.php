@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,7 @@
 
 require_once __DIR__ . "/HeadEntry.php";
 
-class StyleSheetEntry extends HeadEntry
-{
+class StyleSheetEntry extends HeadEntry {
     const LOGIN = "/dist/css/login";
     const DEVICES = "/dist/css/devices";
     const DEVICE_SETTINGS = "/dist/css/device_settings";
@@ -52,8 +51,7 @@ class StyleSheetEntry extends HeadEntry
      * StylesheetEntry constructor.
      * @param string $url
      */
-    public function __construct(string $url)
-    {
+    public function __construct(string $url) {
         $this->url = $url;
     }
 
@@ -62,8 +60,7 @@ class StyleSheetEntry extends HeadEntry
      * @param bool $minified
      * @return string
      */
-    public function toString(bool $minified)
-    {
+    public function toString(bool $minified) {
         preg_match("/.css$/", $this->url, $extension_match);
         preg_match("/^https?:\/\//", $this->url, $external_match);
         $url = sizeof($extension_match) || sizeof($external_match) ? $this->url : $this->url . ($minified ? ".min.css" : ".css");
@@ -72,11 +69,9 @@ class StyleSheetEntry extends HeadEntry
         return "<link rel='stylesheet' href='$url'>";
     }
 
-    public static function getDefaults()
-    {
+    public static function getDefaults() {
         $arr = [];
-        foreach(StyleSheetEntry::DEFAULT as $item)
-        {
+        foreach(StyleSheetEntry::DEFAULT as $item) {
             $arr[] = new StyleSheetEntry($item);
         }
         return $arr;

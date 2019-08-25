@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,20 @@ class SceneEntry {
     public function __construct(string $device_id, int $effect_id) {
         $this->device_id = $device_id;
         $this->effect_id = $effect_id;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEffectId(): int {
+        return $this->effect_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceId(): string {
+        return $this->device_id;
     }
 
     public static function getForUserId(int $user_id) {
@@ -101,20 +115,6 @@ class SceneEntry {
         }
         $stmt->close();
         return $arr;
-    }
-
-    /**
-     * @return int
-     */
-    public function getEffectId(): int {
-        return $this->effect_id;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDeviceId(): string {
-        return $this->device_id;
     }
 
 

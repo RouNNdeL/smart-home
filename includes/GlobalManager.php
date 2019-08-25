@@ -60,80 +60,6 @@ class GlobalManager {
 
     }
 
-    /**
-     * Only use when user has already been authenticated
-     * @param int $user_id
-     */
-    public static function forWebhook(int $user_id) {
-        $manager = new GlobalManager();
-
-        $manager->loadIpTrustManager();
-        $manager->loadExtensionManagers($user_id);
-        $manager->loadUserDeviceManagerManually($user_id);
-
-        return $manager;
-    }
-
-    public static function minimal() {
-        $manager = new GlobalManager();
-
-        $manager->loadIpTrustManager();
-
-        return $manager;
-    }
-
-    public static function withSessionManager($login_required = false, $log = GlobalManager::LOG) {
-        $manager = new GlobalManager();
-
-        $manager->loadIpTrustManager();
-        $manager->loadSessionManager($login_required, $log);
-
-        return $manager;
-    }
-
-    public static function all($scopes = null, $log = GlobalManager::LOG) {
-        $manager = new GlobalManager();
-
-        $manager->loadIpTrustManager();
-        $manager->loadSessionManager(true, $log);
-        $manager->loadUserDeviceManager($scopes);
-
-        return $manager;
-    }
-
-    public function loadIpTrustManager() {
-        $this->ipTrustManager = IpTrustManager::getInstance();
-        if($this->ipTrustManager === null || !$this->ipTrustManager->isAllowed()) {
-            http_response_code(403);
-            exit(0);
-        }
-    }
-
-    public function loadSessionManager($login_required = false, $log = GlobalManager::LOG) {
-        $this->sessionManager = SessionManager::getInstance();
-        if($log)
-            $this->requestLogger = RequestLogger::getInstance();
-        if($login_required && !$this->sessionManager->isLoggedIn()) {
-            header("Location: /");
-            exit(0);
-        }
-    }
-
-    public function loadUserDeviceManager($scopes = null) {
-        if($scopes === null)
-            $this->userDeviceManager = UserDeviceManager::forUserId($this->sessionManager->getUserId());
-        else
-            $this->userDeviceManager = UserDeviceManager::forUserIdAndScope($this->sessionManager->getUserId(), $scopes);
-    }
-
-    public function loadUserDeviceManagerManually(int $user_id){
-        $this->userDeviceManager = UserDeviceManager::forUserId($user_id);
-    }
-
-    public function loadExtensionManagers(int $user_id) {
-        $this->extensionManagers = ExtensionManager::getExtensionManagersByUserId($user_id);
-    }
-
     public function actionsGetSync() {
         $payload = $this->userDeviceManager->getSync();
         foreach($this->extensionManagers as $extensionManager) {
@@ -184,5 +110,79 @@ class GlobalManager {
      */
     public function getIpTrustManager() {
         return $this->ipTrustManager;
+    }
+
+    /**
+     * Only use when user has already been authenticated
+     * @param int $user_id
+     */
+    public static function forWebhook(int $user_id) {
+        $manager = new GlobalManager();
+
+        $manager->loadIpTrustManager();
+        $manager->loadExtensionManagers($user_id);
+        $manager->loadUserDeviceManagerManually($user_id);
+
+        return $manager;
+    }
+
+    public function loadIpTrustManager() {
+        $this->ipTrustManager = IpTrustManager::getInstance();
+        if($this->ipTrustManager === null || !$this->ipTrustManager->isAllowed()) {
+            http_response_code(403);
+            exit(0);
+        }
+    }
+
+    public function loadExtensionManagers(int $user_id) {
+        $this->extensionManagers = ExtensionManager::getExtensionManagersByUserId($user_id);
+    }
+
+    public function loadUserDeviceManagerManually(int $user_id) {
+        $this->userDeviceManager = UserDeviceManager::forUserId($user_id);
+    }
+
+    public static function minimal() {
+        $manager = new GlobalManager();
+
+        $manager->loadIpTrustManager();
+
+        return $manager;
+    }
+
+    public static function withSessionManager($login_required = false, $log = GlobalManager::LOG) {
+        $manager = new GlobalManager();
+
+        $manager->loadIpTrustManager();
+        $manager->loadSessionManager($login_required, $log);
+
+        return $manager;
+    }
+
+    public function loadSessionManager($login_required = false, $log = GlobalManager::LOG) {
+        $this->sessionManager = SessionManager::getInstance();
+        if($log)
+            $this->requestLogger = RequestLogger::getInstance();
+        if($login_required && !$this->sessionManager->isLoggedIn()) {
+            header("Location: /");
+            exit(0);
+        }
+    }
+
+    public static function all($scopes = null, $log = GlobalManager::LOG) {
+        $manager = new GlobalManager();
+
+        $manager->loadIpTrustManager();
+        $manager->loadSessionManager(true, $log);
+        $manager->loadUserDeviceManager($scopes);
+
+        return $manager;
+    }
+
+    public function loadUserDeviceManager($scopes = null) {
+        if($scopes === null)
+            $this->userDeviceManager = UserDeviceManager::forUserId($this->sessionManager->getUserId());
+        else
+            $this->userDeviceManager = UserDeviceManager::forUserIdAndScope($this->sessionManager->getUserId(), $scopes);
     }
 }

@@ -140,12 +140,6 @@ abstract class VirtualDevice {
         $this->will_report_state = $will_report_state;
     }
 
-    public abstract function getTraits();
-
-    public abstract function getActionsDeviceType();
-
-    public abstract function getAttributes();
-
     /**
      * @param array $command
      */
@@ -183,6 +177,12 @@ abstract class VirtualDevice {
             $arr["name"]["nicknames"] = $this->synonyms;
         return $arr;
     }
+
+    public abstract function getAttributes();
+
+    public abstract function getActionsDeviceType();
+
+    public abstract function getTraits();
 
     /**
      * @return string

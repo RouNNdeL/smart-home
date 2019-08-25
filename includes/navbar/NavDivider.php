@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,11 +29,9 @@
  * Date: 2018-07-05
  * Time: 19:38
  */
-class NavDivider extends NavItem
-{
+class NavDivider extends NavItem {
     /** @return string */
-    public function toString()
-    {
+    public function toString() {
         return <<<HTML
             <li class="nav-item $this->class">
                 <div class="dropdown-divider"></div>

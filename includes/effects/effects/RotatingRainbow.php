@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,7 @@
  * Date: 2018-07-04
  * Time: 20:37
  */
-class RotatingRainbow extends Effect
-{
+class RotatingRainbow extends Effect {
 
     const ARG_DIRECTION = "direction";
     const ARG_BRIGHTNESS = "rainbow_brightness";
@@ -40,16 +39,14 @@ class RotatingRainbow extends Effect
     /**
      * @return int
      */
-    public function getTimingsForEffect()
-    {
+    public function getTimingsForEffect() {
         return (1 << Effect::TIME_ROTATION) | (1 << Effect::TIME_DELAY);
     }
 
     /**
      * @return array
      */
-    public function packArgs()
-    {
+    public function packArgs() {
         $args = [];
 
         $args[0] = ($this->args[RotatingRainbow::ARG_DIRECTION] << 0) | ($this->args[RotatingRainbow::ARG_MODE] << 2)
@@ -61,8 +58,7 @@ class RotatingRainbow extends Effect
         return $args;
     }
 
-    public function unpackArgs(array $args)
-    {
+    public function unpackArgs(array $args) {
         $this->args[RotatingRainbow::ARG_DIRECTION] = $args[0] & (1 << 0) ? 1 : 0;
         $this->args[RotatingRainbow::ARG_MODE] = $args[0] & (1 << 2) ? 1 : 0;
         $this->args[RotatingRainbow::ARG_BRIGHTNESS] = $args[1];
@@ -72,32 +68,28 @@ class RotatingRainbow extends Effect
     /**
      * @return int
      */
-    public function avrEffect()
-    {
+    public function avrEffect() {
         return Effect::AVR_EFFECT_RAINBOW;
     }
 
     /**
      * @return int
      */
-    public function getEffectId()
-    {
+    public function getEffectId() {
         return Effect::EFFECT_ROTATING_RAINBOW;
     }
 
     /**
      * @return int
      */
-    public function getMaxColors()
-    {
+    public function getMaxColors() {
         return 0;
     }
 
     /**
      * @return int
      */
-    public function getMinColors()
-    {
+    public function getMinColors() {
         return 0;
     }
 
@@ -105,8 +97,7 @@ class RotatingRainbow extends Effect
      * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
      * The updated_effect JSON filed then contains those values and replaces them in the user interface
      */
-    public function overwriteValues()
-    {
+    public function overwriteValues() {
         if($this->args[RotatingRainbow::ARG_BRIGHTNESS] < 1)
             $this->args[RotatingRainbow::ARG_BRIGHTNESS] = 0xff;
 
@@ -117,22 +108,11 @@ class RotatingRainbow extends Effect
     }
 
     /**
-     * @param int $id
-     * @return Effect
-     */
-    public static function getDefault(int $id)
-    {
-        return new RotatingRainbow($id, [], [0, 0, 0, 0, 5], [5, 0xff, 1]);
-    }
-
-    /**
      * @param $name
      * @return string
      */
-    public function getArgumentClass($name)
-    {
-        switch($name)
-        {
+    public function getArgumentClass($name) {
+        switch($name) {
             case RotatingRainbow::ARG_DIRECTION:
                 return new DirectionArgument($name, $this->args[$name]);
             case RotatingRainbow::ARG_MODE:
@@ -140,5 +120,13 @@ class RotatingRainbow extends Effect
             default:
                 return new Argument($name, $this->args[$name]);
         }
+    }
+
+    /**
+     * @param int $id
+     * @return Effect
+     */
+    public static function getDefault(int $id) {
+        return new RotatingRainbow($id, [], [0, 0, 0, 0, 5], [5, 0xff, 1]);
     }
 }

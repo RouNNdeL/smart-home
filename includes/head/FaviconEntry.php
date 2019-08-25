@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,7 @@
  * Date: 2018-06-14
  * Time: 22:24
  */
-
-class FaviconEntry extends HeadEntry
-{
+class FaviconEntry extends HeadEntry {
 
     /** @var string */
     private $uri;
@@ -40,8 +38,7 @@ class FaviconEntry extends HeadEntry
      * FaviconEntry constructor.
      * @param string $uri
      */
-    public function __construct(string $uri)
-    {
+    public function __construct(string $uri) {
         $this->uri = $uri;
     }
 
@@ -49,8 +46,7 @@ class FaviconEntry extends HeadEntry
      * @param bool $minified
      * @return string
      */
-    public function toString(bool $minified)
-    {
+    public function toString(bool $minified) {
         return "<link rel=\"shortcut icon\" href=\"$this->uri\" />";
     }
 }

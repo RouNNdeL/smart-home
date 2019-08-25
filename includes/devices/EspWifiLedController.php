@@ -75,25 +75,6 @@ URL;
         return $this->isOnline();
     }
 
-    public function handleReportedState(array $state) {
-        $this->current_profile = $state["current_profile"];
-        $this->auto_increment = $state["auto_increment"];
-        // $this->avr_order = $state["scenes"];
-        for($i = 0; $i < sizeof($this->virtual_devices); $i++) {
-            $virtual_device = $this->virtual_devices[$i];
-            if(!($virtual_device instanceof BaseEffectDevice))
-                throw new UnexpectedValueException("Children of EspWifiLedController should be of type RgbEffectDevice");
-            $virtual_device->setBrightness(ceil($state["brightness"][$i] * 100 / 255));
-            $virtual_device->setOn($state["flags"][$i] & (1 << 0));
-            $virtual_device->setEffectsEnabled($state["flags"][$i] & (1 << 2));
-            $virtual_device->setColor($state["color"][$i]);
-        }
-
-        foreach($this->virtual_devices as $virtual_device) {
-            $virtual_device->toDatabase();
-        }
-    }
-
     private function getSmallGlobalsHex() {
         $str_b = "";
         $str_f = "";
@@ -114,6 +95,25 @@ URL;
         return $str_b . $str_f . $str_c;
     }
 
+    public function handleReportedState(array $state) {
+        $this->current_profile = $state["current_profile"];
+        $this->auto_increment = $state["auto_increment"];
+        // $this->avr_order = $state["scenes"];
+        for($i = 0; $i < sizeof($this->virtual_devices); $i++) {
+            $virtual_device = $this->virtual_devices[$i];
+            if(!($virtual_device instanceof BaseEffectDevice))
+                throw new UnexpectedValueException("Children of EspWifiLedController should be of type RgbEffectDevice");
+            $virtual_device->setBrightness(ceil($state["brightness"][$i] * 100 / 255));
+            $virtual_device->setOn($state["flags"][$i] & (1 << 0));
+            $virtual_device->setEffectsEnabled($state["flags"][$i] & (1 << 2));
+            $virtual_device->setColor($state["color"][$i]);
+        }
+
+        foreach($this->virtual_devices as $virtual_device) {
+            $virtual_device->toDatabase();
+        }
+    }
+
     private function getGlobalsHex() {
         $str = $this->getSmallGlobalsHex();
         $str .= dechex($this->getActiveProfileIndex());
@@ -125,41 +125,6 @@ URL;
         }
 
         return $str;
-    }
-
-    private function getEffectHex(Effect $effect) {
-        $str = Utils::intToHex($effect->avrEffect());
-        $str .= Utils::intToHex(sizeof($effect->getColors()));
-
-        foreach($effect->getTimes(Effect::TIMING_MODE_RAW) as $arg) {
-            $str .= Utils::intToHex($arg);
-        }
-        foreach($effect->getSanitizedArgs() as $arg) {
-            $str .= Utils::intToHex($arg);
-        }
-        foreach($effect->getSanitizedColors($this->max_color_count) as $color) {
-            $r = $color >> 16 & 0xff;
-            $g = $color >> 8 & 0xff;
-            $b = $color >> 0 & 0xff;
-
-            $str .= Utils::intToHex($g);
-            $str .= Utils::intToHex($r);
-            $str .= Utils::intToHex($b);
-        }
-
-        return $str;
-    }
-
-    /**
-     * @param string $device_id
-     * @param int $owner_id
-     * @param string $display_name
-     * @param string $hostname
-     * @return PhysicalDevice
-     */
-    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port, array $scopes) {
-        $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
-        return new EspWifiLedController($device_id, $owner_id, $display_name, $hostname, $port, 0, 0, [], $virtual, $scopes);
     }
 
     public function saveEffectForDevice(string $device_id, int $index) {
@@ -194,6 +159,29 @@ URL;
         return false;
     }
 
+    private function getEffectHex(Effect $effect) {
+        $str = Utils::intToHex($effect->avrEffect());
+        $str .= Utils::intToHex(sizeof($effect->getColors()));
+
+        foreach($effect->getTimes(Effect::TIMING_MODE_RAW) as $arg) {
+            $str .= Utils::intToHex($arg);
+        }
+        foreach($effect->getSanitizedArgs() as $arg) {
+            $str .= Utils::intToHex($arg);
+        }
+        foreach($effect->getSanitizedColors($this->max_color_count) as $color) {
+            $r = $color >> 16 & 0xff;
+            $g = $color >> 8 & 0xff;
+            $b = $color >> 0 & 0xff;
+
+            $str .= Utils::intToHex($g);
+            $str .= Utils::intToHex($r);
+            $str .= Utils::intToHex($b);
+        }
+
+        return $str;
+    }
+
     public function previewEffect(string $device_id, int $index) {
         $device = $this->getVirtualDeviceById($device_id);
         $class_name = get_class($this);
@@ -226,5 +214,17 @@ URL;
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param string $device_id
+     * @param int $owner_id
+     * @param string $display_name
+     * @param string $hostname
+     * @return PhysicalDevice
+     */
+    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port, array $scopes) {
+        $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
+        return new EspWifiLedController($device_id, $owner_id, $display_name, $hostname, $port, 0, 0, [], $virtual, $scopes);
     }
 }

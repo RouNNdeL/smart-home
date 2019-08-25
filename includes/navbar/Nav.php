@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,8 +42,7 @@ require_once __DIR__ . "/DropdownItem.php";
 require_once __DIR__ . "/NavBrand.php";
 require_once __DIR__ . "/NavDivider.php";
 
-class Nav
-{
+class Nav {
     const THEME_LIGHT = 0;
     const THEME_DARK = 1;
 
@@ -87,12 +86,10 @@ class Nav
      */
     public function __construct(array $items, $current_page = null, int $theme = Nav::THEME_LIGHT,
                                 int $background = Nav::BACKGROUND_LIGHT, string $background_class = null
-    )
-    {
+    ) {
         $this->items = $items;
 
-        switch($theme)
-        {
+        switch($theme) {
             case Nav::THEME_LIGHT:
                 $this->theme = "navbar-light";
                 break;
@@ -103,8 +100,7 @@ class Nav
                 throw new InvalidArgumentException("Invalid theme type: $theme");
         }
 
-        switch($background)
-        {
+        switch($background) {
             case Nav::BACKGROUND_LIGHT:
                 $this->background = "bg-light";
                 break;
@@ -146,20 +142,16 @@ class Nav
 
     }
 
-    private function notifyPageSet()
-    {
-        foreach($this->items as $item)
-        {
+    private function notifyPageSet() {
+        foreach($this->items as $item) {
             if($item instanceof NavPageSetListener)
                 $item->onPageSet($this->current_page);
         }
     }
 
-    public function toString()
-    {
+    public function toString() {
         $items_html = "";
-        foreach($this->items as $item)
-        {
+        foreach($this->items as $item) {
             $items_html .= $item->toString();
         }
         return <<<HTML
@@ -170,8 +162,7 @@ HTML;
 
     }
 
-    public static function getDefault($current_page = null)
-    {
+    public static function getDefault($current_page = null) {
         $nav_toggled_id = "navbar-" . number_format(rand() * rand(), 0, '', '');
         $items = [];
         $items[] = new NavBrand(Utils::getString("navbar_brand_title"));

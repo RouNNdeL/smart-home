@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,7 @@
  * Date: 2018-07-05
  * Time: 19:16
  */
-class NavBrand extends NavItem
-{
+class NavBrand extends NavItem {
     /** @var $url */
     private $url;
     /** @var string */
@@ -44,8 +43,7 @@ class NavBrand extends NavItem
      * @param string $image
      * @param string $title
      */
-    public function __construct(string $title, string $url = null, string $image = null)
-    {
+    public function __construct(string $title, string $url = null, string $image = null) {
         $this->title = $title;
         $this->url = $url;
         $this->image = $image;
@@ -53,8 +51,7 @@ class NavBrand extends NavItem
 
 
     /** @return string */
-    public function toString()
-    {
+    public function toString() {
         $href = $this->url !== null ? "href='$this->url'" : "";
         $img = $this->image !== null ? "<img src=\"$this->image\" width=\"30\" 
 height=\"30\" class=\"d-inline-block align-top\" alt=\"\">" : "";

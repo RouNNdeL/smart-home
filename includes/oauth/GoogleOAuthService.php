@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,11 +30,10 @@
  * Time: 14:50
  */
 
-require_once __DIR__."/../database/HomeUser.php";
-require_once __DIR__."/../../vendor/autoload.php";
+require_once __DIR__ . "/../database/HomeUser.php";
+require_once __DIR__ . "/../../vendor/autoload.php";
 
-class GoogleOAuthService extends OAuthService
-{
+class GoogleOAuthService extends OAuthService {
     const ID = "1";
 
     const ID_TOKEN_ENDPOINT = "https://www.googleapis.com/oauth2/v3/tokeninfo";
@@ -43,18 +42,16 @@ class GoogleOAuthService extends OAuthService
      * @param array $requestTokens
      * @return HomeUser|null
      */
-    public function getUser(array $requestTokens)
-    {
+    public function getUser(array $requestTokens) {
         $id_token = GoogleOAuthService::decodeIdToken($requestTokens["id_token"]);
         if($id_token === null || isset($id_token["error_description"]))
             return null;
         return HomeUser::queryUserByGoogleId($id_token["sub"]);
     }
 
-    private function decodeIdToken(string $id_token)
-    {
+    private function decodeIdToken(string $id_token) {
         $fields = ["id_token" => $id_token];
-        $ch = curl_init(GoogleOAuthService::ID_TOKEN_ENDPOINT."?".http_build_query($fields));
+        $ch = curl_init(GoogleOAuthService::ID_TOKEN_ENDPOINT . "?" . http_build_query($fields));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $data = curl_exec($ch);
         $json_response = json_decode($data, true);
@@ -68,8 +65,7 @@ class GoogleOAuthService extends OAuthService
      * @param array $requestTokens
      * @return HomeUser
      */
-    public function registerUser(array $requestTokens)
-    {
+    public function registerUser(array $requestTokens) {
         $id_token = GoogleOAuthService::decodeIdToken($requestTokens["id_token"]);
         if($id_token === null || isset($id_token["error_description"]))
             return null;

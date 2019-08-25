@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,17 +29,14 @@
  * Date: 2018-07-05
  * Time: 17:43
  */
-
-abstract class NavItem
-{
+abstract class NavItem {
     protected $class;
 
     /**
      * NavItem constructor.
      * @param $class
      */
-    public function __construct($class)
-    {
+    public function __construct($class) {
         $this->class = $class;
     }
 

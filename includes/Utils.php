@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,15 +29,13 @@
  * Date: 07/08/2017
  * Time: 16:54
  */
-class Utils
-{
+class Utils {
+    const DEFAULT_LANG = "en";
+    const AVAILABLE_LANGUAGES = ["en", "pl"];
     /**
      * @var Utils
      */
     private static $instance;
-    const DEFAULT_LANG = "en";
-    const AVAILABLE_LANGUAGES = ["en", "pl"];
-
     public $strings;
     public $lang;
 
@@ -45,21 +43,18 @@ class Utils
      * Utils constructor.
      * @param null $lang
      */
-    public function __construct($lang = null)
-    {
+    public function __construct($lang = null) {
         if($lang === null)
             $lang = isset($_COOKIE["lang"]) ? $_COOKIE["lang"] : self::DEFAULT_LANG;
         $this->lang = $lang;
         $this->loadStrings();
     }
 
-    private function loadStrings()
-    {
+    private function loadStrings() {
         $lang = $this->lang;
         $path = __DIR__ . "/../_lang/$lang.json";
         $file = file_get_contents($path);
-        if($file == false)
-        {
+        if($file == false) {
             $this->lang = self::DEFAULT_LANG;
             $this->loadStrings();
             return;
@@ -67,10 +62,19 @@ class Utils
         $this->strings = json_decode($file, true);
     }
 
-    public function _getString(string $name)
-    {
-        if($this->strings != null && isset($this->strings[$name]))
-        {
+    public static function sanitizeString(string $string) {
+        $sanitized_string = preg_replace('!\s+!', ' ', $string);
+        $sanitized_string = preg_replace("!\s!", "_", $sanitized_string);
+        $sanitized_string = strtolower($sanitized_string);
+        return preg_replace("![^\sa-z0-9]!", "", $sanitized_string);
+    }
+
+    public static function getString(string $name) {
+        return self::getInstance()->_getString($name);
+    }
+
+    public function _getString(string $name) {
+        if($this->strings != null && isset($this->strings[$name])) {
             return $this->strings[$name];
         }
 
@@ -79,43 +83,25 @@ class Utils
         return "_" . $name;
     }
 
-    public static function sanitizeString(string $string)
-    {
-        $sanitized_string = preg_replace('!\s+!', ' ', $string);
-        $sanitized_string = preg_replace("!\s!", "_", $sanitized_string);
-        $sanitized_string = strtolower($sanitized_string);
-        return preg_replace("![^\sa-z0-9]!", "", $sanitized_string);
-    }
-
-    public static function getInstance()
-    {
-        if(self::$instance == null)
-        {
+    public static function getInstance() {
+        if(self::$instance == null) {
             self::$instance = new self();
         }
 
         return self::$instance;
     }
 
-    public static function getString(string $name)
-    {
-        return self::getInstance()->_getString($name);
-    }
-
-    public static function intToHex(int $n, int $bytes = 1)
-    {
+    public static function intToHex(int $n, int $bytes = 1) {
         return str_pad(dechex($n), $bytes * 2, '0', STR_PAD_LEFT);
     }
 
-    public static function dec2hex($number)
-    {
-        $hexvalues = array('0','1','2','3','4','5','6','7',
-            '8','9','A','B','C','D','E','F');
+    public static function dec2hex($number) {
+        $hexvalues = array('0', '1', '2', '3', '4', '5', '6', '7',
+            '8', '9', 'A', 'B', 'C', 'D', 'E', 'F');
         $hexval = '';
-        while($number != '0')
-        {
-            $hexval = $hexvalues[bcmod($number,'16')].$hexval;
-            $number = bcdiv($number,'16',0);
+        while($number != '0') {
+            $hexval = $hexvalues[bcmod($number, '16')] . $hexval;
+            $number = bcdiv($number, '16', 0);
         }
         return $hexval;
     }

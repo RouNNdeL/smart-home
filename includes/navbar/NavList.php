@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,7 @@
  * Date: 2018-07-05
  * Time: 17:52
  */
-class NavList extends NavItem implements NavPageSetListener
-{
+class NavList extends NavItem implements NavPageSetListener {
     /** @var NavItem[] */
     private $items;
 
@@ -38,34 +37,28 @@ class NavList extends NavItem implements NavPageSetListener
      * NavList constructor.
      * @param NavItem[] $items
      */
-    public function __construct(array $items = [], string $class = "")
-    {
+    public function __construct(array $items = [], string $class = "") {
         parent::__construct($class);
         $this->items = $items;
     }
 
-    public function addItem(NavItem $item)
-    {
+    public function addItem(NavItem $item) {
         $this->items[] = $item;
     }
 
 
     /** @return string */
-    public function toString()
-    {
+    public function toString() {
         $html = " <ul class=\"navbar-nav $this->class\">";
-        foreach($this->items as $item)
-        {
+        foreach($this->items as $item) {
             $html .= $item->toString();
         }
-        $html.="</ul>";
+        $html .= "</ul>";
         return $html;
     }
 
-    function onPageSet(string $page)
-    {
-        foreach($this->items as $item)
-        {
+    function onPageSet(string $page) {
+        foreach($this->items as $item) {
             if($item instanceof NavPageSetListener)
                 $item->onPageSet($page);
         }

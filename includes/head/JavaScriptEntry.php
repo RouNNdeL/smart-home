@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,7 @@
 
 require_once __DIR__ . "/HeadEntry.php";
 
-class JavaScriptEntry extends HeadEntry
-{
+class JavaScriptEntry extends HeadEntry {
     const CAPTCHA = "https://www.google.com/recaptcha/api.js";
     const GOOGLE_PLATFORM = "https://apis.google.com/js/platform";
     const LOGIN = "/dist/js/login";
@@ -62,8 +61,7 @@ class JavaScriptEntry extends HeadEntry
      * @param bool $async
      * @param bool $defer
      */
-    public function __construct(string $url, bool $async = false, bool $defer = false)
-    {
+    public function __construct(string $url, bool $async = false, bool $defer = false) {
         $this->url = $url;
         $this->async = $async;
         $this->defer = $defer;
@@ -73,8 +71,7 @@ class JavaScriptEntry extends HeadEntry
      * @param bool $minified
      * @return string
      */
-    public function toString(bool $minified)
-    {
+    public function toString(bool $minified) {
         $async = $this->async ? "async" : "";
         $defer = $this->defer ? "defer" : "";
         preg_match("/.js$/", $this->url, $output_array);
@@ -83,11 +80,9 @@ class JavaScriptEntry extends HeadEntry
         return "<script src='$url' $async $defer></script>";
     }
 
-    public static function getDefaults()
-    {
+    public static function getDefaults() {
         $arr = [];
-        foreach(JavaScriptEntry::DEFAULT as $item)
-        {
+        foreach(JavaScriptEntry::DEFAULT as $item) {
             $arr[] = new JavaScriptEntry($item, false, false);
         }
         return $arr;

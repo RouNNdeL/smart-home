@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,69 +29,51 @@
  * Date: 2018-06-11
  * Time: 17:47
  */
-class Off extends Effect
-{
+class Off extends Effect {
 
     /**
      * @return int
      */
-    public function getTimingsForEffect()
-    {
+    public function getTimingsForEffect() {
         return 0;
     }
 
     /**
      * @return array
      */
-    public function packArgs()
-    {
+    public function packArgs() {
         return [1 => 0, 2 => 0xff, 5 => 1];
     }
 
-    public function unpackArgs(array $args)
-    {
+    public function unpackArgs(array $args) {
 
     }
 
     /**
      * @return int
      */
-    public function avrEffect()
-    {
+    public function avrEffect() {
         return Effect::AVR_EFFECT_BREATHE;
     }
 
     /**
      * @return int
      */
-    public function getEffectId()
-    {
+    public function getEffectId() {
         return Effect::EFFECT_OFF;
-    }
-
-    /**
-     * @param int $id
-     * @param string $device_id
-     * @return Effect
-     */
-    public static function getDefault(int $id)
-    {
-        return new Off($id, [], [1, 0, 0, 0, 0, 0]);
     }
 
     /**
      * @return int
      */
-    public function getMaxColors()
-    {
+    public function getMaxColors() {
         return 0;
     }
 
     /**
      * @return int
      */
-    public function getMinColors()
-    {
+    public function getMinColors() {
         return 0;
     }
 
@@ -99,8 +81,7 @@ class Off extends Effect
      * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
      * The updated_effect JSON filed then contains those values and replaces them in the user interface
      */
-    public function overwriteValues()
-    {
+    public function overwriteValues() {
         $this->timings[Effect::TIME_OFF] = 1;
         $this->timings[Effect::TIME_ON] = 0;
         $this->timings[Effect::TIME_ROTATION] = 0;
@@ -111,8 +92,16 @@ class Off extends Effect
      * @param $name
      * @return string
      */
-    public function getArgumentClass($name)
-    {
+    public function getArgumentClass($name) {
         return null;
+    }
+
+    /**
+     * @param int $id
+     * @param string $device_id
+     * @return Effect
+     */
+    public static function getDefault(int $id) {
+        return new Off($id, [], [1, 0, 0, 0, 0, 0]);
     }
 }

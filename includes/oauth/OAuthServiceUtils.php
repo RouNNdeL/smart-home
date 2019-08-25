@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,7 @@
  * Date: 2018-05-22
  * Time: 15:22
  */
-class OAuthServiceUtils
-{
+class OAuthServiceUtils {
     const REDIRECT_URI = "https://home.zdul.xyz/oauth/response.php";
 
     /**
@@ -41,8 +40,7 @@ class OAuthServiceUtils
      * @param $redirect_uri
      * @return bool
      */
-    public static function insertState(mysqli $conn, int $session_id, string $service_id, string $state, $redirect_uri)
-    {
+    public static function insertState(mysqli $conn, int $session_id, string $service_id, string $state, $redirect_uri) {
         $sql = "INSERT INTO service_auth_states (session_id, service_id, state, redirect_uri) VALUES(?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("isss", $session_id, $service_id, $state, $redirect_uri);
@@ -54,14 +52,12 @@ class OAuthServiceUtils
      * @param string $state
      * @return bool
      */
-    public static function checkState(mysqli $conn, string $state)
-    {
+    public static function checkState(mysqli $conn, string $state) {
         $sql = "SELECT state FROM service_auth_states WHERE state = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $state);
         $stmt->execute();
-        if($stmt->fetch())
-        {
+        if($stmt->fetch()) {
             $stmt->close();
             $sql = "DELETE FROM service_auth_states WHERE state = ?";
             $stmt = $conn->prepare($sql);

@@ -73,39 +73,6 @@ class IrCode {
         $this->icon = $icon;
     }
 
-    public static function byId(string $id) {
-        $conn = DbUtils::getConnection();
-        $sql = "SELECT primary_code, device_id, support_code, raw_code, protocol, display_name, icon 
-                FROM ir_codes WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $id);
-        $stmt->bind_result($primary_code, $device_id, $support_code, $raw_code, $protocol, $display_name, $icon);
-        $stmt->execute();
-        if($stmt->fetch()) {
-            return new IrCode($id, $device_id, $primary_code, $support_code, $raw_code, $protocol, $display_name, $icon);
-        }
-        return null;
-    }
-
-    /**
-     * @param string $device_id
-     * @return IrCode[]
-     */
-    public static function forDeviceId(string $device_id) {
-        $conn = DbUtils::getConnection();
-        $sql = "SELECT id, primary_code, support_code, raw_code, protocol, display_name, icon FROM ir_codes WHERE device_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $device_id);
-        $stmt->bind_result($id, $primary_code, $support_code, $raw_code, $protocol, $display_name, $icon);
-        $stmt->execute();
-        $arr = [];
-        while($stmt->fetch()) {
-            $arr[$id] = new IrCode($id, $device_id, $primary_code, $support_code, $raw_code, $protocol, $display_name, $icon);
-        }
-        $stmt->close();
-        return $arr;
-    }
-
     /**
      * @return string
      */
@@ -160,5 +127,38 @@ class IrCode {
      */
     public function getProtocol() {
         return $this->protocol;
+    }
+
+    public static function byId(string $id) {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT primary_code, device_id, support_code, raw_code, protocol, display_name, icon 
+                FROM ir_codes WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $id);
+        $stmt->bind_result($primary_code, $device_id, $support_code, $raw_code, $protocol, $display_name, $icon);
+        $stmt->execute();
+        if($stmt->fetch()) {
+            return new IrCode($id, $device_id, $primary_code, $support_code, $raw_code, $protocol, $display_name, $icon);
+        }
+        return null;
+    }
+
+    /**
+     * @param string $device_id
+     * @return IrCode[]
+     */
+    public static function forDeviceId(string $device_id) {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, primary_code, support_code, raw_code, protocol, display_name, icon FROM ir_codes WHERE device_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $device_id);
+        $stmt->bind_result($id, $primary_code, $support_code, $raw_code, $protocol, $display_name, $icon);
+        $stmt->execute();
+        $arr = [];
+        while($stmt->fetch()) {
+            $arr[$id] = new IrCode($id, $device_id, $primary_code, $support_code, $raw_code, $protocol, $display_name, $icon);
+        }
+        $stmt->close();
+        return $arr;
     }
 }

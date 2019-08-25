@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -112,8 +112,7 @@ class LampAnalog extends VirtualDevice {
      * @param string $footer_html
      * @return string
      */
-    public function toHtml($header_name = null, $footer_html = "")
-    {
+    public function toHtml($header_name = null, $footer_html = "") {
         if($header_name !== null)
             $name = $header_name;
         else
@@ -177,6 +176,13 @@ HTML;
     }
 
     /**
+     * @param bool $on
+     */
+    public function setOn(bool $on) {
+        $this->on = $on;
+    }
+
+    /**
      * @return int
      */
     public function getBrightness(): int {
@@ -188,12 +194,5 @@ HTML;
      */
     public function setBrightness(int $brightness) {
         $this->brightness = $brightness;
-    }
-
-    /**
-     * @param bool $on
-     */
-    public function setOn(bool $on) {
-        $this->on = $on;
     }
 }

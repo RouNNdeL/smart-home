@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,11 +32,9 @@
 
 require_once __DIR__ . "/SelectArgument.php";
 
-class YesNoArgument extends SelectArgument
-{
+class YesNoArgument extends SelectArgument {
 
-    protected function getOptions()
-    {
+    protected function getOptions() {
         return [0 => "no", 1 => "yes"];
     }
 }

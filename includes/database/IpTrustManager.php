@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,40 +32,70 @@
 
 require_once __DIR__ . "/DbUtils.php";
 
-class IpTrustManager
-{
+class IpTrustManager {
     const HEAT_LOGIN_ATTEMPT = 10;
     const HEAT_SUCCESSFUL_LOGIN = -25;
     const HEAT_UNTRUSTED = 50;
     const HEAT_DENIED = 250;
     const HEAT_BLACKLIST_BONUS = 100;
     const HEAT_LOCAL_BONUS = -50;
-
-    /** @var string */
-    private $ip;
-
-    /** @var int */
-    private $heat;
-
     /** @var IpTrustManager */
     private static $instance = null;
+    /** @var string */
+    private $ip;
+    /** @var int */
+    private $heat;
 
     /**
      * IpTrustManager constructor.
      * @param string $ip
      * @param int $heat
      */
-    private function __construct(string $ip, int $heat)
-    {
+    private function __construct(string $ip, int $heat) {
         $this->ip = $ip;
         $this->heat = $heat;
     }
 
-    public static function getInstance()
-    {
-        if(IpTrustManager::$instance === null)
-        {
-            IpTrustManager::$instance =  IpTrustManager::fromIp($_SERVER['REMOTE_ADDR']);
+    public function isTrusted() {
+        return $this->getHeat() < self::HEAT_UNTRUSTED;
+    }
+
+    /**
+     * @return int
+     */
+    public function getHeat(): int {
+        return $this->heat + (self::isInBlacklist($this->ip) ? self::HEAT_BLACKLIST_BONUS : 0) +
+            (self::isLocal($this->ip) ? self::HEAT_LOCAL_BONUS : 0);
+    }
+
+    public static function isLocal(string $ip) {
+        preg_match(
+            "/(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/",
+            $ip,
+            $match
+        );
+        return $match !== null && sizeof($match) > 0 && IpTrustManager::isValid($ip);
+    }
+
+    public function isAllowed() {
+        return $this->getHeat() < self::HEAT_DENIED;
+    }
+
+    public function heatUp(int $value) {
+        $this->heat += $value;
+        $this->insertOrUpdate();
+    }
+
+    /**
+     * @return string
+     */
+    public function getIp(): string {
+        return $this->ip;
+    }
+
+    public static function getInstance() {
+        if(IpTrustManager::$instance === null) {
+            IpTrustManager::$instance = IpTrustManager::fromIp($_SERVER['REMOTE_ADDR']);
         }
 
         return IpTrustManager::$instance;
@@ -75,8 +105,7 @@ class IpTrustManager
      * @param string $ip
      * @return IpTrustManager|null
      */
-    private static function fromIp(string $ip)
-    {
+    private static function fromIp(string $ip) {
         if(!self::isValid($ip))
             return null;
         $manager = IpTrustManager::queryByIp(DbUtils::getConnection(), $ip);
@@ -87,15 +116,19 @@ class IpTrustManager
         return $manager;
     }
 
-    private static function queryByIp(mysqli $conn, string $ip)
-    {
+    public static function isValid(string $ip) {
+        $re = '/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/';
+        preg_match($re, $ip, $match);
+        return $match !== null && sizeof($match) > 0;
+    }
+
+    private static function queryByIp(mysqli $conn, string $ip) {
         $sql = "SELECT heat_value FROM ip_heat WHERE ip = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $ip);
         $stmt->bind_result($heat);
         $stmt->execute();
-        if($stmt->fetch())
-        {
+        if($stmt->fetch()) {
             $stmt->close();
             return new IpTrustManager($ip, $heat);
         }
@@ -103,8 +136,7 @@ class IpTrustManager
         return null;
     }
 
-    private function insertOrUpdate()
-    {
+    private function insertOrUpdate() {
         $blacklist = self::isInBlacklist($this->ip) ? 1 : 0;
         $sql = "INSERT INTO ip_heat (ip, heat_value, blacklist) VALUES (?, ?, ?) 
                 ON DUPLICATE KEY UPDATE 
@@ -122,64 +154,13 @@ class IpTrustManager
         return $success;
     }
 
-    public function isTrusted()
-    {
-        return $this->getHeat() < self::HEAT_UNTRUSTED;
-    }
-
-    public function isAllowed()
-    {
-        return $this->getHeat() < self::HEAT_DENIED;
-    }
-
-    public function heatUp(int $value)
-    {
-        $this->heat += $value;
-        $this->insertOrUpdate();
-    }
-
-    public static function isValid(string $ip)
-    {
-        $re = '/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/';
-        preg_match($re, $ip, $match);
-        return $match !== null && sizeof($match) > 0;
-    }
-
-    public static function isInBlacklist(string $ip)
-    {
+    public static function isInBlacklist(string $ip) {
         preg_match(
             "/^" . preg_quote($ip) . "/",
             file_get_contents(__DIR__ . "/../../latest_blacklist.txt"),
             $match
         );
         return $match !== null && sizeof($match) > 0;
-    }
-
-    public static function isLocal(string $ip)
-    {
-        preg_match(
-            "/(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)/",
-            $ip,
-            $match
-        );
-        return $match !== null && sizeof($match) > 0 && IpTrustManager::isValid($ip);
-    }
-
-    /**
-     * @return int
-     */
-    public function getHeat(): int
-    {
-        return $this->heat + (self::isInBlacklist($this->ip) ? self::HEAT_BLACKLIST_BONUS : 0) +
-            (self::isLocal($this->ip) ? self::HEAT_LOCAL_BONUS : 0);
-    }
-
-    /**
-     * @return string
-     */
-    public function getIp(): string
-    {
-        return $this->ip;
     }
 
 }

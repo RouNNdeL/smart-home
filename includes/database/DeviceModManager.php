@@ -47,6 +47,23 @@ class DeviceModManager {
         return $success;
     }
 
+    public static function getLastModDate(mysqli $conn, int $user_id, $physical_id, $virtual_id, $types) {
+        $sql = "SELECT date FROM device_modifications 
+                    JOIN devices_physical dp ON device_modifications.physical_id = dp.id 
+                    LEFT JOIN device_shares share2 on dp.id = share2.subject_id and dp.owner_id = share2.issuer_id
+                    WHERE %WHERE% ORDER BY date DESC LIMIT 1";
+        $stmt = DeviceModManager::getStatementForParams($conn, $sql, $user_id, $physical_id, $virtual_id, $types);
+        $stmt->bind_result($date);
+        $stmt->execute();
+        if($stmt->fetch()) {
+            $stmt->close();
+            return $date;
+        }
+
+        $stmt->close();
+        return null;
+    }
+
     private static function getStatementForParams(mysqli $conn, string $sql, int $user_id, $physical_id, $virtual_id, array $types) {
         $where = "";
         $vars = "";
@@ -103,23 +120,6 @@ class DeviceModManager {
         $stmt = $conn->prepare($query);
         call_user_func_array([$stmt, "bind_param"], $func_params);
         return $stmt;
-    }
-
-    public static function getLastModDate(mysqli $conn, int $user_id, $physical_id, $virtual_id, $types) {
-        $sql = "SELECT date FROM device_modifications 
-                    JOIN devices_physical dp ON device_modifications.physical_id = dp.id 
-                    LEFT JOIN device_shares share2 on dp.id = share2.subject_id and dp.owner_id = share2.issuer_id
-                    WHERE %WHERE% ORDER BY date DESC LIMIT 1";
-        $stmt = DeviceModManager::getStatementForParams($conn, $sql, $user_id, $physical_id, $virtual_id, $types);
-        $stmt->bind_result($date);
-        $stmt->execute();
-        if($stmt->fetch()) {
-            $stmt->close();
-            return $date;
-        }
-
-        $stmt->close();
-        return null;
     }
 
     /**

@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,7 @@
  * Date: 2018-07-05
  * Time: 17:43
  */
-
-class Navbar extends NavItem implements NavPageSetListener
-{
+class Navbar extends NavItem implements NavPageSetListener {
     /** @var NavItem */
     private $items;
 
@@ -42,47 +40,17 @@ class Navbar extends NavItem implements NavPageSetListener
      * @param NavItem[] $items
      * @param int $active_item
      */
-    public function __construct(array $items = [], string $class = "", $id = null)
-    {
+    public function __construct(array $items = [], string $class = "", $id = null) {
         parent::__construct($class);
         $this->items = $items;
         $this->id = $id;
     }
 
-    public function addItem(NavItem $item)
-    {
-        $this->items[] = $item;
-    }
-
-    public static function getDefaultLeft($id = null)
-    {
-        $nav = new Navbar([], "navbar-collapse collapse", $id);
-        $list = new NavList([], "mr-md-auto full-width");
-        foreach(Nav::DEFAULT_LINKS as $url => $string)
-        {
-            $list->addItem(new NavLink($url, Utils::getString($string)));
-        }
-        $list->addItem(new NavDivider("d-md-none"));
-        $list->addItem(new NavLink("/logout", Utils::getString("navbar_logout"), "d-md-none"));
-        $nav->addItem($list);
-        return $nav;
-    }
-
-    public static function getDefaultRight($id = null)
-    {
-        $nav = new Navbar([], "d-none d-md-block", $id);
-        $nav->addItem(NavDropdown::getDefaultUserDropDown());
-        return $nav;
-    }
-
-
     /** @return string */
-    public function toString()
-    {
+    public function toString() {
         $id = $this->id !== null ? "id='$this->id'" : "";
         $items_html = "";
-        foreach($this->items as $item)
-        {
+        foreach($this->items as $item) {
             $items_html .= $item->toString();
         }
         return <<<HTML
@@ -92,12 +60,32 @@ class Navbar extends NavItem implements NavPageSetListener
 HTML;
     }
 
-    function onPageSet(string $page)
-    {
-        foreach($this->items as $item)
-        {
+    function onPageSet(string $page) {
+        foreach($this->items as $item) {
             if($item instanceof NavPageSetListener)
                 $item->onPageSet($page);
         }
+    }
+
+    public static function getDefaultLeft($id = null) {
+        $nav = new Navbar([], "navbar-collapse collapse", $id);
+        $list = new NavList([], "mr-md-auto full-width");
+        foreach(Nav::DEFAULT_LINKS as $url => $string) {
+            $list->addItem(new NavLink($url, Utils::getString($string)));
+        }
+        $list->addItem(new NavDivider("d-md-none"));
+        $list->addItem(new NavLink("/logout", Utils::getString("navbar_logout"), "d-md-none"));
+        $nav->addItem($list);
+        return $nav;
+    }
+
+    public function addItem(NavItem $item) {
+        $this->items[] = $item;
+    }
+
+    public static function getDefaultRight($id = null) {
+        $nav = new Navbar([], "d-none d-md-block", $id);
+        $nav->addItem(NavDropdown::getDefaultUserDropDown());
+        return $nav;
     }
 }

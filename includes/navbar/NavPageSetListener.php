@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,6 @@
  * Date: 2018-07-05
  * Time: 19:26
  */
-
-interface NavPageSetListener
-{
+interface NavPageSetListener {
     function onPageSet(string $page);
 }
