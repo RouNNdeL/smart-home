@@ -91,6 +91,16 @@ class RemoteActionManager extends ExtensionManager {
         return null;
     }
 
+    public function getActionsForDeviceId(string $device_id) {
+        $arr = [];
+        foreach($this->actions as $action) {
+            if($action->getPhysicalDeviceId() === $device_id) {
+                $arr[] = $action;
+            }
+        }
+        return $arr;
+    }
+
     private function isActionOnline(int $action_id) {
         //TODO: Check if corresponding device is online
         return true;
@@ -117,9 +127,27 @@ class RemoteActionManager extends ExtensionManager {
         return $ids;
     }
 
-    private function executeAction($action_id) {
+    /**
+     * @param $action_id
+     * @return bool - true if the action was scheduled to be executed, false otherwise
+     */
+    public function executeAction($action_id) {
+        if(!$this->hasAction($action_id)) {
+            return false;
+        }
+
         $script = __DIR__ . "/../../scripts/execute_remote_action.php";
         exec("php $script $action_id $this->user_id >/dev/null &");
+        return true;
+    }
+
+    private function hasAction(int $action_id): bool {
+        foreach($this->actions as $action) {
+            if($action->getId() === $action_id) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

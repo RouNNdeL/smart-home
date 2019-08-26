@@ -33,6 +33,7 @@
 require_once __DIR__ . "/database/IpTrustManager.php";
 require_once __DIR__ . "/database/SessionManager.php";
 require_once __DIR__ . "/UserDeviceManager.php";
+require_once __DIR__ . "/ExtensionManager.php";
 require_once __DIR__ . "/logging/RequestLogger.php";
 
 class GlobalManager {
@@ -53,11 +54,47 @@ class GlobalManager {
     /** @var IpTrustManager */
     private $ipTrustManager = null;
 
+    private static $instance = null;
+
     /**
      * GlobalManager constructor.
      */
     private function __construct() {
 
+    }
+
+    /**
+     * @return RemoteActionManager
+     */
+    public function getRemoteActionManager(int $user_id = null): RemoteActionManager {
+        foreach($this->extensionManagers as $extensionManager) {
+            if($extensionManager instanceof RemoteActionManager) {
+                return $extensionManager;
+            }
+        }
+
+        if($user_id === null) {
+            $user_id = $this->sessionManager->getUserId();
+        }
+
+        $this->loadExtensionManagers($user_id);
+        foreach($this->extensionManagers as $extensionManager) {
+            if($extensionManager instanceof RemoteActionManager) {
+                return $extensionManager;
+            }
+        }
+
+        throw new UnexpectedValueException("Unable to load RemoteActionManager");
+    }
+
+    /**
+     * @return GlobalManager
+     */
+    public static function getInstance() {
+        if(self::$instance == null) {
+            self::$instance = new GlobalManager();
+        }
+        return self::$instance;
     }
 
     public function actionsGetSync() {
@@ -116,10 +153,12 @@ class GlobalManager {
      * Only use when user has already been authenticated
      * @param int $user_id
      */
-    public static function forWebhook(int $user_id) {
-        $manager = new GlobalManager();
+    public static function withUserOverride(int $user_id, bool $ip_trust_manager = true) {
+        $manager = GlobalManager::getInstance();
 
-        $manager->loadIpTrustManager();
+        if($ip_trust_manager) {
+            $manager->loadIpTrustManager();
+        }
         $manager->loadExtensionManagers($user_id);
         $manager->loadUserDeviceManagerManually($user_id);
 
@@ -143,7 +182,7 @@ class GlobalManager {
     }
 
     public static function minimal() {
-        $manager = new GlobalManager();
+        $manager = &GlobalManager::getInstance();
 
         $manager->loadIpTrustManager();
 
@@ -151,7 +190,7 @@ class GlobalManager {
     }
 
     public static function withSessionManager($login_required = false, $log = GlobalManager::LOG) {
-        $manager = new GlobalManager();
+        $manager = GlobalManager::getInstance();
 
         $manager->loadIpTrustManager();
         $manager->loadSessionManager($login_required, $log);
@@ -170,7 +209,7 @@ class GlobalManager {
     }
 
     public static function all($scopes = null, $log = GlobalManager::LOG) {
-        $manager = new GlobalManager();
+        $manager = GlobalManager::getInstance();
 
         $manager->loadIpTrustManager();
         $manager->loadSessionManager(true, $log);

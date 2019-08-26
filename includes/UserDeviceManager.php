@@ -63,7 +63,10 @@ class UserDeviceManager {
         $states = [];
         foreach($this->physical_devices as $physicalDevice) {
             foreach($physicalDevice->getVirtualDevices() as $virtualDevice) {
-                $states[$virtualDevice->getDeviceId()] = $virtualDevice->getStateJson($physicalDevice->isOnline());
+                $stateJson = $virtualDevice->getStateJson($physicalDevice->isOnline());
+                if($stateJson !== null) {
+                    $states[$virtualDevice->getDeviceId()] = $stateJson;
+                }
             }
         }
 
@@ -122,7 +125,10 @@ class UserDeviceManager {
         foreach($payload["devices"] as $device) {
             $id = $device["id"];
             $online = $this->getPhysicalDeviceByVirtualId($id)->isOnline();
-            $response[$id] = $this->getVirtualDeviceById($id)->getStateJson($online);
+            $stateJson = $this->getVirtualDeviceById($id)->getStateJson($online);
+            if($stateJson !== null) {
+                $response[$id] = $stateJson;
+            }
         }
         return $response;
     }

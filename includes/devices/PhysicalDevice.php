@@ -273,7 +273,7 @@ HTML;
      * @param string $hostname
      * @return PhysicalDevice
      */
-    public static abstract function load(string $device_id, int $owner_id, string $display_name,
+    protected static abstract function load(string $device_id, int $owner_id, string $display_name,
                                          string $hostname, int $port, array $scopes
     );
 

@@ -103,6 +103,20 @@ class RemoteAction {
     }
 
     /**
+     * @return string
+     */
+    public function getPhysicalDeviceId(): string {
+        return $this->physical_device_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string {
+        return $this->name;
+    }
+
+    /**
      * @param int $id
      * @return RemoteAction|null
      */

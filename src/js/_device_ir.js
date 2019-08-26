@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ import $ from 'jquery';
 import {showSnackbar, sleep} from "./_utils";
 
 const IR_ACTION_URL = "/api/device_ir_action.php";
+const IR_REMOTE_ACTION_URL = "/api/device_ir_remote_action.php";
 
 export default function init() {
     let action_in_progress = false;
@@ -62,12 +63,27 @@ export default function init() {
         action_in_progress = false;
     }); // jshint ignore:line
 
+    $(".ir-action-btn").click(function() {
+        const remote_action_id = $(this).data("remote-action-id");
+        const device_id = $(this).parents(".device-parent").eq(0).data("parent-id");
+        postRemoteAction(remote_action_id, device_id);
+    });
+
     function postAction(action_id, device_id) {
         $.ajax(IR_ACTION_URL, {
             method: "POST",
             dataType: "json",
             contentType: "json",
             data: JSON.stringify({action_id: action_id, device_id: device_id})
+        });
+    }
+
+    function postRemoteAction(remote_action_id, device_id) {
+        $.ajax(IR_REMOTE_ACTION_URL, {
+            method: "POST",
+            dataType: "json",
+            contentType: "json",
+            data: JSON.stringify({remote_action_id: remote_action_id, device_id: device_id})
         });
     }
 }

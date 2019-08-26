@@ -30,8 +30,10 @@
  * Time: 18:11
  */
 
+require_once __DIR__ . "/../GlobalManager.php";
 require_once __DIR__ . "/PhysicalDevice.php";
 require_once __DIR__ . "/ir/IrCode.php";
+require_once __DIR__ . "/VirtualIrActionsDevice.php";
 
 class IrRemote extends PhysicalDevice {
 
@@ -258,9 +260,14 @@ HTML;
      * @param string $hostname
      * @return PhysicalDevice
      */
-    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port, array $scopes) {
-
+    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port,
+                                array $scopes
+    ) {
+        $actions = GlobalManager::getInstance()->getRemoteActionManager()->getActionsForDeviceId($device_id);
         $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
+
+        $virtual[] = new VirtualIrActionsDevice($actions);
+
         return new IrRemote($device_id, $owner_id, $display_name, $hostname, $port, $virtual, $scopes);
     }
 }
