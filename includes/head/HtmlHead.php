@@ -37,7 +37,7 @@ require_once __DIR__ . "/StyleSheetEntry.php";
 require_once __DIR__ . "/FaviconEntry.php";
 
 class HtmlHead {
-    const VERSION = "1.7";
+    const VERSION = "1.8";
 
     /** @var string */
     private $title;
