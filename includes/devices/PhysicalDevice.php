@@ -195,7 +195,14 @@ abstract class PhysicalDevice {
         if(sizeof($this->virtual_devices) > 1) {
             $devices = "- " . Utils::getString("device_devices") . ": ";
             foreach($this->virtual_devices as $i => $device) {
-                if($i > 0) $devices .= ", ";
+                if(substr($device->getDeviceId(), 0, 12) === "virtualized_") {
+                    break;
+                }
+
+                if($i > 0) {
+                    $devices .= ", ";
+                }
+
                 $devices .= $device->getDeviceName();
             }
             $devices .= "<br>";
@@ -274,7 +281,7 @@ HTML;
      * @return PhysicalDevice
      */
     protected static abstract function load(string $device_id, int $owner_id, string $display_name,
-                                         string $hostname, int $port, array $scopes
+                                            string $hostname, int $port, array $scopes
     );
 
     public static function fromDatabaseRow(array $row

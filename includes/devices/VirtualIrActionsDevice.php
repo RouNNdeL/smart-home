@@ -30,7 +30,7 @@ class VirtualIrActionsDevice extends VirtualDevice {
     private $remote_actions;
 
     public function __construct(array $remote_actions) {
-        parent::__construct("virtual_ir_actions", Utils::getString("ir_actions"), [],
+        parent::__construct("virtualized_ir_actions", Utils::getString("ir_actions"), [],
             VirtualDevice::DEVICE_TYPE_VIRTUALIZED, false, false);
         $this->remote_actions = $remote_actions;
     }
