@@ -35,12 +35,13 @@ $manager = GlobalManager::all([ShareManager::SCOPE_SIMPLE_CONTROL]);
 require_once __DIR__ . "/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("PW Stalker");
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::PW));
+$head->addEntry(new StyleSheetEntry(StyleSheetEntry::MATERIAL_ICONS));
 echo $head->toString();
 
 
 ?>
 <body>
-<div class="container mt-5">
+<div class="container mt-3">
 
     <?php
     require_once __DIR__ . "/../../includes/pw_stalker/PwDbUtils.php";
@@ -132,6 +133,10 @@ HTML;
                     <td>Median</td>
                     <td id="department-mid"><?php echo (int)$department->getMedian() ?></td>
                 </tr>
+                <tr>
+                    <td class="font-weight-bold">Count</td>
+                    <td id="department-count" class="font-weight-bold"><?php echo sizeof($department->getAllStudents()) ?></td>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -154,6 +159,10 @@ HTML;
                 <tr>
                     <td>Median</td>
                     <td id="course-mid"><?php echo (int)$course->getMedian() ?></td>
+                </tr>
+                <tr>
+                    <td class="font-weight-bold">Count</td>
+                    <td id="course-count" class="font-weight-bold"><?php echo sizeof($course->getStudents()) ?></td>
                 </tr>
                 </tbody>
             </table>

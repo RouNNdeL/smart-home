@@ -106,7 +106,8 @@ class Department {
                 "min" => $department->getMin(),
                 "max" => $department->getMax(),
                 "avg" => $department->getAverage(),
-                "mid" => $department->getMedian()
+                "mid" => $department->getMedian(),
+                "count" => sizeof($department->getAllStudents())
             ];
         }
         return $json;
@@ -120,6 +121,18 @@ class Department {
         $arr = [];
         foreach($departments as $department) {
             $arr = array_merge($arr, $department->getCourses());
+        }
+        return $arr;
+    }
+
+    /**
+     * @param Department[] $departments
+     * @return array
+     */
+    public function getAllStudents(): array {
+        $arr = [];
+        foreach($this->courses as $course) {
+            $arr = array_merge($arr, $course->getStudents());
         }
         return $arr;
     }

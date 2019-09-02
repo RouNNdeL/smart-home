@@ -42,6 +42,7 @@ $(function() {
         $("#department-max").text(departments[id].max);
         $("#department-avg").text(Math.round(departments[id].avg));
         $("#department-mid").text(Math.round(departments[id].mid));
+        $("#department-count").text(departments[id].count);
     });
 
     $(".course-select select").change(function() {
@@ -52,5 +53,6 @@ $(function() {
         $("#course-max").text(courses[id].max);
         $("#course-avg").text(Math.round(courses[id].avg));
         $("#course-mid").text(Math.round(courses[id].mid));
+        $("#course-count").text(courses[id].count);
     });
 });

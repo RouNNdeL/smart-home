@@ -100,7 +100,8 @@ class Course {
                 "min" => $course->getMin(),
                 "max" => $course->getMax(),
                 "avg" => $course->getAverage(),
-                "mid" => $course->getMedian()
+                "mid" => $course->getMedian(),
+                "count" => sizeof($course->getStudents())
             ];
         }
         return $json;
