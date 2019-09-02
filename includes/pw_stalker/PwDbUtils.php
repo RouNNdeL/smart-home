@@ -94,4 +94,32 @@ class PwDbUtils {
 
         return $arr;
     }
+
+    public static function getStudentsJsonByQuery(string $query) {
+        $like = "%$query%";
+
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT ps.id, pc.name, pd.name, ps.name, points FROM pw_students ps
+                JOIN pw_courses pc on ps.course_id = pc.id 
+                JOIN pw_departments pd on pc.department_id = pd.id
+                WHERE ps.name LIKE ? ORDER BY ps.name LIMIT 25 ";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $like);
+        $stmt->bind_result($id, $course, $department, $name, $points);
+        $stmt->execute();
+        $arr = [];
+
+        while($stmt->fetch()) {
+            $arr[] = [
+                "id" => $id,
+                "name" => $name,
+                "points" => $points,
+                "department" => $department,
+                "course" => $course
+            ];
+        }
+        $stmt->close();
+
+        return $arr;
+    }
 }

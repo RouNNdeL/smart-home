@@ -23,28 +23,27 @@
  * SOFTWARE.
  */
 
-/**
- * Created by PhpStorm.
- * User: Krzysiek
- * Date: 11/08/2017
- * Time: 16:33
- */
 header("Content-Type: application/json");
 
-if($_SERVER['REQUEST_METHOD'] !== 'GET')
-{
-    echo "{\"status\":\"error\",\"message\":\"Invalid request\"}";
+if($_SERVER["REQUEST_METHOD"] !== "GET") {
+    $response = ["status" => "error", "error" => "invalid_request"];
     http_response_code(400);
-    exit(0);
+    echo json_encode($response);
+    exit();
 }
 
-if(!isset($_GET["name"]))
-{
+require_once __DIR__."/../includes/GlobalManager.php";
+
+$manager = GlobalManager::withSessionManager();
+
+if(!isset($_GET["q"])) {
+    $response = ["status" => "error", "error" => "invalid_request"];
     http_response_code(400);
-    echo "{\"status\":\"error\",\"message\":\"Missing arguments\"}";
-    exit(0);
+    echo json_encode($response);
+    exit();
 }
 
-require_once(__DIR__ . "/../web/includes/Utils.php");
-$string =  Utils::getString($_GET["name"]);
-echo json_encode(array("status" => "success", "string" => $string));
+$query = $_GET["q"];
+
+require_once __DIR__ . "/../includes/pw_stalker/PwDbUtils.php";
+echo json_encode(PwDbUtils::getStudentsJsonByQuery($query));

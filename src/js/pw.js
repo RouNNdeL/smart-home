@@ -24,8 +24,14 @@
 
 /* Workaround for jQuery UI not working properly with module imports */
 import $ from './_jquery';
+import 'bootstrap';
+import 'tether';
+
+const MAX_LIST_ITEMS = 5;
 
 $(function() {
+    "use strict";
+
     const json = $("#json-div");
     const departments = json.data("departments");
     const courses = json.data("courses");
@@ -55,4 +61,53 @@ $(function() {
         $("#course-mid").text(Math.round(courses[id].mid));
         $("#course-count").text(courses[id].count);
     });
+
+    $("#student-search").on("input", function() {
+        const val = $(this).val();
+
+        if(val.length > 0) {
+            $.ajax(`/api/pw_student_search.php?q=${val}`).done(function(data) {
+                $(".student-list-item").not("#student-placeholder").remove();
+                for(let i = 0; i < Math.min(data.length, MAX_LIST_ITEMS); i++) {
+                    $("#student-list").append(getStudentListItem(data[i]));
+                }
+            });
+        } else {
+            $(".student-list-item").not("#student-placeholder").remove();
+        }
+    });
+
+    $("#student-modal").modal({show: false});
+
+    function getStudentListItem({course, department, id, name, points}) {
+        const item = $("#student-placeholder").clone();
+
+        item.removeClass("d-none");
+        item.attr("id", false);
+        item.data("student-id", id);
+        item.data("student-name", name);
+        item.data("student-points", points);
+        item.data("student-department", department);
+        item.data("student-course", course);
+
+        item.find(".student-name").text(name);
+        item.find(".student-department").text(department);
+        item.click(function() {
+            const id = $(this).data("student-id");
+            const name = $(this).data("student-name");
+            const department = $(this).data("student-department");
+            const course = $(this).data("student-course");
+            const points = $(this).data("student-points");
+
+            $("#modal-student-id").text(id);
+            $("#modal-student-name").text(name);
+            $("#modal-student-department").text(department);
+            $("#modal-student-course").text(course);
+            $("#modal-student-points").text(points);
+            $("#student-modal").modal("show");
+        });
+
+        return item;
+    }
+
 });

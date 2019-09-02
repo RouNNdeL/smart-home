@@ -35,7 +35,6 @@ $manager = GlobalManager::withSessionManager();
 require_once __DIR__ . "/../../includes/head/HtmlHead.php";
 $head = new HtmlHead("PW Stalker");
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::PW));
-$head->addEntry(new StyleSheetEntry(StyleSheetEntry::MATERIAL_ICONS));
 echo $head->toString();
 
 
@@ -166,6 +165,13 @@ HTML;
                 </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <a class="btn btn-primary" role="button" href="/pw_search">Search</a>
+            </div>
         </div>
     </div>
 </div>
