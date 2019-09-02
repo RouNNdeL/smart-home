@@ -25,7 +25,7 @@
 
 require_once __DIR__ . "/../../includes/GlobalManager.php";
 
-$manager = GlobalManager::all([ShareManager::SCOPE_SIMPLE_CONTROL]);
+$manager = GlobalManager::withSessionManager();
 
 ?>
 
