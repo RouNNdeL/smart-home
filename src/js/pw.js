@@ -26,8 +26,14 @@
 import $ from './_jquery';
 import 'bootstrap';
 import 'tether';
+import {sleep} from "./_utils";
 
 const MAX_LIST_ITEMS = 5;
+const POINT_ROLL_DEFAULT_DELAY = 18;
+const POINT_ROLL_SLOWDOWN_THRESHOLD_MIN = 20;
+const POINT_ROLL_SLOWDOWN_THRESHOLD_SPAN = 20;
+const POINT_ROLL_SLOWDOWN_VALUE_MIN = 2;
+const POINT_ROLL_SLOWDOWN_VALUE_SPAN = 7;
 
 $(function() {
     "use strict";
@@ -103,7 +109,28 @@ $(function() {
             $("#modal-student-name").text(name);
             $("#modal-student-department").text(department);
             $("#modal-student-course").text(course);
-            $("#modal-student-points").text(points);
+            $("#modal-student-points").text("-");
+
+            const show_points_btn = $("#modal-show-points-btn");
+            show_points_btn.off("click");
+            show_points_btn.attr("disabled", false);
+            show_points_btn.click(async function() {
+                $(this).attr("disabled", true);
+                let current_points = 0;
+                let delay = POINT_ROLL_DEFAULT_DELAY;
+                const slowdown_threshold = Math.round(
+                    Math.random() * POINT_ROLL_SLOWDOWN_THRESHOLD_SPAN + POINT_ROLL_SLOWDOWN_THRESHOLD_MIN);
+                while(points > current_points) {
+                    if(points - current_points < slowdown_threshold) {
+                        delay += Math.round(
+                            Math.random() * POINT_ROLL_SLOWDOWN_VALUE_SPAN + POINT_ROLL_SLOWDOWN_VALUE_MIN);
+                    }
+                    current_points++;
+                    $("#modal-student-points").text(current_points);
+                    await sleep(delay);
+                }
+            });
+
             $("#student-modal").modal("show");
         });
 

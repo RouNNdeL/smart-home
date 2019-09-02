@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -196,7 +196,7 @@ module.exports = function(grunt) {
         },
         jshint: {
             options: {
-                "esversion": 6
+                "esversion": 8
             },
             build: ["Gruntfile.js", "src/js/*.js"]
         },
