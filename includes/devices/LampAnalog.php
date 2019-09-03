@@ -112,8 +112,7 @@ class LampAnalog extends VirtualDevice {
      * @param string $footer_html
      * @return string
      */
-    public function toHtml($header_name = null, $footer_html = "")
-    {
+    public function toHtml($header_name = null, $footer_html = "") {
         if($header_name !== null)
             $name = $header_name;
         else
@@ -177,6 +176,13 @@ HTML;
     }
 
     /**
+     * @param bool $on
+     */
+    public function setOn(bool $on) {
+        $this->on = $on;
+    }
+
+    /**
      * @return int
      */
     public function getBrightness(): int {
@@ -188,12 +194,5 @@ HTML;
      */
     public function setBrightness(int $brightness) {
         $this->brightness = $brightness;
-    }
-
-    /**
-     * @param bool $on
-     */
-    public function setOn(bool $on) {
-        $this->on = $on;
     }
 }

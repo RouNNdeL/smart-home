@@ -80,48 +80,6 @@ class RemoteAction {
         }
     }
 
-    /**
-     * @param int $id
-     * @return RemoteAction|null
-     */
-    public static function byId(int $id) {
-        $conn = DbUtils::getConnection();
-        $sql = "SELECT name, physcial_device_id, user_id, synonyms, default_delay FROM remote_actions WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $id);
-        $stmt->bind_result($name, $physical_device_id, $user_id, $synonyms, $default_delay);
-        $stmt->execute();
-        if($stmt->fetch()) {
-            $stmt->close();
-            $entries = ActionEntry::getEntriesForActionId($id);
-            return new RemoteAction($id, $name, $physical_device_id, $user_id, explode(",", $synonyms), $entries, $default_delay);
-        }
-        $stmt->close();
-        return null;
-    }
-
-
-    /**
-     * @param int $id
-     * @return RemoteAction[]
-     */
-    public static function forUserId(int $user_id) {
-        $entries = ActionEntry::getEntriesForUserId($user_id);
-
-        $conn = DbUtils::getConnection();
-        $sql = "SELECT id, name, physcial_device_id, synonyms, default_delay FROM remote_actions WHERE user_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $user_id);
-        $stmt->bind_result($id, $name, $physical_device_id, $synonyms, $default_delay);
-        $stmt->execute();
-        $arr = [];
-        while($stmt->fetch()) {
-            $arr[] = new RemoteAction($id, $name, $physical_device_id, $user_id, explode(",", $synonyms), $entries[$id], $default_delay);
-        }
-        $stmt->close();
-        return $arr;
-    }
-
     public function getSyncJson() {
         return [
             "id" => $this->getPrefixedId(),
@@ -142,5 +100,60 @@ class RemoteAction {
      */
     public function getId(): int {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPhysicalDeviceId(): string {
+        return $this->physical_device_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string {
+        return $this->name;
+    }
+
+    /**
+     * @param int $id
+     * @return RemoteAction|null
+     */
+    public static function byId(int $id) {
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT name, physcial_device_id, user_id, synonyms, default_delay FROM remote_actions WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->bind_result($name, $physical_device_id, $user_id, $synonyms, $default_delay);
+        $stmt->execute();
+        if($stmt->fetch()) {
+            $stmt->close();
+            $entries = ActionEntry::getEntriesForActionId($id);
+            return new RemoteAction($id, $name, $physical_device_id, $user_id, explode(",", $synonyms), $entries, $default_delay);
+        }
+        $stmt->close();
+        return null;
+    }
+
+    /**
+     * @param int $id
+     * @return RemoteAction[]
+     */
+    public static function forUserId(int $user_id) {
+        $entries = ActionEntry::getEntriesForUserId($user_id);
+
+        $conn = DbUtils::getConnection();
+        $sql = "SELECT id, name, physcial_device_id, synonyms, default_delay FROM remote_actions WHERE user_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $user_id);
+        $stmt->bind_result($id, $name, $physical_device_id, $synonyms, $default_delay);
+        $stmt->execute();
+        $arr = [];
+        while($stmt->fetch()) {
+            $arr[] = new RemoteAction($id, $name, $physical_device_id, $user_id, explode(",", $synonyms), $entries[$id], $default_delay);
+        }
+        $stmt->close();
+        return $arr;
     }
 }

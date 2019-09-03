@@ -29,21 +29,18 @@
  * Date: 2018-07-04
  * Time: 15:48
  */
-class SimpleRainbow extends Effect
-{
+class SimpleRainbow extends Effect {
     const TIME_CYCLE = 3;
     const ARG_BRIGHTNESS = "rainbow_brightness";
 
     /**
      * @return int
      */
-    public function getTimingsForEffect()
-    {
+    public function getTimingsForEffect() {
         return (1 << SimpleRainbow::TIME_CYCLE) | (1 << Effect::TIME_DELAY);
     }
 
-    protected function getTimingStrings()
-    {
+    protected function getTimingStrings() {
         $strings = parent::getTimingStrings();
         $strings[SimpleRainbow::TIME_CYCLE] = "cycle";
         return $strings;
@@ -52,8 +49,7 @@ class SimpleRainbow extends Effect
     /**
      * @return array
      */
-    public function packArgs()
-    {
+    public function packArgs() {
         $args = [];
 
         $args[0] = (1 << 3);
@@ -63,40 +59,35 @@ class SimpleRainbow extends Effect
         return $args;
     }
 
-    public function unpackArgs(array $args)
-    {
+    public function unpackArgs(array $args) {
         $this->args[SimpleRainbow::ARG_BRIGHTNESS] = $args[1];
     }
 
     /**
      * @return int
      */
-    public function avrEffect()
-    {
+    public function avrEffect() {
         return Effect::AVR_EFFECT_RAINBOW;
     }
 
     /**
      * @return int
      */
-    public function getEffectId()
-    {
+    public function getEffectId() {
         return Effect::EFFECT_SIMPLE_RAINBOW;
     }
 
     /**
      * @return int
      */
-    public function getMaxColors()
-    {
+    public function getMaxColors() {
         return 0;
     }
 
     /**
      * @return int
      */
-    public function getMinColors()
-    {
+    public function getMinColors() {
         return 0;
     }
 
@@ -104,28 +95,25 @@ class SimpleRainbow extends Effect
      * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
      * The updated_effect JSON filed then contains those values and replaces them in the user interface
      */
-    public function overwriteValues()
-    {
+    public function overwriteValues() {
         if($this->args[SimpleRainbow::ARG_BRIGHTNESS] < 1)
             $this->args[SimpleRainbow::ARG_BRIGHTNESS] = 0xff;
         $this->colors = [0]; /* Required in order to send color count greater then 0 */
     }
 
     /**
-     * @param int $id
-     * @return Effect
-     */
-    public static function getDefault(int $id)
-    {
-        return new SimpleRainbow($id, [], [0, 0, 0, 2], [0, 0xff, 1]);
-    }
-
-    /**
      * @param $name
      * @return string
      */
-    public function getArgumentClass($name)
-    {
+    public function getArgumentClass($name) {
         return new Argument($name, $this->args[$name]);
+    }
+
+    /**
+     * @param int $id
+     * @return Effect
+     */
+    public static function getDefault(int $id) {
+        return new SimpleRainbow($id, [], [0, 0, 0, 2], [0, 0xff, 1]);
     }
 }

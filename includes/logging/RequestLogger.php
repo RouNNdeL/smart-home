@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,29 +32,37 @@
 
 require_once __DIR__ . "/../database/DbUtils.php";
 
-class RequestLogger
-{
-    private $id;
-
+class RequestLogger {
     private static $instance = null;
+    private $id;
 
     /**
      * RequestLogger constructor.
      * @param $id
      */
-    private function __construct($id)
-    {
+    private function __construct($id) {
         $this->id = $id;
         register_shutdown_function(array(&$this, "updateHttpCodeAuto"));
+    }
+
+    public function updateHttpCodeAuto() {
+        $this->updateHttpCode(http_response_code());
+    }
+
+    private function updateHttpCode(int $code) {
+        $conn = DbUtils::getConnection();
+        $sql = "UPDATE log_request SET http_response = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ii", $code, $this->id);
+        $stmt->execute();
+        $stmt->close();
     }
 
     /**
      * @return RequestLogger
      */
-    public static function getInstance()
-    {
-        if(RequestLogger::$instance === null)
-        {
+    public static function getInstance() {
+        if(RequestLogger::$instance === null) {
             RequestLogger::$instance = RequestLogger::create(
                 SessionManager::getInstance()->getSessionId(),
                 $_SERVER["SCRIPT_NAME"],
@@ -74,8 +82,7 @@ class RequestLogger
      * @param string $ip
      * @return RequestLogger
      */
-    private static function create(int $session_id, string $resource, string $uri, string $method, string $ip)
-    {
+    private static function create(int $session_id, string $resource, string $uri, string $method, string $ip) {
         $conn = DbUtils::getConnection();
         $sql = "INSERT INTO log_request (session_id, ip, uri, method, resource) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
@@ -84,20 +91,5 @@ class RequestLogger
         $stmt->close();
 
         return new RequestLogger($conn->insert_id);
-    }
-
-    public function updateHttpCodeAuto()
-    {
-        $this->updateHttpCode(http_response_code());
-    }
-
-    private function updateHttpCode(int $code)
-    {
-        $conn = DbUtils::getConnection();
-        $sql = "UPDATE log_request SET http_response = ? WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ii", $code, $this->id);
-        $stmt->execute();
-        $stmt->close();
     }
 }

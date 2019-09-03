@@ -30,8 +30,10 @@
  * Time: 18:11
  */
 
+require_once __DIR__ . "/../GlobalManager.php";
 require_once __DIR__ . "/PhysicalDevice.php";
 require_once __DIR__ . "/ir/IrCode.php";
+require_once __DIR__ . "/VirtualIrActionsDevice.php";
 
 class IrRemote extends PhysicalDevice {
 
@@ -41,23 +43,6 @@ class IrRemote extends PhysicalDevice {
     const ASSISTANT_INPUT_MODE = "input source";
     const ASSISTANT_INPUT_CHROMECAST = "chromecast";
     const ASSISTANT_INPUT_TV = "tv";
-
-    public function sendData(bool $quick) {
-        return $this->isOnline();
-    }
-
-    /**
-     * @param string $device_id
-     * @param int $owner_id
-     * @param string $display_name
-     * @param string $hostname
-     * @return PhysicalDevice
-     */
-    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port, array $scopes) {
-
-        $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
-        return new IrRemote($device_id, $owner_id, $display_name, $hostname, $port, $virtual, $scopes);
-    }
 
     public function reboot() {
         if($this->isOnline()) {
@@ -152,7 +137,7 @@ class IrRemote extends PhysicalDevice {
                             case VirtualDevice::DEVICE_COMMAND_SET_MODES:
                                 $modes = $item["params"]["updateModeSettings"];
                                 if(isset($modes[IrRemote::ASSISTANT_INPUT_MODE])) {
-                                    switch($modes[IrRemote::ASSISTANT_INPUT_MODE]){
+                                    switch($modes[IrRemote::ASSISTANT_INPUT_MODE]) {
                                         case IrRemote::ASSISTANT_INPUT_TV:
                                             $ir_code = IrCode::byId("av_input_hdmi2");
                                             $this->sendCode($ir_code);
@@ -233,6 +218,10 @@ class IrRemote extends PhysicalDevice {
         curl_close($ch);
     }
 
+    public function sendData(bool $quick) {
+        return $this->isOnline();
+    }
+
     public function getHtmlHeader() {
         $button_title_on = Utils::getString("device_ir_all_on");
         $button_title_off = Utils::getString("device_ir_all_off");
@@ -262,5 +251,23 @@ class IrRemote extends PhysicalDevice {
         </div>
     </div>
 HTML;
+    }
+
+    /**
+     * @param string $device_id
+     * @param int $owner_id
+     * @param string $display_name
+     * @param string $hostname
+     * @return PhysicalDevice
+     */
+    public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port,
+                                array $scopes
+    ) {
+        $actions = GlobalManager::getInstance()->getRemoteActionManager()->getActionsForDeviceId($device_id);
+        $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
+
+        $virtual[] = new VirtualIrActionsDevice($actions);
+
+        return new IrRemote($device_id, $owner_id, $display_name, $hostname, $port, $virtual, $scopes);
     }
 }

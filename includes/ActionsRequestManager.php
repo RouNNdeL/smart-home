@@ -65,7 +65,7 @@ class ActionsRequestManager {
         $payload = [];
         $request_id = $request["requestId"];
 
-        $manager = GlobalManager::forWebhook($user_id);
+        $manager = GlobalManager::withUserOverride($user_id);
 
         foreach($request["inputs"] as $input) {
             switch($input["intent"]) {

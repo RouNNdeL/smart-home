@@ -72,6 +72,20 @@ class ShareManager {
         return $arr;
     }
 
+    public static function getScopeLike(array $scopes) {
+        $like = "%";
+        foreach(ShareManager::sortScopes($scopes) as $scope) {
+            $like .= "$scope ";
+        }
+        $like .= "%";
+        return $like;
+    }
+
+    public static function sortScopes(array $scopes) {
+        sort($scopes);
+        return $scopes;
+    }
+
     public static function getScopeForModType(int $type) {
         switch($type) {
             case DeviceModManager::DEVICE_MOD_ONLINE_STATE:
@@ -82,19 +96,5 @@ class ShareManager {
             default:
                 return ShareManager::SCOPE_NONE;
         }
-    }
-
-    public static function sortScopes(array $scopes) {
-        sort($scopes);
-        return $scopes;
-    }
-
-    public static function getScopeLike(array $scopes) {
-        $like = "%";
-        foreach(ShareManager::sortScopes($scopes) as $scope) {
-            $like .= "$scope ";
-        }
-        $like .= "%";
-        return $like;
     }
 }

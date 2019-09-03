@@ -40,22 +40,15 @@ require_once __DIR__ . "/../Utils.php";
 abstract class PhysicalDevice {
     /** @var VirtualDevice[] */
     protected $virtual_devices;
-
-    /** @var string */
-    private $id;
-
     /** @var string */
     protected $display_name;
-
+    protected $hostname;
+    protected $port;
+    protected $online = null;
+    /** @var string */
+    private $id;
     /** @var int */
     private $owner_id;
-
-    protected $hostname;
-
-    protected $port;
-
-    protected $online = null;
-
     /** @var array */
     private $scopes;
 
@@ -75,51 +68,6 @@ abstract class PhysicalDevice {
         $this->virtual_devices = $virtual_devices;
         $this->scopes = $scopes;
     }
-
-    /**
-     * @return bool
-     */
-    public function isOnline() {
-        if($this->online !== null)
-            return $this->online;
-        $waitTimeoutInSeconds = .2;
-        $fp = @fsockopen($this->hostname, $this->port, $errCode, $errStr, $waitTimeoutInSeconds);
-        $this->online = $fp !== false;
-        DeviceDbHelper::setOnline(DbUtils::getConnection(), $this->getId(), $this->online);
-        if($this->online)
-            fclose($fp);
-        return $this->online;
-    }
-
-    /**
-     * @param string $issuer_id
-     * @return bool - whether any changes were made to the Database
-     */
-    public function save(string $issuer_id) {
-        $changed = false;
-        foreach($this->virtual_devices as $virtual_device) {
-            $d_changed = $virtual_device->toDatabase();
-            if($d_changed) {
-                DeviceModManager::insertDeviceModification(DbUtils::getConnection(), $this->id,
-                    $virtual_device->getDeviceId(), DeviceModManager::DEVICE_MOD_SIMPLE_SETTINGS, $issuer_id);
-            }
-            $changed = $changed || $d_changed;
-        }
-        return $changed;
-    }
-
-    public abstract function sendData(bool $quick);
-
-    /**
-     * @param string $device_id
-     * @param int $owner_id
-     * @param string $display_name
-     * @param string $hostname
-     * @return PhysicalDevice
-     */
-    public static abstract function load(string $device_id, int $owner_id, string $display_name,
-                                         string $hostname, int $port, array $scopes
-    );
 
     public abstract function reboot();
 
@@ -161,6 +109,47 @@ abstract class PhysicalDevice {
                 return $virtual_device;
         }
         return null;
+    }
+
+    /**
+     * @param string $issuer_id
+     * @return bool - whether any changes were made to the Database
+     */
+    public function save(string $issuer_id) {
+        $changed = false;
+        foreach($this->virtual_devices as $virtual_device) {
+            $d_changed = $virtual_device->toDatabase();
+            if($d_changed) {
+                DeviceModManager::insertDeviceModification(DbUtils::getConnection(), $this->id,
+                    $virtual_device->getDeviceId(), DeviceModManager::DEVICE_MOD_SIMPLE_SETTINGS, $issuer_id);
+            }
+            $changed = $changed || $d_changed;
+        }
+        return $changed;
+    }
+
+    public abstract function sendData(bool $quick);
+
+    /**
+     * @return bool
+     */
+    public function isOnline() {
+        if($this->online !== null)
+            return $this->online;
+        $waitTimeoutInSeconds = .2;
+        $fp = @fsockopen($this->hostname, $this->port, $errCode, $errStr, $waitTimeoutInSeconds);
+        $this->online = $fp !== false;
+        DeviceDbHelper::setOnline(DbUtils::getConnection(), $this->getId(), $this->online);
+        if($this->online)
+            fclose($fp);
+        return $this->online;
+    }
+
+    /**
+     * @return string
+     */
+    public function getId(): string {
+        return $this->id;
     }
 
     /**
@@ -206,7 +195,14 @@ abstract class PhysicalDevice {
         if(sizeof($this->virtual_devices) > 1) {
             $devices = "- " . Utils::getString("device_devices") . ": ";
             foreach($this->virtual_devices as $i => $device) {
-                if($i > 0) $devices .= ", ";
+                if(substr($device->getDeviceId(), 0, 12) === "virtualized_") {
+                    break;
+                }
+
+                if($i > 0) {
+                    $devices .= ", ";
+                }
+
                 $devices .= $device->getDeviceName();
             }
             $devices .= "<br>";
@@ -228,6 +224,7 @@ abstract class PhysicalDevice {
                 <p class="card-text">
                     $devices
                     - Owner: <b>$owner</b><br>
+                    - Hostname: <i>$this->hostname:$this->port</i>
                 </p>
             </div>
         </div>
@@ -236,22 +233,9 @@ HTML;
 
     }
 
-    public static function fromDatabaseRow(array $row
-    ) {
-        if(!class_exists($row["device_driver"]) || !is_subclass_of($row["device_driver"], PhysicalDevice::class)) {
-            throw new InvalidArgumentException("$row[device_driver] is not a valid PhysicalDevice class name");
-        }
-
-        $scopes = isset($row["scope"]) ? explode(" ", $row["scope"]) : [];
-        return $row["device_driver"]::load($row["id"], $row["owner_id"],
-            $row["display_name"], trim($row["hostname"]), $row["port"], $scopes);
-    }
-
-    /**
-     * @return string
-     */
-    public function getId(): string {
-        return $this->id;
+    public function getNameWithState() {
+        $class = $this->isOnline() ? "invisible" : "";
+        return trim("$this->display_name <span class=\"device-offline-text $class\">(" . Utils::getString("device_status_offline") . ")</span>");
     }
 
     /**
@@ -259,11 +243,6 @@ HTML;
      */
     public function getDisplayName(): string {
         return $this->display_name;
-    }
-
-    public function getNameWithState() {
-        $class = $this->isOnline() ? "invisible" : "";
-        return trim("$this->display_name <span class=\"device-offline-text $class\">(" . Utils::getString("device_status_offline") . ")</span>");
     }
 
     public function hasScope(string $scope) {
@@ -283,7 +262,36 @@ HTML;
         exec("php $script $this->owner_id >/dev/null &");
     }
 
-    public function getHtmlHeader(){
+    public function getHtmlHeader() {
         return "<h4>$this->display_name</h4>";
+    }
+
+    /**
+     * @return string
+     */
+    public function getDisplayHostname(): string {
+        return $this->hostname . ":" . $this->port;
+    }
+
+    /**
+     * @param string $device_id
+     * @param int $owner_id
+     * @param string $display_name
+     * @param string $hostname
+     * @return PhysicalDevice
+     */
+    protected static abstract function load(string $device_id, int $owner_id, string $display_name,
+                                            string $hostname, int $port, array $scopes
+    );
+
+    public static function fromDatabaseRow(array $row
+    ) {
+        if(!class_exists($row["device_driver"]) || !is_subclass_of($row["device_driver"], PhysicalDevice::class)) {
+            throw new InvalidArgumentException("$row[device_driver] is not a valid PhysicalDevice class name");
+        }
+
+        $scopes = isset($row["scope"]) ? explode(" ", $row["scope"]) : [];
+        return $row["device_driver"]::load($row["id"], $row["owner_id"],
+            $row["display_name"], trim($row["hostname"]), $row["port"], $scopes);
     }
 }

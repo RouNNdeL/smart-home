@@ -69,7 +69,7 @@ class PcLedController extends RgbEffectDevice {
             $data["profiles"] = $profiles;
             $data["profile_flags"] = 0;
 
-            $json = array("type" => $quick ? "quick_globals" :"globals_update", "data" => $data);
+            $json = array("type" => $quick ? "quick_globals" : "globals_update", "data" => $data);
 
             $fp = fsockopen($this->hostname, $this->port, $errno, $errstr, 0.2);
             fwrite($fp, json_encode($json));
@@ -77,6 +77,18 @@ class PcLedController extends RgbEffectDevice {
         }
 
         return $this->isOnline();
+    }
+
+    public function reboot() {
+        // TODO: Implement reboot() method.
+    }
+
+    public function saveEffectForDevice(string $device_id, int $index) {
+        // TODO: Implement saveEffectForDevice() method.
+    }
+
+    public function previewEffect(string $device_id, int $index) {
+        // TODO: Implement previewEffect() method.
     }
 
     /**
@@ -91,17 +103,5 @@ class PcLedController extends RgbEffectDevice {
     ) {
         $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
         return new PcLedController($device_id, $owner_id, $display_name, $hostname, $port, 0, 0, [], $virtual, $scopes);
-    }
-
-    public function reboot() {
-        // TODO: Implement reboot() method.
-    }
-
-    public function saveEffectForDevice(string $device_id, int $index) {
-        // TODO: Implement saveEffectForDevice() method.
-    }
-
-    public function previewEffect(string $device_id, int $index) {
-        // TODO: Implement previewEffect() method.
     }
 }

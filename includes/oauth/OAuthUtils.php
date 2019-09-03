@@ -30,10 +30,9 @@
  * Time: 15:57
  */
 
-require_once __DIR__."/../database/HomeUser.php";
+require_once __DIR__ . "/../database/HomeUser.php";
 
-class OAuthUtils
-{
+class OAuthUtils {
     const SCOPE_HOME_CONTROL = "home_control";
     const SCOPE_EFFECT_CONTROL = "effect_control";
 
@@ -48,24 +47,20 @@ class OAuthUtils
      * @return null|string
      * @throws InvalidArgumentException
      */
-    public static function insertAuthCode(mysqli $conn, string $client_id, int $user_id, string $scopes)
-    {
+    public static function insertAuthCode(mysqli $conn, string $client_id, int $user_id, string $scopes) {
         if(!OAuthUtils::checkScopes($scopes))
             throw new InvalidArgumentException("Invalid scope");
-        try
-        {
+        try {
             $code = base64_encode(openssl_random_pseudo_bytes(128));
         }
-        catch(Exception $exception)
-        {
+        catch(Exception $exception) {
             return null;
         }
         $sql = "INSERT INTO oauth_tokens (token, client_id, user_id, scopes, type, expires) VALUES 
                 ('$code', $client_id, $user_id, ?, 'auth_code', (NOW() + INTERVAL 5 MINUTE))";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $scopes);
-        if($stmt->execute() !== false)
-        {
+        if($stmt->execute() !== false) {
             $stmt->close();
             return $code;
         }
@@ -73,8 +68,23 @@ class OAuthUtils
         return null;
     }
 
-    public static function exchangePasswordForTokens(mysqli $conn, string $client_id, string $username, string $password, string $scopes)
-    {
+    /**
+     * @param string $scopes
+     * @return bool
+     */
+    public static function checkScopes(string $scopes) {
+        $arr = explode(" ", $scopes);
+
+        foreach($arr as $item) {
+            if(!in_array($item, OAuthUtils::SUPPORTED_SCOPES)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static function exchangePasswordForTokens(mysqli $conn, string $client_id, string $username, string $password, string $scopes) {
         if(!OAuthUtils::checkScopes($scopes))
             throw new InvalidArgumentException("Invalid scope");
         $sql = "SELECT password, id FROM home_users WHERE username = ?";
@@ -82,18 +92,41 @@ class OAuthUtils
         $stmt->bind_param("s", $username);
         $stmt->bind_result($password_hash, $user_id);
         $stmt->execute();
-        if(!$stmt->fetch())
-        {
+        if(!$stmt->fetch()) {
             $stmt->close();
             return null;
         }
-        if(!HomeUser::verifyPassword($password, $password_hash))
-        {
+        if(!HomeUser::verifyPassword($password, $password_hash)) {
             $stmt->close();
             return null;
         }
         $stmt->close();
         return OAuthUtils::generateAndInsertTokens($conn, $client_id, $user_id, $scopes);
+    }
+
+    private static function generateAndInsertTokens(mysqli $conn, string $client_id,
+                                                    string $user_id, string $scopes, bool $only_access = false
+    ) {
+        $access_token = base64_encode(openssl_random_pseudo_bytes(128));
+        $sql = "INSERT INTO oauth_tokens (token, client_id, user_id, scopes, type, expires) VALUES 
+                    ('$access_token', ?, $user_id, ?, 'access_token', (NOW() + INTERVAL 90 DAY ))";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $client_id, $scopes);
+        $stmt->execute();
+        $stmt->close();
+
+        if(!$only_access) {
+            $refresh_token = base64_encode(openssl_random_pseudo_bytes(128));
+            $sql = "INSERT INTO oauth_tokens (token, client_id, user_id, scopes, type) VALUES 
+                    ('$refresh_token', ?, $user_id, ?, 'refresh_token')";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ss", $client_id, $scopes);
+            $stmt->execute();
+            $stmt->close();
+
+            return ["access_token" => $access_token, "refresh_token" => $refresh_token];
+        }
+        return ["access_token" => $access_token];
     }
 
     /**
@@ -102,8 +135,7 @@ class OAuthUtils
      * @param $client_id
      * @return array|null
      */
-    public static function exchangeCodeForTokens(mysqli $conn, string $auth_code, string $client_id)
-    {
+    public static function exchangeCodeForTokens(mysqli $conn, string $auth_code, string $client_id) {
         $sql = "SELECT user_id, scopes FROM oauth_tokens WHERE token='$auth_code' 
                 AND type='auth_code' AND client_id=? AND expires > NOW()";
         $stmt = $conn->prepare($sql);
@@ -111,8 +143,7 @@ class OAuthUtils
         $stmt->execute();
         $result = $stmt->get_result();
         $stmt->close();
-        if($result->num_rows > 0)
-        {
+        if($result->num_rows > 0) {
             $sql = "DELETE FROM oauth_tokens WHERE token='$auth_code'";
             $conn->query($sql);
 
@@ -126,46 +157,18 @@ class OAuthUtils
         return null;
     }
 
-    private static function generateAndInsertTokens(mysqli $conn, string $client_id,
-                                                    string $user_id, string $scopes, bool $only_access = false)
-    {
-        $access_token = base64_encode(openssl_random_pseudo_bytes(128));
-        $sql = "INSERT INTO oauth_tokens (token, client_id, user_id, scopes, type, expires) VALUES 
-                    ('$access_token', ?, $user_id, ?, 'access_token', (NOW() + INTERVAL 90 DAY ))";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $client_id, $scopes);
-        $stmt->execute();
-        $stmt->close();
-
-        if(!$only_access)
-        {
-            $refresh_token = base64_encode(openssl_random_pseudo_bytes(128));
-            $sql = "INSERT INTO oauth_tokens (token, client_id, user_id, scopes, type) VALUES 
-                    ('$refresh_token', ?, $user_id, ?, 'refresh_token')";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ss", $client_id, $scopes);
-            $stmt->execute();
-            $stmt->close();
-
-            return ["access_token" => $access_token, "refresh_token" => $refresh_token];
-        }
-        return  ["access_token" => $access_token];
-    }
-
     /**
      * @param $conn mysqli
      * @param $token
      * @return int
      */
-    public static function getUserIdForToken($conn, $token)
-    {
+    public static function getUserIdForToken($conn, $token) {
         $sql = "SELECT user_id FROM oauth_tokens WHERE token=? AND type='access_token' AND expires > NOW()";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $token);
         $stmt->execute();
         $stmt->bind_result($user_id);
-        if($stmt->fetch())
-        {
+        if($stmt->fetch()) {
             $stmt->close();
             return $user_id;
         }
@@ -178,15 +181,13 @@ class OAuthUtils
      * @param $token
      * @return string
      */
-    public static function getScopesForToken(mysqli $conn, string $token)
-    {
+    public static function getScopesForToken(mysqli $conn, string $token) {
         $sql = "SELECT scopes FROM oauth_tokens WHERE token = ? AND type = 'access_token' AND expires > NOW()";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $token);
         $stmt->execute();
         $stmt->bind_result($scopes);
-        if($stmt->fetch())
-        {
+        if($stmt->fetch()) {
             $stmt->close();
             return $scopes;
         }
@@ -194,8 +195,7 @@ class OAuthUtils
         return null;
     }
 
-    public static function exchangeRefreshForAccessToken(mysqli $conn, string $client_id, string $refresh_token)
-    {
+    public static function exchangeRefreshForAccessToken(mysqli $conn, string $client_id, string $refresh_token) {
         $sql = "SELECT user_id, scopes FROM oauth_tokens WHERE token = ? AND type='refresh_token' AND client_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $refresh_token, $client_id);
@@ -206,24 +206,5 @@ class OAuthUtils
 
         $stmt->close();
         return OAuthUtils::generateAndInsertTokens($conn, $client_id, $user_id, $scopes, true);
-    }
-
-    /**
-     * @param string $scopes
-     * @return bool
-     */
-    public static function checkScopes(string $scopes)
-    {
-        $arr = explode(" ", $scopes);
-
-        foreach($arr as $item)
-        {
-            if(!in_array($item, OAuthUtils::SUPPORTED_SCOPES))
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

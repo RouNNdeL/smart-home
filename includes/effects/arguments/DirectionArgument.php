@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,10 +32,8 @@
 
 require_once __DIR__ . "/SelectArgument.php";
 
-class DirectionArgument extends SelectArgument
-{
-    protected function getOptions()
-    {
+class DirectionArgument extends SelectArgument {
+    protected function getOptions() {
         return [Effect::DIRECTION_NORMAL => "profile_arguments_direction_normal",
             Effect::DIRECTION_REVERSE => "profile_arguments_direction_reversed"];
     }

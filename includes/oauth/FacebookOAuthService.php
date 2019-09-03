@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,7 @@
  * Date: 2018-06-14
  * Time: 19:03
  */
-
-class FacebookOAuthService extends OAuthService
-{
+class FacebookOAuthService extends OAuthService {
     const ID = 2;
 
     const USER_INFO_ENDPOINT = "https://graph.facebook.com/v3.0/me";
@@ -40,26 +38,13 @@ class FacebookOAuthService extends OAuthService
      * @param array $requestTokens
      * @return HomeUser|null
      */
-    public function getUser(array $requestTokens)
-    {
+    public function getUser(array $requestTokens) {
         $user_id = FacebookOAuthService::queryUserData($requestTokens)["id"];
         $user = HomeUser::queryUserByFacebookId($user_id);
         return $user;
     }
 
-    /**
-     * @param array $requestTokens
-     * @return HomeUser
-     */
-    public function registerUser(array $requestTokens)
-    {
-        $user_data = FacebookOAuthService::queryUserData($requestTokens);
-        $name_arr = explode(" ", $user_data["name"]);
-        return HomeUser::newUserWithFacebook($user_data["id"], $name_arr[0], end($name_arr));
-    }
-
-    private static function queryUserData(array $requestTokens)
-    {
+    private static function queryUserData(array $requestTokens) {
         $header = [];
         $token_type = ucfirst($requestTokens["token_type"]);
         $header[] = "Authorization: $token_type $requestTokens[access_token]";
@@ -71,5 +56,15 @@ class FacebookOAuthService extends OAuthService
         $json_response = json_decode($data, true);
         curl_close($ch);
         return $json_response;
+    }
+
+    /**
+     * @param array $requestTokens
+     * @return HomeUser
+     */
+    public function registerUser(array $requestTokens) {
+        $user_data = FacebookOAuthService::queryUserData($requestTokens);
+        $name_arr = explode(" ", $user_data["name"]);
+        return HomeUser::newUserWithFacebook($user_data["id"], $name_arr[0], end($name_arr));
     }
 }

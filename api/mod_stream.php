@@ -70,6 +70,9 @@ ob_end_flush();
 
 $last_event = DeviceModManager::getLastModDate(DbUtils::getConnection(),
     $user_id, $physical_id, $virtual_id, $types);
+if($last_event === null) {
+    $last_event = "2000-01-01 00:00:00";
+}
 
 while(1) {
     $new_mods = DeviceModManager::queryNewMods(DbUtils::getConnection(),

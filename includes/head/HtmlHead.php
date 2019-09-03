@@ -30,15 +30,14 @@
  * Time: 11:28
  */
 
-require_once __DIR__."/HeadEntry.php";
-require_once __DIR__."/MetaEntry.php";
-require_once __DIR__."/JavaScriptEntry.php";
-require_once __DIR__."/StyleSheetEntry.php";
-require_once __DIR__."/FaviconEntry.php";
+require_once __DIR__ . "/HeadEntry.php";
+require_once __DIR__ . "/MetaEntry.php";
+require_once __DIR__ . "/JavaScriptEntry.php";
+require_once __DIR__ . "/StyleSheetEntry.php";
+require_once __DIR__ . "/FaviconEntry.php";
 
-class HtmlHead
-{
-    const VERSION = "1.7";
+class HtmlHead {
+    const VERSION = "1.8";
 
     /** @var string */
     private $title;
@@ -53,28 +52,24 @@ class HtmlHead
      * HtmlHead constructor.
      * @param string $title
      */
-    public function __construct(string $title)
-    {
+    public function __construct(string $title) {
         $this->title = $title;
         $this->entries = MetaEntry::getDefaults();
         $this->entries = array_merge($this->entries, JavaScriptEntry::getDefaults());
         $this->entries = array_merge($this->entries, StyleSheetEntry::getDefaults());
     }
 
-    public function addEntry(HeadEntry $entry)
-    {
+    public function addEntry(HeadEntry $entry) {
         $this->entries[] = $entry;
     }
 
-    public function toString($head_tags = true)
-    {
+    public function toString($head_tags = true) {
         $str = $head_tags ? "<head>" : "";
         $str .= <<<TAG
     <meta charset="UTF-8">
     <title>$this->title</title>
 TAG;
-        foreach($this->entries as $entry)
-        {
+        foreach($this->entries as $entry) {
             $str .= $entry->toString($this->minified);
         }
         if($head_tags)
@@ -86,8 +81,7 @@ TAG;
     /**
      * @param bool $minified
      */
-    public function setMinified(bool $minified)
-    {
+    public function setMinified(bool $minified) {
         $this->minified = $minified;
     }
 }

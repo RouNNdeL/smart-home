@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,7 @@
  * Date: 2018-06-11
  * Time: 11:34
  */
-
-abstract class HeadEntry
-{
+abstract class HeadEntry {
     /**
      * @param bool $minified
      * @return string

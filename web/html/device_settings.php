@@ -77,6 +77,8 @@ echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
     <div class="row device-settings-content" data-device-id="<?php echo $parent_id ?>">
         <div class="col">
             <?php
+            $device_hostname = $device->getDisplayHostname();
+
             $reboot_string = Utils::getString("device_reboot");
             $reboot_disabled = $device->getOwnerId() !== $manager->getSessionManager()->getUserId() &&
                 !$device->hasScope(ShareManager::SCOPE_REBOOT);
@@ -119,16 +121,24 @@ HTML;
                                 $virtual_html
                             </div>
                         </div>
-                        <div class="card-footer">
-                            $reboot_btn
+                        <div class="card-footer row">
+                             <div class="col"> 
+                                 $reboot_btn
+                             </div>
+                             <div class="col col-auto float-right text-center-vertical"> 
+                                 <small class="text-muted">$device_hostname</small>
+                             </div>
                         </div>
                     </div>
 HTML;
 
             } else {
                 $footer = <<<HTML
-                    <div class="col col-auto float-right"> 
+                    <div class="col"> 
                         $reboot_btn
+                    </div>
+                    <div class="col col-auto float-right text-center-vertical"> 
+                        <small class="text-muted">$device_hostname</small>
                     </div>
 HTML;
 

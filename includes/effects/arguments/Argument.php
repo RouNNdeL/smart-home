@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,7 @@
  * Date: 2018-07-06
  * Time: 20:10
  */
-
-class Argument
-{
+class Argument {
     /** @var string */
     protected $name;
 
@@ -43,14 +41,12 @@ class Argument
      * @param string $name
      * @param string $value
      */
-    public function __construct(string $name, int $value)
-    {
+    public function __construct(string $name, int $value) {
         $this->name = $name;
         $this->value = $value;
     }
 
-    public function toString()
-    {
+    public function toString() {
         $template = Effect::INPUT_TEMPLATE_ARGUMENTS;
         $template = str_replace("\$label", Utils::getString("profile_arguments_$this->name"), $template);
         $template = str_replace("\$name", "arg_" . $this->name, $template);

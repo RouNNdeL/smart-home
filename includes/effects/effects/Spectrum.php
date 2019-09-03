@@ -29,8 +29,7 @@
  * Date: 2018-07-04
  * Time: 15:24
  */
-class Spectrum extends Effect
-{
+class Spectrum extends Effect {
     const TIME_FADE = 3;
     const ARG_DIRECTION = "direction";
     const ARG_COLOR_COUNT = "spectrum_color_count";
@@ -39,14 +38,12 @@ class Spectrum extends Effect
     /**
      * @return int
      */
-    public function getTimingsForEffect()
-    {
+    public function getTimingsForEffect() {
         return (1 << Effect::TIME_ON) | (1 << Spectrum::TIME_FADE) |
             (1 << Effect::TIME_ROTATION) | (1 << Effect::TIME_DELAY);
     }
 
-    protected function getTimingStrings()
-    {
+    protected function getTimingStrings() {
         $strings = parent::getTimingStrings();
         $strings[Fade::TIME_FADE] = "fade";
         return $strings;
@@ -55,8 +52,7 @@ class Spectrum extends Effect
     /**
      * @return array
      */
-    public function packArgs()
-    {
+    public function packArgs() {
         $args = [];
         $args[0] = $this->args[Spectrum::ARG_DIRECTION] << 0;
         $args[1] = $this->args[Spectrum::ARG_COLOR_COUNT];
@@ -65,8 +61,7 @@ class Spectrum extends Effect
         return $args;
     }
 
-    public function unpackArgs(array $args)
-    {
+    public function unpackArgs(array $args) {
         $this->args[Spectrum::ARG_DIRECTION] = $args[0] & (1 << 0) ? 1 : 0;
         $this->args[Spectrum::ARG_COLOR_COUNT] = $args[1];
         $this->args[Spectrum::ARG_BLEND_MODE] = $args[2];
@@ -75,32 +70,28 @@ class Spectrum extends Effect
     /**
      * @return int
      */
-    public function avrEffect()
-    {
+    public function avrEffect() {
         return Effect::AVR_EFFECT_SPECTRUM;
     }
 
     /**
      * @return int
      */
-    public function getEffectId()
-    {
+    public function getEffectId() {
         return Effect::EFFECT_SPECTRUM;
     }
 
     /**
      * @return int
      */
-    public function getMaxColors()
-    {
+    public function getMaxColors() {
         return Effect::COLOR_COUNT_UNLIMITED;
     }
 
     /**
      * @return int
      */
-    public function getMinColors()
-    {
+    public function getMinColors() {
         return 2;
     }
 
@@ -108,8 +99,7 @@ class Spectrum extends Effect
      * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
      * The updated_effect JSON filed then contains those values and replaces them in the user interface
      */
-    public function overwriteValues()
-    {
+    public function overwriteValues() {
         if(sizeof($this->colors) < 2)
             $this->colors = [0xff0000, 0x0000ff];
 
@@ -120,9 +110,21 @@ class Spectrum extends Effect
             $this->args[Spectrum::ARG_COLOR_COUNT] = sizeof($this->colors);
 
         while(sizeof($this->colors) % $this->args[Spectrum::ARG_COLOR_COUNT] > 0 ||
-            $this->args[Spectrum::ARG_COLOR_COUNT] < 2)
-        {
+            $this->args[Spectrum::ARG_COLOR_COUNT] < 2) {
             $this->args[Spectrum::ARG_COLOR_COUNT]++;
+        }
+    }
+
+    /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name) {
+        switch($name) {
+            case Spectrum::ARG_DIRECTION:
+                return new DirectionArgument($name, $this->args[$name]);
+            default:
+                return new Argument($name, $this->args[$name]);
         }
     }
 
@@ -130,23 +132,7 @@ class Spectrum extends Effect
      * @param int $id
      * @return Effect
      */
-    public static function getDefault(int $id)
-    {
+    public static function getDefault(int $id) {
         return new Spectrum($id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 5], [3, 2, 0]);
-    }
-
-    /**
-     * @param $name
-     * @return string
-     */
-    public function getArgumentClass($name)
-    {
-        switch($name)
-        {
-            case Spectrum::ARG_DIRECTION:
-                return new DirectionArgument($name, $this->args[$name]);
-            default:
-                return new Argument($name, $this->args[$name]);
-        }
     }
 }

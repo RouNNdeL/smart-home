@@ -52,6 +52,20 @@ class SceneEntry {
         $this->effect_id = $effect_id;
     }
 
+    /**
+     * @return int
+     */
+    public function getEffectId(): int {
+        return $this->effect_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceId(): string {
+        return $this->device_id;
+    }
+
     public static function getForUserId(int $user_id) {
         $conn = DbUtils::getConnection();
 
@@ -101,20 +115,6 @@ class SceneEntry {
         }
         $stmt->close();
         return $arr;
-    }
-
-    /**
-     * @return int
-     */
-    public function getEffectId(): int {
-        return $this->effect_id;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDeviceId(): string {
-        return $this->device_id;
     }
 
 

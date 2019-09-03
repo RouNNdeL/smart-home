@@ -8,6 +8,7 @@ before_script:
 
 install:
     - scripts/download_jqueryui.sh
+    - npm install
 
 script:
     - npm run-script build

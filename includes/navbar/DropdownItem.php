@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,7 @@
  * Date: 2018-07-05
  * Time: 18:02
  */
-class DropdownItem extends NavItem
-{
+class DropdownItem extends NavItem {
 
     private $url;
     private $title;
@@ -42,8 +41,7 @@ class DropdownItem extends NavItem
      * @param $title
      * @param $active
      */
-    public function __construct($url, $title, $class = "", $active = false)
-    {
+    public function __construct($url, $title, $class = "", $active = false) {
         parent::__construct($class);
         $this->url = $url;
         $this->title = $title;
@@ -52,8 +50,7 @@ class DropdownItem extends NavItem
 
 
     /** @return string */
-    public function toString()
-    {
+    public function toString() {
         $active = $this->active ? "active" : "";
         return <<<HTML
         <a class="dropdown-item $active $this->class" href="$this->url">$this->title</a>

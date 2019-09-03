@@ -94,10 +94,11 @@ class IrControlledDevice extends VirtualDevice {
      * @return string
      */
     public function toHtml($header_name = null, $footer_html = "") {
-        if($header_name !== null)
+        if($header_name !== null) {
             $name = $header_name;
-        else
+        } else {
             $name = $this->device_name;
+        }
 
         $layout = json_decode(file_get_contents(__DIR__ . "/ir/layouts/$this->device_id.json"), true);
         $remote_grid = (new RemoteLayoutGenerator($this->device_id))->toHtml($layout);

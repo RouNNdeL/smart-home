@@ -32,67 +32,58 @@
 
 require_once __DIR__ . "/Effect.php";
 
-class Fade extends Effect
-{
+class Fade extends Effect {
     const TIME_FADE = 3;
 
     /**
      * @return int
      */
-    public function getTimingsForEffect()
-    {
+    public function getTimingsForEffect() {
         return (1 << Fade::TIME_FADE) | (1 << Effect::TIME_ON) | (1 << Effect::TIME_DELAY);
     }
 
     /**
      * @return array
      */
-    public function packArgs()
-    {
+    public function packArgs() {
         return [2 => 0xff, 5 => 1];
     }
 
-    protected function getTimingStrings()
-    {
+    protected function getTimingStrings() {
         $strings = parent::getTimingStrings();
         $strings[Fade::TIME_FADE] = "fade";
         return $strings;
     }
 
-    public function unpackArgs(array $args)
-    {
+    public function unpackArgs(array $args) {
 
     }
 
     /**
      * @return int
      */
-    public function avrEffect()
-    {
+    public function avrEffect() {
         return Effect::AVR_EFFECT_FADE;
     }
 
     /**
      * @return int
      */
-    public function getEffectId()
-    {
+    public function getEffectId() {
         return Effect::EFFECT_FADING;
     }
 
     /**
      * @return int
      */
-    public function getMaxColors()
-    {
+    public function getMaxColors() {
         return Effect::COLOR_COUNT_UNLIMITED;
     }
 
     /**
      * @return int
      */
-    public function getMinColors()
-    {
+    public function getMinColors() {
         return 2;
     }
 
@@ -100,8 +91,7 @@ class Fade extends Effect
      * Makes sure the submitted values aren't going to cause a crash by overwriting invalid user input
      * The updated_effect JSON filed then contains those values and replaces them in the user interface
      */
-    public function overwriteValues()
-    {
+    public function overwriteValues() {
         $this->timings[Effect::TIME_OFF] = 0;
         $this->timings[Effect::TIME_FADEIN] = 0;
         $this->timings[Effect::TIME_ROTATION] = 0;
@@ -111,21 +101,19 @@ class Fade extends Effect
     }
 
     /**
+     * @param $name
+     * @return string
+     */
+    public function getArgumentClass($name) {
+        return null;
+    }
+
+    /**
      * @param int $id
      * @param string $device_id
      * @return Effect
      */
-    public static function getDefault(int $id)
-    {
+    public static function getDefault(int $id) {
         return new Fade($id, [0xff0000, 0x0000ff], [0, 0, 4, 1, 0, 0]);
-    }
-
-    /**
-     * @param $name
-     * @return string
-     */
-    public function getArgumentClass($name)
-    {
-        return null;
     }
 }

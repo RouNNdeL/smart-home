@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,15 +32,10 @@
 
 require_once __DIR__ . "/Argument.php";
 
-abstract class SelectArgument extends Argument
-{
-    protected abstract function getOptions();
-
-    public function toString()
-    {
+abstract class SelectArgument extends Argument {
+    public function toString() {
         $options_html = "";
-        foreach($this->getOptions() as $value => $name)
-        {
+        foreach($this->getOptions() as $value => $name) {
             $selected = $value == $this->value ? "selected" : "";
             $str = Utils::getString($name);
             $options_html .= "<option value=\"$value\" $selected>$str</option>";
@@ -54,4 +49,6 @@ abstract class SelectArgument extends Argument
             </div>
 HTML;
     }
+
+    protected abstract function getOptions();
 }

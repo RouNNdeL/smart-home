@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,7 @@
 
 require_once __DIR__ . "/NavItem.php";
 
-class NavLink extends NavItem implements NavPageSetListener
-{
+class NavLink extends NavItem implements NavPageSetListener {
     private $url;
     private $title;
     private $active;
@@ -45,8 +44,7 @@ class NavLink extends NavItem implements NavPageSetListener
      * @param $title
      * @param $active
      */
-    public function __construct($url, $title, $class = "", $active = false, $disabled = false)
-    {
+    public function __construct($url, $title, $class = "", $active = false, $disabled = false) {
         parent::__construct($class);
         $this->url = $url;
         $this->title = $title;
@@ -56,8 +54,7 @@ class NavLink extends NavItem implements NavPageSetListener
 
 
     /** @return string */
-    public function toString()
-    {
+    public function toString() {
         $active = $this->active ? "active" : "";
         $disabled = $this->disabled ? "disabled" : "";
         $sr = $this->active ? " <span class=\"sr-only\">(current)</span>" : "";
@@ -70,8 +67,7 @@ HTML;
 
     }
 
-    function onPageSet(string $page)
-    {
+    function onPageSet(string $page) {
         if($page === $this->url)
             $this->active = true;
     }

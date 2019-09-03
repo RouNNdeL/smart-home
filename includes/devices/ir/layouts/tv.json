@@ -65,15 +65,16 @@
       "name": "tv_aspect_ratio",
       "column": 6
     }
-  ],[
-  {
-    "name": "tv_viera_cast",
-    "offset": 6,
-    "column": 6
-  },
-  {
-    "name": "tv_input_hdmi2",
-    "column": 6
-  }
-]
+  ],
+  [
+    {
+      "name": "tv_viera_cast",
+      "offset": 6,
+      "column": 6
+    },
+    {
+      "name": "tv_input_hdmi2",
+      "column": 6
+    }
+  ]
 ]

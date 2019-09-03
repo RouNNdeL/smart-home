@@ -46,6 +46,7 @@ abstract class VirtualDevice {
     const DEVICE_TYPE_LAMP_ANALOG = "DEVICE_LAMP_ANALOG";
     const DEVICE_TYPE_SWITCH = "DEVICE_SWITCH";
     const DEVICE_TYPE_REMOTE_CONTROLLED = "DEVICE_REMOTE_CONTROLLED";
+    const DEVICE_TYPE_VIRTUALIZED = "DEVICE_VIRTUALIZED";
 
     const DEVICE_TRAIT_BRIGHTNESS = "action.devices.traits.Brightness";
     const DEVICE_TRAIT_COLOR_SETTING = "action.devices.traits.ColorSetting";
@@ -140,12 +141,6 @@ abstract class VirtualDevice {
         $this->will_report_state = $will_report_state;
     }
 
-    public abstract function getTraits();
-
-    public abstract function getActionsDeviceType();
-
-    public abstract function getAttributes();
-
     /**
      * @param array $command
      */
@@ -183,6 +178,12 @@ abstract class VirtualDevice {
             $arr["name"]["nicknames"] = $this->synonyms;
         return $arr;
     }
+
+    public abstract function getAttributes();
+
+    public abstract function getActionsDeviceType();
+
+    public abstract function getTraits();
 
     /**
      * @return string

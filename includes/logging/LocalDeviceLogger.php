@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,14 +32,12 @@
 
 require_once __DIR__ . "/../database/DbUtils.php";
 
-class LocalDeviceLogger
-{
+class LocalDeviceLogger {
     const TYPE_UPDATE_CHECK = "update_check";
     const TYPE_REPORT_STATE = "report_state";
     const TYPE_REPORT_HALT = "report_halt";
 
-    public static function log(string $device_id, string $type, int $attempts, string $payload)
-    {
+    public static function log(string $device_id, string $type, int $attempts, string $payload) {
         $payload = $payload === "" ? null : $payload;
         $conn = DbUtils::getConnection();
         $sql = "INSERT INTO log_device_requests 

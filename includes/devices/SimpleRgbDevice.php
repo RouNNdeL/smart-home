@@ -195,17 +195,17 @@ HTML;
     }
 
     /**
-     * @return int
+     * @param bool $on
      */
-    public function getBrightness(): int {
-        return $this->brightness;
+    public function setOn(bool $on) {
+        $this->on = $on;
     }
 
     /**
      * @return int
      */
-    public function getColor(): int {
-        return $this->color;
+    public function getBrightness(): int {
+        return $this->brightness;
     }
 
     /**
@@ -216,10 +216,10 @@ HTML;
     }
 
     /**
-     * @param bool $on
+     * @return int
      */
-    public function setOn(bool $on) {
-        $this->on = $on;
+    public function getColor(): int {
+        return $this->color;
     }
 
     /**

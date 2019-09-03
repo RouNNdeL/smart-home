@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,7 @@
  * Date: 2018-07-05
  * Time: 18:35
  */
-
-class NavHamburger extends NavItem
-{
+class NavHamburger extends NavItem {
 
     /** @var string */
     private $toggles_id;
@@ -43,8 +41,7 @@ class NavHamburger extends NavItem
      * NavHamburger constructor.
      * @param string $toggles_id
      */
-    public function __construct(string $toggles_id, string $label = null, $class = "")
-    {
+    public function __construct(string $toggles_id, string $label = null, $class = "") {
         parent::__construct($class);
         $this->toggles_id = $toggles_id;
         $this->label = $label;
@@ -52,8 +49,7 @@ class NavHamburger extends NavItem
 
 
     /** @return string */
-    public function toString()
-    {
+    public function toString() {
         $label = $this->label !== null ? "aria-label='$this->label'" : "";
         return <<<HTML
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#$this->toggles_id"

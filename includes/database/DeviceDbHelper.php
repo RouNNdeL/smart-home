@@ -91,10 +91,10 @@ class DeviceDbHelper {
      */
     public static function queryVirtualDevicesForPhysicalDevice(mysqli $conn, string $physical_device_id) {
         $sql = "SELECT devices_virtual.id, type, display_name, synonyms, home_actions, will_report_state, state,
-  brightness, color, toggles, max_profile_count, color_count, active_profile_count
-        FROM devices_virtual
-          LEFT JOIN devices_effect_properties ON devices_effect_properties.id = parent_id
-        WHERE parent_id = ?";
+                brightness, color, toggles, max_profile_count, color_count, active_profile_count
+                FROM devices_virtual
+                  LEFT JOIN devices_effect_properties ON devices_effect_properties.id = parent_id
+                WHERE parent_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $physical_device_id);
         $stmt->execute();
@@ -181,7 +181,7 @@ class DeviceDbHelper {
         $stmt->close();
         if($changed) {
             DeviceModManager::insertDeviceModification($conn, $physical_device_id, null,
-                DeviceModManager::DEVICE_MOD_ONLINE_STATE);
+                DeviceModManager::DEVICE_MOD_ONLINE_STATE, "server");
         }
     }
 
