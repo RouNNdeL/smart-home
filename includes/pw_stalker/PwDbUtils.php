@@ -64,7 +64,7 @@ class PwDbUtils {
         $arr = [];
 
         while($stmt->fetch()) {
-            if(!isset($arr[$department_id])){
+            if(!isset($arr[$department_id])) {
                 $arr[$department_id] = [];
             }
 
@@ -84,7 +84,7 @@ class PwDbUtils {
         $arr = [];
 
         while($stmt->fetch()) {
-            if(!isset($arr[$course_id])){
+            if(!isset($arr[$course_id])) {
                 $arr[$course_id] = [];
             }
 
@@ -95,14 +95,15 @@ class PwDbUtils {
         return $arr;
     }
 
-    public static function getStudentsJsonByQuery(string $query) {
+    public static function getStudentsJsonByQuery(string $query, bool $is_zero = false) {
         $like = "%$query%";
+        $zero = $is_zero ? "AND is_zero = 1" : "";
 
         $conn = DbUtils::getConnection();
         $sql = "SELECT ps.id, pc.name, pd.name, ps.name, points FROM pw_students ps
                 JOIN pw_courses pc on ps.course_id = pc.id 
                 JOIN pw_departments pd on pc.department_id = pd.id
-                WHERE ps.name LIKE ? ORDER BY ps.name LIMIT 25 ";
+                WHERE ps.name LIKE ? $zero ORDER BY ps.name LIMIT 25 ";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $like);
         $stmt->bind_result($id, $course, $department, $name, $points);

@@ -45,8 +45,15 @@ echo $head->toString();
 <div class="container mt-3">
     <h1 class="text-center">PW Stalker - Search</h1>
     <div class="form-group">
-        <!--suppress HtmlFormInputWithoutLabel -->
-        <input class="form-control" placeholder="Search" type="text" id="student-search">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text">
+                    <input id="student-search-is-zero" type="checkbox" aria-label="Is Zero" title="Is Zero">
+                </div>
+            </div>
+            <!--suppress HtmlFormInputWithoutLabel -->
+            <input class="form-control" placeholder="Search" type="text" id="student-search">
+        </div>
     </div>
     <div class="row">
         <div class="col">

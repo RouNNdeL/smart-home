@@ -68,11 +68,16 @@ $(function() {
         $("#course-count").text(courses[id].count);
     });
 
+    $("#student-search-is-zero").change(function() {
+        $("#student-search").trigger("input");
+    });
+
     $("#student-search").on("input", function() {
         const val = $(this).val();
+        const is_zero = $("#student-search-is-zero")[0].checked ? 1 : 0;
 
         if(val.length > 0) {
-            $.ajax(`/api/pw_student_search.php?q=${val}`).done(function(data) {
+            $.ajax(`/api/pw_student_search.php?q=${val}&is_zero=${is_zero}`).done(function(data) {
                 $(".student-list-item").not("#student-placeholder").remove();
                 for(let i = 0; i < Math.min(data.length, MAX_LIST_ITEMS); i++) {
                     $("#student-list").append(getStudentListItem(data[i]));
@@ -136,5 +141,4 @@ $(function() {
 
         return item;
     }
-
 });

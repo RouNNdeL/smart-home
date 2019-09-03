@@ -43,7 +43,13 @@ if(!isset($_GET["q"])) {
     exit();
 }
 
+if(isset($_GET["is_zero"])) {
+    $is_zero = $_GET["is_zero"];
+} else {
+    $is_zero = false;
+}
+
 $query = $_GET["q"];
 
 require_once __DIR__ . "/../includes/pw_stalker/PwDbUtils.php";
-echo json_encode(PwDbUtils::getStudentsJsonByQuery($query));
+echo json_encode(PwDbUtils::getStudentsJsonByQuery($query, $is_zero));
