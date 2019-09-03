@@ -28,7 +28,7 @@ import 'bootstrap';
 import 'tether';
 import {sleep} from "./_utils";
 
-const MAX_LIST_ITEMS = 10;
+const MAX_MAX_LIST_ITEMS = 25;
 const POINT_ROLL_DEFAULT_DELAY = 18;
 const POINT_ROLL_SLOWDOWN_THRESHOLD_MIN = 20;
 const POINT_ROLL_SLOWDOWN_THRESHOLD_SPAN = 20;
@@ -73,7 +73,7 @@ $(function() {
     });
 
     let request_id = 0;
-    let max_request_id = 0;
+    let max_request_id = 0; /* Sometimes request arrive of out order, ignore past requests */
 
     $("#student-search").on("input", function() {
         const val = $(this).val();
