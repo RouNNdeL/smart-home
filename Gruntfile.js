@@ -196,7 +196,7 @@ module.exports = function(grunt) {
         },
         jshint: {
             options: {
-                "esversion": 8
+                jshintrc: '.jshintrc'
             },
             build: ["Gruntfile.js", "src/js/*.js"]
         },
