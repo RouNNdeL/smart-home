@@ -28,7 +28,10 @@ import 'bootstrap';
 import 'tether';
 import {sleep} from "./_utils";
 
-const MAX_MAX_LIST_ITEMS = 25;
+const TOP_HEIGHT = 126;
+const LIST_ITEM_HEIGHT = 74;
+
+const DEFAULT_MAX_LIST_ITEMS = 5;
 const POINT_ROLL_DEFAULT_DELAY = 18;
 const POINT_ROLL_SLOWDOWN_THRESHOLD_MIN = 20;
 const POINT_ROLL_SLOWDOWN_THRESHOLD_SPAN = 20;
@@ -74,6 +77,7 @@ $(function() {
 
     let request_id = 0;
     let max_request_id = 0; /* Sometimes request arrive of out order, ignore past requests */
+    let max_list_items = DEFAULT_MAX_LIST_ITEMS;
 
     $("#student-search").on("input", function() {
         const val = $(this).val();
@@ -85,7 +89,7 @@ $(function() {
                 if(local_request_id > max_request_id) {
                     max_request_id = local_request_id;
                     $(".student-list-item").not("#student-placeholder").remove();
-                    for(let i = 0; i < Math.min(data.length, MAX_LIST_ITEMS); i++) {
+                    for(let i = 0; i < Math.min(data.length, max_list_items); i++) {
                         $("#student-list").append(getStudentListItem(data[i]));
                     }
                 }
@@ -94,6 +98,13 @@ $(function() {
             $(".student-list-item").not("#student-placeholder").remove();
         }
     });
+
+    function recalculateMaxListItems() {
+        max_list_items = Math.floor((window.innerHeight - TOP_HEIGHT) / LIST_ITEM_HEIGHT);
+    }
+
+    $(window).resize(recalculateMaxListItems);
+    recalculateMaxListItems();
 
     $("#student-modal").modal({show: false});
 
