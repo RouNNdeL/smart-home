@@ -28,7 +28,7 @@ import 'bootstrap';
 import 'tether';
 import {sleep} from "./_utils";
 
-const MAX_LIST_ITEMS = 5;
+const MAX_LIST_ITEMS = 10;
 const POINT_ROLL_DEFAULT_DELAY = 18;
 const POINT_ROLL_SLOWDOWN_THRESHOLD_MIN = 20;
 const POINT_ROLL_SLOWDOWN_THRESHOLD_SPAN = 20;
@@ -72,15 +72,22 @@ $(function() {
         $("#student-search").trigger("input");
     });
 
+    let request_id = 0;
+    let max_request_id = 0;
+
     $("#student-search").on("input", function() {
         const val = $(this).val();
         const is_zero = $("#student-search-is-zero")[0].checked ? 1 : 0;
 
+        const local_request_id = request_id++;
         if(val.length > 0) {
             $.ajax(`/api/pw_student_search.php?q=${val}&is_zero=${is_zero}`).done(function(data) {
-                $(".student-list-item").not("#student-placeholder").remove();
-                for(let i = 0; i < Math.min(data.length, MAX_LIST_ITEMS); i++) {
-                    $("#student-list").append(getStudentListItem(data[i]));
+                if(local_request_id > max_request_id) {
+                    max_request_id = local_request_id;
+                    $(".student-list-item").not("#student-placeholder").remove();
+                    for(let i = 0; i < Math.min(data.length, MAX_LIST_ITEMS); i++) {
+                        $("#student-list").append(getStudentListItem(data[i]));
+                    }
                 }
             });
         } else {
