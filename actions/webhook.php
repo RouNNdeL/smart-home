@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,31 +30,41 @@
  * Time: 18:43
  */
 
-if($_SERVER["REQUEST_METHOD"] !== "POST")
-{
+require_once __DIR__ . "/../includes/logging/RequestLogger.php";
+
+$logger = RequestLogger::getInstance(false);
+
+if($_SERVER["REQUEST_METHOD"] !== "POST") {
     echo "{\"error\": \"invalid_request\"}";
     http_response_code(400);
     exit(0);
 }
 
-if(!isset(apache_request_headers()["Authorization"]))
-{
+if(!isset(apache_request_headers()["Authorization"])) {
     $response = ["error" => "invalid_grant"];
     http_response_code(401);
-    echo json_encode($response);
+    $json = json_encode($response);
+    $logger->addDebugInfo($json);
+    echo $json;
     exit(0);
 }
 preg_match("/Bearer (.*)/", apache_request_headers()["Authorization"], $match);
-if($match === null)
-{
+if($match === null) {
     $response = ["error" => "invalid_grant"];
     http_response_code(401);
-    echo json_encode($response);
+    $json = json_encode($response);
+    $logger->addDebugInfo($json);
+    echo $json;
     exit(0);
 }
 
-require_once __DIR__. "/../includes/ActionsRequestManager.php";
+require_once __DIR__ . "/../includes/ActionsRequestManager.php";
 
 $token = $match[1];
 $request = json_decode(file_get_contents("php://input"), true);
-echo json_encode(ActionsRequestManager::processRequest($request, $token));
+$response = ActionsRequestManager::processRequest($request, $token);
+$json = json_encode($response);
+echo $json;
+if(isset($response["error"])) {
+    $logger->addDebugInfo($json);
+}
