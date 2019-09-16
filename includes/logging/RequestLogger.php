@@ -58,13 +58,22 @@ class RequestLogger {
         $stmt->close();
     }
 
+    public function addDebugInfo(string $debug_info) {
+        $conn = DbUtils::getConnection();
+        $sql = "UPDATE log_request SET debug_info = IF(ISNULL(debug_info), ?, CONCAT(debug_info, '\n', ?)) WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ssi", $debug_info, $debug_info, $this->id);
+        $stmt->execute();
+        $stmt->close();
+    }
+
     /**
      * @return RequestLogger
      */
-    public static function getInstance() {
+    public static function getInstance(bool $with_session_id = true) {
         if(RequestLogger::$instance === null) {
             RequestLogger::$instance = RequestLogger::create(
-                SessionManager::getInstance()->getSessionId(),
+                $with_session_id ? SessionManager::getInstance()->getSessionId() : null,
                 $_SERVER["SCRIPT_NAME"],
                 $_SERVER["REQUEST_URI"],
                 $_SERVER["REQUEST_METHOD"],
@@ -82,9 +91,9 @@ class RequestLogger {
      * @param string $ip
      * @return RequestLogger
      */
-    private static function create(int $session_id, string $resource, string $uri, string $method, string $ip) {
+    private static function create($session_id, string $resource, string $uri, string $method, string $ip) {
         $conn = DbUtils::getConnection();
-        $sql = "INSERT INTO log_request (session_id, ip, uri, method, resource) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO log_request (session_id, ip, uri, method, resource, debug_info) VALUES (?, ?, ?, ?, ?, NULL)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("issss", $session_id, $ip, $uri, $method, $resource);
         $stmt->execute();
