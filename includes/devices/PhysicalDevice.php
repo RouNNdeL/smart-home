@@ -102,8 +102,7 @@ abstract class PhysicalDevice {
      * @param string $id
      * @return &VirtualDevice|null
      */
-    public function getVirtualDeviceById(string $id
-    ) {
+    public function getVirtualDeviceById(string $id) {
         foreach($this->virtual_devices as &$virtual_device) {
             if($virtual_device->getDeviceId() === $id)
                 return $virtual_device;
@@ -156,8 +155,7 @@ abstract class PhysicalDevice {
      * @param string $id
      * @return int
      */
-    public function getVirtualDeviceIndexById(string $id
-    ) {
+    public function getVirtualDeviceIndexById(string $id) {
         foreach($this->virtual_devices as $i => $virtual_device) {
             if($virtual_device->getDeviceId() === $id)
                 return $i;
@@ -187,8 +185,7 @@ abstract class PhysicalDevice {
         return $html;
     }
 
-    public function getRowHtml(int $user_id
-    ) {
+    public function getRowHtml(int $user_id) {
         $id = urlencode($this->id);
         $display_name = urlencode($this->display_name);
 
@@ -284,8 +281,7 @@ HTML;
                                             string $hostname, int $port, array $scopes
     );
 
-    public static function fromDatabaseRow(array $row
-    ) {
+    public static function fromDatabaseRow(array $row) {
         if(!class_exists($row["device_driver"]) || !is_subclass_of($row["device_driver"], PhysicalDevice::class)) {
             throw new InvalidArgumentException("$row[device_driver] is not a valid PhysicalDevice class name");
         }
