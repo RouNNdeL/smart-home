@@ -36,7 +36,7 @@ abstract class NavItem {
      * NavItem constructor.
      * @param $class
      */
-    public function __construct($class) {
+    public function __construct($class = "") {
         $this->class = $class;
     }
 

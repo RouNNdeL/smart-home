@@ -44,6 +44,7 @@ class NavBrand extends NavItem {
      * @param string $title
      */
     public function __construct(string $title, string $url = null, string $image = null) {
+        parent::__construct();
         $this->title = $title;
         $this->url = $url;
         $this->image = $image;
