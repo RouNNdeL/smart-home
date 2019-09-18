@@ -163,12 +163,24 @@ HTML;
     }
 
     public static function getDefault($current_page = null) {
+        switch(Utils::getTheme()) {
+            case Utils::THEME_LIGHT:
+                $brand_class = "";
+                $theme = Nav::THEME_LIGHT;
+                $background = Nav::BACKGROUND_LIGHT;
+                break;
+            case Utils::THEME_DARK:
+                $brand_class = "text-white";
+                $theme = Nav::THEME_DARK;
+                $background = Nav::BACKGROUND_DARK;
+                break;
+        }
         $nav_toggled_id = "navbar-" . number_format(rand() * rand(), 0, '', '');
         $items = [];
-        $items[] = new NavBrand(Utils::getString("navbar_brand_title"));
+        $items[] = new NavBrand(Utils::getString("navbar_brand_title"), $brand_class);
         $items[] = new NavHamburger($nav_toggled_id);
         $items[] = Navbar::getDefaultLeft($nav_toggled_id);
         $items[] = Navbar::getDefaultRight();
-        return new Nav($items, $current_page);
+        return new Nav($items, $current_page, $theme, $background);
     }
 }

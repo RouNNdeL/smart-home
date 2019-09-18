@@ -43,8 +43,8 @@ class NavBrand extends NavItem {
      * @param string $image
      * @param string $title
      */
-    public function __construct(string $title, string $url = null, string $image = null) {
-        parent::__construct();
+    public function __construct(string $title, string $class = "", string $url = null, string $image = null) {
+        parent::__construct($class);
         $this->title = $title;
         $this->url = $url;
         $this->image = $image;
@@ -57,7 +57,7 @@ class NavBrand extends NavItem {
         $img = $this->image !== null ? "<img src=\"$this->image\" width=\"30\" 
 height=\"30\" class=\"d-inline-block align-top\" alt=\"\">" : "";
         return <<<HTML
-<a class="navbar-brand" $href>
+<a class="navbar-brand $this->class" $href>
     $img 
     $this->title
   </a>
