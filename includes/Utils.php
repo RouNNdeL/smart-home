@@ -32,20 +32,32 @@
 class Utils {
     const DEFAULT_LANG = "en";
     const AVAILABLE_LANGUAGES = ["en", "pl"];
+
+    const THEME_DARK = "dark";
+    const THEME_LIGHT = "light";
+    const DEFAULT_THEME = Utils::THEME_DARK;
+
+    /** @var array maps theme id to a string resource */
+    const AVAILABLE_THEMES = [Utils::THEME_DARK => "theme_dark", Utils::THEME_LIGHT => "theme_light"];
+
+
     /**
      * @var Utils
      */
     private static $instance;
     public $strings;
     public $lang;
+    public $theme;
 
     /**
      * Utils constructor.
      * @param null $lang
      */
     public function __construct($lang = null) {
-        if($lang === null)
-            $lang = isset($_COOKIE["lang"]) ? $_COOKIE["lang"] : self::DEFAULT_LANG;
+        if($lang === null) {
+            $lang = isset($_COOKIE["lang"]) ? $_COOKIE["lang"] : Utils::DEFAULT_LANG;
+        }
+        $this->theme = isset($_COOKIE["theme"]) ? $_COOKIE["theme"] : Utils::DEFAULT_THEME;
         $this->lang = $lang;
         $this->loadStrings();
     }
@@ -55,7 +67,7 @@ class Utils {
         $path = __DIR__ . "/../_lang/$lang.json";
         $file = file_get_contents($path);
         if($file == false) {
-            $this->lang = self::DEFAULT_LANG;
+            $this->lang = Utils::DEFAULT_LANG;
             $this->loadStrings();
             return;
         }
@@ -69,8 +81,12 @@ class Utils {
         return preg_replace("![^\sa-z0-9]!", "", $sanitized_string);
     }
 
+    public static function getTheme() {
+        return Utils::getInstance()->theme;
+    }
+
     public static function getString(string $name) {
-        return self::getInstance()->_getString($name);
+        return Utils::getInstance()->_getString($name);
     }
 
     public function _getString(string $name) {
@@ -84,11 +100,11 @@ class Utils {
     }
 
     public static function getInstance() {
-        if(self::$instance == null) {
-            self::$instance = new self();
+        if(Utils::$instance == null) {
+            Utils::$instance = new Utils();
         }
 
-        return self::$instance;
+        return Utils::$instance;
     }
 
     public static function intToHex(int $n, int $bytes = 1) {
