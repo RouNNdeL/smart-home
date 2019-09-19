@@ -263,7 +263,7 @@ HTML;
     public static function load(string $device_id, int $owner_id, string $display_name, string $hostname, int $port,
                                 array $scopes
     ) {
-        $actions = GlobalManager::getInstance()->getRemoteActionManager()->getActionsForDeviceId($device_id);
+        $actions = GlobalManager::getInstance()->getRemoteActionManager($owner_id)->getActionsForDeviceId($device_id);
         $virtual = DeviceDbHelper::queryVirtualDevicesForPhysicalDevice(DbUtils::getConnection(), $device_id);
 
         $virtual[] = new VirtualIrActionsDevice($actions);
