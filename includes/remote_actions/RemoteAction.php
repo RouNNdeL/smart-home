@@ -55,6 +55,12 @@ class RemoteAction {
     /** @var int */
     private $default_delay;
 
+    /** @var int */
+    private $deactivate_action_id;
+
+    /** @var bool */
+    private $is_deactivate;
+
     /**
      * RemoteAction constructor.
      * @param string $name
@@ -62,7 +68,9 @@ class RemoteAction {
      * @param ActionEntry[] $entries
      * @param int $default_delay
      */
-    private function __construct(int $id, string $name, string $physical_device_id, int $user_id, array $synonyms, array $entries, int $default_delay) {
+    private function __construct(int $id, string $name, string $physical_device_id, int $user_id, array $synonyms,
+                                 array $entries, int $default_delay, bool $is_deactivate, $deactivate_action_id
+    ) {
         $this->id = $id;
         $this->name = $name;
         $this->physical_device_id = $physical_device_id;
@@ -70,6 +78,8 @@ class RemoteAction {
         $this->synonyms = $synonyms;
         $this->entries = $entries;
         $this->default_delay = $default_delay;
+        $this->is_deactivate = $is_deactivate;
+        $this->deactivate_action_id = $deactivate_action_id;
     }
 
 
@@ -87,7 +97,9 @@ class RemoteAction {
             "type" => VirtualDevice::DEVICE_TYPE_ACTIONS_SCENE,
             "traits" => [VirtualDevice::DEVICE_TRAIT_SCENE],
             "willReportState" => false,
-            "attributes" => [VirtualDevice::DEVICE_ATTRIBUTE_SCENE_REVERSIBLE => false]
+            "attributes" => [
+                VirtualDevice::DEVICE_ATTRIBUTE_SCENE_REVERSIBLE => $this->deactivate_action_id !== null
+            ]
         ];
     }
 
@@ -117,20 +129,37 @@ class RemoteAction {
     }
 
     /**
+     * @return bool
+     */
+    public function isDeactivate(): bool {
+        return $this->is_deactivate;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDeactivateActionId(): int {
+        return $this->deactivate_action_id;
+    }
+
+    /**
      * @param int $id
      * @return RemoteAction|null
      */
     public static function byId(int $id) {
         $conn = DbUtils::getConnection();
-        $sql = "SELECT name, physcial_device_id, user_id, synonyms, default_delay FROM remote_actions WHERE id = ?";
+        $sql = "SELECT name, physcial_device_id, user_id, synonyms, default_delay, is_deactivate, deactivate_action_id
+                FROM remote_actions WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id);
-        $stmt->bind_result($name, $physical_device_id, $user_id, $synonyms, $default_delay);
+        $stmt->bind_result($name, $physical_device_id, $user_id,
+            $synonyms, $default_delay, $is_deactivate, $deactivate_action_id);
         $stmt->execute();
         if($stmt->fetch()) {
             $stmt->close();
             $entries = ActionEntry::getEntriesForActionId($id);
-            return new RemoteAction($id, $name, $physical_device_id, $user_id, explode(",", $synonyms), $entries, $default_delay);
+            return new RemoteAction($id, $name, $physical_device_id, $user_id, explode(",", $synonyms),
+                $entries, $default_delay, $is_deactivate, $deactivate_action_id);
         }
         $stmt->close();
         return null;
@@ -140,18 +169,30 @@ class RemoteAction {
      * @param int $id
      * @return RemoteAction[]
      */
-    public static function forUserId(int $user_id) {
+    public static function forUserId(int $user_id, bool $is_deactivate = null) {
+        if($is_deactivate !== null) {
+            if($is_deactivate) {
+                $deactivate_sql = "AND is_deactivate = 1";
+            } else {
+                $deactivate_sql = "AND is_deactivate = 0";
+            }
+        } else {
+            $deactivate_sql = "";
+        }
         $entries = ActionEntry::getEntriesForUserId($user_id);
 
         $conn = DbUtils::getConnection();
-        $sql = "SELECT id, name, physcial_device_id, synonyms, default_delay FROM remote_actions WHERE user_id = ?";
+        $sql = "SELECT id, name, physcial_device_id, synonyms, default_delay, is_deactivate, deactivate_action_id
+                FROM remote_actions WHERE user_id = ? $deactivate_sql";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
-        $stmt->bind_result($id, $name, $physical_device_id, $synonyms, $default_delay);
+        $stmt->bind_result($id, $name, $physical_device_id,
+            $synonyms, $default_delay, $is_deactivate, $deactivate_action_id);
         $stmt->execute();
         $arr = [];
         while($stmt->fetch()) {
-            $arr[] = new RemoteAction($id, $name, $physical_device_id, $user_id, explode(",", $synonyms), $entries[$id], $default_delay);
+            $arr[] = new RemoteAction($id, $name, $physical_device_id, $user_id, explode(",", $synonyms),
+                $entries[$id], $default_delay, $is_deactivate, $deactivate_action_id);
         }
         $stmt->close();
         return $arr;

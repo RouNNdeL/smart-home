@@ -54,7 +54,9 @@ class RemoteActionManager extends ExtensionManager {
     public function getSync() {
         $payload = [];
         foreach($this->actions as $action) {
-            $payload[] = $action->getSyncJson();
+            if(!$action->isDeactivate()) {
+                $payload[] = $action->getSyncJson();
+            }
         }
         return $payload;
     }
@@ -71,7 +73,7 @@ class RemoteActionManager extends ExtensionManager {
     }
 
     /**
-     * @return Scene
+     * @return RemoteAction
      */
     public function getActionByPrefixedId(string $prefixed_id) {
         $re = '/' . RemoteAction::ID_PREFIX . '(\d+)/m';
@@ -114,7 +116,12 @@ class RemoteActionManager extends ExtensionManager {
                 if($action !== null) {
                     foreach($command["execution"] as $item) {
                         if($item["command"] === VirtualDevice::DEVICE_COMMAND_ACTIVATE_SCENE) {
-                            $this->executeAction($action->getId());
+                            if($item["params"]["deactivate"]) {
+                                $this->executeAction($action->getDeactivateActionId());
+                            } else {
+                                $this->executeAction($action->getId());
+                            }
+
                             $success = $this->isActionOnline($action->getId());
                             if(!isset($ids[$success ? "PENDING" : "ERROR:deviceTurnedOff"])) /* may not be required */
                                 $ids[$success ? "PENDING" : "ERROR:deviceTurnedOff"] = [];
