@@ -181,9 +181,12 @@ class GlobalManager {
         $this->userDeviceManager = UserDeviceManager::forUserId($user_id);
     }
 
-    public static function minimal() {
-        $manager = &GlobalManager::getInstance();
+    public static function minimal($log = GlobalManager::LOG) {
+        $manager = GlobalManager::getInstance();
 
+        if($log) {
+            $manager->requestLogger = RequestLogger::getInstance();
+        }
         $manager->loadIpTrustManager();
 
         return $manager;
@@ -200,8 +203,9 @@ class GlobalManager {
 
     public function loadSessionManager($login_required = false, $log = GlobalManager::LOG) {
         $this->sessionManager = SessionManager::getInstance();
-        if($log)
+        if($log) {
             $this->requestLogger = RequestLogger::getInstance();
+        }
         if($login_required && !$this->sessionManager->isLoggedIn()) {
             header("Location: /");
             exit(0);
