@@ -31,7 +31,6 @@
  */
 
 require_once __DIR__ . "/../vendor/autoload.php";
-require_once __DIR__ . "/database/HomeGraphTokenManager.php";
 require_once __DIR__ . "/database/DbUtils.php";
 require_once __DIR__ . "/database/HomeUser.php";
 require_once __DIR__ . "/database/DeviceDbHelper.php";
@@ -59,7 +58,7 @@ class UserDeviceManager {
     }
 
     public function sendReportState(string $requestId = null) {
-        $token = HomeGraphTokenManager::getToken();
+        $api_key = DbUtils::getSecret("smart_home_api_key");
         $states = [];
         foreach($this->physical_devices as $physicalDevice) {
             foreach($physicalDevice->getVirtualDevices() as $virtualDevice) {
@@ -76,11 +75,9 @@ class UserDeviceManager {
 
         $header = [];
         $header[] = "Content-type: application/json";
-        $header[] = "Authorization: Bearer " . $token;
-        $header[] = "X-GFE-SSL: yes";
 
 
-        $ch = curl_init("https://homegraph.googleapis.com/v1/devices:reportStateAndNotification");
+        $ch = curl_init("https://homegraph.googleapis.com/v1/devices:reportStateAndNotification?key=$api_key");
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
@@ -202,15 +199,13 @@ class UserDeviceManager {
     }
 
     public function requestSync() {
-        $token = HomeGraphTokenManager::getToken();
-        $payload = ["agentUserId" => (string)($this->user_id)];
+        $api_key = DbUtils::getSecret("smart_home_api_key");
+        $payload = ["agentUserId" => (string)($this->user_id), "async" => true];
 
         $header = [];
         $header[] = "Content-type: application/json";
-        $header[] = "Authorization: Bearer " . $token;
-        $header[] = "X-GFE-SSL: yes";
 
-        $ch = curl_init("https://homegraph.googleapis.com/v1/devices:requestSync");
+        $ch = curl_init("https://homegraph.googleapis.com/v1/devices:requestSync?key=$api_key");
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
