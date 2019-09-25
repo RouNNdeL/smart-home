@@ -41,8 +41,9 @@ class DeviceDbHelper {
      * @return PhysicalDevice
      */
     public static function queryPhysicalDeviceById(mysqli $conn, string $physical_device_id) {
-        // TODO: Add Devices shared by other users
-        $sql = "SELECT id, display_name, device_driver, hostname, port, owner_id FROM devices_physical WHERE id = ?";
+        $sql = "SELECT id, display_name, device_driver, hostname, port, owner_id 
+                  FROM devices_physical 
+                  WHERE id = ? AND enabled";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $physical_device_id);
         $stmt->execute();
@@ -62,8 +63,9 @@ class DeviceDbHelper {
      * @return PhysicalDevice[]
      */
     public static function queryPhysicalDevicesForUser(mysqli $conn, int $user_id) {
-        // TODO: Add Devices shared by other users
-        $sql = "SELECT id, display_name, device_driver, hostname, port, owner_id FROM devices_physical WHERE owner_id = ?";
+        $sql = "SELECT id, display_name, device_driver, hostname, port, owner_id 
+                FROM devices_physical 
+                WHERE owner_id = ? AND enabled";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
         $stmt->execute();
