@@ -74,9 +74,11 @@ class PcLedController extends RgbEffectDevice {
             $fp = fsockopen($this->hostname, $this->port, $errno, $errstr, 0.2);
             fwrite($fp, json_encode($json));
             fclose($fp);
+
+            return true;
         }
 
-        return $this->isOnline();
+        return false;
     }
 
     public function reboot() {

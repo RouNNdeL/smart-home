@@ -91,11 +91,14 @@ abstract class PhysicalDevice {
             }
         }
 
+
         if($this->save("google_assistant_action")) {
-            $this->sendData(false);
+            $status = $this->sendData(false) ? "SUCCESS" : "ERROR:deviceTurnedOff";
+        } else {
+            $status = "ERROR:alreadyInState";
         }
 
-        return ["status" => ($this->isOnline() ? "SUCCESS" : "ERROR:deviceTurnedOff"), "ids" => $ids];
+        return ["status" => $status, "ids" => $ids];
     }
 
     /**
@@ -107,6 +110,7 @@ abstract class PhysicalDevice {
             if($virtual_device->getDeviceId() === $id)
                 return $virtual_device;
         }
+
         return null;
     }
 
@@ -124,6 +128,7 @@ abstract class PhysicalDevice {
             }
             $changed = $changed || $d_changed;
         }
+
         return $changed;
     }
 
@@ -133,14 +138,18 @@ abstract class PhysicalDevice {
      * @return bool
      */
     public function isOnline() {
-        if($this->online !== null)
+        if($this->online !== null) {
             return $this->online;
+        }
+
         $waitTimeoutInSeconds = .2;
         $fp = @fsockopen($this->hostname, $this->port, $errCode, $errStr, $waitTimeoutInSeconds);
         $this->online = $fp !== false;
         DeviceDbHelper::setOnline(DbUtils::getConnection(), $this->getId(), $this->online);
-        if($this->online)
+        if($this->online) {
             fclose($fp);
+        }
+
         return $this->online;
     }
 
@@ -253,8 +262,13 @@ HTML;
         return $this->owner_id;
     }
 
+    /** @noinspection PhpUnusedParameterInspection */
+
+    /**
+     * Devices that report the state can override this to handle it
+     * @param string $state - State reported by HW device. May very in format depending on device type
+     */
     public function handleDeviceReportedState(string $state) {
-        /* Devices that report the state can override this to handle it */
         $script = __DIR__ . "/../../scripts/report_state.php";
         exec("php $script $this->owner_id >/dev/null &");
     }
