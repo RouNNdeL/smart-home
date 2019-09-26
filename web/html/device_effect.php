@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,16 @@
  * SOFTWARE.
  */
 
+use App\Database\ShareManager;
+use App\Devices\BaseEffectDevice;
+use App\Devices\RgbEffectDevice;
+use App\GlobalManager;
+use App\Head\HtmlHead;
+use App\Head\JavaScriptEntry;
+use App\Head\StyleSheetEntry;
+use App\Navbar\Nav;
+use App\Utils;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -30,7 +40,7 @@
  * Time: 08:54
  */
 
-require_once __DIR__ . "/../../includes/GlobalManager.php";
+require_once __DIR__ . "/../../vendor/autoload.php";
 
 $manager = GlobalManager::withSessionManager(true);
 
@@ -68,7 +78,7 @@ if(isset($_GET["name"]) && $_GET["name"] === "false")
 <!DOCTYPE html>
 <html lang="en">
 <?php
-require_once __DIR__ . "/../../includes/head/HtmlHead.php";
+
 $head = new HtmlHead("Smart Home - " . $device->getDeviceName());
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICE_ADVANCED));
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICE_ADVANCED));
@@ -78,7 +88,6 @@ echo $head->toString();
 ?>
 <body>
 <?php
-require_once __DIR__."/../../includes/navbar/Nav.php";
 
 echo Nav::getDefault(Nav::PAGE_EFFECTS)->toString();
 ?>

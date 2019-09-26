@@ -38,7 +38,7 @@ export default function init() {
         });
     });
 
-    $(".ir-multi-action-btn").click(async function() { // jshint ignore:line
+    $(".Ir-multi-action-btn").click(async function() { // jshint ignore:line
         const actions = $(this).data("action-id").split(" ");
         const devices = $(this).data("device-id").split(" ");
         const delay = parseInt($(this).data("action-delay")) || 50;
@@ -63,7 +63,7 @@ export default function init() {
         action_in_progress = false;
     }); // jshint ignore:line
 
-    $(".ir-action-btn").click(function() {
+    $(".Ir-action-btn").click(function() {
         const remote_action_id = $(this).data("remote-action-id");
         const device_id = $(this).parents(".device-parent").eq(0).data("parent-id");
         postRemoteAction(remote_action_id, device_id);

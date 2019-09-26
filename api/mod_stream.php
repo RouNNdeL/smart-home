@@ -23,6 +23,11 @@
  * SOFTWARE.
  */
 
+use App\Database\DbUtils;
+use App\Database\DeviceModManager;
+use App\Database\ShareManager;
+use App\GlobalManager;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -30,9 +35,7 @@
  * Time: 13:31
  */
 
-require_once __DIR__ . "/../includes/GlobalManager.php";
-require_once __DIR__ . "/../includes/database/DbUtils.php";
-require_once __DIR__ . "/../includes/database/DeviceDbHelper.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 
 $manager = GlobalManager::all([ShareManager::SCOPE_ANY]);
 

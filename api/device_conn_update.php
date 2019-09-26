@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+use App\Database\DbUtils;
+use App\Database\DeviceDbHelper;
 
 /**
  * Created by PhpStorm.
@@ -48,8 +51,8 @@ if($json === false || !isset($json["device_id"]) || !isset($json["device_port"])
     exit();
 }
 
-require_once __DIR__ . "/../includes/database/DbUtils.php";
-require_once __DIR__ . "/../includes/database/DeviceDbHelper.php";
+require_once __DIR__ . "/../vendor/autoload.php";
+
 $success = DeviceDbHelper::updateDeviceConnectionInfo(DbUtils::getConnection(),
     $json["device_id"], $_SERVER["REMOTE_ADDR"], $json["device_port"]);
 DeviceDbHelper::queryPhysicalDeviceById(DbUtils::getConnection(), $json["device_id"])->isOnline();

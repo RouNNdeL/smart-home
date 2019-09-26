@@ -23,6 +23,14 @@
  * SOFTWARE.
  */
 
+use App\Database\ShareManager;
+use App\GlobalManager;
+use App\Head\HtmlHead;
+use App\Head\JavaScriptEntry;
+use App\Head\StyleSheetEntry;
+use App\Navbar\Nav;
+use App\Utils;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -30,7 +38,7 @@
  * Time: 1:53 PM
  */
 
-require_once __DIR__ . "/../../includes/GlobalManager.php";
+require_once __DIR__ . "/../../vendor/autoload.php";
 
 $manager = GlobalManager::withSessionManager(true);
 
@@ -59,7 +67,7 @@ $parent_id = $device->getId();
 <!DOCTYPE html>
 <html lang="en">
 <?php
-require_once __DIR__ . "/../../includes/head/HtmlHead.php";
+
 $head = new HtmlHead("Smart Home - " . $device->getDisplayName());
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICE_SETTINGS));
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICE_SETTINGS));
@@ -69,7 +77,6 @@ echo $head->toString();
 ?>
 <body>
 <?php
-require_once __DIR__ . "/../../includes/navbar/Nav.php";
 
 echo Nav::getDefault(Nav::PAGE_DEVICES)->toString();
 ?>

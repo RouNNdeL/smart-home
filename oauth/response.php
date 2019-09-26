@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,9 @@
  * SOFTWARE.
  */
 
+use App\GlobalManager;
+use App\OAuth\OAuthService;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -31,7 +34,8 @@
  */
 
 
-require_once __DIR__."/../includes/GlobalManager.php";
+require_once __DIR__."/../vendor/autoload.php";
+
 $manager = GlobalManager::withSessionManager(false, false);
 
 if($_SERVER["REQUEST_METHOD"] !== "GET" || !isset($_GET["state"]) || !isset($_GET["code"]))
@@ -41,8 +45,6 @@ if($_SERVER["REQUEST_METHOD"] !== "GET" || !isset($_GET["state"]) || !isset($_GE
     http_response_code(400);
     exit();
 }
-
-require_once __DIR__ . "/../includes/oauth/OAuthService.php";
 
 $service = OAuthService::fromSessionAndState($manager->getSessionManager()->getSessionId(), $_GET["state"]);
 if($service === null)

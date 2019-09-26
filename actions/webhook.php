@@ -23,6 +23,9 @@
  * SOFTWARE.
  */
 
+use App\ActionsRequestManager;
+use App\Logging\RequestLogger;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -30,7 +33,7 @@
  * Time: 18:43
  */
 
-require_once __DIR__ . "/../includes/logging/RequestLogger.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 
 $logger = RequestLogger::getInstance(false);
 
@@ -57,8 +60,6 @@ if($match === null) {
     echo $json;
     exit(0);
 }
-
-require_once __DIR__ . "/../includes/ActionsRequestManager.php";
 
 $token = $match[1];
 $request = json_decode(file_get_contents("php://input"), true);

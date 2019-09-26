@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+use App\Utils;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -37,14 +39,14 @@ if($_SERVER['REQUEST_METHOD'] !== 'GET')
     http_response_code(400);
     exit(0);
 }
-
 if(!isset($_GET["name"]))
 {
     http_response_code(400);
-    echo "{\"status\":\"error\",\"message\":\"Missing arguments\"}";
+    echo "{\"status\":\"error\",\"message\":\"Missing Arguments\"}";
     exit(0);
 }
 
-require_once(__DIR__ . "/../web/includes/Utils.php");
+require_once __DIR__ . "/../vendor/autoload.php";
+
 $string =  Utils::getString($_GET["name"]);
 echo json_encode(array("status" => "success", "string" => $string));

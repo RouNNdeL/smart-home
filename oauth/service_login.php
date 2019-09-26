@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,9 @@
  * SOFTWARE.
  */
 
+use App\GlobalManager;
+use App\OAuth\OAuthService;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -30,25 +33,22 @@
  * Time: 16:21
  */
 
-if($_SERVER["REQUEST_METHOD"] !== "GET" || !isset($_GET["id"]))
-{
+if($_SERVER["REQUEST_METHOD"] !== "GET" || !isset($_GET["id"])) {
     echo "Invalid request";
     http_response_code(400);
     exit(0);
 }
 
-require_once __DIR__ . "/../includes/oauth/OAuthService.php";
-require_once __DIR__."/../includes/GlobalManager.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 
-$manager = GlobalManager::withSessionManager( false);
+$manager = GlobalManager::withSessionManager(false);
 
 $service = OAuthService::fromId($_GET["id"]);
 if(isset($_GET["redirect_uri"]))
     $service->setRedirectUri($_GET["redirect_uri"]);
-if($service === null)
-{
+if($service === null) {
     echo "Invalid request";
     http_response_code(400);
     exit();
 }
-header("Location: ".$service->generateAuthUrl($manager->getSessionManager()->getSessionId()));
+header("Location: " . $service->generateAuthUrl($manager->getSessionManager()->getSessionId()));

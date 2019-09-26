@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,15 @@
  * SOFTWARE.
  */
 
+use App\Database\DbUtils;
+use App\Database\IpTrustManager;
+use App\Database\SessionManager;
+use App\GlobalManager;
+use App\Head\HtmlHead;
+use App\Head\JavaScriptEntry;
+use App\Head\StyleSheetEntry;
+use App\OAuth\{ApiClient, OAuthUtils};
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -30,24 +39,18 @@
  * Time: 14:34
  */
 
-require_once __DIR__ . "/../includes/GlobalManager.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 
 $manager = GlobalManager::minimal();
 
-require_once __DIR__ . "/../includes/oauth/ApiClient.php";
-require_once __DIR__ . "/../includes/oauth/OAuthUtils.php";
-require_once __DIR__ . "/../includes/database/DbUtils.php";
-
 if(!isset($_GET["client_id"]) || !isset($_GET["redirect_uri"]) || !isset($_GET["state"]) || !isset($_GET["scope"])
-    || !isset($_GET["response_type"]) || $_GET["response_type"] !== "code")
-{
+    || !isset($_GET["response_type"]) || $_GET["response_type"] !== "code") {
     $response = ["error" => "invalid_request"];
     http_response_code(401);
     echo json_encode($response);
 }
 
-if(!OAuthUtils::checkScopes($_GET["scope"]))
-{
+if(!OAuthUtils::checkScopes($_GET["scope"])) {
     $response = ["error" => "invalid_scope"];
     http_response_code(400);
     echo json_encode($response);
@@ -55,48 +58,37 @@ if(!OAuthUtils::checkScopes($_GET["scope"]))
 
 $client = ApiClient::queryClientById(DbUtils::getConnection(), $_GET["client_id"]);
 
-if($client === null)
-{
+if($client === null) {
     $response = ["error" => "invalid_client"];
     http_response_code(401);
     echo json_encode($response);
 }
 
 $manager->loadSessionManager(false);
-if(isset($_POST["oauth-username"]) && isset($_POST["oauth-password"]) && !$manager->getSessionManager()->isLoggedIn())
-{
-    if($manager->getIpTrustManager()->isTrusted() || (isset($_POST["g-recaptcha-response"]) &&
-            $_POST["g-recaptcha-response"] !== null && strlen($_POST["g-recaptcha-response"]) > 0))
-    {
-        if(SessionManager::validateCaptchaAuto($_POST["g-recaptcha-response"]))
-        {
-            $success = $manager->getSessionManager()->attemptLoginAuto($_POST["oauth-username"], $_POST["oauth-password"]);
-            if($success)
-            {
+if(isset($_POST["OAuth-username"]) && isset($_POST["OAuth-password"]) && !$manager->getSessionManager()->isLoggedIn()) {
+    $captcha_present = isset($_POST["g-recaptcha-response"]) && $_POST["g-recaptcha-response"] !== null &&
+        strlen($_POST["g-recaptcha-response"]) > 0;
+    if($manager->getIpTrustManager()->isTrusted() || $captcha_present) {
+        if(!$captcha_present || SessionManager::validateCaptchaAuto($_POST["g-recaptcha-response"])) {
+            $success = $manager->getSessionManager()->attemptLoginAuto($_POST["OAuth-username"], $_POST["OAuth-password"]);
+            if($success) {
                 $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_SUCCESSFUL_LOGIN);
-            }
-            else
-            {
+            } else {
                 $user_error = "Invalid username or password";
             }
-        }
-        else
-        {
+        } else {
             $user_error = "Incorrect captcha";
         }
-    }
-    else
-    {
+    } else {
         $user_error = "Please complete the Captcha";
     }
     $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_LOGIN_ATTEMPT);
 }
 
-if($manager->getSessionManager()->isLoggedIn())
-{
+if($manager->getSessionManager()->isLoggedIn()) {
     //TODO: Implement 2FA if the user has enabled it
-    require_once __DIR__ . "/../includes/oauth/OAuthUtils.php";
-    $code = urlencode(OAuthUtils::insertAuthCode(DbUtils::getConnection(), $client->id, $manager->getSessionManager()->getUserId(), $_GET["scope"]));
+    $code = urlencode(OAuthUtils::insertAuthCode(DbUtils::getConnection(), $client->id,
+        $manager->getSessionManager()->getUserId(), $_GET["scope"]));
     $state = $_GET["state"];
     header("Location: " . $_GET["redirect_uri"] . "?code=$code&state=$state");
     exit(0);
@@ -107,7 +99,6 @@ if($manager->getSessionManager()->isLoggedIn())
 <html lang="en">
 <?php
 
-require_once __DIR__."/../includes/head/HtmlHead.php";
 $head = new HtmlHead("Login to Smart Home");
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::LOGIN));
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::CAPTCHA));
@@ -120,8 +111,7 @@ echo $head->toString();
     <div class="row justify-content-md-center">
         <div class="col col-md-auto"><h3>Login to Smart Home with <?php echo $client->name ?></h3>
             <?php
-            if(isset($user_error))
-            {
+            if(isset($user_error)) {
                 echo <<<TAG
                 <div class="alert alert-danger" role="alert">
                   $user_error
@@ -141,8 +131,7 @@ TAG;
                            name="oauth-password">
                 </div>
                 <?php
-                if(!$manager->getIpTrustManager()->isTrusted())
-                {
+                if(!$manager->getIpTrustManager()->isTrusted()) {
                     echo <<<HTML
                 <div class="g-recaptcha" data-sitekey="6LedoFoUAAAAADtLI8MmDil2Yf8_DYeq6iMk7Xb7"></div>
 HTML;
@@ -152,10 +141,8 @@ HTML;
                     <button id="register-next-btn" class="btn btn-primary" role="button" type="submit">Login</button>
                 </div>
                 <?php
-                foreach($_GET as $name => $value)
-                {
-                    if(strpos($name, "oauth-") === false)
-                    {
+                foreach($_GET as $name => $value) {
+                    if(strpos($name, "OAuth-") === false) {
                         $name = htmlspecialchars($name);
                         $value = htmlspecialchars($value);
                         echo '<input type="hidden" name="' . $name . '" value="' . $value . '">';
