@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+namespace App\PwStalker;
+
 class Student {
     /** @var int */
     private $id;

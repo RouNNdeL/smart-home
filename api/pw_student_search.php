@@ -23,6 +23,9 @@
  * SOFTWARE.
  */
 
+use App\GlobalManager;
+use App\PwStalker\PwDbUtils;
+
 header("Content-Type: application/json");
 
 if($_SERVER["REQUEST_METHOD"] !== "GET") {
@@ -32,7 +35,7 @@ if($_SERVER["REQUEST_METHOD"] !== "GET") {
     exit();
 }
 
-require_once __DIR__."/../includes/GlobalManager.php";
+require_once __DIR__."/../vendor/autoload.php";
 
 $manager = GlobalManager::withSessionManager();
 
@@ -51,5 +54,4 @@ if(isset($_GET["is_zero"])) {
 
 $query = $_GET["q"];
 
-require_once __DIR__ . "/../includes/pw_stalker/PwDbUtils.php";
 echo json_encode(PwDbUtils::getStudentsJsonByQuery($query, $is_zero));

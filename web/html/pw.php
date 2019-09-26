@@ -23,7 +23,11 @@
  * SOFTWARE.
  */
 
-require_once __DIR__ . "/../../includes/GlobalManager.php";
+use App\GlobalManager;
+use App\Head\{HtmlHead, JavaScriptEntry};
+use App\PwStalker\{Course, Department, PwDbUtils};
+
+require_once __DIR__ . "/../../vendor/autoload.php";
 
 $manager = GlobalManager::withSessionManager();
 
@@ -32,7 +36,7 @@ $manager = GlobalManager::withSessionManager();
 <!DOCTYPE html>
 <html lang="en">
 <?php
-require_once __DIR__ . "/../../includes/head/HtmlHead.php";
+
 $head = new HtmlHead("PW Stalker");
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::PW));
 echo $head->toString();
@@ -43,7 +47,6 @@ echo $head->toString();
 <div class="container mt-3">
 
     <?php
-    require_once __DIR__ . "/../../includes/pw_stalker/PwDbUtils.php";
 
     $departments = PwDbUtils::getDepartments();
 

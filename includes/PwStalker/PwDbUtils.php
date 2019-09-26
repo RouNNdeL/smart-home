@@ -23,10 +23,9 @@
  * SOFTWARE.
  */
 
-require_once __DIR__ . "/../database/DbUtils.php";
-require_once __DIR__ . "/../pw_stalker/Department.php";
-require_once __DIR__ . "/../pw_stalker/Course.php";
-require_once __DIR__ . "/../pw_stalker/Student.php";
+namespace App\PwStalker;
+
+use App\Database\DbUtils;
 
 class PwDbUtils {
 
