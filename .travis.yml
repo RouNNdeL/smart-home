@@ -10,6 +10,7 @@ before_script:
 install:
     - scripts/download_jqueryui.sh
     - npm install
+    - npm rebuild node-sass
     - composer install
 
 script:
