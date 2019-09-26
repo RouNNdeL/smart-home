@@ -24,6 +24,9 @@
  */
 
 
+use App\Database\ShareManager;
+use App\GlobalManager;
+
 header("Content-Type: application/json");
 
 if($_SERVER["REQUEST_METHOD"] !== "GET") {
@@ -33,7 +36,7 @@ if($_SERVER["REQUEST_METHOD"] !== "GET") {
     exit();
 }
 
-require_once __DIR__."/../includes/GlobalManager.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 
 $manager = GlobalManager::all([ShareManager::SCOPE_SIMPLE_CONTROL]);
 

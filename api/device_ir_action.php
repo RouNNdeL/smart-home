@@ -23,6 +23,12 @@
  * SOFTWARE.
  */
 
+use App\Database\ShareManager;
+use App\Devices\Ir\IrCode;
+use App\Devices\IrControlledDevice;
+use App\Devices\IrRemote;
+use App\GlobalManager;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -38,7 +44,7 @@ if($_SERVER["REQUEST_METHOD"] !== "POST")
     exit();
 }
 
-require_once __DIR__ . "/../includes/GlobalManager.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 
 $manager = GlobalManager::all([ShareManager::SCOPE_SIMPLE_CONTROL]);
 
@@ -51,8 +57,6 @@ if($json === false || !isset($json["action_id"]) || !isset($json["device_id"]))
     exit();
 }
 
-require_once __DIR__ . "/../includes/devices/ir/IrCode.php";
-
 $ir_code = IrCode::byId($json["action_id"]);
 if($ir_code === null)
 {
@@ -64,7 +68,7 @@ if($ir_code === null)
 
 $action_device_id = $ir_code->getDeviceId();
 
-/* Only allow the action to execute if both devices are part of the same VirtualDevice */
+/* Only allow the action to execute if both Devices are part of the same VirtualDevice */
 $physical = $manager->getUserDeviceManager()->getPhysicalDeviceByVirtualId($action_device_id);
 $virtual_parent = $physical->getVirtualDeviceById($json["device_id"]);
 

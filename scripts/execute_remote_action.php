@@ -23,6 +23,9 @@
  * SOFTWARE.
  */
 
+use App\GlobalManager;
+use App\RemoteActions\RemoteAction;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -39,7 +42,7 @@ if(isset($argv[1]) && isset($argv[2])) {
         throw new InvalidArgumentException("Invalid user id: $argv[2]");
     }
 
-    require_once __DIR__."/../includes/remote_actions/RemoteAction.php";
+    require_once __DIR__ . "/../includes/RemoteActions/RemoteAction.php";
 
     $action = RemoteAction::byId($argv[1]);
     $action->executeAction($manager);

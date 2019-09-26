@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,13 @@
  * SOFTWARE.
  */
 
+use App\Database\IpTrustManager;
+use App\Database\SessionManager;
+use App\GlobalManager;
+use App\Head\HtmlHead;
+use App\Head\JavaScriptEntry;
+use App\Head\StyleSheetEntry;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -30,7 +37,7 @@
  * Time: 14:34
  */
 
-require_once __DIR__ . "/../../includes/GlobalManager.php";
+require_once __DIR__ . "/../../vendor/autoload.php";
 
 $manager = GlobalManager::withSessionManager(false, false);
 
@@ -81,7 +88,7 @@ if($_SERVER["REQUEST_METHOD"] === "POST")
 <!DOCTYPE html>
 <html lang="en">
 <?php
-require_once __DIR__."/../../includes/head/HtmlHead.php";
+
 $head = new HtmlHead("Login to Smart Home");
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::LOGIN));
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::CAPTCHA));

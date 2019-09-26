@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+use App\Database\DbUtils;
+use App\Database\DeviceDbHelper;
+use App\Logging\LocalDeviceLogger;
 
 /**
  * Created by PhpStorm.
@@ -48,7 +52,7 @@ if($json === false || !isset($json["device_id"]))
     exit(0);
 }
 
-require_once __DIR__ . "/../includes/devices/EspWifiLedController.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 $device_id = $json["device_id"];
 $device = DeviceDbHelper::queryPhysicalDeviceById(DbUtils::getConnection(), $device_id);
 if($device === null)
@@ -59,10 +63,6 @@ if($device === null)
     exit(0);
 }
 
-require_once __DIR__ . "/../includes/database/DbUtils.php";
-require_once __DIR__ . "/../includes/database/DeviceDbHelper.php";
-require_once __DIR__ . "/../includes/UserDeviceManager.php";
-require_once __DIR__ . "/../includes/logging/LocalDeviceLogger.php";
 $attempts = isset(apache_request_headers()["x-Request-Attempts"]) ? apache_request_headers()["x-Request-Attempts"] : null;
 
 //TODO: Set the device status to halted and maybe send a notification to the device owner

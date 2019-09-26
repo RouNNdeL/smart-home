@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,14 @@
  * SOFTWARE.
  */
 
+use App\Database\ShareManager;
+use App\Effects\Scenes\Scene;
+use App\GlobalManager;
+use App\Head\HtmlHead;
+use App\Head\JavaScriptEntry;
+use App\Head\StyleSheetEntry;
+use App\Navbar\Nav;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -30,8 +38,7 @@
  * Time: 12:15
  */
 
-require_once __DIR__ . "/../../includes/effects/scenes/Scene.php";
-require_once __DIR__ . "/../../includes/GlobalManager.php";
+require_once __DIR__ . "/../../vendor/autoload.php";
 
 $manager = GlobalManager::all([ShareManager::SCOPE_VIEW_EFFECTS]);
 
@@ -40,7 +47,7 @@ $manager = GlobalManager::all([ShareManager::SCOPE_VIEW_EFFECTS]);
 <!DOCTYPE html>
 <html lang="en">
 <?php
-require_once __DIR__ . "/../../includes/head/HtmlHead.php";
+
 $head = new HtmlHead("Smart Home - Profiles");
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::DEVICE_SCENES));
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::DEVICE_SCENES));
@@ -49,7 +56,6 @@ echo $head->toString();
 ?>
 <body>
 <?php
-require_once __DIR__."/../../includes/navbar/Nav.php";
 
 $scenes = Scene::allForUserId($manager->getSessionManager()->getUserId());
 

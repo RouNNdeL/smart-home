@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,21 +23,26 @@
  * SOFTWARE.
  */
 
+use App\GlobalManager;
+use App\Head\HtmlHead;
+use App\Utils;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
  * Date: 08/08/2017
  * Time: 20:16
  */
-require_once(__DIR__ . "/../../includes/Utils.php");
-require_once(__DIR__ . "/../../includes/GlobalManager.php");
+
+require_once __DIR__ . "/../../vendor/autoload.php";
+
 GlobalManager::withSessionManager();
 $lang = Utils::getInstance()->lang;
 echo <<<TAG
 <!DOCTYPE html>
 <html lang="$lang">
 TAG;
-require_once __DIR__."/../../includes/head/HtmlHead.php";
+
 $head = new HtmlHead("404 Error");
 echo $head->toString();
 $msg = Utils::getInstance()->getString("error_msg_404");

@@ -23,6 +23,12 @@
  * SOFTWARE.
  */
 
+use App\Database\ShareManager;
+use App\Devices\BaseEffectDevice;
+use App\Devices\RgbEffectDevice;
+use App\Effects\Effects\Effect;
+use App\GlobalManager;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -39,7 +45,7 @@ if($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit();
 }
 
-require_once __DIR__ . "/../includes/GlobalManager.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 
 $manager = GlobalManager::all([ShareManager::SCOPE_EDIT_EFFECTS]);
 

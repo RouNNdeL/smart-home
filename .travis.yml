@@ -1,14 +1,16 @@
-language: node_js
-node_js:
-    - "11"
+language: php
+php:
+    - 7.3
 
 before_script:
+    - nvm install 11
     - npm install grunt-cli -g
     - npm install grunt
 
 install:
     - scripts/download_jqueryui.sh
     - npm install
+    - composer install
 
 script:
     - npm run-script build

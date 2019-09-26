@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,9 @@
  * SOFTWARE.
  */
 
+use App\Database\ShareManager;
+use App\GlobalManager;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -39,7 +42,7 @@ if($_SERVER["REQUEST_METHOD"] !== "GET") {
     exit();
 }
 
-require_once __DIR__."/../includes/GlobalManager.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 
 $manager = GlobalManager::all([ShareManager::SCOPE_SIMPLE_CONTROL]);
 

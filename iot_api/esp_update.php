@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+use App\Logging\LocalDeviceLogger;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -36,7 +38,8 @@ if(!isset(apache_request_headers()["x-ESP8266-version"]) || !ctype_digit(apache_
     http_response_code(400);
     exit(0);
 }
-require_once __DIR__ . "/../includes/logging/LocalDeviceLogger.php";
+
+require_once __DIR__ . "/../vendor/autoload.php";
 
 $device_id = $_GET["device_id"];
 $version = (int)apache_request_headers()["x-ESP8266-version"];

@@ -23,20 +23,17 @@
  * SOFTWARE.
  */
 
+namespace App;
+
+use App\Database\{DbUtils, HomeUser};
+use App\OAuth\OAuthUtils;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
  * Date: 2018-05-17
  * Time: 18:46
  */
-
-require_once __DIR__ . "/database/DeviceDbHelper.php";
-require_once __DIR__ . "/UserDeviceManager.php";
-require_once __DIR__ . "/GlobalManager.php";
-require_once __DIR__ . "/effects/scenes/SceneManager.php";
-require_once __DIR__ . "/database/HomeUser.php";
-require_once __DIR__ . "/../includes/database/DbUtils.php";
-require_once __DIR__ . "/../includes/oauth/OAuthUtils.php";
 
 class ActionsRequestManager {
     const ACTION_INTENT_SYNC = "action.devices.SYNC";

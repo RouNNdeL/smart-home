@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+use App\Database\DbUtils;
+use App\Database\DeviceDbHelper;
+use App\Devices\EspWiFiLamp;
 
 /**
  * Created by PhpStorm.
@@ -46,8 +50,7 @@ if(!isset($_GET["device_id"])) {
     exit();
 }
 
-require_once __DIR__ . "/../includes/database/DbUtils.php";
-require_once __DIR__ . "/../includes/database/DeviceDbHelper.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 
 $device = DeviceDbHelper::queryPhysicalDeviceById(DbUtils::getConnection(), $_GET["device_id"]);
 if($device === null || !($device instanceof EspWiFiLamp)) {

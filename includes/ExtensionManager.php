@@ -23,16 +23,17 @@
  * SOFTWARE.
  */
 
+namespace App;
+
+use App\Effects\Scenes\SceneManager;
+use App\RemoteActions\RemoteActionManager;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
  * Date: 2019-06-11
  * Time: 15:31
  */
-
-require_once __DIR__ . "/effects/scenes/SceneManager.php";
-require_once __DIR__ . "/remote_actions/RemoteActionManager.php";
-
 
 abstract class ExtensionManager {
     public abstract function getSync();

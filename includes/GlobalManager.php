@@ -23,18 +23,19 @@
  * SOFTWARE.
  */
 
+namespace App;
+
+use App\Database\{IpTrustManager, SessionManager};
+use App\Logging\RequestLogger;
+use App\RemoteActions\RemoteActionManager;
+use UnexpectedValueException;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
  * Date: 2018-06-04
  * Time: 17:17
  */
-
-require_once __DIR__ . "/database/IpTrustManager.php";
-require_once __DIR__ . "/database/SessionManager.php";
-require_once __DIR__ . "/UserDeviceManager.php";
-require_once __DIR__ . "/ExtensionManager.php";
-require_once __DIR__ . "/logging/RequestLogger.php";
 
 class GlobalManager {
     const LOG = true;
@@ -152,6 +153,7 @@ class GlobalManager {
     /**
      * Only use when user has already been authenticated
      * @param int $user_id
+     * @return GlobalManager
      */
     public static function withUserOverride(int $user_id, bool $ip_trust_manager = true) {
         $manager = GlobalManager::getInstance();

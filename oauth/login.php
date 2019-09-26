@@ -23,6 +23,15 @@
  * SOFTWARE.
  */
 
+use App\Database\DbUtils;
+use App\Database\IpTrustManager;
+use App\Database\SessionManager;
+use App\GlobalManager;
+use App\Head\HtmlHead;
+use App\Head\JavaScriptEntry;
+use App\Head\StyleSheetEntry;
+use App\OAuth\{ApiClient, OAuthUtils};
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -30,13 +39,9 @@
  * Time: 14:34
  */
 
-require_once __DIR__ . "/../includes/GlobalManager.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 
 $manager = GlobalManager::minimal();
-
-require_once __DIR__ . "/../includes/oauth/ApiClient.php";
-require_once __DIR__ . "/../includes/oauth/OAuthUtils.php";
-require_once __DIR__ . "/../includes/database/DbUtils.php";
 
 if(!isset($_GET["client_id"]) || !isset($_GET["redirect_uri"]) || !isset($_GET["state"]) || !isset($_GET["scope"])
     || !isset($_GET["response_type"]) || $_GET["response_type"] !== "code") {
@@ -60,12 +65,12 @@ if($client === null) {
 }
 
 $manager->loadSessionManager(false);
-if(isset($_POST["oauth-username"]) && isset($_POST["oauth-password"]) && !$manager->getSessionManager()->isLoggedIn()) {
+if(isset($_POST["OAuth-username"]) && isset($_POST["OAuth-password"]) && !$manager->getSessionManager()->isLoggedIn()) {
     $captcha_present = isset($_POST["g-recaptcha-response"]) && $_POST["g-recaptcha-response"] !== null &&
         strlen($_POST["g-recaptcha-response"]) > 0;
     if($manager->getIpTrustManager()->isTrusted() || $captcha_present) {
         if(!$captcha_present || SessionManager::validateCaptchaAuto($_POST["g-recaptcha-response"])) {
-            $success = $manager->getSessionManager()->attemptLoginAuto($_POST["oauth-username"], $_POST["oauth-password"]);
+            $success = $manager->getSessionManager()->attemptLoginAuto($_POST["OAuth-username"], $_POST["OAuth-password"]);
             if($success) {
                 $manager->getIpTrustManager()->heatUp(IpTrustManager::HEAT_SUCCESSFUL_LOGIN);
             } else {
@@ -82,7 +87,6 @@ if(isset($_POST["oauth-username"]) && isset($_POST["oauth-password"]) && !$manag
 
 if($manager->getSessionManager()->isLoggedIn()) {
     //TODO: Implement 2FA if the user has enabled it
-    require_once __DIR__ . "/../includes/oauth/OAuthUtils.php";
     $code = urlencode(OAuthUtils::insertAuthCode(DbUtils::getConnection(), $client->id,
         $manager->getSessionManager()->getUserId(), $_GET["scope"]));
     $state = $_GET["state"];
@@ -95,7 +99,6 @@ if($manager->getSessionManager()->isLoggedIn()) {
 <html lang="en">
 <?php
 
-require_once __DIR__ . "/../includes/head/HtmlHead.php";
 $head = new HtmlHead("Login to Smart Home");
 $head->addEntry(new StyleSheetEntry(StyleSheetEntry::LOGIN));
 $head->addEntry(new JavaScriptEntry(JavaScriptEntry::CAPTCHA));
@@ -139,7 +142,7 @@ HTML;
                 </div>
                 <?php
                 foreach($_GET as $name => $value) {
-                    if(strpos($name, "oauth-") === false) {
+                    if(strpos($name, "OAuth-") === false) {
                         $name = htmlspecialchars($name);
                         $value = htmlspecialchars($value);
                         echo '<input type="hidden" name="' . $name . '" value="' . $value . '">';

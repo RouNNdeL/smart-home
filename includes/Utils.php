@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+namespace App;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek

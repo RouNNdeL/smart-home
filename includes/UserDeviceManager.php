@@ -23,6 +23,12 @@
  * SOFTWARE.
  */
 
+namespace App;
+
+use App\Database\{DbUtils, DeviceDbHelper, HomeUser, ShareManager};
+use App\Devices\{PhysicalDevice, VirtualDevice};
+use InvalidArgumentException;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -30,12 +36,6 @@
  * Time: 21:10
  */
 
-require_once __DIR__ . "/../vendor/autoload.php";
-require_once __DIR__ . "/database/DbUtils.php";
-require_once __DIR__ . "/database/HomeUser.php";
-require_once __DIR__ . "/database/DeviceDbHelper.php";
-require_once __DIR__ . "/database/ShareManager.php";
-require_once __DIR__ . "/../secure_config.php";
 
 class UserDeviceManager {
     /** @var PhysicalDevice[] */

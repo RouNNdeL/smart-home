@@ -2,7 +2,7 @@
 /**
  * MIT License
  *
- * Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+ * Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,8 @@
  * SOFTWARE.
  */
 
+use App\Utils;
+
 /**
  * Created by PhpStorm.
  * User: Krzysiek
@@ -40,9 +42,11 @@ if($_SERVER['REQUEST_METHOD'] !== 'GET')
 if(!isset($_GET["name"]))
 {
     http_response_code(400);
-    echo "{\"status\":\"error\",\"message\":\"Missing arguments\"}";
+    echo "{\"status\":\"error\",\"message\":\"Missing Arguments\"}";
     exit(0);
 }
-require_once(__DIR__ . "/../web/includes/Utils.php");
+
+require_once __DIR__ . "/../vendor/autoload.php";
+
 $string =  Utils::getString($_GET["name"]);
 echo json_encode(array("status" => "success", "string" => $string));
