@@ -1,16 +1,21 @@
 language: php
 php:
-    - 7.3
+  - 7.3
 
 before_script:
-    - npm install grunt-cli -g
-    - npm install grunt
+  - npm install grunt-cli -g
+  - npm install grunt
 
 install:
-    - scripts/download_jqueryui.sh
-    - nvm install 11
-    - npm install
-    - composer install
+  - scripts/download_jqueryui.sh
+  - nvm install 11
+  - npm install
+  - composer install
 
 script:
-    - npm run-script build
+  - npm run-script build
+
+cache:
+  npm: true
+  directories:
+    - $HOME/.composer/cache/files
