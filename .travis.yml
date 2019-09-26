@@ -3,12 +3,12 @@ php:
     - 7.3
 
 before_script:
-    - nvm install 11
     - npm install grunt-cli -g
     - npm install grunt
 
 install:
     - scripts/download_jqueryui.sh
+    - nvm install 11
     - npm install
     - npm rebuild node-sass
     - composer install
