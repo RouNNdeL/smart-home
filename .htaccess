@@ -9,6 +9,7 @@ RewriteRule ^ /iot_api%{REQUEST_URI} [END]
 RewriteCond %{SERVER_NAME} !dev.zdul.xyz
 RewriteCond %{SERVER_NAME} !bets.zdul.xyz
 RewriteCond %{SERVER_NAME} !home.zdul.xyz
+RewriteCond %{SERVER_NAME} !pw.zdul.xyz
 RewriteCond %{SERVER_NAME} !192.168.1.10
 RewriteRule ^ https://home.zdul.xyz%{REQUEST_URI} [END,R=permanent]
 
