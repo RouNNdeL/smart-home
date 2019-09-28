@@ -16,7 +16,7 @@ RewriteRule ^ https://home.zdul.xyz%{REQUEST_URI} [END,R=permanent]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)/$ /$1 [L,R=301]
 
-RewriteRule ^$ /login [L]
+RewriteRule ^$ /pw [L]
 RewriteRule ^/?effect/.*?/(.+)$ /device_effect?device_id=$1 [L]
 RewriteRule ^/?effect/(.+)$ /device_effect?device_id=$1&name=false [L]
 RewriteRule ^/?scenes /device_scenes [L]
