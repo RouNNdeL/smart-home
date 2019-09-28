@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ "$#" -ne 3 ]; then
-    echo "3 Arguments required (db user, db password, dir)"
+    echo "3 arguments required (db user, db password, dir)"
     exit
 fi
 

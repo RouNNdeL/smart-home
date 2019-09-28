@@ -236,7 +236,7 @@ class IrRemote extends PhysicalDevice {
             <h4>$this->display_name</h4>
         </div>
         <div class="col-auto float-right pr-0 pl-2 align-self-center">
-            <button class="btn btn-danger full-width Ir-multi-action-btn" 
+            <button class="btn btn-danger full-width ir-multi-action-btn" 
              data-action-delay="250"
             data-action-id="av_power_off _ tv_power_off _ horizon_power_toggle"
             data-device-id="av _ tv _ horizon"
@@ -245,7 +245,7 @@ class IrRemote extends PhysicalDevice {
             </button>
         </div>
         <div class="col-auto float-right pl-1 pr-1 align-self-center">
-            <button class="btn btn-success full-width Ir-multi-action-btn" 
+            <button class="btn btn-success full-width ir-multi-action-btn" 
             data-action-delay="250"
             data-action-id="tv_power_on _ av_power_on _ horizon_power_toggle"
             data-device-id="tv _ av _ horizon"
