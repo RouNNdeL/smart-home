@@ -80,7 +80,7 @@ class VirtualIrActionsDevice extends VirtualDevice {
             $action_name = $remote_action->getName();
             $action_buttons .= <<<HTML
             <div class="col col-24 py-2">
-                <button class="btn btn-info full-width Ir-action-btn" data-remote-action-id="$action_id" 
+                <button class="btn btn-info full-width ir-action-btn" data-remote-action-id="$action_id" 
                 role="button" type="button">$action_name</button>
             </div>
 HTML;
