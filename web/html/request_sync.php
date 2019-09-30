@@ -32,7 +32,7 @@ use App\UserDeviceManager;
  * Time: 21:14
  */
 
-require_once __DIR__ . "/../../vendor/autoload.php";
+require_once __DIR__ . "/../../autoload.php";
 
 header("Content-Type: application/json");
 

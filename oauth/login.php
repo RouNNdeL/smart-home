@@ -39,7 +39,7 @@ use App\OAuth\{ApiClient, OAuthUtils};
  * Time: 14:34
  */
 
-require_once __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__ . "/../autoload.php";
 
 $manager = GlobalManager::minimal();
 

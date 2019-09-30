@@ -37,7 +37,7 @@ use App\Head\StyleSheetEntry;
  * Time: 14:34
  */
 
-require_once __DIR__ . "/../../vendor/autoload.php";
+require_once __DIR__ . "/../../autoload.php";
 
 $manager = GlobalManager::withSessionManager(false, false);
 
@@ -126,7 +126,7 @@ TAG;
                            name="username" autocapitalize="off">
                 </div>
                 <div class="form-group">
-                    <label for="login-username">Password</label>
+                    <label for="login-password">Password</label>
                     <input type="password" class="form-control" id="login-password" placeholder="Password"
                            name="password">
                 </div>

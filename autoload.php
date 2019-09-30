@@ -23,26 +23,7 @@
  * SOFTWARE.
  */
 
-use App\UserDeviceManager;
+require_once __DIR__ . "/vendor/autoload.php";
 
-/**
- * Created by PhpStorm.
- * User: Krzysiek
- * Date: 2018-06-28
- * Time: 00:00
- */
-
-if(php_sapi_name() != 'cli') exit;
-
-require_once __DIR__."/../autoload.php";
-
-if(isset($argv[1])) {
-    $manager = UserDeviceManager::forUserId($argv[1]);
-    if($manager === null) {
-        throw new InvalidArgumentException("Invalid user id: $argv[1]");
-    }
-    $manager->sendReportState();
-}
-else {
-    echo "You need to provide a user id";
-}
+$dotenv = Dotenv\Dotenv::create(__DIR__);
+$dotenv->load();

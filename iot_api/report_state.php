@@ -50,7 +50,7 @@ if(!isset($_GET["device_id"])) {
     exit();
 }
 
-require_once __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__ . "/../autoload.php";
 
 $device = DeviceDbHelper::queryPhysicalDeviceById(DbUtils::getConnection(), $_GET["device_id"]);
 if($device === null || !($device instanceof EspWiFiLamp)) {

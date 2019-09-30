@@ -39,7 +39,7 @@ if($_SERVER["REQUEST_METHOD"] !== "GET" || !isset($_GET["id"])) {
     exit(0);
 }
 
-require_once __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__ . "/../autoload.php";
 
 $manager = GlobalManager::withSessionManager(false);
 

@@ -34,8 +34,6 @@ namespace App\Database;
 
 use mysqli;
 
-require_once __DIR__ . "/../../secure_config.php";
-
 class DbUtils {
     /** @var mysqli */
     private static $connection = null;
@@ -47,7 +45,8 @@ class DbUtils {
 
         if(self::$connection === null) {
             mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-            return self::$connection = new mysqli("localhost", DB_USERNAME, DB_PASSWORD, "smart_home");
+            return self::$connection = new mysqli(getenv("DB_HOST"), getenv("DB_USERNAME"),
+                getenv("DB_PASSWORD"), getenv("DB_NAME"));
         } else {
             return self::$connection;
         }

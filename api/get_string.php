@@ -46,7 +46,7 @@ if(!isset($_GET["name"]))
     exit(0);
 }
 
-require_once __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__ . "/../autoload.php";
 
 $string =  Utils::getString($_GET["name"]);
 echo json_encode(array("status" => "success", "string" => $string));
