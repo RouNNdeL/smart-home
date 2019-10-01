@@ -86,7 +86,8 @@ echo $head->toString();
                 <p><span>Course: <span id="modal-student-course">modal-student-course</span></span></p>
                 <h1 id="modal-student-points" class="text-big text-center">-</h1>
                 <div class="text-center">
-                    <button id="modal-show-points-btn" role="button" type="button" class="btn btn-primary">Show points</button>
+                    <button id="modal-roll-points-btn" role="button" type="button" class="btn btn-primary">Roll points</button>
+                    <button id="modal-show-points-btn" role="button" type="button" class="btn btn-secondary">Show points</button>
                 </div>
             </div>
         </div>

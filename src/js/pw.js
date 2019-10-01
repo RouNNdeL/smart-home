@@ -134,24 +134,44 @@ $(function() {
             $("#modal-student-course").text(course);
             $("#modal-student-points").text("-");
 
+            const roll_points_btn = $("#modal-roll-points-btn");
             const show_points_btn = $("#modal-show-points-btn");
-            show_points_btn.off("click");
-            show_points_btn.attr("disabled", false);
-            show_points_btn.click(async function() {
+
+            let point_override = false;
+
+            roll_points_btn.off("click");
+            roll_points_btn.attr("disabled", false);
+            roll_points_btn.click(async function() {
                 $(this).attr("disabled", true);
                 let current_points = 0;
                 let delay = POINT_ROLL_DEFAULT_DELAY;
                 const slowdown_threshold = Math.round(
                     Math.random() * POINT_ROLL_SLOWDOWN_THRESHOLD_SPAN + POINT_ROLL_SLOWDOWN_THRESHOLD_MIN);
+
                 while(points > current_points) {
                     if(points - current_points < slowdown_threshold) {
                         delay += Math.round(
                             Math.random() * POINT_ROLL_SLOWDOWN_VALUE_SPAN + POINT_ROLL_SLOWDOWN_VALUE_MIN);
                     }
+
                     current_points++;
+                    if(point_override) {
+                        break;
+                    }
+
                     $("#modal-student-points").text(current_points);
                     await sleep(delay);
                 }
+                show_points_btn.attr("disabled", true);
+            });
+
+            show_points_btn.off("click");
+            show_points_btn.attr("disabled", false);
+            show_points_btn.click(function() {
+                $(this).attr("disabled", true);
+                roll_points_btn.attr("disabled", true);
+                point_override = true;
+                $("#modal-student-points").text(points);
             });
 
             $("#student-modal").modal("show");
