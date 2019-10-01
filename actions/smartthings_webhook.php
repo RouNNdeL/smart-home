@@ -23,26 +23,25 @@
  * SOFTWARE.
  */
 
-use App\UserDeviceManager;
+use App\Logging\RequestLogger;
+use App\SmartThingsRequestManager;
 
-/**
- * Created by PhpStorm.
- * User: Krzysiek
- * Date: 2018-06-28
- * Time: 00:00
- */
+require_once __DIR__ . "/../autoload.php";
 
-if(php_sapi_name() != 'cli') exit;
+$logger = RequestLogger::getInstance(false);
 
-require_once __DIR__."/../autoload.php";
-
-if(isset($argv[1])) {
-    $manager = UserDeviceManager::forUserId($argv[1]);
-    if($manager === null) {
-        throw new InvalidArgumentException("Invalid user id: $argv[1]");
-    }
-    $manager->sendActionsReportState();
+$request = json_decode(file_get_contents("php://input"), true);
+if(!isset($request["authentication"]) || !is_array($request["authentication"]) ||
+    !isset($request["authentication"]["tokenType"]) || !isset($request["authentication"]["token"]) ||
+    $request["authentication"]["tokenType"] !== "Bearer") {
+    echo json_encode(["error" => "invalid_request"]);
+    http_response_code(400);
+    exit(0);
 }
-else {
-    echo "You need to provide a user id";
+
+$response = SmartThingsRequestManager::processRequest($request);
+$json = json_encode($response);
+echo $json;
+if(isset($response["error"])) {
+    $logger->addDebugInfo($json);
 }

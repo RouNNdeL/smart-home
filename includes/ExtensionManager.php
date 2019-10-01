@@ -34,13 +34,18 @@ use App\RemoteActions\RemoteActionManager;
  * Date: 2019-06-11
  * Time: 15:31
  */
-
 abstract class ExtensionManager {
-    public abstract function getSync();
+    public abstract function getActionsSync();
 
-    public abstract function processQuery(array $payload);
+    public abstract function processActionsQuery(array $payload);
 
-    public abstract function processExecute(array $payload);
+    public abstract function processActionsExecute(array $payload);
+
+    public abstract function getSmartThingsDiscovery();
+
+    public abstract function processSmartThingsCommand(array $payload): ?array;
+
+    public abstract function getSmartThingsState(): ?array;
 
     public static function getExtensionManagersByUserId(int $user_id) {
         return [SceneManager::forUserId($user_id), RemoteActionManager::forUserId($user_id)];

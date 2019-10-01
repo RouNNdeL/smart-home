@@ -36,8 +36,6 @@ use UnexpectedValueException;
  * Date: 2018-05-16
  * Time: 14:15
  */
-
-
 abstract class BaseEffectDevice extends SimpleRgbDevice {
     const ACTIONS_TOGGLE_EFFECT = "effect";
 
@@ -67,17 +65,21 @@ abstract class BaseEffectDevice extends SimpleRgbDevice {
      * @param array $synonyms
      * @param bool $home_actions
      * @param bool $will_report_state
+     * @param bool $smart_things
      * @param int $color
      * @param int $brightness
      * @param bool $on
      * @param int $toggles
+     * @param null $max_color_count
+     * @param null $max_effect_count
+     * @param null $max_active_effect_count
      */
     public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions,
-                                bool $will_report_state, int $color = 0xffffff, int $brightness = 100,
+                                bool $will_report_state, bool $smart_things, int $color = 0xffffff, int $brightness = 100,
                                 bool $on = true, int $toggles = 0,
                                 $max_color_count = null, $max_effect_count = null, $max_active_effect_count = null
     ) {
-        parent::__construct($device_id, $device_name, $synonyms, $home_actions, $will_report_state, $color, $brightness, $on);
+        parent::__construct($device_id, $device_name, $synonyms, $home_actions, $will_report_state, $smart_things, $color, $brightness, $on);
         $this->effects_enabled = $toggles & (1 << BaseEffectDevice::TOGGLE_EFFECT_BIT);
         $this->max_color_count = $max_color_count;
         $this->max_effect_count = $max_effect_count;
@@ -125,14 +127,14 @@ abstract class BaseEffectDevice extends SimpleRgbDevice {
         return $json;
     }
 
-    public function getTraits() {
-        $array = parent::getTraits();
+    public function getActionsTraits() {
+        $array = parent::getActionsTraits();
         array_push($array, self::DEVICE_TRAIT_TOGGLES);
         return $array;
     }
 
-    public function getAttributes() {
-        $attributes = parent::getAttributes();
+    public function getActionsAttributes() {
+        $attributes = parent::getActionsAttributes();
         $name_values = [];
         $name_values[] = ["lang" => "en", "name_synonym" =>
             ["effect", "Effects", "light effect", "light Effects", "led Effects"]];

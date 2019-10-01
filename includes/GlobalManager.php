@@ -36,7 +36,6 @@ use UnexpectedValueException;
  * Date: 2018-06-04
  * Time: 17:17
  */
-
 class GlobalManager {
     const LOG = true;
 
@@ -99,27 +98,57 @@ class GlobalManager {
     }
 
     public function actionsGetSync() {
-        $payload = $this->userDeviceManager->getSync();
+        $payload = $this->userDeviceManager->getActionsSync();
         foreach($this->extensionManagers as $extensionManager) {
-            $payload = array_merge($payload, $extensionManager->getSync());
+            $payload = array_merge($payload, $extensionManager->getActionsSync());
         }
         return $payload;
     }
 
     public function actionsProcessQuery(array $payload) {
-        $response = $this->userDeviceManager->processQuery($payload);
+        $response = $this->userDeviceManager->processActionsQuery($payload);
         foreach($this->extensionManagers as $extensionManager) {
-            $response = array_merge($response, $extensionManager->processQuery($payload));
+            $response = array_merge($response, $extensionManager->processActionsQuery($payload));
         }
         return $response;
     }
 
     public function actionsProcessExecute(array $payload) {
-        $response = $this->userDeviceManager->processExecute($payload);
+        $response = $this->userDeviceManager->processActionsExecute($payload);
         foreach($this->extensionManagers as $extensionManager) {
-            $response = array_merge($response, $extensionManager->processExecute($payload));
+            $response = array_merge($response, $extensionManager->processActionsExecute($payload));
         }
         return $response;
+    }
+
+    public function getSmartThingsDiscovery() {
+        $payload = $this->userDeviceManager->getSmartThingsDiscovery();
+        foreach($this->extensionManagers as $extensionManager) {
+            $payload = array_merge($payload, $extensionManager->getSmartThingsDiscovery());
+        }
+        return $payload;
+    }
+
+    public function processSmartThingsCommand(array $payload) {
+        $response = $this->userDeviceManager->processSmartThingsCommand($payload);
+        foreach($this->extensionManagers as $extensionManager) {
+            $manager_response = $extensionManager->processSmartThingsCommand($payload);
+            if($manager_response !== null) {
+                $response = array_merge($response, $manager_response);
+            }
+        }
+        return $response;
+    }
+
+    public function getSmartThingsState() {
+        $payload = $this->userDeviceManager->getSmartThingsState();
+        foreach($this->extensionManagers as $extensionManager) {
+            $smartThingsState = $extensionManager->getSmartThingsState();
+            if($smartThingsState !== null) {
+                $payload = array_merge($payload, $smartThingsState);
+            }
+        }
+        return $payload;
     }
 
     /**

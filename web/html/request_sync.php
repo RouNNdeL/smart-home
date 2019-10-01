@@ -32,15 +32,15 @@ use App\UserDeviceManager;
  * Time: 21:14
  */
 
-require_once __DIR__ . "/../../vendor/autoload.php";
+require_once __DIR__ . "/../../autoload.php";
 
 header("Content-Type: application/json");
 
 if(isset($_GET["user_id"]))
 {
-    echo json_encode(UserDeviceManager::forUserId($_GET["user_id"])->requestSync());
+    echo json_encode(UserDeviceManager::forUserId($_GET["user_id"])->requestActionsSync());
 }
 else
 {
-    echo json_encode(UserDeviceManager::requestSyncForAll());
+    echo json_encode(UserDeviceManager::requestActionsSyncForAll());
 }

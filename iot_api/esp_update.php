@@ -39,7 +39,7 @@ if(!isset(apache_request_headers()["x-ESP8266-version"]) || !ctype_digit(apache_
     exit(0);
 }
 
-require_once __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__ . "/../autoload.php";
 
 $device_id = $_GET["device_id"];
 $version = (int)apache_request_headers()["x-ESP8266-version"];

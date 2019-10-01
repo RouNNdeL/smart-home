@@ -7,3 +7,4 @@ dist/
 lib/jquery-ui
 /home_graph_key.json
 /database.mwb.*
+.env

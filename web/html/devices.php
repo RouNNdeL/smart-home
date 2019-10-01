@@ -37,7 +37,7 @@ use App\Navbar\Nav;
  * Time: 14:34
  */
 
-require_once __DIR__ . "/../../vendor/autoload.php";
+require_once __DIR__ . "/../../autoload.php";
 
 $manager = GlobalManager::all([ShareManager::SCOPE_SIMPLE_CONTROL]);
 

@@ -52,7 +52,7 @@ if($json === false || !isset($json["device_id"]))
     exit(0);
 }
 
-require_once __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__ . "/../autoload.php";
 $device_id = $json["device_id"];
 $device = DeviceDbHelper::queryPhysicalDeviceById(DbUtils::getConnection(), $device_id);
 if($device === null)

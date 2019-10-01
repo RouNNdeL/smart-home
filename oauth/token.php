@@ -53,7 +53,7 @@ if(!isset($params["client_id"]) || !isset($params["client_secret"]) || !isset($p
     exit(0);
 }
 
-require_once __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__ . "/../autoload.php";
 
 $client = ApiClient::queryClientById(DbUtils::getConnection(), $params["client_id"]);
 

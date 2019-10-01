@@ -36,17 +36,16 @@ use App\RemoteActions\RemoteAction;
 if(php_sapi_name() != 'cli') exit;
 
 if(isset($argv[1]) && isset($argv[2])) {
-    require_once __DIR__ . "/../includes/UserDeviceManager.php";
+
+    require_once __DIR__ . "/../autoload.php";
+
     $manager = GlobalManager::withUserOverride($argv[2], false)->getUserDeviceManager();
     if($manager === null) {
         throw new InvalidArgumentException("Invalid user id: $argv[2]");
     }
 
-    require_once __DIR__ . "/../includes/RemoteActions/RemoteAction.php";
-
     $action = RemoteAction::byId($argv[1]);
     $action->executeAction($manager);
-}
-else {
+} else {
     echo "You need to provide an action id and user id";
 }

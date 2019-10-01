@@ -51,7 +51,7 @@ if($json === false || !isset($json["device_id"]) || !isset($json["device_port"])
     exit();
 }
 
-require_once __DIR__ . "/../vendor/autoload.php";
+require_once __DIR__ . "/../autoload.php";
 
 $success = DeviceDbHelper::updateDeviceConnectionInfo(DbUtils::getConnection(),
     $json["device_id"], $_SERVER["REMOTE_ADDR"], $json["device_port"]);

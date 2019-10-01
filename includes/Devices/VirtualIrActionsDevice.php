@@ -35,7 +35,7 @@ class VirtualIrActionsDevice extends VirtualDevice {
 
     public function __construct(array $remote_actions) {
         parent::__construct("virtualized_ir_actions", Utils::getString("ir_actions"), [],
-            VirtualDevice::DEVICE_TYPE_VIRTUALIZED, false, false);
+            VirtualDevice::DEVICE_TYPE_VIRTUALIZED, false, false, false);
         $this->remote_actions = $remote_actions;
     }
 
@@ -80,7 +80,7 @@ class VirtualIrActionsDevice extends VirtualDevice {
             $action_name = $remote_action->getName();
             $action_buttons .= <<<HTML
             <div class="col col-24 py-2">
-                <button class="btn btn-info full-width Ir-action-btn" data-remote-action-id="$action_id" 
+                <button class="btn btn-info full-width ir-action-btn" data-remote-action-id="$action_id" 
                 role="button" type="button">$action_name</button>
             </div>
 HTML;
@@ -102,7 +102,7 @@ HTML;
         return $html;
     }
 
-    public function getSyncJson() {
+    public function getActionsSyncJson() {
         return null;
     }
 
@@ -113,7 +113,7 @@ HTML;
         return false;
     }
 
-    public function getAttributes() {
+    public function getActionsAttributes() {
         return null;
     }
 
@@ -121,7 +121,22 @@ HTML;
         return null;
     }
 
-    public function getTraits() {
+    public function getActionsTraits() {
         return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSmartThingsHandlerType(): ?string {
+        return null;
+    }
+
+    public function getSmartThingsState(bool $online): ?array {
+        return null;
+    }
+
+    public function processSmartThingsCommand($commands) {
+        // Ignored, handled by RemoteActionManager
     }
 }

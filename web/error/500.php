@@ -34,7 +34,7 @@ use App\Utils;
  * Time: 15:32
  */
 
-require_once __DIR__ . "/../../vendor/autoload.php";
+require_once __DIR__ . "/../../autoload.php";
 
 GlobalManager::withSessionManager();
 $lang = Utils::getInstance()->lang;

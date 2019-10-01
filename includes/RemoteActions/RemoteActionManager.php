@@ -34,8 +34,6 @@ use App\ExtensionManager;
  * Date: 2019-06-11
  * Time: 15:30
  */
-
-
 class RemoteActionManager extends ExtensionManager {
     /** @var RemoteAction[] */
     private $actions;
@@ -54,7 +52,7 @@ class RemoteActionManager extends ExtensionManager {
     }
 
 
-    public function getSync() {
+    public function getActionsSync() {
         $payload = [];
         foreach($this->actions as $action) {
             if(!$action->isDeactivate()) {
@@ -64,7 +62,7 @@ class RemoteActionManager extends ExtensionManager {
         return $payload;
     }
 
-    public function processQuery(array $payload) {
+    public function processActionsQuery(array $payload) {
         $response = [];
         foreach($payload["devices"] as $d) {
             $scene = $this->getActionByPrefixedId($d["id"]);
@@ -111,7 +109,7 @@ class RemoteActionManager extends ExtensionManager {
         return true;
     }
 
-    public function processExecute(array $payload) {
+    public function processActionsExecute(array $payload) {
         $ids = [];
         foreach($payload["commands"] as $command) {
             foreach($command["devices"] as $d) {
@@ -166,5 +164,17 @@ class RemoteActionManager extends ExtensionManager {
      */
     public static function forUserId(int $user_id) {
         return new RemoteActionManager(RemoteAction::forUserId($user_id), $user_id);
+    }
+
+    public function getSmartThingsDiscovery() {
+        return [];
+    }
+
+    public function processSmartThingsCommand(array $payload): ?array {
+        return null;
+    }
+
+    public function getSmartThingsState(): ?array {
+        return null;
     }
 }

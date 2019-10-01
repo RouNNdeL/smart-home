@@ -35,8 +35,6 @@ use InvalidArgumentException;
  * Date: 2018-05-16
  * Time: 21:10
  */
-
-
 class UserDeviceManager {
     /** @var PhysicalDevice[] */
     private $physical_devices;
@@ -57,7 +55,7 @@ class UserDeviceManager {
         $this->physical_devices = $physical_devices;
     }
 
-    public function sendReportState(string $requestId = null) {
+    public function sendActionsReportState(string $requestId = null) {
         $api_key = DbUtils::getSecret("smart_home_api_key");
         $states = [];
         foreach($this->physical_devices as $physicalDevice) {
@@ -101,7 +99,7 @@ class UserDeviceManager {
         return $stmt->execute();
     }
 
-    public function processExecute(array $payload) {
+    public function processActionsExecute(array $payload) {
         $commands_response = [];
         foreach($this->physical_devices as $device) {
             $result = $device->handleAssistantAction($payload);
@@ -117,7 +115,7 @@ class UserDeviceManager {
         return $commands_response;
     }
 
-    public function processQuery(array $payload) {
+    public function processActionsQuery(array $payload) {
         $response = [];
         foreach($payload["devices"] as $device) {
             $id = $device["id"];
@@ -156,11 +154,11 @@ class UserDeviceManager {
         return null;
     }
 
-    public function getSync() {
+    public function getActionsSync() {
         $devices_payload = [];
         foreach($this->physical_devices as $device) {
             foreach($device->getVirtualDevices() as $virtualDevice) {
-                $syncJson = $virtualDevice->getSyncJson();
+                $syncJson = $virtualDevice->getActionsSyncJson();
                 if($syncJson !== null)
                     $devices_payload[] = $syncJson;
             }
@@ -190,15 +188,15 @@ class UserDeviceManager {
     /**
      * @return array
      */
-    public static function requestSyncForAll() {
+    public static function requestActionsSyncForAll() {
         $responses = [];
         foreach(HomeUser::queryAllRegistered(DbUtils::getConnection()) as $user) {
-            $responses[$user->id] = UserDeviceManager::forUserId($user->id)->requestSync();
+            $responses[$user->id] = UserDeviceManager::forUserId($user->id)->requestActionsSync();
         }
         return $responses;
     }
 
-    public function requestSync() {
+    public function requestActionsSync() {
         $api_key = DbUtils::getSecret("smart_home_api_key");
         $payload = ["agentUserId" => (string)($this->user_id), "async" => true];
 
@@ -215,6 +213,46 @@ class UserDeviceManager {
         curl_close($ch);
 
         return $response;
+    }
+
+    public function getSmartThingsDiscovery() {
+        $devices_payload = [];
+        foreach($this->physical_devices as $device) {
+            foreach($device->getVirtualDevices() as $virtualDevice) {
+                $discoveryJson = $virtualDevice->getSmartThingsDiscoveryJson();
+                if($discoveryJson !== null)
+                    $devices_payload[] = $discoveryJson;
+            }
+        }
+        return $devices_payload;
+    }
+
+    public function processSmartThingsCommand(array $payload) {
+        $commands_response = [];
+        foreach($this->physical_devices as $device) {
+            $result = $device->handleSmartThingsCommand($payload);
+            $commands_response = array_merge($commands_response, $result);
+        }
+
+        return $commands_response;
+    }
+
+    public function getSmartThingsState() {
+        $devices_payload = [];
+        foreach($this->physical_devices as $device) {
+            $online = $device->isOnline();
+            foreach($device->getVirtualDevices() as $virtualDevice) {
+                $state = $virtualDevice->getSmartThingsState($online);
+                if($state !== null) {
+                    $devices_payload[] = [
+                        "externalDeviceId" => $virtualDevice->getDeviceId(),
+                        "deviceCookie" => [],
+                        "states" => $state
+                    ];
+                }
+            }
+        }
+        return $devices_payload;
     }
 
     public static function forUserId(int $id) {
