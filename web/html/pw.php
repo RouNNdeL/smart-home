@@ -27,7 +27,7 @@ use App\GlobalManager;
 use App\Head\{HtmlHead, JavaScriptEntry};
 use App\PwStalker\{Course, Department, PwDbUtils};
 
-require_once __DIR__ . "/../../vendor/autoload.php";
+require_once __DIR__ . "/../../autoload.php";
 
 $manager = GlobalManager::withSessionManager();
 
