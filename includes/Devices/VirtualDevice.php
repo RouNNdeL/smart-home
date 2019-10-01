@@ -33,8 +33,6 @@ use InvalidArgumentException;
  * Date: 2018-05-14
  * Time: 17:51
  */
-
-
 abstract class VirtualDevice {
     const DEVICE_TYPE_RGB = "DEVICE_RGB";
     const DEVICE_TYPE_EFFECTS_RGB_ANALOG = "DEVICE_EFFECTS_RGB_ANALOG";
@@ -105,6 +103,22 @@ abstract class VirtualDevice {
     const DEVICE_COMMAND_MEDIA_SEEK_TO_POSITION = "action.devices.commands.mediaSeekToPosition";
     const DEVICE_COMMAND_SET_MODES = "action.devices.commands.SetModes";
 
+    const ST_CAPABILITY_SWITCH = "st.switch";
+    const ST_CAPABILITY_SWITCH_LEVEL = "st.switchLevel";
+    const ST_CAPABILITY_COLOR_CONTROL = "st.colorControl";
+    const ST_CAPABILITY_HEALTH_CHECK = "st.healthCheck";
+
+    const ST_ATTRIBUTE_SWITCH = "switch";
+    const ST_ATTRIBUTE_SWITCH_LEVEL = "level";
+    const ST_ATTRIBUTE_HEALTH_STATUS = "healthStatus";
+    const ST_ATTRIBUTE_HUE = "hue";
+    const ST_ATTRIBUTE_SATURATION = "saturation";
+
+    const ST_COMMAND_SET_LEVEL = "setLevel";
+    const ST_COMMAND_SET_COLOR = "setColor";
+    const ST_COMMAND_ON = "on";
+    const ST_COMMAND_OFF = "off";
+
     /** @var string */
     protected $device_type;
     /** @var string */
@@ -117,6 +131,8 @@ abstract class VirtualDevice {
     protected $home_actions;
     /** @var  bool */
     protected $will_report_state;
+    /** @var bool */
+    protected $smart_things;
 
     /**
      * VirtualDevice constructor.
@@ -126,9 +142,10 @@ abstract class VirtualDevice {
      * @param string $device_type
      * @param bool $home_actions
      * @param bool $will_report_state
+     * @param bool $smart_things
      */
     public function __construct(string $device_id, string $device_name, array $synonyms, string $device_type,
-                                bool $home_actions, bool $will_report_state
+                                bool $home_actions, bool $will_report_state, bool $smart_things
     ) {
         $this->device_id = $device_id;
         $this->device_name = $device_name;
@@ -136,6 +153,7 @@ abstract class VirtualDevice {
         $this->device_type = $device_type;
         $this->home_actions = $home_actions;
         $this->will_report_state = $will_report_state;
+        $this->smart_things = $smart_things;
     }
 
     /**
@@ -161,26 +179,60 @@ abstract class VirtualDevice {
      */
     public abstract function toHtml($header_name = null, $footer_html = "");
 
-    public function getSyncJson() {
-        if(!$this->home_actions)
+    public function getActionsSyncJson() {
+        if(!$this->home_actions) {
             return null;
-        $attributes = $this->getAttributes();
+        }
+
+        $attributes = $this->getActionsAttributes();
         $arr = ["id" => $this->device_id,
             "type" => $this->getActionsDeviceType(),
             "name" => ["name" => $this->device_name],
-            "traits" => $this->getTraits(), "willReportState" => $this->will_report_state];
-        if($attributes !== null && sizeof($attributes) > 0)
+            "traits" => $this->getActionsTraits(), "willReportState" => $this->will_report_state];
+
+        if($attributes !== null && sizeof($attributes) > 0) {
             $arr["attributes"] = $attributes;
-        if(sizeof($this->synonyms) > 0)
+        }
+
+        if(sizeof($this->synonyms) > 0) {
             $arr["name"]["nicknames"] = $this->synonyms;
+        }
+
         return $arr;
     }
 
-    public abstract function getAttributes();
+    public abstract function getActionsAttributes();
 
     public abstract function getActionsDeviceType();
 
-    public abstract function getTraits();
+    public abstract function getActionsTraits();
+
+    public function getSmartThingsDiscoveryJson() {
+        if(!$this->smart_things) {
+            return null;
+        }
+
+        $arr = [
+            "externalDeviceId" => $this->device_id,
+            "friendlyName" => $this->device_name,
+            "manufacturerInfo" => [
+                "manufacturerName" => "RouNdeL",
+                "modelName" => $this->device_type
+            ],
+            "deviceHandlerType" => $this->getSmartThingsHandlerType()
+        ];
+
+        return $arr;
+    }
+
+    /**
+     * @return string|null
+     */
+    public abstract function getSmartThingsHandlerType(): ?string;
+
+    public abstract function getSmartThingsState(bool $online): ?array;
+
+    public abstract function processSmartThingsCommand($commands);
 
     /**
      * @return string
@@ -215,29 +267,29 @@ abstract class VirtualDevice {
             case self::DEVICE_TYPE_RGB:
                 return new SimpleRgbDevice(
                     $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["will_report_state"],
-                    $row["color"], $row["brightness"], $row["state"]
+                    $row["smart_things"], $row["color"], $row["brightness"], $row["state"]
                 );
             case self::DEVICE_TYPE_EFFECTS_RGB_ANALOG:
                 return new AnalogEffectDevice(
                     $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["will_report_state"],
-                    $row["color"], $row["brightness"], $row["state"], $row["toggles"],
+                    $row["smart_things"], $row["color"], $row["brightness"], $row["state"], $row["toggles"],
                     $row["color_count"], $row["max_profile_count"], $row["active_profile_count"]
                 );
             case self::DEVICE_TYPE_EFFECTS_RGB_DIGITAL:
                 return new DigitalEffectDevice(
                     $row["id"], $row["display_name"], $synonyms, $row["home_actions"], $row["will_report_state"],
-                    $row["color"], $row["brightness"], $row["state"], $row["toggles"],
+                    $row["smart_things"], $row["color"], $row["brightness"], $row["state"], $row["toggles"],
                     $row["color_count"], $row["max_profile_count"], $row["active_profile_count"]
                 );
             case self::DEVICE_TYPE_LAMP:
                 return new LampSimple(
                     $row["id"], $row["display_name"], $synonyms,
-                    $row["home_actions"], $row["will_report_state"], $row["state"]
+                    $row["home_actions"], $row["will_report_state"], $row["smart_things"], $row["state"]
                 );
             case self::DEVICE_TYPE_LAMP_ANALOG:
                 return new LampAnalog(
                     $row["id"], $row["display_name"], $synonyms, $row["home_actions"],
-                    $row["will_report_state"], $row["brightness"], $row["state"]
+                    $row["will_report_state"], $row["smart_things"], $row["brightness"], $row["state"]
                 );
             case self::DEVICE_TYPE_REMOTE_CONTROLLED:
                 return new IrControlledDevice(

@@ -71,6 +71,7 @@ class RequestLogger {
     }
 
     /**
+     * @param bool $with_session_id
      * @return RequestLogger
      */
     public static function getInstance(bool $with_session_id = true) {

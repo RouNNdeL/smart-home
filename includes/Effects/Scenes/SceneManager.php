@@ -34,7 +34,6 @@ use App\ExtensionManager;
  * Date: 2018-12-25
  * Time: 13:11
  */
-
 class SceneManager extends ExtensionManager {
     /** @var Scene[] */
     private $scenes;
@@ -53,7 +52,7 @@ class SceneManager extends ExtensionManager {
     }
 
 
-    public function getSync() {
+    public function getActionsSync() {
         $payload = [];
         foreach($this->scenes as $scene) {
             $payload[] = $scene->getSyncJson();
@@ -61,7 +60,7 @@ class SceneManager extends ExtensionManager {
         return $payload;
     }
 
-    public function processQuery(array $payload) {
+    public function processActionsQuery(array $payload) {
         $response = [];
         foreach($payload["devices"] as $d) {
             $scene = $this->getSceneByPrefixedId($d["id"]);
@@ -102,7 +101,7 @@ class SceneManager extends ExtensionManager {
         return false;
     }
 
-    public function processExecute(array $payload) {
+    public function processActionsExecute(array $payload) {
         $ids = [];
         foreach($payload["commands"] as $command) {
             foreach($command["devices"] as $d) {
@@ -132,5 +131,17 @@ class SceneManager extends ExtensionManager {
 
     public static function forUserId(int $user_id) {
         return new SceneManager(Scene::allForUserId($user_id), $user_id);
+    }
+
+    public function getSmartThingsDiscovery() {
+        return [];
+    }
+
+    public function processSmartThingsCommand(array $payload): ?array {
+        return null;
+    }
+
+    public function getSmartThingsState(): ?array {
+        return null;
     }
 }

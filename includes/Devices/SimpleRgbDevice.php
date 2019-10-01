@@ -50,12 +50,16 @@ class SimpleRgbDevice extends VirtualDevice {
      * @param array $synonyms
      * @param bool $home_actions
      * @param bool $will_report_state
+     * @param bool $smart_things
      * @param int $color
      * @param int $brightness
      * @param bool $on
      */
-    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions, bool $will_report_state, int $color = 0xffffff, int $brightness = 100, bool $on = true) {
-        parent::__construct($device_id, $device_name, $synonyms, VirtualDevice::DEVICE_TYPE_RGB, $home_actions, $will_report_state);
+    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions,
+                                bool $will_report_state, bool $smart_things, int $color = 0xffffff,
+                                int $brightness = 100, bool $on = true) {
+        parent::__construct($device_id, $device_name, $synonyms,
+            VirtualDevice::DEVICE_TYPE_RGB, $home_actions, $will_report_state, $smart_things);
         $this->color = $color;
         $this->brightness = $brightness;
         $this->on = $on;
@@ -126,6 +130,18 @@ class SimpleRgbDevice extends VirtualDevice {
         return $changes;
     }
 
+    public function getSmartThingsHandlerType(): ?string {
+        return "c2c-rgb-color-bulb";
+    }
+
+    public function getSmartThingsState(bool $online): ?array {
+        return null;
+    }
+
+    public function processSmartThingsCommand($commands) {
+        // TODO: Implement processSmartThingsCommand() method.
+    }
+
     /**
      * @param string $header_name
      * @param string $footer_html
@@ -179,7 +195,7 @@ HTML;
 
     }
 
-    public function getTraits() {
+    public function getActionsTraits() {
         return [self::DEVICE_TRAIT_ON_OFF, self::DEVICE_TRAIT_COLOR_SETTING, self::DEVICE_TRAIT_BRIGHTNESS];
     }
 
@@ -187,7 +203,7 @@ HTML;
         return self::DEVICE_TYPE_ACTIONS_LIGHT;
     }
 
-    public function getAttributes() {
+    public function getActionsAttributes() {
         return [self::DEVICE_ATTRIBUTE_COLOR_MODEL => self::DEVICE_ATTRIBUTE_COLOR_MODEL_RGB];
     }
 

@@ -57,15 +57,15 @@ class SmartThingsRequestManager {
         $manager = GlobalManager::withUserOverride($user_id);
         switch($payload["headers"]["interactionType"]) {
             case self::INTERACTION_TYPE_DISCOVERY_REQUEST:
-                //TODO: Implement 'discoveryRequest' interaction type similarly to Actions on Google SYNC intent
+                $payload["devices"] = $manager->getSmartThingsDiscovery();
                 $payload["headers"]["interactionType"] = self::INTERACTION_TYPE_DISCOVERY_RESPONSE;
                 return $payload;
             case self::INTERACTION_TYPE_STATE_REFRESH_REQUEST:
-                //TODO: Implement 'stateRefresh' interaction type similarly to Actions on Google QUERY intent
+                $payload["deviceState"] = $manager->getSmartThingsState();
                 $payload["headers"]["interactionType"] = self::INTERACTION_TYPE_STATE_REFRESH_RESPONSE;
                 return $payload;
             case self::INTERACTION_TYPE_COMMAND_REQUEST:
-                //TODO: Implement 'command' interaction type similarly to Actions on Google EXECUTE intent
+                $payload["deviceState"] = $manager->processSmartThingsCommand($request);
                 $payload["headers"]["interactionType"] = self::INTERACTION_TYPE_COMMAND_RESPONSE;
                 return $payload;
             default:

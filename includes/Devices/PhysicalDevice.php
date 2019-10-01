@@ -71,7 +71,6 @@ abstract class PhysicalDevice {
 
     /**
      * @param array $action
-     * @param string $request_id
      * @return array
      * @noinspection PhpUnusedParameterInspection
      */
@@ -99,9 +98,33 @@ abstract class PhysicalDevice {
         return ["status" => $status, "ids" => $ids];
     }
 
+    public function handleSmartThingsCommand(array $payload) {
+        $response = [];
+        foreach($payload["devices"] as $device) {
+            $id = $device["externalDeviceId"];
+            $virtualDevice = $this->getVirtualDeviceById($id);
+            if($virtualDevice !== null) {
+                $virtualDevice->processSmartThingsCommand($device["commands"]);
+                $state = $virtualDevice->getSmartThingsState($this->isOnline());
+                if($state !== null) {
+                    $response[] = $devices_payload[] = [
+                        "externalDeviceId" => $id,
+                        "deviceCookie" => [],
+                        "states" => $state
+                    ];
+                }
+            }
+        }
+
+        if($this->save("samsung_smart_things_command")){
+            $this->sendData(false);
+        }
+        return $response;
+    }
+
     /**
      * @param string $id
-     * @return &VirtualDevice|null
+     * @return VirtualDevice|null
      */
     public function getVirtualDeviceById(string $id) {
         foreach($this->virtual_devices as &$virtual_device) {

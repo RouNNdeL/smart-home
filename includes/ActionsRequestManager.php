@@ -71,7 +71,7 @@ class ActionsRequestManager {
                     $devices_payload = $manager->actionsGetSync();
                     $payload["devices"] = $devices_payload;
                     HomeUser::setActionsRegistered(DbUtils::getConnection(), $user_id, true);
-                    $manager->getUserDeviceManager()->sendReportState($request_id);
+                    $manager->getUserDeviceManager()->sendActionsReportState($request_id);
                     break;
                 case self::ACTION_INTENT_QUERY:
                     $response = $manager->actionsProcessQuery($input["payload"]);
@@ -89,7 +89,7 @@ class ActionsRequestManager {
                         }
                     }
                     $payload["commands"] = $commands_response_array;
-                    $manager->getUserDeviceManager()->sendReportState($request_id);
+                    $manager->getUserDeviceManager()->sendActionsReportState($request_id);
                     break;
                 case self::ACTION_INTENT_DISCONNECT:
                     HomeUser::setActionsRegistered(DbUtils::getConnection(), $user_id, false);

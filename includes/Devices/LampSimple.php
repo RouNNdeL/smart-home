@@ -44,10 +44,13 @@ class LampSimple extends VirtualDevice {
      * @param array $synonyms
      * @param bool $home_actions
      * @param bool $will_report_state
+     * @param bool $smart_things
      * @param bool $on
      */
-    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions, bool $will_report_state, bool $on = true) {
-        parent::__construct($device_id, $device_name, $synonyms, VirtualDevice::DEVICE_TYPE_LAMP, $home_actions, $will_report_state);
+    public function __construct(string $device_id, string $device_name, array $synonyms, bool $home_actions,
+                                bool $will_report_state, bool $smart_things, bool $on = true) {
+        parent::__construct($device_id, $device_name, $synonyms, VirtualDevice::DEVICE_TYPE_LAMP,
+            $home_actions, $will_report_state, $smart_things);
         $this->on = $on;
     }
 
@@ -105,7 +108,7 @@ class LampSimple extends VirtualDevice {
         return "";
     }
 
-    public function getTraits() {
+    public function getActionsTraits() {
         return [self::DEVICE_TRAIT_ON_OFF];
     }
 
@@ -113,8 +116,41 @@ class LampSimple extends VirtualDevice {
         return self::DEVICE_TYPE_ACTIONS_LIGHT;
     }
 
-    public function getAttributes() {
+    public function getActionsAttributes() {
         return [];
+    }
+
+    public function getSmartThingsHandlerType(): ?string {
+        return "c2c-switch";
+    }
+
+    public function getSmartThingsState(bool $online): ?array {
+        return [
+            [
+                "component" => "main",
+                "capability" => VirtualDevice::ST_CAPABILITY_SWITCH,
+                "attribute" => VirtualDevice::ST_ATTRIBUTE_SWITCH,
+                "value" => $this->on ? "on" : "off"
+            ], [
+                "component" => "main",
+                "capability" => VirtualDevice::ST_CAPABILITY_HEALTH_CHECK,
+                "attribute" => VirtualDevice::ST_ATTRIBUTE_HEALTH_STATUS,
+                "value" => $online ? "online" : "offline"
+            ]
+        ];
+    }
+
+    public function processSmartThingsCommand($commands) {
+        foreach($commands as $command) {
+            switch($command["command"]) {
+                case VirtualDevice::ST_COMMAND_ON:
+                    $this->on = true;
+                    break;
+                case VirtualDevice::ST_COMMAND_OFF:
+                    $this->on = false;
+                    break;
+            }
+        }
     }
 
     /**

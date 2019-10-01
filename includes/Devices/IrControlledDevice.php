@@ -45,12 +45,12 @@ class IrControlledDevice extends VirtualDevice {
     protected $on;
 
     public function __construct(string $device_id, string $device_name, $synonyms, string $device_type, bool $on) {
-        parent::__construct($device_id, $device_name, $synonyms, $device_type, true, false);
+        parent::__construct($device_id, $device_name, $synonyms, $device_type, true, false, false);
         $this->on = $on;
     }
 
 
-    public function getTraits() {
+    public function getActionsTraits() {
         return [VirtualDevice::DEVICE_TRAIT_ON_OFF,
             VirtualDevice::DEVICE_TRAIT_VOLUME,
             VirtualDevice::DEVICE_TRAIT_CHANNEL,
@@ -63,7 +63,7 @@ class IrControlledDevice extends VirtualDevice {
         return VirtualDevice::DEVICE_TYPE_ACTIONS_REMOTE_CONTROL;
     }
 
-    public function getAttributes() {
+    public function getActionsAttributes() {
         return ["availableModes" => [[
             "name" => IrRemote::ASSISTANT_INPUT_MODE,
             "name_values" => [["lang" => "en", "name_synonym" => ["input source"]]],
@@ -168,5 +168,20 @@ HTML;
         $changes = $stmt->affected_rows > 0 ? true : false;
         $stmt->close();
         return $changes;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSmartThingsHandlerType(): ?string {
+        return null;
+    }
+
+    public function getSmartThingsState(bool $online): ?array {
+        return null;
+    }
+
+    public function processSmartThingsCommand($commands) {
+        // TODO: Implement processSmartThingsCommand() method.
     }
 }

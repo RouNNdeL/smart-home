@@ -41,7 +41,7 @@ if(isset($argv[1])) {
     if($manager === null) {
         throw new InvalidArgumentException("Invalid user id: $argv[1]");
     }
-    $manager->sendReportState();
+    $manager->sendActionsReportState();
 }
 else {
     echo "You need to provide a user id";
