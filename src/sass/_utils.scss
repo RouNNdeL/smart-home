@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2018 Krzysztof "RouNdeL" Zdulski
+// Copyright (c) 2019 Krzysztof "RouNdeL" Zdulski
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -83,7 +83,6 @@ $half-grid: (
 
     @each $prop, $abbrev in (margin: m, padding: p) {
       @each $size, $length in $half-grid {
-
         // sass-lint:disable-block no-important
         .#{$abbrev}#{$infix}-#{$size}p {
           #{$prop}: $length !important;
