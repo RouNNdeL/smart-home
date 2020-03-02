@@ -33,6 +33,7 @@ export default function init() {
     $(".device-remote").each(function() {
         const device_id = $(this).parents(".device-parent").eq(0).data("device-id");
         $(this).find("button").click(function() {
+            window.navigator.vibrate(50);
             const action_id = $(this).data("action-id");
             postAction(action_id, device_id);
         });

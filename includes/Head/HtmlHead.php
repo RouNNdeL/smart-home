@@ -33,7 +33,7 @@ namespace App\Head;
  */
 
 class HtmlHead {
-    const VERSION = "1.8";
+    const VERSION = "1.85";
 
     /** @var string */
     private $title;
