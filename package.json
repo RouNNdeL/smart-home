@@ -6,7 +6,7 @@
     "bootstrap-colorpicker": "^3.1.2",
     "bootstrap-switch": "3.3.4",
     "ion-rangeslider": "^2.3.0",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "jquery-ui": "^1.12.1",
     "math-expression-evaluator": "^1.2.17",
     "mathjs": "^6.2.3",
